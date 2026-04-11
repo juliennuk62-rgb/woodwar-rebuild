@@ -86,3 +86,25 @@ dédié aux événements (`test_generated_events_follow_schema`) pour verrouille
 la structure des choix/effects comme c'est déjà fait pour les quêtes.
 
 ---
+
+## Run 2026-04-11T22:00:00Z — Camps Kobolds + items générés
+
+**Priorité choisie** : 3 (contenu sous-servi) — rotation camps + items
+**Cause** : L'état du playtest est **green** (0 blocker), les tests passent
+71/71, mais `variety.counts` montre toujours `camps=0` et `items=0`. Les deux
+derniers runs ont touché quests puis mixed (events+lore) : c'est pile la
+rotation parfaite pour attaquer les deux catégories encore vides, en
+respectant la règle anti-répétition.
+
+**Plan du run** (chaque étape = son propre commit vert) :
+- **Étape 1** : Générer 5 camps Kobolds (biomes variés, archetypes + AI
+  patterns + difficulty tiers pour exploiter le système de Phase 11).
+- **Étape 2** : Générer 5 items nouveaux (id ≥ 100, buffs variés, durée
+  et drop_weight cohérents).
+- **Étape 3** : Ajouter un test unitaire dédié qui verrouille les champs
+  obligatoires des camps et items générés (pv_max 300-100k, buff_effect
+  dans la liste blanche, buff_multiplier 0.5-2.5).
+
+### Étape 1 — Commit de démarrage
+
+
