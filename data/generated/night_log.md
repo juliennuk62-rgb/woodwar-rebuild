@@ -105,6 +105,27 @@ respectant la règle anti-répétition.
   obligatoires des camps et items générés (pv_max 300-100k, buff_effect
   dans la liste blanche, buff_multiplier 0.5-2.5).
 
-### Étape 1 — Commit de démarrage
+### Étape 1 — Commit de démarrage — ✅
+### Étape 2 — 5 camps Kobolds générés — ✅
+
+Cinq camps couvrant les cinq biomes, avec une progression tier 1→5 et
+chacun son archetype + ai_pattern distinct :
+
+- `camp_bourbier_blostrom` — marécage, kobold/passive, tier 1, pv 1800,
+  lié au marchand Blöstrom (évt_caravane_thulmis).
+- `camp_clairiere_eolric` — forêt, ambusher/evasive, tier 2, pv 5200,
+  clin d'œil au druide Eolric (rumeurs, festin Gaelyn).
+- `camp_brume_isorfidia` — brouillard, wraith/aggressive, tier 3,
+  pv 12000, résonne avec l'évt Aura vacillante.
+- `camp_nid_vank` — montagnes, troll/armored, tier 4, pv 22000,
+  nom hommage au chef Vank des Maneldar.
+- `camp_forteresse_akkrongar` — fortifié, boss/regenerator, tier 5,
+  pv 48000, ancre narrative du Traître Akkrongär (voir evt_traitre et
+  prophétie Maneldar). Loot 14500/3200/2800.
+
+Chaque camp a un backstory_fr de 4-6 phrases qui tisse des liens avec
+les quêtes, événements et rumeurs déjà générés. Les archetypes/patterns
+utilisent exactement le vocabulaire d'ENEMY_ARCHETYPES + AI_PATTERN_TUNING
+de game_logic.py pour permettre une intégration future dans seed_kobold_camps.
 
 
