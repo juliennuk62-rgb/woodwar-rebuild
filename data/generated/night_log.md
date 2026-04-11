@@ -172,3 +172,34 @@ invariants sera bloqué au niveau du CI avant merge.
 **Total commits** : 5 (1 démarrage + 3 étapes + 1 clôture)
 
 ---
+
+## Run 2026-04-11T23:30:00Z — playtest aveugle aux camps + items
+
+**Priorité choisie** : 4 (bug détecté) — `scripts/playtest.py` ignore
+complètement `camps.json` et `items.json`.
+**Cause** : Le run précédent a ajouté 5 camps et 6 items (ids 100-105) avec
+leurs tests de schéma, mais `check_content_variety()` ne compte que
+quests/events/lore. Les nouveaux types sont donc invisibles au playtest :
+`variety.counts` n'affiche toujours que `{quests: 5, events: 5, lore: 6}`,
+et aucune feasibility check ne couvre pv_max des camps ou buff_effect des
+items. Une régression future (camp avec pv_max=0, item avec
+buff_multiplier=999, doublon d'id cross-content) passerait sous le radar.
+Les tests unitaires verrouillent le schéma, mais le playtest — qui est la
+boucle de feedback permanente du trigger — est aveugle.
+
+**Anti-répétition** : parfait. Les 3 derniers runs ont touché à la
+génération de contenu (quests, events+lore, camps+items). Ce run vise
+l'infrastructure du harnais pour refermer la boucle.
+
+**Plan du run** (chaque étape = son propre commit vert) :
+- **Étape 1** : Étendre `scripts/playtest.py` — compter camps et items
+  dans `check_content_variety`, ajouter `check_camps_feasibility` (pv_max
+  dans [300, 100k], tier dans [1, 5], loot cohérent) et
+  `check_items_feasibility` (buff_multiplier, duration, drop_weight), et
+  flagger les doublons d'id cross-content.
+- **Étape 2** : Générer 2-3 entrées lore qui tissent narrativement les
+  nouveaux camps avec les quêtes et rumeurs existantes (petit polish
+  narratif, au passage, pour enrichir le fil).
+- **Étape 3** : Commit de clôture avec bilan.
+
+### Étape 1 — Commit de démarrage
