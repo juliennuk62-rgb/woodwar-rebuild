@@ -23,6 +23,19 @@
     </div>
   {% endif %}
 
+  {% if army %}
+    <div class="auto-farm-banner">
+      <p>
+        ⚙ <strong>Auto-farm</strong> : attaque automatiquement les camps
+        que vous pouvez vaincre sans perdre plus de 20% de votre armée
+        (jusqu'à 10 camps en une fois).
+      </p>
+      <form method="post" action="{{ url_for('auto_farm_route') }}">
+        <button type="submit" class="ww-action auto-farm-btn">⚙ Auto-farm</button>
+      </form>
+    </div>
+  {% endif %}
+
   <div class="card">
     <h2>Camps disponibles ({{ camps | length }})</h2>
     <p style="color: var(--fg-dim); font-size: 0.85em;">

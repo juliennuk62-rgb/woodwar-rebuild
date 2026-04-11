@@ -143,6 +143,53 @@ features majeures.
 
 **Tests** : 68/68 OK · **Playtest** : green, 0 blockers
 
+#### Feature 4 — Automatisation (auto-farm + build queue + scripts dev)
+
+**Added — côté joueur**
+- **Auto-farm** : `POST /auto_farm` attaque automatiquement jusqu'à
+  10 camps Kobolds que le joueur peut vaincre sans perdre plus de 20%
+  de son armée. Constants `AUTO_FARM_MAX_CAMPS=10`,
+  `AUTO_FARM_MAX_LOSS_RATIO=0.20`.
+  - Calcule le total damage de l'armée + relics + dracos
+  - Sélectionne les camps vivants dont `pv_max <= 0.8 × total_damage`
+  - Lance `resolve_combat` en boucle, agrège loot + losses
+  - Bouton « ⚙ Auto-farm » dans `/campagnes` (banner orange en haut)
+- **Build queue** : modèle `BuildQueueItem(player_id, building_id,
+  position)`. Le joueur peut ajouter des bâtiments à une file qui se
+  vide automatiquement.
+  - `enqueue_build`, `dequeue_build`, `list_build_queue`
+  - `process_build_queue` lancé par le tick loop ET par chaque visite
+    du dashboard : si aucune upgrade en cours et qu'il y a une queue,
+    démarre le prochain item si le joueur peut le payer
+  - Bouton « ➕ File » sur chaque carte bâtiment du dashboard
+  - Section « ⚙ File de construction automatique » sur le dashboard
+    avec liste numérotée + bouton ✕ Retirer
+
+**Added — côté dev**
+- `scripts/seed_test_data.py` : crée 4 utilisateurs de test (test_alpha,
+  test_beta, test_gamma, test_delta) avec différents niveaux/clans/armées
+  pour avoir du contenu dans /joueurs et /pvp en dev. Idempotent.
+  Mot de passe par défaut : `test`.
+- `scripts/smoke_check.py` : check 1-commande qui lance :
+  1. Le full unittest suite (77 tests)
+  2. Le playtest simulator
+  3. Smoke HTTP sur 10 endpoints clés (skip si serveur down)
+  Exit code 0 si tout OK, 1 sinon. Idéal pour pre-commit ou CI.
+
+**Refactor**
+- `_background_tick_loop` appelle aussi `process_build_queue` pour
+  chaque player à chaque tick (60s par défaut)
+
+- `tests/test_automation.py` (9 tests) :
+  - auto-farm without units → ValueError
+  - constants in valid range
+  - enqueue/dequeue/list build queue
+  - invalid building_id → ValueError
+  - dequeue other player's item → ValueError
+  - process_queue starts next build, skips if busy, skips if unaffordable
+
+**Tests** : 77/77 OK · **Playtest** : green, 0 blockers · **Smoke** : ✓
+
 ## [0.10.0] — 2026-04-11 — Bundle B + automatisation nocturne
 
 ### Added

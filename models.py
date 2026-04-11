@@ -494,6 +494,27 @@ class PlayerItem(Base):
         return f"<PlayerItem player={self.player_id} item={self.item_id} x{self.count}>"
 
 
+class BuildQueueItem(Base):
+    """A queued building upgrade.
+
+    The background tick loop walks the queue: when a building finishes
+    upgrading and the player has enough resources for the next item in
+    the queue, that item is consumed and the upgrade starts automatically.
+    """
+
+    __tablename__ = "build_queue_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
+    building_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Position in the queue: lowest first.
+    position: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    def __repr__(self) -> str:
+        return f"<BuildQueueItem player={self.player_id} bat={self.building_id} pos={self.position}>"
+
+
 class PvPCooldown(Base):
     """A per-(attacker, defender) cooldown enforced after a PvP attack.
 

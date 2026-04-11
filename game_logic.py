@@ -2501,3 +2501,252 @@ def get_pvp_cooldown_view(
         "target_cooldown_minutes": PVP_TARGET_COOLDOWN_SEC // 60,
         "matchmaking_level_range": PVP_MATCHMAKING_LEVEL_RANGE,
     }
+
+
+# ===========================================================================
+# Phase 14 — Automation : auto-farm + build queue (Feature 4)
+# ===========================================================================
+
+# Cap on how many camps a single auto-farm run will hit, to avoid
+# accidentally clearing the entire grid in one click.
+AUTO_FARM_MAX_CAMPS = 10
+
+# Safety cushion: only auto-farm camps where we expect to win without
+# losing more than this fraction of the army.
+AUTO_FARM_MAX_LOSS_RATIO = 0.20
+
+
+def auto_farm_run(
+    db_session: "Session",
+    player: "Player",
+) -> dict:
+    """Attack the easiest camps the player can comfortably beat.
+
+    Picks alive camps in ascending HP order, sends the full army at each,
+    stops as soon as a camp would consume more than AUTO_FARM_MAX_LOSS_RATIO
+    of the army or AUTO_FARM_MAX_CAMPS have been defeated.
+    """
+    from models import KoboldCamp
+
+    now = datetime.utcnow()
+
+    # Total damage the army can produce right now (used as our "ceiling").
+    relic_ids = player_relic_ids(player)
+    army = unit_stock(player)
+    if not any(c > 0 for c in army.values()):
+        raise ValueError("Aucune unité disponible pour auto-farmer.")
+
+    # Estimate the total damage with all units (relics included).
+    total_dmg_estimate = 0
+    for unit_id, count in army.items():
+        if count > 0:
+            total_dmg_estimate += unit_total_damage(unit_id, count, relic_ids)
+    draco_dmg, _ = draco_contribution(player)
+    total_dmg_estimate += draco_dmg
+
+    # Pick alive camps with HP up to (max_loss_ratio * total_dmg_estimate),
+    # so we expect to win without bleeding too many units.
+    hp_ceiling = int(total_dmg_estimate * (1.0 - AUTO_FARM_MAX_LOSS_RATIO))
+    candidates = (
+        db_session.query(KoboldCamp)
+        .filter(
+            (KoboldCamp.respawn_at.is_(None)) | (KoboldCamp.respawn_at <= now)
+        )
+        .filter(KoboldCamp.pv_max <= hp_ceiling)
+        .order_by(KoboldCamp.pv_max.asc())
+        .limit(AUTO_FARM_MAX_CAMPS)
+        .all()
+    )
+
+    if not candidates:
+        raise ValueError(
+            "Aucun camp à votre portée ne peut être farm sans pertes excessives. "
+            "Renforcez votre armée d'abord."
+        )
+
+    results = []
+    total_gold = 0
+    total_wood = 0
+    total_mana = 0
+    total_losses = 0
+
+    for camp in candidates:
+        # Re-fetch the live army each loop because previous attacks
+        # may have reduced it.
+        live_army = unit_stock(player)
+        if not any(c > 0 for c in live_army.values()):
+            break
+        try:
+            r = resolve_combat(db_session, player, camp, live_army)
+        except ValueError:
+            # Skip camps we cannot attack (respawning etc.)
+            continue
+        if r["outcome"] == "victory":
+            total_gold += r["loot"]["gold"]
+            total_wood += r["loot"]["wood"]
+            total_mana += r["loot"]["mana"]
+            total_losses += sum(r["losses"].values())
+            results.append({
+                "camp_name": camp.name,
+                "archetype": camp.archetype,
+                "loot": r["loot"],
+                "losses": sum(r["losses"].values()),
+            })
+        else:
+            # Stop on first failed attack to avoid wasting more units.
+            break
+
+    return {
+        "attacks": len(results),
+        "results": results,
+        "total_loot": {
+            "gold": total_gold,
+            "wood": total_wood,
+            "mana": total_mana,
+        },
+        "total_losses": total_losses,
+    }
+
+
+# ----- Build queue -----------------------------------------------------------
+
+
+def list_build_queue(db_session: "Session", player: "Player") -> list[dict]:
+    """Return the player's current build queue, ordered by position."""
+    from models import BuildQueueItem
+
+    items = (
+        db_session.query(BuildQueueItem)
+        .filter(BuildQueueItem.player_id == player.id)
+        .order_by(BuildQueueItem.position.asc(), BuildQueueItem.id.asc())
+        .all()
+    )
+    out = []
+    for item in items:
+        meta = game_data.building_by_id(item.building_id)
+        out.append({
+            "id": item.id,
+            "building_id": item.building_id,
+            "name": meta["name_fr"] if meta else f"Bâtiment #{item.building_id}",
+            "position": item.position,
+        })
+    return out
+
+
+def enqueue_build(
+    db_session: "Session",
+    player: "Player",
+    building_id: int,
+) -> "BuildQueueItem":
+    """Append a building to the end of the player's build queue."""
+    from models import BuildQueueItem
+
+    if building_id not in BUILDABLE_IDS:
+        raise ValueError("Bâtiment non constructible.")
+
+    last = (
+        db_session.query(BuildQueueItem)
+        .filter(BuildQueueItem.player_id == player.id)
+        .order_by(BuildQueueItem.position.desc())
+        .first()
+    )
+    next_position = (last.position + 1) if last is not None else 0
+
+    item = BuildQueueItem(
+        player_id=player.id,
+        building_id=building_id,
+        position=next_position,
+    )
+    db_session.add(item)
+    db_session.flush()
+    return item
+
+
+def dequeue_build(
+    db_session: "Session",
+    player: "Player",
+    item_id: int,
+) -> None:
+    from models import BuildQueueItem
+
+    item = db_session.get(BuildQueueItem, item_id)
+    if item is None or item.player_id != player.id:
+        raise ValueError("Élément introuvable dans votre file.")
+    db_session.delete(item)
+    db_session.flush()
+
+
+def process_build_queue(
+    db_session: "Session",
+    player: "Player",
+) -> dict | None:
+    """If the player has no upgrade in progress AND a queue, start the next.
+
+    This is called by the background tick loop and on every dashboard
+    visit. Returns a description of the started upgrade, or None.
+    """
+    from models import BuildQueueItem, PlayerBuilding
+
+    # If a building is already upgrading, do nothing.
+    busy = any(b.upgrading_until is not None for b in player.buildings)
+    if busy:
+        return None
+
+    next_item = (
+        db_session.query(BuildQueueItem)
+        .filter(BuildQueueItem.player_id == player.id)
+        .order_by(BuildQueueItem.position.asc(), BuildQueueItem.id.asc())
+        .first()
+    )
+    if next_item is None:
+        return None
+
+    bid = next_item.building_id
+    pb = next(
+        (b for b in player.buildings if b.building_id == bid),
+        None,
+    )
+    current_level = pb.level if pb is not None else 0
+    cost = upgrade_cost(bid, current_level)
+    if cost is None:
+        # Building maxed out — drop it from the queue silently.
+        db_session.delete(next_item)
+        return None
+
+    if (
+        player.gold < cost["or"]
+        or player.wood < cost["bois"]
+    ):
+        # Not enough resources right now — leave the queue as-is and
+        # try again next tick.
+        return None
+
+    # Charge resources and start the upgrade.
+    player.gold -= cost["or"]
+    player.wood -= cost["bois"]
+
+    if pb is None:
+        pb = PlayerBuilding(
+            player_id=player.id,
+            building_id=bid,
+            level=0,
+            upgrading_until=datetime.utcnow() + timedelta(seconds=cost["time"]),
+            upgrading_to=1,
+        )
+        db_session.add(pb)
+        # Make the new building visible to subsequent ORM queries via the
+        # parent relationship without requiring a commit.
+        db_session.flush()
+        if pb not in player.buildings:
+            player.buildings.append(pb)
+    else:
+        pb.upgrading_until = datetime.utcnow() + timedelta(seconds=cost["time"])
+        pb.upgrading_to = pb.level + 1
+
+    db_session.delete(next_item)
+    db_session.flush()
+    return {
+        "building_id": bid,
+        "target_level": pb.upgrading_to,
+        "duration_seconds": cost["time"],
+    }

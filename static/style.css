@@ -2374,3 +2374,98 @@ textarea:focus {
   margin: 0;
 }
 
+/* ===============================================================
+   Build queue (Feature 4)
+   =============================================================== */
+
+.queue-add-btn {
+  font-size: 0.78em;
+  padding: 0.25em 0.6em;
+  margin-left: 0.4em;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--ww-border-light);
+  color: var(--tab-brown-fg);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.queue-add-btn:hover {
+  border-color: var(--ww-link);
+  color: var(--ww-link);
+}
+
+.build-queue-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5em 0 0;
+}
+
+.build-queue-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  padding: 0.5em 0.8em;
+  margin-bottom: 0.4em;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--ww-border-light);
+  border-left: 3px solid var(--ww-link);
+  border-radius: 3px;
+}
+
+.build-queue-pos {
+  color: var(--ww-bright-lime);
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+}
+
+.build-queue-name {
+  flex: 1;
+  color: var(--ww-fg);
+}
+
+.queue-remove-btn {
+  font-size: 0.78em;
+  padding: 0.2em 0.55em;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--ww-red);
+  color: var(--ww-red);
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.queue-remove-btn:hover {
+  opacity: 1;
+}
+
+/* Auto-farm button banner */
+.auto-farm-banner {
+  margin: 0.7em 0;
+  padding: 0.6em 1em;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--ww-border-light);
+  border-left: 3px solid var(--ww-link);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em;
+}
+.auto-farm-banner p {
+  margin: 0;
+  color: var(--tab-brown-fg);
+  font-size: 0.88em;
+}
+
+.auto-farm-btn {
+  background: linear-gradient(180deg, var(--ww-link), #b76e0a);
+  color: var(--ww-bg);
+  border: 1px solid var(--ww-link);
+  padding: 0.45em 1em;
+  border-radius: 3px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.85em;
+}
+

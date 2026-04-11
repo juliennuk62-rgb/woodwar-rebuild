@@ -293,11 +293,17 @@
               {% endif %}
             </div>
             <form method="post" action="{{ url_for('build', building_id=b.id) }}" style="display: inline;">
-              <button type="submit"
+              <button type="submit" class="ww-action"
                 {% if player.gold < b.next_cost.or or player.wood < b.next_cost.bois %}
                   disabled title="Ressources insuffisantes"
                 {% endif %}>
                 {% if b.owned %}Améliorer → L{{ b.level + 1 }}{% else %}Construire{% endif %}
+              </button>
+            </form>
+            <form method="post" action="{{ url_for('build_queue_add', building_id=b.id) }}" style="display: inline;">
+              <button type="submit" class="ww-action queue-add-btn"
+                      title="Ajouter à la file de construction (auto)">
+                ➕ File
               </button>
             </form>
           {% endif %}
@@ -305,6 +311,28 @@
       {% endfor %}
     </div>
   </div>
+
+  {% if build_queue %}
+    <div class="card">
+      <h2>⚙ File de construction automatique</h2>
+      <p style="color: var(--tab-brown-fg); font-size: 0.9em;">
+        Les bâtiments listés ci-dessous seront construits automatiquement
+        l'un après l'autre dès qu'ils seront finançables, sans intervention
+        de votre part.
+      </p>
+      <ol class="build-queue-list">
+        {% for q in build_queue %}
+          <li class="build-queue-item">
+            <span class="build-queue-pos">#{{ loop.index }}</span>
+            <span class="build-queue-name">{{ q.name }}</span>
+            <form method="post" action="{{ url_for('build_queue_remove', item_id=q.id) }}" style="display: inline;">
+              <button type="submit" class="ww-action queue-remove-btn">✕ Retirer</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+  {% endif %}
 
   {% if my_alliance %}
     <div class="card">

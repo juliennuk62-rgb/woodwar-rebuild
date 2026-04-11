@@ -168,11 +168,12 @@ _tick_thread_lock = threading.Lock()
 
 
 def _background_tick_loop(app: Flask, interval_seconds: int = 60) -> None:
-    """Periodically credit production to every player.
+    """Periodically credit production to every player + advance build queue.
 
     The per-request tick (on dashboard load, on /build/...) is the
-    authoritative path; this loop is just a safety net for long-idle sessions
-    and API-only clients.
+    authoritative path; this loop is just a safety net for long-idle
+    sessions and API-only clients. It also advances the auto-build queue
+    for any player that has one.
     """
     while True:
         try:
@@ -182,6 +183,15 @@ def _background_tick_loop(app: Flask, interval_seconds: int = 60) -> None:
                     players = s.query(Player).all()
                     for p in players:
                         game_logic.apply_production_tick(s, p)
+                        # Auto-advance the build queue: if no upgrade is
+                        # in progress and the player has a queue, start
+                        # the next item if affordable.
+                        try:
+                            game_logic.process_build_queue(s, p)
+                        except Exception as e:  # noqa: BLE001
+                            app.logger.warning(
+                                "process_build_queue failed for %s: %s", p.id, e
+                            )
                     s.commit()
         except Exception as e:  # noqa: BLE001 — keep the loop alive
             app.logger.warning("Background tick error: %s", e)
@@ -397,7 +407,11 @@ def create_app() -> Flask:
         with SessionLocal() as s:
             player = s.query(Player).filter(Player.user_id == user.id).one()
             tick = game_logic.apply_production_tick(s, player)
+            # Advance the build queue immediately so the player sees the
+            # next item start as soon as the previous one finishes.
+            game_logic.process_build_queue(s, player)
             s.commit()
+            build_queue = game_logic.list_build_queue(s, player)
 
             clan = game_data.clan_by_id(user.clan_id) or {
                 "name": "—", "chief": "—", "color": "#888"
@@ -489,6 +503,7 @@ def create_app() -> Flask:
                 map_grid=map_grid,
                 map_rows=MAP_ROWS,
                 map_cols=MAP_COLS,
+                build_queue=build_queue,
             )
 
     # ----- Building actions -----------------------------------------------
@@ -1439,6 +1454,66 @@ def create_app() -> Flask:
                 s.rollback()
                 flash(str(e), "error")
             return redirect(url_for("rumeurs_page"))
+
+    # ----- Automation: auto-farm + build queue (Feature 4) ----------------
+
+    @app.route("/auto_farm", methods=["POST"])
+    @auth.login_required
+    def auto_farm_route():
+        user = auth.current_user()
+        with SessionLocal() as s:
+            player = s.query(Player).filter(Player.user_id == user.id).one()
+            game_logic.apply_production_tick(s, player)
+            try:
+                report = game_logic.auto_farm_run(s, player)
+                s.commit()
+                if report["attacks"] == 0:
+                    flash("Aucun camp accessible — auto-farm annulé.", "error")
+                else:
+                    flash(
+                        f"⚙ Auto-farm : {report['attacks']} camps détruits "
+                        f"(+{report['total_loot']['gold']} or, "
+                        f"+{report['total_loot']['wood']} bois, "
+                        f"+{report['total_loot']['mana']} mana, "
+                        f"-{report['total_losses']} unités).",
+                        "success",
+                    )
+            except ValueError as e:
+                s.rollback()
+                flash(str(e), "error")
+            return redirect(url_for("campagnes"))
+
+    @app.route("/build_queue/add/<int:building_id>", methods=["POST"])
+    @auth.login_required
+    def build_queue_add(building_id: int):
+        user = auth.current_user()
+        with SessionLocal() as s:
+            player = s.query(Player).filter(Player.user_id == user.id).one()
+            try:
+                game_logic.enqueue_build(s, player, building_id)
+                s.commit()
+                meta = game_data.building_by_id(building_id)
+                name = meta["name_fr"] if meta else f"Bâtiment #{building_id}"
+                flash(f"« {name} » ajouté à la file de construction.", "success")
+            except ValueError as e:
+                s.rollback()
+                flash(str(e), "error")
+            return redirect(url_for("dashboard"))
+
+    @app.route("/build_queue/remove/<int:item_id>", methods=["POST"])
+    @auth.login_required
+    def build_queue_remove(item_id: int):
+        user = auth.current_user()
+        with SessionLocal() as s:
+            player = s.query(Player).filter(Player.user_id == user.id).one()
+            try:
+                game_logic.dequeue_build(s, player, item_id)
+                s.commit()
+                flash("Élément retiré de la file.", "success")
+            except ValueError as e:
+                s.rollback()
+                flash(str(e), "error")
+            return redirect(url_for("dashboard"))
 
     # ----- Bundle B: inventory, items, spy, market ------------------------
 
