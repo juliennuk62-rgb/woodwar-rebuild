@@ -435,4 +435,35 @@ evt_caravane_thulmis (40), evt_enfant_givre (35), evt_bestiaire_amaraldor
 Tests : 89/89 vert. Playtest : green, 0 blocker.
 `variety.counts.events` passe de 5 à 8.
 
+### Étape 4 — Commit de clôture — ✅
+
+**Tests finaux** : 89/89 green (inchangé — contenu pur, aucun test
+schéma dédié events ni quests n'existe pour les nouveaux champs, ils
+passent les tests génériques `test_all_generated_files_are_valid_json`
+et `test_generated_files_have_meta_and_list` + les feasibility checks
+de `scripts/playtest.py`).
+**Playtest final** : green, 0 blocker. `variety.counts` final :
+`{quests:9, events:8, lore:9, camps:5, items:6}`. Tout est monté
+d'un cran sauf camps et items.
+**Total commits** : 4 (1 démarrage + 2 étapes contenu + 1 clôture).
+
+**Bilan narratif** : ce run referme un arc qui s'étalait sur 3 runs.
+Les camps générés au run 2026-04-11T22:00Z sont désormais cités
+nommément dans 4 quêtes, et la Forteresse d'Akkrongär spécifiquement
+reçoit une quête hard + un événement hostile + les lore déjà présents
+(chant, bulletin Vank, prophétie Fenrir). Le joueur qui commencera la
+prochaine saison aura un arc complet à suivre : présage de l'enfant
+de givre → registre des douze → annonce de la mort du onzième →
+quête qst_couronne_akkrongar → assaut du camp tier 5.
+
+**Priorité suggérée pour le prochain run** : dernière rotation contenu
+manquante (`camp_nid_vank` n'a toujours pas sa quête dédiée), ou
+basculer sur item/polish. Candidat fort : une quête hard de type
+`earn_mana` ou `win_campaigns` qui cite `camp_nid_vank` et boucle sur
+le chef Vank des Maneldar. Sinon, un test unitaire dédié qui
+verrouille le schéma events (choices obligatoire, weight dans [1,100],
+difficulty dans la whitelist) — c'est le seul type de contenu généré
+sans test schéma dédié pour l'instant (les camps/items/quests ont tous
+leur test, les events n'en ont qu'un générique).
+
 ---
