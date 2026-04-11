@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Classements — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>Classements</h1>
+    <p style="color: var(--fg-dim);">
+      Les meilleurs Seigneurs, alliances et guerriers du royaume.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>🏰 Top Seigneurs</h2>
+    {% if players %}
+      <table class="combat-table">
+        <thead>
+          <tr><th>#</th><th>Seigneur</th><th>Clan</th><th>Niveau</th><th>XP</th><th>Or</th></tr>
+        </thead>
+        <tbody>
+          {% for p in players %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ p.username }}</td>
+              <td style="color: {{ p.clan.color }};">{{ p.clan.name }}</td>
+              <td>{{ p.level }}</td>
+              <td>{{ "{:,}".format(p.xp).replace(",", " ") }}</td>
+              <td>{{ "{:,}".format(p.gold).replace(",", " ") }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="color: var(--fg-dim);">Aucun Seigneur enregistré.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>🤝 Top Alliances</h2>
+    {% if alliances %}
+      <table class="combat-table">
+        <thead>
+          <tr><th>#</th><th>Tag</th><th>Nom</th><th>Membres</th></tr>
+        </thead>
+        <tbody>
+          {% for a in alliances %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td><code>[{{ a.tag }}]</code></td>
+              <td><a href="{{ url_for('alliance_detail', alliance_id=a.id) }}">{{ a.name }}</a></td>
+              <td>{{ a.members }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="color: var(--fg-dim);">Aucune alliance n'a encore vu le jour.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>⚔ Top Guerriers</h2>
+    <p style="color: var(--fg-dim); font-size: 0.9em;">
+      Classé par nombre de victoires en campagne ou en PvP.
+    </p>
+    {% if warriors %}
+      <table class="combat-table">
+        <thead>
+          <tr><th>#</th><th>Seigneur</th><th>Clan</th><th>Victoires</th><th>Combats</th></tr>
+        </thead>
+        <tbody>
+          {% for w in warriors %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ w.username }}</td>
+              <td style="color: {{ w.clan.color }};">{{ w.clan.name }}</td>
+              <td><strong style="color: var(--success);">{{ w.victories }}</strong></td>
+              <td>{{ w.total }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="color: var(--fg-dim);">Aucun combat n'a encore été mené.</p>
+    {% endif %}
+  </div>
+{% endblock %}

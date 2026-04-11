@@ -1,0 +1,14 @@
+{
+  "_meta": {
+    "description": "Rumeurs, bulletins du royaume, textes d'ambiance affichés dans le feed /rumeurs.",
+    "schema": {
+      "id": "string",
+      "title_fr": "string (headline, 3-8 words)",
+      "body_fr": "string (1-4 sentences, newspaper-style)",
+      "category": "string (rumeur|bulletin|prophétie|chant|fable)",
+      "created_at": "ISO 8601"
+    },
+    "last_generated_at": null
+  },
+  "entries": []
+}

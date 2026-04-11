@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Rumeurs du royaume — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>Rumeurs du royaume</h1>
+    <p style="color: var(--tab-brown-fg);">
+      Ces textes et quêtes sont générés périodiquement par l'esprit vigilant qui
+      veille sur Woodwar. Chaque aube apporte son lot de rumeurs, de prophéties
+      et d'objectifs pour les Seigneurs ambitieux.
+    </p>
+    <div class="generated-stats">
+      <span>📜 {{ total_lore }} rumeurs</span>
+      <span>🎯 {{ total_quests }} quêtes</span>
+      <span>🎲 {{ total_events }} événements</span>
+      <span>⚔ {{ total_camps }} camps générés</span>
+      <span>💎 {{ total_items }} objets inventés</span>
+    </div>
+  </div>
+
+  {% if quests %}
+    <div class="card">
+      <h2>Quêtes du jour</h2>
+      <div class="quests-list">
+        {% for q in quests %}
+          <div class="quest-card quest-{{ q.difficulty or 'medium' }}">
+            <div class="quest-head">
+              <span class="quest-name">{{ q.name_fr }}</span>
+              <span class="quest-reward">+{{ q.reward_xp }} XP · +{{ q.reward_gold }} or</span>
+            </div>
+            <div class="quest-desc">{{ q.description_fr }}</div>
+            {% if q.lore_hook %}
+              <div class="quest-lore">« {{ q.lore_hook }} »</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if lore_entries %}
+    <div class="card">
+      <h2>Feed du royaume</h2>
+      <div class="lore-feed">
+        {% for entry in lore_entries %}
+          <div class="lore-entry lore-cat-{{ entry.category or 'rumeur' }}">
+            <div class="lore-head">
+              <span class="lore-category">{{ entry.category or 'rumeur' }}</span>
+              <span class="lore-title">{{ entry.title_fr }}</span>
+            </div>
+            <div class="lore-body">{{ entry.body_fr }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <div class="card">
+      <p style="color: var(--tab-brown-fg); font-style: italic;">
+        Aucune rumeur n'a encore traversé les murs de votre royaume.
+        Le générateur de contenu n'a pas encore tourné. Revenez plus tard.
+      </p>
+    </div>
+  {% endif %}
+{% endblock %}

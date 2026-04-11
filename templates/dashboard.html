@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Royaume de {{ current_user.username }} — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  {# --- Woodwar ornate header banner --- #}
+  <div class="ww-header">
+    <img src="{{ url_for('legacy_asset', filename='extensions/wwix/2/header2.jpg') }}"
+         alt="Woodwar" class="ww-header-img">
+  </div>
+
+  {# --- Main layout: left border / sidebar / central / right border --- #}
+  <div id="homeflex">
+    <div class="m-none ww-border-left"></div>
+
+    {# --- Left HUD with the 6 navigation tiles. The .gif backgrounds
+         already contain the label baked in (VUE GLOBALE / VOTRE CITÉ
+         / etc.) so we only position the 80x80 portrait on top. --- #}
+    <div id="hudleft">
+      <div class="hud-tile" title="Vue Globale">
+        <a href="{{ url_for('dashboard') }}">
+          <div class="hud-tile-img" style="background-image: url('{{ url_for('legacy_asset', filename='extensions/wwix/2/hud_imgdoubles/0.gif') }}');">
+            <div class="hud-tile-portrait" style="background-image: url('{{ url_for('legacy_asset', filename='vg_0.jpg') }}');"></div>
+          </div>
+        </a>
+      </div>
+
+      <div class="hud-tile" title="Votre Cité / Bâtiments">
+        <a href="{{ url_for('dashboard') }}#batiments">
+          <div class="hud-tile-img" style="background-image: url('{{ url_for('legacy_asset', filename='extensions/wwix/2/hud_imgdoubles/1.gif') }}');">
+            <div class="hud-tile-portrait" style="background-image: url('{{ url_for('legacy_asset', filename='extensions/wwix/2/hud_imgdoubles/sol.jpg') }}');"></div>
+          </div>
+        </a>
+      </div>
+
+      <div class="hud-tile" title="Alliance">
+        <a href="{% if my_alliance %}{{ url_for('alliance_detail', alliance_id=my_alliance.id) }}{% else %}{{ url_for('alliances_list') }}{% endif %}">
+          <div class="hud-tile-img" style="background-image: url('{{ url_for('legacy_asset', filename='extensions/wwix/2/hud_imgdoubles/4.gif') }}');">
+            {% if my_alliance %}
+              <div class="hud-tile-portrait hud-tile-alliance"></div>
+            {% else %}
+              <div class="hud-tile-portrait" style="background-image: url('{{ url_for('legacy_asset', filename='extensions/wwix/2/hud_imgdoubles/vg_bat.jpg') }}');"></div>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+
+      <div class="hud-tile" title="Explorer les environs">
+        <a href="{{ url_for('joueurs') }}">
+          <div class="hud-tile-img" style="background-image: url('{{ url_for('legacy_asset', filename='Explorer.gif') }}');">
+            <div class="hud-tile-portrait" style="background-image: url('{{ url_for('legacy_asset', filename='extensions/wwix/2/hud_imgdoubles/vg.jpg') }}');"></div>
+          </div>
+        </a>
+      </div>
+
+      <div class="hud-tile" title="L'Esprit">
+        <a href="{{ url_for('classements') }}">
+          <div class="hud-tile-img" style="background-image: url('{{ url_for('legacy_asset', filename='extensions/wwix/2/hud_imgdoubles/3.gif') }}');">
+            <div class="hud-tile-portrait" style="background-image: url('{{ url_for('legacy_asset', filename='esprit.jpg') }}');"></div>
+          </div>
+        </a>
+      </div>
+
+      <div class="hud-tile" title="Inventaire / Prouesses">
+        <a href="{{ url_for('prouesses_page') }}">
+          <div class="hud-tile-img" style="background-image: url('{{ url_for('legacy_asset', filename='Inventaire.gif') }}');">
+            <div class="hud-tile-portrait" style="background-image: url('{{ url_for('legacy_asset', filename='vg_1.jpg') }}');"></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    {# --- Central area: tabs + rate bar + map --- #}
+    <div id="central_td">
+
+      {# Top navigation tabs --- #}
+      <nav class="haut-carte-nav">
+        <a href="{{ url_for('dashboard') }}#batiments">
+          <span>●</span> Chantier
+        </a>
+        <a href="{{ url_for('caserne') }}">
+          <span>●</span> Caserne
+        </a>
+        <a href="{{ url_for('dracos_page') }}">
+          <span>●</span> Bestiaire
+        </a>
+        <a href="{{ url_for('prouesses_page') }}">
+          <span>●</span> Sanctuaire
+        </a>
+        <a href="{{ url_for('classements') }}">
+          <span>●</span> Classements
+        </a>
+        <a href="{{ url_for('campagnes') }}">
+          <span>●</span> Campagnes
+        </a>
+      </nav>
+
+      {# Resource rate bar --- #}
+      <div class="stats-wrapper">
+        <div class="bar">
+          <div class="label"><strong>Évolution des ressources par heure :</strong></div>
+          <div class="values">
+            <div class="item or">
+              <span>+{{ "{:,.1f}".format(rates.gold or 0).replace(",", " ") }}</span>
+              <img src="{{ url_for('legacy_asset', filename='or.gif') }}" alt="Or">
+            </div>
+            <div class="item bois">
+              <span>+{{ "{:,.1f}".format(rates.wood or 0).replace(",", " ") }}</span>
+              <img src="{{ url_for('legacy_asset', filename='bois.gif') }}" alt="Bois">
+            </div>
+            <div class="item mana">
+              <span>+{{ "{:,.1f}".format(rates.mana or 0).replace(",", " ") }}</span>
+              <img src="{{ url_for('legacy_asset', filename='mana.gif') }}" alt="Mana">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Current stocks (compact bar under the rate) --- #}
+      <div class="stocks-wrapper">
+        <div class="bar">
+          <div class="label"><strong>Stocks actuels :</strong></div>
+          <div class="values">
+            <div class="item or">
+              <span>{{ "{:,}".format(player.gold).replace(",", " ") }}</span>
+              <img src="{{ url_for('legacy_asset', filename='or.gif') }}" alt="Or">
+            </div>
+            <div class="item bois">
+              <span>{{ "{:,}".format(player.wood).replace(",", " ") }}</span>
+              <img src="{{ url_for('legacy_asset', filename='bois.gif') }}" alt="Bois">
+            </div>
+            <div class="item mana">
+              <span>{{ "{:,}".format(player.mana).replace(",", " ") }}</span>
+              <img src="{{ url_for('legacy_asset', filename='mana.gif') }}" alt="Mana">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# The map of the kingdom --- #}
+      <div class="carte_div"
+           style="background-image: url('{{ url_for('legacy_asset', filename='terrain0_2.jpg') }}');">
+        <div class="carte-body">
+          <div class="carte-938">
+            {% for row in map_grid %}
+              <div class="cartecolumn">
+                {% for cell in row %}
+                  <div class="carte_height_width">
+                    {% if cell %}
+                      <a href="{{ url_for('dashboard') }}#batiments" class="carte-tile-link"
+                         title="{{ cell.name }} — Niveau {{ cell.level }}">
+                        <div class="carte-tile-base"
+                             style="background-image: url('{{ url_for('legacy_asset', filename=cell.sprite) }}');">
+                          {% if cell.overlay %}
+                            <img src="{{ url_for('legacy_asset', filename=cell.overlay) }}"
+                                 alt="{{ cell.name }}"
+                                 class="carte-tile-overlay">
+                          {% endif %}
+                        </div>
+                      </a>
+                    {% else %}
+                      <a href="{{ url_for('dashboard') }}#batiments" class="carte-tile-empty">
+                        <img src="{{ url_for('legacy_asset', filename='compas.png') }}"
+                             class="carte-tile-compas" alt="">
+                      </a>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="carte-footer">
+          <a href="{{ url_for('dashboard') }}#batiments" class="bottom_sol">
+            ⚜ Vos tourelles apportent actuellement
+            {{ "{:,}".format((player.gold + player.wood + player.mana) // 10).replace(",", " ") }}
+            point en renfort.
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-none ww-border-right"></div>
+  </div>
+
+  {# --- Below the map: classic card views (season, player, buildings, ...) --- #}
+  <a id="batiments"></a>
+
+  <div class="card season-banner">
+    <div class="season-info">
+      <span class="season-label">{{ season.label }}</span>
+      <span class="season-day">Jour {{ season.day }}</span>
+    </div>
+    <div class="season-prouesses">
+      🏆 {{ earned_count }} / {{ total_achievements }} prouesses ·
+      <a href="{{ url_for('prouesses_page') }}">voir</a>
+    </div>
+  </div>
+
+  {% if invitations %}
+    <div class="card" style="border-left: 3px solid var(--ww-link);">
+      <h2>Invitations en attente</h2>
+      {% for inv in invitations %}
+        <div class="invitation-row">
+          <div>
+            <strong>{{ inv.alliance_name }}</strong> [{{ inv.alliance_tag }}] ·
+            invité par {{ inv.sender_name }}
+          </div>
+          <div style="display: flex; gap: 0.5em;">
+            <form method="post" action="{{ url_for('alliance_invitation_accept', invitation_id=inv.id) }}" style="margin: 0;">
+              <button type="submit" style="margin: 0; padding: 0.4em 0.9em; font-size: 0.85em;">Accepter</button>
+            </form>
+            <form method="post" action="{{ url_for('alliance_invitation_decline', invitation_id=inv.id) }}" style="margin: 0;">
+              <button type="submit" class="btn-secondary" style="margin: 0; padding: 0.4em 0.9em; font-size: 0.85em;">Décliner</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="player-header">
+      <div>
+        <h1 class="player-name">{{ current_user.username }}</h1>
+        <div class="player-level">
+          Seigneur de niveau {{ player.level }} · {{ player.xp }} XP · Réputation {{ player.reputation }}
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <div style="display: inline-block; padding: 0.5em 1em; background: rgba(0, 0, 0, 0.5); border: 2px solid {{ clan.color }};">
+          <div style="color: var(--tab-brown-fg); font-size: 0.8em; font-variant: small-caps;">Clan</div>
+          <div style="font-size: 1.1em; color: {{ clan.color }}; font-weight: bold; font-variant: small-caps;">{{ clan.name }}</div>
+          <div style="color: var(--tab-brown-fg); font-size: 0.8em;">Chef : {{ clan.chief }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Bâtiments — construction et amélioration</h2>
+    <p style="color: var(--tab-brown-fg); font-size: 0.9em;">
+      Construisez les producteurs en premier pour obtenir un revenu passif.
+      Les formules de coût et de temps sont directement reprises du jeu original (<code>nivprix.php</code>).
+    </p>
+
+    <div class="buildings-grid">
+      {% for b in buildings %}
+        <div class="building-card building-role-{{ b.role }}">
+          {% if b.image %}
+            <div class="building-image">
+              <img src="{{ url_for('legacy_asset', filename=b.image) }}" alt="{{ b.name }}" loading="lazy">
+            </div>
+          {% endif %}
+          <div class="building-header">
+            <div class="building-name">{{ b.name }}</div>
+            <div class="building-level">
+              {% if b.owned %}Niveau {{ b.level }}{% else %}Non construit{% endif %}
+            </div>
+          </div>
+
+          {% if b.owned and b.production_per_hour and b.resource_produced %}
+            <div class="building-production">
+              Produit {{ "{:,.1f}".format(b.production_per_hour).replace(",", " ") }}
+              {% if b.resource_produced == 'gold' %}or{% elif b.resource_produced == 'wood' %}bois{% else %}mana{% endif %}/h
+            </div>
+          {% endif %}
+
+          {% if b.upgrading %}
+            <div class="building-upgrading">
+              ⚙ Amélioration vers le niveau {{ b.upgrading_to }}
+              <br><small>Reste ~{{ b.upgrade_remaining_fmt }}</small>
+            </div>
+          {% elif b.at_max %}
+            <div class="building-maxed">Niveau maximum atteint</div>
+          {% else %}
+            <div class="building-cost">
+              {{ "{:,}".format(b.next_cost.or).replace(",", " ") }} or ·
+              {{ "{:,}".format(b.next_cost.bois).replace(",", " ") }} bois
+              {% if b.next_cost.time > 60 %}
+                · {{ (b.next_cost.time // 60) }} min
+              {% else %}
+                · {{ b.next_cost.time }}s
+              {% endif %}
+            </div>
+            <form method="post" action="{{ url_for('build', building_id=b.id) }}" style="display: inline;">
+              <button type="submit"
+                {% if player.gold < b.next_cost.or or player.wood < b.next_cost.bois %}
+                  disabled title="Ressources insuffisantes"
+                {% endif %}>
+                {% if b.owned %}Améliorer → L{{ b.level + 1 }}{% else %}Construire{% endif %}
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if my_alliance %}
+    <div class="card">
+      <h2>Alliance</h2>
+      <p>
+        Vous êtes membre de
+        <a href="{{ url_for('alliance_detail', alliance_id=my_alliance.id) }}">
+          <strong>{{ my_alliance.name }}</strong> [{{ my_alliance.tag }}]
+        </a>
+        ({{ my_alliance_role }}).
+      </p>
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <h2>Sanctuaire · Reliques ({{ relic_count }}/{{ relics | length }})</h2>
+    <p style="color: var(--tab-brown-fg); font-size: 0.9em;">
+      Les reliques ramenées des campagnes multiplient par 3 les dégâts de l'unité
+      correspondante en combat.
+    </p>
+    <div class="relic-grid">
+      {% for r in relics %}
+        <div class="relic-card {% if not r.owned %}relic-missing{% endif %}">
+          {% if r.owned %}✦{% else %}·{% endif %} {{ r.name }}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

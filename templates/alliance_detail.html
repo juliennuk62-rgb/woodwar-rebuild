@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}{{ alliance.name }} [{{ alliance.tag }}] — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  {# --- Alliance header (reproduces viewteam_* layout from woodwar9.net) --- #}
+  <div class="viewteam_height">
+    <div class="viewteam_bgtop">
+
+      {# Left: blason frame #}
+      <div class="viewteam_left">
+        <div class="img_blasons"
+             style="background-image: url('{{ url_for('legacy_asset', filename=blason_path) }}');">
+          <img src="{{ url_for('legacy_asset', filename='fiche_alliance/cadre_1.png') }}"
+               alt="cadre" class="img_blasons_frame">
+        </div>
+      </div>
+
+      {# Right: alliance info #}
+      <div class="viewteam_right">
+        <div class="viewteam_bgtopr">
+          <div class="vb_ht1"></div>
+          <div class="vb_ht2">
+            <span class="viewteam_name">{{ alliance.name }}</span>
+            <span class="viewteam_tag">[{{ alliance.tag }}]</span>
+          </div>
+          <div class="vb_ht3">
+            <i>
+              Alliance née {{ age_label }}
+              &brvbar; {{ members | length }} membre{{ 's' if members | length > 1 else '' }}
+              &brvbar; {{ "{:,}".format(total_points).replace(",", "&nbsp;") | safe }} points
+            </i>
+          </div>
+          <div class="vb_ht4">
+            {% if has_room %}
+              <span class="vert">Nous acceptons les candidatures.</span>
+            {% else %}
+              <span class="rouge">Alliance complète.</span>
+            {% endif %}
+          </div>
+          <div class="vb_ht5">
+            <span class="viewteam_chef">
+              Chef de l'Alliance :
+              <a href="#">{{ founder_name }}</a>
+            </span>
+          </div>
+          <div class="vb_ht6">
+            {% if is_member and not is_founder %}
+              <form method="post" action="{{ url_for('alliance_leave', alliance_id=alliance.id) }}"
+                    style="display: inline; margin: 0;"
+                    onsubmit="return confirm('Déserter cette Alliance ?');">
+                <button type="submit" class="viewteam_desert">Déserter</button>
+              </form>
+            {% elif is_founder %}
+              <form method="post" action="{{ url_for('alliance_disband', alliance_id=alliance.id) }}"
+                    style="display: inline; margin: 0;"
+                    onsubmit="return confirm('Dissoudre définitivement l\'alliance ?');">
+                <button type="submit" class="viewteam_desert">Dissoudre</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+
+        {# Action buttons row #}
+        <div class="viewteam_actions">
+          <a href="{{ url_for('alliance_diplomacy_page', alliance_id=alliance.id) }}"
+             title="Diplomatie de l'alliance">
+            <img src="{{ url_for('legacy_asset', filename='export_actions_wwix/voir_promesses.png') }}"
+                 alt="Diplomatie">
+          </a>
+          <a href="{{ url_for('alliances_list') }}" title="Rechercher une autre Alliance">
+            <img src="{{ url_for('legacy_asset', filename='export_actions_wwix/loupe.png') }}"
+                 alt="Rechercher">
+          </a>
+          {% if is_member %}
+            <a href="#invite" title="Recrutement">
+              <img src="{{ url_for('legacy_asset', filename='export_actions_wwix/recrutement.png') }}"
+                   alt="Recrutement">
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if alliance.description %}
+    <div class="card">
+      <p>{{ alliance.description }}</p>
+    </div>
+  {% endif %}
+
+  {# --- Members --- #}
+  <div class="card">
+    <h2>Membres ({{ members | length }})</h2>
+    <table class="combat-table">
+      <thead>
+        <tr><th>Seigneur</th><th>Clan</th><th>Rôle</th><th>Niveau</th></tr>
+      </thead>
+      <tbody>
+        {% for m in members %}
+          <tr>
+            <td>{{ m.username }}</td>
+            <td style="color: {{ m.clan.color }};">{{ m.clan.name }}</td>
+            <td>{% if m.role == 'founder' %}<span class="alter">Fondateur</span>{% else %}Membre{% endif %}</td>
+            <td>{{ m.level }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if is_member %}
+    {# --- Recruitment form --- #}
+    <a id="invite"></a>
+    <div class="card">
+      <h2>Recrutement</h2>
+      <p>
+        Coût par invitation : <span class="alter">{{ invitation_cost }}</span>
+        <img src="{{ url_for('legacy_asset', filename='or.gif') }}" style="vertical-align: middle;" alt="or">
+      </p>
+      <form method="post" action="{{ url_for('alliance_invite', alliance_id=alliance.id) }}">
+        <label for="username">Pseudo du Seigneur à inviter</label>
+        <div style="display: flex; gap: 0.6em;">
+          <input type="text" id="username" name="username" class="inputy" required maxlength="32" style="flex: 1;">
+          <button type="submit" style="margin-top: 0.3em;">Inviter</button>
+        </div>
+      </form>
+    </div>
+
+    {# --- Chat wall (reproduces mur_1.jpg background from original) --- #}
+    <div class="view_team_padd"
+         style="background-image: url('{{ url_for('legacy_asset', filename='mur_1.jpg') }}');">
+      <span class="alter viewteam_mur_title">
+        Mur en pierres millénaires de l'Alliance {{ alliance.name }}
+      </span>
+
+      <div class="chat-log">
+        {% if messages %}
+          {% for msg in messages %}
+            <div class="chat-message">
+              <div class="chat-head">
+                <span class="chat-sender">{{ msg.sender_name }}</span>
+                <span class="chat-time">{{ msg.created_at.strftime('%H:%M %d/%m') }}</span>
+              </div>
+              <div class="chat-body">{{ msg.content }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p style="color: var(--tab-brown-fg); font-style: italic;">
+            Aucun message. Soyez le premier à parler.
+          </p>
+        {% endif %}
+      </div>
+
+      <form method="post" action="{{ url_for('alliance_chat', alliance_id=alliance.id) }}" class="chat-form">
+        <textarea name="content" rows="3" placeholder="Tapez un message ici..." required maxlength="500"
+                  class="inputy" style="width: 100%;"></textarea>
+        <button type="submit">Envoyer</button>
+      </form>
+    </div>
+  {% else %}
+    <div class="card">
+      <p style="color: var(--tab-brown-fg);">
+        Vous n'êtes pas membre de cette alliance. Une invitation d'un membre est nécessaire pour rejoindre.
+      </p>
+    </div>
+  {% endif %}
+{% endblock %}

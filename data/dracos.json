@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "source": "carac_dracos.php + fr_leng.php (DRACOS1..DRACOS4 + DRACOSnb)",
+    "count": 4,
+    "formulas": {
+      "or": "5000 * type",
+      "bois": "300 * type",
+      "mana": "200 * type",
+      "obedience": "10 - type * 2",
+      "caserne_required": "type * 3 - 2",
+      "time": "type * 100",
+      "defense": "type * 100"
+    },
+    "notes": "Dracos are powerful beasts trained at the Bestiary (building id 11). Lower obedience on higher-tier dracos means they are harder to control."
+  },
+  "dracos": [
+    {
+      "id": 1,
+      "slug": "dracos_green",
+      "name_fr": "Dracos vert",
+      "description_key": "DRACOS1b",
+      "cost": { "or": 5000,  "bois": 300,  "mana": 200 },
+      "defense": 100,
+      "obedience": 8,
+      "caserne_required": 1,
+      "time": 100
+    },
+    {
+      "id": 2,
+      "slug": "dracos_blue",
+      "name_fr": "Dracos bleu",
+      "description_key": "DRACOS2b",
+      "cost": { "or": 10000, "bois": 600,  "mana": 400 },
+      "defense": 200,
+      "obedience": 6,
+      "caserne_required": 4,
+      "time": 200
+    },
+    {
+      "id": 3,
+      "slug": "dracos_yellow",
+      "name_fr": "Dracos jaune",
+      "description_key": "DRACOS3b",
+      "cost": { "or": 15000, "bois": 900,  "mana": 600 },
+      "defense": 300,
+      "obedience": 4,
+      "caserne_required": 7,
+      "time": 300
+    },
+    {
+      "id": 4,
+      "slug": "dracos_red",
+      "name_fr": "Dracos rouge",
+      "description_key": "DRACOS4b",
+      "cost": { "or": 20000, "bois": 1200, "mana": 800 },
+      "defense": 400,
+      "obedience": 2,
+      "caserne_required": 10,
+      "time": 400
+    }
+  ]
+}

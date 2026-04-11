@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ msg.subject or 'Message' }} — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>{{ msg.subject or '(sans sujet)' }}</h1>
+    <p style="color: var(--fg-dim); font-size: 0.9em;">
+      De <strong>{{ msg.sender_name }}</strong> ·
+      à <strong>{{ msg.recipient_name }}</strong> ·
+      {{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}
+    </p>
+  </div>
+
+  <div class="card">
+    <div style="white-space: pre-wrap; word-wrap: break-word; color: var(--fg);">{{ msg.content }}</div>
+  </div>
+
+  <div class="card">
+    <a href="{{ url_for('inbox') }}" class="btn btn-secondary">Retour à la boîte</a>
+    {% if is_recipient %}
+      <a href="{{ url_for('messages_new', to=msg.sender_name) }}" class="btn">Répondre</a>
+    {% endif %}
+    <form method="post" action="{{ url_for('message_archive', message_id=msg.id) }}" style="display: inline;">
+      <button type="submit" class="btn-secondary">Archiver</button>
+    </form>
+  </div>
+{% endblock %}

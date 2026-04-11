@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "description": "Nouveaux objets venant enrichir le pool de drops en combat. Doivent avoir un id > 46 pour ne pas écraser les items d'origine.",
+    "schema": {
+      "id": "int (>= 100 to avoid conflicts)",
+      "name_fr": "string",
+      "description_fr": "string (1-3 sentences)",
+      "effect_fr": "string (what it does in plain French)",
+      "buff_effect": "string (train_speed|attack_power|camp_gold|camp_wood|camp_mana|fret_capacity)",
+      "buff_multiplier": "float",
+      "buff_duration_seconds": "int",
+      "drop_weight": "int (1-10, 10=very common, 1=legendary)",
+      "created_at": "ISO 8601"
+    },
+    "last_generated_at": null
+  },
+  "items": []
+}

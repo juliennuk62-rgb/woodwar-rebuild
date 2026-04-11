@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "source": "carac_armes.php",
+    "notes": "Weapon 'tiers' — used to progress from weapon level N to N+1. The cost is applied to each of or/bois/mana (so tier 0→1 actually costs 5000 or + 5000 bois + 5000 mana). Tiers 8-15 also have a recharge cooldown (date_limite in seconds). Tiers 12 and 15 were not used in the original.",
+    "tier_count": 16,
+    "active_tiers": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14],
+    "unused_tiers": [12, 15]
+  },
+  "tier_costs": {
+    "0":  5000,
+    "1":  15000,
+    "2":  35000,
+    "3":  65000,
+    "4":  500000,
+    "5":  1000000,
+    "6":  5000000,
+    "7":  10000000,
+    "8":  30000000,
+    "9":  60000000,
+    "10": 100000000,
+    "11": 200000000,
+    "12": 500000000,
+    "13": 1000000000,
+    "14": 5000000000,
+    "15": 10000000000
+  },
+  "recharge_seconds": {
+    "8":  86400,
+    "9":  604800,
+    "10": 864000,
+    "11": 1296000,
+    "12": 432000,
+    "13": 518400,
+    "14": 604800,
+    "15": 1209600
+  }
+}

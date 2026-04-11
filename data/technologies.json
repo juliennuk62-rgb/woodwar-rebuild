@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "source": "carac_techs.php + fr_leng.php (TECH1..TECH12)",
+    "count": 12,
+    "notes": "config.php says nb_tec=11 but carac_techs.php defines 12 entries. carac_techs.php is the source of truth. Each tech requires a certain 'lvl_labo' (tech lab level) and belongs to category 'magie' or 'technologie'. Mana cost is nominally 5 but is likely a placeholder."
+  },
+  "technologies": [
+    { "id": 1,  "slug": "dark_fetish",       "name_fr": "Fétiche des ténèbres",  "description_key": "TECH1B",  "category": "magic",     "lab_level_required": 1,  "cost": { "or": 3000,   "bois": 2000,  "mana": 5 }, "time": 60 },
+    { "id": 2,  "slug": "white_magic_sceptre", "name_fr": "Sceptre de magie blanche", "description_key": "TECH2B",  "category": "magic",     "lab_level_required": 3,  "cost": { "or": 3500,   "bois": 2500,  "mana": 5 }, "time": 60 },
+    { "id": 3,  "slug": "initiation_pentacle", "name_fr": "Pentacle d'initiation", "description_key": "TECH3B",  "category": "magic",     "lab_level_required": 5,  "cost": { "or": 4000,   "bois": 3000,  "mana": 5 }, "time": 60 },
+    { "id": 4,  "slug": "clairvoyance_sceptre", "name_fr": "Sceptre de clairvoyance", "description_key": "TECH4B",  "category": "magic",     "lab_level_required": 9,  "cost": { "or": 50000,  "bois": 90000, "mana": 5 }, "time": 60 },
+    { "id": 5,  "slug": "redemption_ring",   "name_fr": "Anneau rédempteur",     "description_key": "TECH5B",  "category": "technology", "lab_level_required": 13, "cost": { "or": 200000, "bois": 50000, "mana": 5 }, "time": 60 },
+    { "id": 6,  "slug": "flaming_sword",     "name_fr": "Épée ardente",          "description_key": "TECH6B",  "category": "technology", "lab_level_required": 1,  "cost": { "or": 500,    "bois": 200,   "mana": 5 }, "time": 60 },
+    { "id": 7,  "slug": "aurora_diadem",    "name_fr": "Diadèmes aux Aurores",  "description_key": "TECH7B",  "category": "magic",     "lab_level_required": 14, "cost": { "or": 200000, "bois": 120000, "mana": 5 }, "time": 60 },
+    { "id": 8,  "slug": "elven_bow",        "name_fr": "Arc elfique",           "description_key": "TECH8B",  "category": "technology", "lab_level_required": 5,  "cost": { "or": 3000,   "bois": 2000,  "mana": 5 }, "time": 60 },
+    { "id": 9,  "slug": "poison_spear",     "name_fr": "Lance vénéneuse",       "description_key": "TECH9B",  "category": "technology", "lab_level_required": 7,  "cost": { "or": 70000,  "bois": 50000, "mana": 5 }, "time": 60 },
+    { "id": 10, "slug": "dagtorv",          "name_fr": "Dagtörv",               "description_key": "TECH10B", "category": "technology", "lab_level_required": 11, "cost": { "or": 90000,  "bois": 90000, "mana": 5 }, "time": 60 },
+    { "id": 11, "slug": "battle_axe",       "name_fr": "Hache de combat",       "description_key": "TECH11B", "category": "technology", "lab_level_required": 12, "cost": { "or": 120000, "bois": 120000, "mana": 5 }, "time": 60 },
+    { "id": 12, "slug": "accord_stone",     "name_fr": "Pierre d'entente",      "description_key": "TECH12B", "category": "magic",     "lab_level_required": 15, "cost": { "or": 200000, "bois": 100000, "mana": 5 }, "time": 60 }
+  ]
+}

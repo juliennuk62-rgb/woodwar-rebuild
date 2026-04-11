@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Bestiaire — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>Bestiaire</h1>
+    {% if bestiary_level == 0 %}
+      <p class="flash flash-error">
+        Vous n'avez pas encore de bestiaire.
+        <a href="{{ url_for('dashboard') }}">Construisez-en un</a> pour dresser des dracos.
+      </p>
+    {% else %}
+      <p style="color: var(--fg-dim);">
+        Bestiaire de niveau <strong style="color: var(--accent);">{{ bestiary_level }}</strong>.
+        Chaque draco combat systématiquement à vos côtés lors de vos attaques.
+      </p>
+      {% if total_draco_dmg > 0 %}
+        <p>
+          Puissance draconique actuelle :
+          <strong style="color: #e36a6a;">{{ total_draco_dmg }}</strong> dégâts,
+          <strong style="color: #9ac4f0;">{{ total_draco_def }}</strong> défense.
+        </p>
+      {% endif %}
+    {% endif %}
+
+    <div class="resources" style="margin-top: 1em;">
+      <div class="resource">
+        <div class="resource-label">Or</div>
+        <div class="resource-value">{{ "{:,}".format(player.gold).replace(",", " ") }}</div>
+      </div>
+      <div class="resource">
+        <div class="resource-label">Bois</div>
+        <div class="resource-value">{{ "{:,}".format(player.wood).replace(",", " ") }}</div>
+      </div>
+      <div class="resource">
+        <div class="resource-label">Mana</div>
+        <div class="resource-value">{{ "{:,}".format(player.mana).replace(",", " ") }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Dressage de dracos</h2>
+    <div class="units-grid">
+      {% for d in dracos %}
+        <div class="unit-card draco-card {% if not d.unlocked %}unit-locked{% endif %}">
+          <div class="unit-portrait">
+            <img src="{{ url_for('legacy_asset', filename='dracos/' + d.id|string + '.gif') }}"
+                 alt="{{ d.name }}"
+                 loading="lazy">
+          </div>
+          <div class="unit-header">
+            <div class="unit-name">{{ d.name }}</div>
+            <div class="unit-owned">
+              {% if d.owned > 0 %}×{{ d.owned }}{% else %}—{% endif %}
+            </div>
+          </div>
+
+          <div class="unit-stats">
+            <span style="color: #e36a6a;" title="Dégâts dérivés (défense × 2)">⚔ {{ d.damage }}</span>
+            <span style="color: #9ac4f0;" title="Défense">🛡 {{ d.defense }}</span>
+          </div>
+
+          {% if not d.unlocked %}
+            <div class="unit-locked-msg">
+              Verrouillé<br>
+              Nécessite Bestiaire niv. {{ d.bestiary_required }}
+            </div>
+          {% else %}
+            <div class="unit-cost">
+              {{ "{:,}".format(d.cost.or).replace(",", " ") }} or ·
+              {{ "{:,}".format(d.cost.bois).replace(",", " ") }} bois ·
+              {{ "{:,}".format(d.cost.mana).replace(",", " ") }} mana
+            </div>
+            <form method="post" action="{{ url_for('train_draco_route', draco_id=d.id) }}" class="unit-train-form">
+              <input type="number" name="quantity" min="1" max="{{ d.max_affordable if d.max_affordable > 0 else 1 }}"
+                     value="1" {% if d.max_affordable == 0 %}disabled{% endif %}>
+              <button type="submit" {% if d.max_affordable == 0 %}disabled title="Ressources insuffisantes"{% endif %}>
+                Dresser
+              </button>
+            </form>
+            {% if d.max_affordable > 0 %}
+              <div class="unit-max">Max : {{ d.max_affordable }}</div>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Seigneurs — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>Autres Seigneurs</h1>
+    <p style="color: var(--fg-dim);">
+      Attaquez d'autres Seigneurs pour leur dérober 10 % de leurs ressources.
+      Leurs armées défendent automatiquement.
+    </p>
+  </div>
+
+  {% if not army %}
+    <div class="card">
+      <p class="flash flash-error">
+        Vous n'avez aucune unité à envoyer.
+        <a href="{{ url_for('caserne') }}">Rendez-vous à la caserne</a> pour en former.
+      </p>
+    </div>
+  {% elif not others %}
+    <div class="card">
+      <p style="color: var(--fg-dim);">
+        Aucun autre Seigneur dans le royaume pour l'instant.
+        Invitez un ami à créer un compte pour commencer le PvP.
+      </p>
+    </div>
+  {% else %}
+    <div class="card">
+      <h2>Liste des Seigneurs</h2>
+      {% for o in others %}
+        <div class="camp-card">
+          <div class="camp-header">
+            <div>
+              <div class="camp-name" style="color: {{ o.clan.color }};">
+                {{ o.username }}
+              </div>
+              <div class="camp-desc">
+                Clan {{ o.clan.name }} · Niveau {{ o.level }} · {{ o.total_units }} unités
+              </div>
+            </div>
+            <div class="camp-hp" style="color: var(--accent);">
+              {{ "{:,}".format(o.gold).replace(",", " ") }} or ·
+              {{ "{:,}".format(o.wood).replace(",", " ") }} bois ·
+              {{ "{:,}".format(o.mana).replace(",", " ") }} mana
+            </div>
+          </div>
+
+          <div class="camp-loot">
+            Butin estimé : {{ "{:,}".format(o.gold // 10).replace(",", " ") }} or ·
+            {{ "{:,}".format(o.wood // 10).replace(",", " ") }} bois ·
+            {{ "{:,}".format(o.mana // 10).replace(",", " ") }} mana
+          </div>
+
+          <div style="padding: 0 1em 0.6em;">
+            <form method="post" action="{{ url_for('espionnage', target_user_id=o.id) }}" style="display: inline;">
+              <button type="submit" class="btn-secondary" style="margin: 0; padding: 0.4em 0.9em; font-size: 0.85em;">
+                🔍 Espionner (500 mana)
+              </button>
+            </form>
+          </div>
+
+          <form method="post" action="{{ url_for('attaque_joueur', target_id=o.id) }}" class="attack-form">
+            <div class="attack-inputs">
+              {% for u in army %}
+                <label class="attack-unit">
+                  {{ u.name }} (max {{ u.count }})
+                  <input type="number" name="unit_{{ u.id }}" min="0" max="{{ u.count }}" value="0">
+                </label>
+              {% endfor %}
+            </div>
+            <button type="submit" class="attack-btn">Attaquer {{ o.username }}</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

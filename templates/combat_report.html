@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Rapport de combat — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>
+      {% if log.outcome == 'victory' %}
+        <span style="color: var(--success);">⚔ Victoire</span>
+      {% else %}
+        <span style="color: var(--danger);">✕ Camp résistant</span>
+      {% endif %}
+    </h1>
+    <p style="color: var(--fg-dim);">
+      Combat contre <strong>{{ log.camp_name }}</strong> · {{ log.created_at.strftime('%Y-%m-%d %H:%M') }}
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Déroulement</h2>
+    <ul style="line-height: 1.8;">
+      <li>PV du camp avant l'assaut : <strong>{{ "{:,}".format(log.camp_pv_before).replace(",", " ") }}</strong></li>
+      <li>Dégâts infligés : <strong style="color: var(--accent);">{{ "{:,}".format(log.attacker_damage).replace(",", " ") }}</strong></li>
+      <li>PV du camp après l'assaut : <strong>{{ "{:,}".format(log.camp_pv_after).replace(",", " ") }}</strong></li>
+    </ul>
+
+    {% if log.outcome == 'victory' %}
+      <h2>Butin ramené</h2>
+      <div class="resources">
+        <div class="resource">
+          <div class="resource-label">Or</div>
+          <div class="resource-value">+{{ "{:,}".format(log.loot_gold).replace(",", " ") }}</div>
+        </div>
+        <div class="resource">
+          <div class="resource-label">Bois</div>
+          <div class="resource-value">+{{ "{:,}".format(log.loot_wood).replace(",", " ") }}</div>
+        </div>
+        <div class="resource">
+          <div class="resource-label">Mana</div>
+          <div class="resource-value">+{{ "{:,}".format(log.loot_mana).replace(",", " ") }}</div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Armée engagée</h2>
+    <table class="combat-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Unité</th>
+          <th>Envoyées</th>
+          <th>Perdues</th>
+          <th>Revenues</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in sent_view %}
+          <tr>
+            <td style="width: 42px;">
+              {% if u.image %}
+                <img src="{{ url_for('legacy_asset', filename=u.image) }}"
+                     alt="{{ u.name }}"
+                     style="width: 36px; height: 36px; object-fit: contain;">
+              {% endif %}
+            </td>
+            <td>{{ u.name }}</td>
+            <td>{{ u.sent }}</td>
+            <td>
+              {% if u.lost > 0 %}
+                <span style="color: var(--danger);">−{{ u.lost }}</span>
+              {% else %}
+                0
+              {% endif %}
+            </td>
+            <td>
+              <span style="color: var(--success);">{{ u.survivors }}</span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <p>
+      <a href="{{ url_for('campagnes') }}" class="btn">Retour aux campagnes</a>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Royaume</a>
+    </p>
+  </div>
+{% endblock %}

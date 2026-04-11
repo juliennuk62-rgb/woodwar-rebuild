@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Marché — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>Marché d'échange</h1>
+    <p style="color: var(--tab-brown-fg);">
+      Le marchand ambulant accepte d'échanger vos ressources au taux de
+      <strong class="alter">{{ ratio }} pour 1</strong>.
+      Un échange n'est jamais rentable sur le papier, mais permet de débloquer
+      une production qui stagne.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Votre trésor</h2>
+    <div class="resources">
+      <div class="resource">
+        <div class="resource-label">Or</div>
+        <div class="resource-value">{{ "{:,}".format(player.gold).replace(",", " ") }}</div>
+      </div>
+      <div class="resource">
+        <div class="resource-label">Bois</div>
+        <div class="resource-value">{{ "{:,}".format(player.wood).replace(",", " ") }}</div>
+      </div>
+      <div class="resource">
+        <div class="resource-label">Mana</div>
+        <div class="resource-value">{{ "{:,}".format(player.mana).replace(",", " ") }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Proposer un échange</h2>
+
+    <form method="post" action="{{ url_for('marche') }}" class="market-form">
+      <label for="source">Je donne</label>
+      <div style="display: flex; gap: 0.6em; align-items: center;">
+        <input type="number" id="amount" name="amount" min="{{ ratio }}" required
+               placeholder="Quantité" style="flex: 1;">
+        <select name="source" id="source" style="flex: 1;">
+          <option value="gold">Or</option>
+          <option value="wood">Bois</option>
+          <option value="mana">Mana</option>
+        </select>
+      </div>
+
+      <label for="target">Je reçois (divisé par {{ ratio }})</label>
+      <select name="target" id="target">
+        <option value="gold">Or</option>
+        <option value="wood" selected>Bois</option>
+        <option value="mana">Mana</option>
+      </select>
+
+      <button type="submit">Échanger</button>
+    </form>
+
+    <p style="color: var(--tab-brown-fg); font-size: 0.85em; margin-top: 1em;">
+      Exemples :
+      <br>• 100 or → 50 bois
+      <br>• 1 000 bois → 500 mana
+      <br>• 2 000 mana → 1 000 or
+    </p>
+  </div>
+{% endblock %}

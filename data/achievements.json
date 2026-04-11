@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "source": "carac_prouesses.php",
+    "count": 16,
+    "notes": "Achievements ('prouesses') grant XP rewards on completion. 'lot_prouesse' seems to reference a 'reward pack' id. Some achievements are tutorial-style (0-3), others are long-term goals (13: form 1500 units, 14: 2000 battles)."
+  },
+  "achievements": [
+    { "id": 0,  "name_fr": "Dans la peau",                               "description": "Créez votre avatar.",                                            "reward_lot": 30, "reward_xp": 500 },
+    { "id": 1,  "name_fr": "La première pierre",                         "description": "Construire une mine, une scierie et une fontaine magique.",     "reward_lot": 24, "reward_xp": 500 },
+    { "id": 2,  "name_fr": "Pour une lignée éternelle",                  "description": "Former 5 unités de combat.",                                    "reward_lot": 25, "reward_xp": 1200 },
+    { "id": 3,  "name_fr": "Le triomphe de la grandeur",                 "description": "Remportez votre première bataille.",                            "reward_lot": 28, "reward_xp": 3000 },
+    { "id": 4,  "name_fr": "Temps des hâches, temps des épées",          "description": "Réussir 1 campagne contre les Kobolds.",                        "reward_lot": 9,  "reward_xp": 1600 },
+    { "id": 5,  "name_fr": "Ils ne passeront pas",                       "description": "Construire 1 tourelle pour protéger votre royaume.",            "reward_lot": 14, "reward_xp": 1800 },
+    { "id": 6,  "name_fr": "C'est chez nous que ça se passe !",          "description": "Remporter 3 batailles et réussir 5 campagnes contre les Kobolds.", "reward_lot": 31, "reward_xp": 2000 },
+    { "id": 7,  "name_fr": "La fidélité au poing",                       "description": "Appartenir à une alliance.",                                    "reward_lot": 26, "reward_xp": 1400 },
+    { "id": 8,  "name_fr": "Le Butin",                                   "description": "Cumuler 50 000 ressources.",                                    "reward_lot": 2,  "reward_xp": 6000 },
+    { "id": 9,  "name_fr": "L'heure des boucliers fendus",               "description": "Réussir 10 campagnes en un mois.",                              "reward_lot": 30, "reward_xp": 10000 },
+    { "id": 10, "name_fr": "L'Homme au milieu des ruines",               "description": "Activer le portail magique.",                                   "reward_lot": 25, "reward_xp": 10000 },
+    { "id": 11, "name_fr": "Un pouvoir pour la nuit des temps",          "description": "Assister à 2 éclipses en une semaine.",                         "reward_lot": 32, "reward_xp": 20000 },
+    { "id": 12, "name_fr": "Les Armes de l'esprit",                      "description": "Avoir 5 Arbres d'Aura (ou, avec extension, 'Prêt pour l'ultime défi ?').", "reward_lot": 26, "reward_xp": 30000 },
+    { "id": 13, "name_fr": "Par la mort je m'élève",                     "description": "Former 1500 unités de combat.",                                 "reward_lot": 28, "reward_xp": 100000 },
+    { "id": 14, "name_fr": "La guerre, seule hygiène du monde.",         "description": "Participez à 2000 batailles.",                                  "reward_lot": 2,  "reward_xp": 150000 },
+    { "id": 15, "name_fr": "Au coeur de la Tradition",                   "description": "Votre sanctuaire doit renfermer une relique.",                  "reward_lot": 44, "reward_xp": 200000 }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "description": "Nouveaux camps Kobolds ajoutés à la liste des cibles PvE. Seront seedés dans kobold_camps au prochain démarrage du serveur.",
+    "schema": {
+      "id": "string (unique slug)",
+      "name_fr": "string",
+      "description_fr": "string (1-2 sentences)",
+      "biome": "string (marecage|foret|brouillard|montagnes|fortifie)",
+      "pv_max": "int",
+      "loot_gold": "int",
+      "loot_wood": "int",
+      "loot_mana": "int",
+      "backstory_fr": "string (3-6 sentences lore)",
+      "created_at": "ISO 8601"
+    },
+    "last_generated_at": null
+  },
+  "camps": []
+}

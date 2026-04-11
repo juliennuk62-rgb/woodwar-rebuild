@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "description": "Événements aléatoires déclenchés à la visite du dashboard (cooldown par joueur).",
+    "schema": {
+      "id": "string (unique)",
+      "title_fr": "string",
+      "narrative_fr": "string (2-5 sentences setting up the event)",
+      "choices": [
+        {
+          "label_fr": "string (what the player clicks)",
+          "outcome_fr": "string (what happens)",
+          "effect": {
+            "gold": "int (signed delta)",
+            "wood": "int (signed delta)",
+            "mana": "int (signed delta)",
+            "item_id": "int (optional, item granted)",
+            "buff_effect": "string (optional)",
+            "buff_multiplier": "float",
+            "buff_duration_seconds": "int"
+          }
+        }
+      ],
+      "weight": "int (1-100, higher = more likely to be drawn)",
+      "difficulty": "string (peaceful|neutral|hostile)",
+      "created_at": "ISO 8601"
+    },
+    "last_generated_at": null
+  },
+  "events": []
+}

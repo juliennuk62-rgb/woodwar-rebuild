@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Nouveau message — Woodwar Rebuild{% endblock %}
+
+{% block content %}
+  <div class="card" style="max-width: 720px; margin: 2em auto;">
+    <h1>Nouveau message</h1>
+
+    <form method="post" action="{{ url_for('messages_new') }}">
+      <label for="to">Destinataire (pseudo)</label>
+      <input type="text" id="to" name="to" required maxlength="32"
+             value="{{ form_data.to }}" autofocus>
+
+      <label for="subject">Sujet</label>
+      <input type="text" id="subject" name="subject" maxlength="128"
+             value="{{ form_data.subject }}" placeholder="(optionnel)">
+
+      <label for="content">Message</label>
+      <textarea id="content" name="content" rows="10" required maxlength="2000"
+                style="width: 100%; padding: 0.6em 0.8em; background: var(--bg); color: var(--fg); border: 1px solid var(--border); border-radius: 4px; font-family: inherit; resize: vertical;">{{ form_data.content }}</textarea>
+
+      <button type="submit">Envoyer</button>
+      <a href="{{ url_for('inbox') }}" class="btn btn-secondary">Annuler</a>
+    </form>
+  </div>
+{% endblock %}

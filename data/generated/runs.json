@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "description": "Historique des runs du générateur automatique. Permet d'éviter les doublons et de tracer l'évolution.",
+    "schema": {
+      "run_id": "string",
+      "started_at": "ISO 8601",
+      "completed_at": "ISO 8601",
+      "theme": "string (quests|events|lore|camps|items|mixed)",
+      "entries_added": "int",
+      "summary_fr": "string",
+      "commit_sha": "string (optional)"
+    }
+  },
+  "runs": []
+}

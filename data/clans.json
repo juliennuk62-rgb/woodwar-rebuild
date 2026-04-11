@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "source": "carac_clans.php + fr_leng.php (CLAND1..CLAND8)",
+    "count": 8,
+    "notes": "Clan choice at character creation. The 'coloris_clan' hex color is used for UI accents. Description keys (CLANDn) point to fr_leng.php for lore text."
+  },
+  "clans": [
+    { "id": 1, "name": "Orghana",    "chief": "Legamir", "color": "#D697F0", "description_key": "CLAND1" },
+    { "id": 2, "name": "Gaelyn",     "chief": "Sharsor", "color": "#ABB3DB", "description_key": "CLAND2" },
+    { "id": 3, "name": "Isorfidia",  "chief": "Erogar",  "color": "#DCC084", "description_key": "CLAND3" },
+    { "id": 4, "name": "Gleoryn",    "chief": "Glolas",  "color": "#7BC07E", "description_key": "CLAND4" },
+    { "id": 5, "name": "Maneldar",   "chief": "Fenrir",  "color": "#D98090", "description_key": "CLAND5" },
+    { "id": 6, "name": "Amaraldor",  "chief": "Ysumir",  "color": "#A2A2A2", "description_key": "CLAND6" },
+    { "id": 7, "name": "Langwen",    "chief": "Vank",    "color": "#BF8D76", "description_key": "CLAND7" },
+    { "id": 8, "name": "Kuran",      "chief": "Kara",    "color": "#9090F8", "description_key": "CLAND8" }
+  ]
+}

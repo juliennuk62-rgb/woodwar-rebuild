@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "description": "Quêtes générées par le trigger quotidien. Chaque quête a un objectif mesurable et une récompense.",
+    "schema": {
+      "id": "string (unique)",
+      "name_fr": "string",
+      "description_fr": "string",
+      "objective_type": "string (e.g., 'train_units', 'win_campaigns', 'earn_gold')",
+      "objective_count": "int",
+      "reward_gold": "int",
+      "reward_xp": "int",
+      "difficulty": "string (easy|medium|hard)",
+      "created_at": "ISO 8601",
+      "lore_hook": "string (1-3 sentences of narrative flavor)"
+    },
+    "last_generated_at": null
+  },
+  "quests": []
+}
