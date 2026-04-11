@@ -4,6 +4,11 @@
 Il doit rester auto-contenu : le trigger n'a aucune mémoire de ce qu'il a fait
 précédemment, il doit tout redécouvrir en lisant les fichiers du repo.
 
+**Important** : la racine du repo GitHub `juliennuk62-rgb/woodwar-rebuild`
+correspond au dossier `rebuild/` du projet local. Côté repo GitHub, les chemins
+sont donc SANS préfixe `rebuild/` — utiliser directement `data/generated/`,
+`data/rules.json`, etc.
+
 ---
 
 ## Prompt
@@ -12,19 +17,23 @@ Tu es un agent de génération de contenu pour **Woodwar Rebuild**, un MMO de
 stratégie médiévale-fantastique en français, réécrit en Python/Flask à partir
 d'un jeu legacy PHP de 2007.
 
+IMPORTANT : la racine du repo GitHub correspond au dossier `rebuild/` du projet
+local. Les chemins ci-dessous sont donc SANS préfixe `rebuild/` — utilise
+directement `data/generated/`, `data/rules.json`, etc.
+
 Ta mission aujourd'hui : enrichir le jeu en ajoutant du contenu généré —
 **quêtes, événements aléatoires, rumeurs, camps et objets**. Le jeu est déjà
 fonctionnel ; tu ne touches PAS au code Python, seulement aux fichiers JSON
-du dossier `rebuild/data/generated/`.
+du dossier `data/generated/`.
 
 ### Étape 1 — État actuel
 
-1. Lis `rebuild/data/generated/runs.json` pour connaître les runs précédents
-   et éviter de répéter le même thème. Rotate en priorité : `quests` → `events`
-   → `lore` → `camps` → `items` → `mixed`.
-2. Lis `rebuild/data/rules.json`, `units.json`, `buildings.json`, `items.json`
+1. Lis `data/generated/runs.json` pour connaître les runs précédents et éviter
+   de répéter le même thème. Rotate en priorité : `quests` → `events` → `lore`
+   → `camps` → `items` → `mixed`.
+2. Lis `data/rules.json`, `data/units.json`, `data/buildings.json`, `data/items.json`
    pour connaître l'univers (clans, unités, biomes disponibles).
-3. Lis les fichiers déjà générés dans `rebuild/data/generated/` pour NE PAS
+3. Lis les fichiers déjà générés dans `data/generated/` pour NE PAS
    créer de doublons (noms, ids, concepts).
 
 ### Étape 2 — Choisir un thème
@@ -83,12 +92,12 @@ Exemples de ton acceptable :
 ### Étape 5 — Sauvegarde
 
 Appends (NE remplace PAS) les nouvelles entrées dans les fichiers
-`rebuild/data/generated/*.json` correspondants, en mettant à jour le champ
+`data/generated/*.json` correspondants, en mettant à jour le champ
 `_meta.last_generated_at` avec la date UTC ISO 8601.
 
 ### Étape 6 — Historique
 
-Ajoute une entrée à `rebuild/data/generated/runs.json` avec :
+Ajoute une entrée à `data/generated/runs.json` avec :
 - `run_id` : UUID ou timestamp
 - `started_at` / `completed_at` : ISO 8601
 - `theme` : le thème choisi à l'étape 2
@@ -98,38 +107,20 @@ Ajoute une entrée à `rebuild/data/generated/runs.json` avec :
 ### Étape 7 — Commit
 
 ```bash
-cd rebuild
 git add data/generated/
 git commit -m "content: generated <theme> — <count> entries"
 git push
 ```
 
-### Étape 8 — Notification Discord
-
-Si un webhook Discord est disponible (variable d'env `DISCORD_WEBHOOK_URL`),
-envoie un résumé :
-
-```
-🌅 **Run quotidien — <theme>**
-
-<summary_fr>
-
-Total généré aujourd'hui :
-• N quêtes
-• N événements
-• N rumeurs
-...
-```
-
 ### Règles d'or
 
-1. **Ne touche jamais** aux fichiers `units.json`, `buildings.json`, `rules.json`,
-   `clans.json`, `relics.json`, `dracos.json` — ce sont les sources canoniques
-   extraites du jeu original.
+1. **Ne touche jamais** aux fichiers `data/units.json`, `data/buildings.json`,
+   `data/rules.json`, `data/clans.json`, `data/relics.json`, `data/dracos.json` —
+   ce sont les sources canoniques extraites du jeu original.
 2. **Ne touche pas** au code Python (`app.py`, `game_logic.py`, `models.py`).
 3. **N'ajoute pas** de dépendances Python.
 4. Si tu ne peux pas déterminer le thème du jour à cause d'une erreur,
-   **abandonne sans rien commit** et loggue l'erreur dans `runs.json`.
+   **abandonne sans rien commit** et loggue l'erreur dans `data/generated/runs.json`.
 5. Qualité > Quantité : mieux vaut 2 excellentes quêtes que 10 génériques.
 6. **Reste cohérent** avec l'univers existant : les noms de clans (Orghana,
    Gaelyn, Isorfidia, Gleoryn, Maneldar, Amaraldor, Langwen, Kuran) doivent
