@@ -255,3 +255,36 @@ visibles, comptés, et validés à chaque playtest. Une régression future
 basculer le status en `yellow` avec un blocker explicite.
 
 Tests : 79 → 89 (dix nouveaux). Tout vert.
+
+### Étape 3 — 3 lore narratives qui tissent les nouveaux camps — ✅
+
+Trois entrées ajoutées à `data/generated/lore.json` pour refermer le
+fil narratif ouvert par les camps du run précédent (lore 6 → 9) :
+
+- **`lore_rumeur_bourbier_blostrom`** (rumeur) — Blöstrom, le vieux
+  marchand du camp marais, revient à la Grande Taverne avec une carte
+  trempée de vase marquant un coffret scellé. Rejoue la seed du camp
+  `camp_bourbier_blostrom` dont le backstory évoque exactement ce
+  coffret, et relie explicitement aux Orghana (bardes qui recopient
+  la carte).
+- **`lore_bulletin_nid_vank`** (bulletin) — Les tambours de pierre du
+  `camp_nid_vank` se remettent à battre, les Trolls reforgent des
+  boucliers à la mesure de celui de Vank, les Oracles d'Isorfidia
+  allument un troisième cierge sur « l'autel des cols ». Fait avancer
+  la prophétie du douzième Seigneur (déjà posée dans
+  `lore_prophetie_baiser_fenrir` et `lore_bulletin_duel_maneldar`).
+- **`lore_chant_forteresse_akkrongar`** (chant) — Couplet des trois
+  collines du `camp_forteresse_akkrongar`, délibérément sans strophe
+  finale : la tradition veut que seul le Seigneur qui prendra le
+  bastion souterrain ait le droit de la composer. Accroche directe à
+  l'`evt_ombre_akkrongar` et à la prise du camp tier 5.
+
+Tous trois respectent le ton médiéval français et le vocabulaire
+canonique (Seigneur, Royaume, Oracles, Traître, Aura, clans). Les
+nouvelles catégories utilisées (rumeur, bulletin, chant) sont toutes
+déjà employées dans le fichier, donc la vitrine `/rumeurs` les
+affichera automatiquement sans aucun changement côté template.
+
+Playtest : `variety.counts.lore` passe de 6 → 9, zéro issue, status
+green. Tests : 89/89, inchangé — aucun test schéma de lore n'est
+cassé par les ajouts.
