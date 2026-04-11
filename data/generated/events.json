@@ -24,7 +24,7 @@
       "difficulty": "string (peaceful|neutral|hostile)",
       "created_at": "ISO 8601"
     },
-    "last_generated_at": "2026-04-11T13:00:00Z"
+    "last_generated_at": "2026-04-12T00:00:00Z"
   },
   "events": [
     {
@@ -223,6 +223,126 @@
       "weight": 30,
       "difficulty": "neutral",
       "created_at": "2026-04-11T13:00:00Z"
+    },
+    {
+      "id": "evt_enfant_givre",
+      "title_fr": "L'Enfant aux mains de givre",
+      "narrative_fr": "Une fillette d'à peine sept étés se tient au pied du pont-levis, seule, pieds nus dans la neige. Sa main droite est enveloppée d'un givre qui ne fond pas, même quand vos sentinelles l'approchent d'une torche. Elle ne parle pas, mais elle tend cette main vers votre donjon comme si elle demandait quelque chose sans le savoir. Une vieille servante Amaraldor, en la voyant, s'agenouille aussitôt et murmure le nom de Fenrir.",
+      "choices": [
+        {
+          "label_fr": "Accueillir l'enfant dans vos appartements et nourrir le givre d'un peu de Mana.",
+          "outcome_fr": "La fillette s'endort près de l'âtre et, à l'aube, son givre s'est cristallisé en un fin bracelet qu'elle vous offre sans un mot. Les Oracles jurent que c'est une relique vivante — et les forgerons sentent leurs mains plus sûres pour une demi-journée.",
+          "effect": {
+            "gold": 0,
+            "wood": 0,
+            "mana": -250,
+            "buff_effect": "attack_power",
+            "buff_multiplier": 1.2,
+            "buff_duration_seconds": 86400
+          }
+        },
+        {
+          "label_fr": "Envoyer un messager réveiller les Oracles d'Isorfidia et leur confier l'enfant.",
+          "outcome_fr": "Les Oracles arrivent avant le coucher du soleil et repartent avec la petite, en vous remerciant d'une bourse scellée aux armes d'Isorfidia. Vous n'avez rien vu du givre de plus près, mais votre trésor est un peu plus gras.",
+          "effect": {
+            "gold": 420,
+            "wood": 0,
+            "mana": 0
+          }
+        },
+        {
+          "label_fr": "Refermer le pont-levis et laisser l'enfant sur le parvis.",
+          "outcome_fr": "À l'aube, la fillette a disparu. À sa place, une fine couche de givre dessine sur les dalles une silhouette à trois têtes — celle, dit-on, du Traître Akkrongär. Les servantes refusent de dormir dans les communs pendant trois nuits.",
+          "effect": {
+            "gold": 0,
+            "wood": 0,
+            "mana": -180
+          }
+        }
+      ],
+      "weight": 35,
+      "difficulty": "peaceful",
+      "created_at": "2026-04-12T00:00:00Z"
+    },
+    {
+      "id": "evt_registre_legamir",
+      "title_fr": "Le Registre des Douze",
+      "narrative_fr": "Les bardes de Legamir ont déroulé sur le parvis de la Grande Taverne un registre long comme deux chevaux, scellé aux armes des Maneldar. Une ligne, tout en haut, porte déjà un nom tracé à l'encre rouge — mais nul ne sait lire ce nom : les lettres se brouillent quand on en approche. C'est la première fois depuis cent ans que le registre des douze victoires est ouvert, et les bardes regardent chaque Seigneur qui passe avec une patience d'oiseau de proie.",
+      "choices": [
+        {
+          "label_fr": "Faire inscrire votre sceau juste en dessous du nom rouge.",
+          "outcome_fr": "Les bardes applaudissent en silence, un Oracle Isorfidia pose un baiser de givre sur votre épaulière (purement symbolique, jurent-ils), et une rumeur court avant l'aube : un Seigneur a osé se déclarer. Le peuple reprend foi. Vos recrues s'entraînent plus vite pour trois jours.",
+          "effect": {
+            "gold": -350,
+            "wood": 0,
+            "mana": 0,
+            "buff_effect": "train_speed",
+            "buff_multiplier": 1.25,
+            "buff_duration_seconds": 259200
+          }
+        },
+        {
+          "label_fr": "Payer les bardes pour effacer le nom rouge — quel qu'il soit.",
+          "outcome_fr": "Les bardes acceptent à contrecœur et grattent le parchemin trois nuits durant. Mais au matin, le nom rouge est réapparu, et les Maneldar murmurent que quelqu'un essaie de cacher quelque chose. Vous perdez un peu de crédit, mais gagnez la gratitude silencieuse d'un Oracle.",
+          "effect": {
+            "gold": -600,
+            "wood": 0,
+            "mana": 120
+          }
+        },
+        {
+          "label_fr": "Détourner les yeux et passer votre chemin.",
+          "outcome_fr": "Les bardes ne vous retiennent pas. Le parvis reste le parvis, le registre reste ouvert. Trois lunes plus tard, un messager Maneldar vous laissera entendre que « le registre a de la mémoire » — sans jamais rien préciser de plus.",
+          "effect": {
+            "gold": 0,
+            "wood": 0,
+            "mana": 0
+          }
+        }
+      ],
+      "weight": 45,
+      "difficulty": "neutral",
+      "created_at": "2026-04-12T00:00:00Z"
+    },
+    {
+      "id": "evt_onzieme_tombe",
+      "title_fr": "Le Onzième Seigneur est tombé",
+      "narrative_fr": "Un messager Maneldar à cheval blanc s'effondre devant votre donjon, une flèche noire dans le flanc et un rouleau serré contre la poitrine. Le rouleau porte trois sceaux brisés : les Oracles d'Isorfidia, les bardes de Legamir, et le chef Vank en personne. Le parchemin annonce, en trois lignes sobres, que le onzième Seigneur de la prophétie est tombé dans la Forteresse Oubliée d'Akkrongär, et que la couronne du douzième n'a plus qu'un nom à trouver. Le givre commence à remonter le long de la lame de votre épée sans que vous l'ayez tirée.",
+      "choices": [
+        {
+          "label_fr": "Rassembler une compagnie et marcher vers la Forteresse d'Akkrongär.",
+          "outcome_fr": "Vos hommes se mettent en route dans l'heure. Les trois premières journées sont dures — nourriture courte, pluie glacée — mais une horde de Kobolds, croyant surprendre un convoi isolé, se brise sur votre avant-garde et laisse un coffret d'Aura derrière elle.",
+          "effect": {
+            "gold": -800,
+            "wood": -200,
+            "mana": 550,
+            "buff_effect": "attack_power",
+            "buff_multiplier": 1.3,
+            "buff_duration_seconds": 172800
+          }
+        },
+        {
+          "label_fr": "Barricader le donjon et attendre que les Oracles se prononcent.",
+          "outcome_fr": "Les Oracles d'Isorfidia envoient trois prophéties contradictoires en deux jours, et les Maneldar vous reprochent ouvertement votre hésitation. Vous perdez un peu de standing — mais les Kuran, eux, vous envoient trois chariots de bois par reconnaissance pour « un Seigneur qui sait ne pas mourir trop tôt ».",
+          "effect": {
+            "gold": 0,
+            "wood": 280,
+            "mana": -150
+          }
+        },
+        {
+          "label_fr": "Abattre le messager avant qu'il ne parle à d'autres — personne ne doit savoir.",
+          "outcome_fr": "Le messager meurt en silence, vous brûlez le rouleau dans la cheminée basse. Mais le givre, lui, ne brûle pas : il remonte d'une phalange sur votre épée chaque nuit. Les servantes refusent de vous servir le vin. Les Maneldar, d'une manière ou d'une autre, finiront par apprendre.",
+          "effect": {
+            "gold": 200,
+            "wood": 0,
+            "mana": -400
+          }
+        }
+      ],
+      "weight": 20,
+      "difficulty": "hostile",
+      "created_at": "2026-04-12T00:00:00Z"
     }
   ]
 }

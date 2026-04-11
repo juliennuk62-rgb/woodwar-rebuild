@@ -51,6 +51,14 @@
       "theme": "quests",
       "entries_added": 4,
       "summary_fr": "Quatre quêtes additionnelles ancrées aux nouveaux camps : qst_coffret_blostrom (easy, earn_gold, camp_bourbier_blostrom), qst_embuscade_clairiere_eolric (medium, train_units, camp_clairiere_eolric), qst_miroir_isorfidia (medium, build_level, camp_brume_isorfidia), et qst_couronne_akkrongar (hard, own_relic, camp_forteresse_akkrongar). Trois nouveaux objective_types activés (earn_gold, build_level, own_relic) ; 6/8 types couverts au total. Seul camp non cité : camp_nid_vank, gardé pour un run ultérieur."
+    },
+    {
+      "run_id": "run_20260412_events_prophetie_01",
+      "started_at": "2026-04-12T00:15:00Z",
+      "completed_at": "2026-04-12T00:25:00Z",
+      "theme": "events",
+      "entries_added": 3,
+      "summary_fr": "Trois événements qui font avancer la prophétie du douzième Seigneur : evt_enfant_givre (peaceful, fillette aux mains de givre au pied du pont-levis), evt_registre_legamir (neutral, les bardes rouvrent le registre des douze victoires avec un nom déjà tracé en rouge), et evt_onzieme_tombe (hostile, messager Maneldar qui annonce la mort du onzième Seigneur dans la Forteresse d'Akkrongär). Les trois événements arment narrativement la quête qst_couronne_akkrongar créée plus tôt dans le run — un joueur qui les enchaîne a un arc narratif complet présage → call to action → objectif mécanique."
     }
   ]
 }

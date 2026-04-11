@@ -381,4 +381,58 @@ biomes/camps.
 Tests : 89/89 vert. Playtest : green, 0 blocker. `variety.counts.quests`
 passe de 5 à 9.
 
+### Étape 3 — 3 événements autour de la prophétie du douzième Seigneur — ✅
+
+Trois événements ajoutés à `data/generated/events.json` (5 → 8), tous
+construits pour faire avancer la prophétie posée dans
+`lore_prophetie_baiser_fenrir` et `lore_bulletin_duel_maneldar`. Une
+difficulté par événement, et un choix explicitement lié à la
+Forteresse d'Akkrongär dans chacun — chaque événement renforce
+l'ancrage narratif du camp tier 5 et de la quête hard qui vient
+d'être créée.
+
+- **`evt_enfant_givre`** (peaceful, weight 35) — Une fillette aux
+  mains de givre au pied du pont-levis, une servante Amaraldor qui
+  s'agenouille en murmurant le nom de Fenrir. Trois choix : accueillir
+  (buff attack_power 1.2x / 24h, coût Mana), confier aux Oracles
+  (gold +420), ou refermer le pont (mauvais augure, -180 Mana). C'est
+  la première apparition physique d'un « signe du givre » dans le
+  fil narratif.
+- **`evt_registre_legamir`** (neutral, weight 45) — Les bardes
+  déroulent pour la première fois en cent ans le registre des douze
+  victoires. Un nom est déjà tracé en rouge, mais les lettres se
+  brouillent à l'approche. Trois choix : s'inscrire (buff train_speed
+  1.25x / 3 jours, -350 gold), payer pour effacer le nom rouge (-600
+  gold, +120 Mana), ou détourner les yeux. La mention « le registre
+  a de la mémoire » garde la porte ouverte pour un événement futur.
+- **`evt_onzieme_tombe`** (hostile, weight 20) — Un messager Maneldar
+  s'effondre devant le donjon avec un rouleau à trois sceaux brisés :
+  le onzième Seigneur est mort dans la Forteresse d'Akkrongär, la
+  couronne n'attend plus qu'un douzième nom. Trois choix : marcher
+  sur Akkrongär (buff attack_power 1.3x / 48h, coût gold+wood), se
+  barricader (+280 bois Kuran, -150 Mana), ou abattre le messager (le
+  givre remonte d'une phalange chaque nuit, -400 Mana, +200 gold).
+  C'est l'événement qui arme directement la quête
+  `qst_couronne_akkrongar` : un joueur qui voit évt puis accepte la
+  quête a un arc narratif complet (présage → call to action →
+  objectif mécanique).
+
+Les trois événements respectent le schéma (3 choix chacun, weight
+dans [1,100], difficulty parmi {peaceful,neutral,hostile}, effets
+avec `gold/wood/mana` signés, `buff_*` quand présents dans la
+whitelist). Tous utilisent exclusivement le vocabulaire canonique
+(Seigneur, Oracles, Fenrir, Aura, Kobolds, Traître, Maneldar,
+Isorfidia, Amaraldor, Legamir, Kuran), zéro anglicisme, zéro emoji
+dans le narratif.
+
+**Distribution des difficultés des événements après ajout** (8 events
+totaux) : `peaceful:2, neutral:3, hostile:3`. Poids total 285 (contre
+170 avant). La vitrine `/rumeurs` affichera désormais les 6 events
+les plus pondérés : evt_festin_gaelyn (60), evt_registre_legamir (45),
+evt_caravane_thulmis (40), evt_enfant_givre (35), evt_bestiaire_amaraldor
+(30), evt_oracle_aura_vacillante (25).
+
+Tests : 89/89 vert. Playtest : green, 0 blocker.
+`variety.counts.events` passe de 5 à 8.
+
 ---
