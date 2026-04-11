@@ -8,7 +8,7 @@
       "category": "string (rumeur|bulletin|prophétie|chant|fable)",
       "created_at": "ISO 8601"
     },
-    "last_generated_at": "2026-04-11T13:00:00Z"
+    "last_generated_at": "2026-04-11T23:30:00Z"
   },
   "entries": [
     {
@@ -52,6 +52,27 @@
       "body_fr": "Par parole de hérault, le clan Maneldar annonce que tout Seigneur souhaitant prétendre à la couronne de Fenrir devra vaincre douze rivaux en duel loyal, non pas cinq comme le prétendait la rumeur récente. Les bardes corrigent donc leurs registres, et les paris, déjà ouverts à la Grande Taverne de Legamir, ont été rouverts au tarif doublé. Aucun nom ne s'est encore inscrit sur le grand tableau de chêne.",
       "category": "bulletin",
       "created_at": "2026-04-11T13:00:00Z"
+    },
+    {
+      "id": "lore_rumeur_bourbier_blostrom",
+      "title_fr": "Blöstrom revient avec une carte trempée",
+      "body_fr": "Le vieux marchand Blöstrom, que l'on croyait enlisé depuis deux lunes, s'est présenté avant-hier à la Grande Taverne de Legamir en réclamant un bol de cervoise chaude et une plume d'oie. Il a déroulé sur la table une carte du Bourbier qui porte son nom, toute suintante de vase, et a tracé d'un doigt tremblant une croix sur un îlot que personne n'avait jamais signalé. « Le coffret scellé au plomb, messire, il est là », aurait-il murmuré avant de s'endormir la tête sur son bol. Les apprentis bardes des Orghana ont déjà commencé à recopier la carte, mais la vase l'efface plus vite qu'ils ne l'écrivent.",
+      "category": "rumeur",
+      "created_at": "2026-04-11T23:30:00Z"
+    },
+    {
+      "id": "lore_bulletin_nid_vank",
+      "title_fr": "Le Nid d'Aigle de Vank parle à nouveau",
+      "body_fr": "Les éclaireurs Maneldar revenus des hautes passes rapportent que les tambours de pierre du Nid d'Aigle de Vank, muets depuis la fin de la première ère, se sont remis à battre trois coups par nuit. Les Trolls qui occupent aujourd'hui le sommet portent, d'après les récits, des boucliers d'ardoise taillés à la mesure du bouclier légendaire de Vank lui-même. Le chef Kuran chargé de la veille a interdit aux marchands Gleoryn de quitter Thulmis sans escorte, et les Oracles d'Isorfidia ont allumé un troisième cierge sur l'autel des cols. La prophétie du douzième Seigneur prend, disent-ils, des contours de plus en plus précis.",
+      "category": "bulletin",
+      "created_at": "2026-04-11T23:30:00Z"
+    },
+    {
+      "id": "lore_chant_forteresse_akkrongar",
+      "title_fr": "Chant des trois collines d'Akkrongär",
+      "body_fr": "« Sous la première colline, Akkrongär dort ; sous la seconde, il compte son or ; sous la troisième, il aiguise son heaume — et le jour où trois cents lances frapperont ensemble les trois collines, le Traître cessera enfin d'être un rêve. » Ce chant, entonné à voix basse par les bûcherons Langwen quand ils croisent un bataillon d'Orghana sur la route de la Clairière d'Eolric, n'a pas de couplet final : la tradition veut que seul le Seigneur qui enfoncera la porte du bastion souterrain ait le droit d'en composer la dernière strophe. Les bardes de Legamir gardent une place blanche sur leur grand registre, en attendant.",
+      "category": "chant",
+      "created_at": "2026-04-11T23:30:00Z"
     }
   ]
 }

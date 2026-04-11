@@ -172,3 +172,137 @@ invariants sera bloqué au niveau du CI avant merge.
 **Total commits** : 5 (1 démarrage + 3 étapes + 1 clôture)
 
 ---
+
+## Run 2026-04-11T23:30:00Z — playtest aveugle aux camps + items
+
+**Priorité choisie** : 4 (bug détecté) — `scripts/playtest.py` ignore
+complètement `camps.json` et `items.json`.
+**Cause** : Le run précédent a ajouté 5 camps et 6 items (ids 100-105) avec
+leurs tests de schéma, mais `check_content_variety()` ne compte que
+quests/events/lore. Les nouveaux types sont donc invisibles au playtest :
+`variety.counts` n'affiche toujours que `{quests: 5, events: 5, lore: 6}`,
+et aucune feasibility check ne couvre pv_max des camps ou buff_effect des
+items. Une régression future (camp avec pv_max=0, item avec
+buff_multiplier=999, doublon d'id cross-content) passerait sous le radar.
+Les tests unitaires verrouillent le schéma, mais le playtest — qui est la
+boucle de feedback permanente du trigger — est aveugle.
+
+**Anti-répétition** : parfait. Les 3 derniers runs ont touché à la
+génération de contenu (quests, events+lore, camps+items). Ce run vise
+l'infrastructure du harnais pour refermer la boucle.
+
+**Plan du run** (chaque étape = son propre commit vert) :
+- **Étape 1** : Étendre `scripts/playtest.py` — compter camps et items
+  dans `check_content_variety`, ajouter `check_camps_feasibility` (pv_max
+  dans [300, 100k], tier dans [1, 5], loot cohérent) et
+  `check_items_feasibility` (buff_multiplier, duration, drop_weight), et
+  flagger les doublons d'id cross-content.
+- **Étape 2** : Générer 2-3 entrées lore qui tissent narrativement les
+  nouveaux camps avec les quêtes et rumeurs existantes (petit polish
+  narratif, au passage, pour enrichir le fil).
+- **Étape 3** : Commit de clôture avec bilan.
+
+### Étape 1 — Commit de démarrage — ✅
+
+### Étape 2 — Extension playtest.py (variety + feasibility) — ✅
+
+**Changements dans `scripts/playtest.py`** :
+
+- `check_content_variety()` compte désormais cinq catégories au lieu de
+  trois : quests/events/lore/**camps**/**items**. Le nouveau
+  `variety.counts` affiche immédiatement combien de contenu existe dans
+  chaque bucket — c'est le signal principal que l'agent lit pour choisir
+  sa prochaine génération.
+- Même fonction : détection de **doublons d'id cross-content**. Si un
+  quest et un camp partagent un id, le playtest lève un issue. C'était
+  un angle mort critique — la boucle de chargement de `game_data.py`
+  écraserait silencieusement l'une des deux entrées.
+- Nouveau `check_camps_feasibility()` — vérifie pv_max ∈ [300, 100k],
+  biome/archetype/ai_pattern dans les whitelists de `game_logic.py`,
+  difficulty_tier ∈ [1, 5], loot non-négatif, et flagge les camps
+  non-triviaux (pv ≥ 500) qui droppent zéro loot (camp PvE inutile).
+- Nouveau `check_items_feasibility()` — vérifie buff_effect,
+  buff_multiplier ∈ [0.5, 2.5], duration ∈ [60, 7200], drop_weight
+  ∈ [1, 10], et flagge toute collision d'id avec les items legacy
+  (< 100) qui casserait le merge de `GameData.__init__`.
+- `run_all()` inclut les deux nouveaux rapports et leurs issues dans la
+  liste globale des blockers.
+
+**Nouveau fichier `tests/test_playtest.py`** (10 tests) :
+
+- `PlaytestVarietyTests` — 2 tests : `counts` contient bien les cinq
+  clés, et un doublon cross-content est bien détecté.
+- `PlaytestCampsFeasibilityTests` — 4 tests : les camps actuels sont
+  propres, et trois smoke tests injectent des camps défectueux
+  (pv_max=50, archetype='dragon', loot=0 pour pv=5000) pour vérifier
+  que le check les rejette.
+- `PlaytestItemsFeasibilityTests` — 3 tests : items actuels propres,
+  rejet de buff_multiplier=10 et d'un id legacy=50.
+- `PlaytestRunAllTests` — 1 test qui vérifie qu'un issue camps remonte
+  bien dans `report['blockers']` et bascule `status` à `yellow`.
+
+**Résultat immédiat sur le rapport playtest** :
+
+```
+variety.counts: {quests: 5, events: 5, lore: 6, camps: 5, items: 6}
+camps: {camp_count: 5, issues: []}
+items: {item_count: 6, issues: []}
+```
+
+Les 5 camps et 6 items générés au run précédent sont désormais
+visibles, comptés, et validés à chaque playtest. Une régression future
+(pv_max=0, buff_multiplier aberrant, doublon d'id) fera immédiatement
+basculer le status en `yellow` avec un blocker explicite.
+
+Tests : 79 → 89 (dix nouveaux). Tout vert.
+
+### Étape 3 — 3 lore narratives qui tissent les nouveaux camps — ✅
+
+Trois entrées ajoutées à `data/generated/lore.json` pour refermer le
+fil narratif ouvert par les camps du run précédent (lore 6 → 9) :
+
+- **`lore_rumeur_bourbier_blostrom`** (rumeur) — Blöstrom, le vieux
+  marchand du camp marais, revient à la Grande Taverne avec une carte
+  trempée de vase marquant un coffret scellé. Rejoue la seed du camp
+  `camp_bourbier_blostrom` dont le backstory évoque exactement ce
+  coffret, et relie explicitement aux Orghana (bardes qui recopient
+  la carte).
+- **`lore_bulletin_nid_vank`** (bulletin) — Les tambours de pierre du
+  `camp_nid_vank` se remettent à battre, les Trolls reforgent des
+  boucliers à la mesure de celui de Vank, les Oracles d'Isorfidia
+  allument un troisième cierge sur « l'autel des cols ». Fait avancer
+  la prophétie du douzième Seigneur (déjà posée dans
+  `lore_prophetie_baiser_fenrir` et `lore_bulletin_duel_maneldar`).
+- **`lore_chant_forteresse_akkrongar`** (chant) — Couplet des trois
+  collines du `camp_forteresse_akkrongar`, délibérément sans strophe
+  finale : la tradition veut que seul le Seigneur qui prendra le
+  bastion souterrain ait le droit de la composer. Accroche directe à
+  l'`evt_ombre_akkrongar` et à la prise du camp tier 5.
+
+Tous trois respectent le ton médiéval français et le vocabulaire
+canonique (Seigneur, Royaume, Oracles, Traître, Aura, clans). Les
+nouvelles catégories utilisées (rumeur, bulletin, chant) sont toutes
+déjà employées dans le fichier, donc la vitrine `/rumeurs` les
+affichera automatiquement sans aucun changement côté template.
+
+Playtest : `variety.counts.lore` passe de 6 → 9, zéro issue, status
+green. Tests : 89/89, inchangé — aucun test schéma de lore n'est
+cassé par les ajouts.
+
+**Tests finaux** : 89/89 green (79 + 10 nouveaux dans test_playtest.py)
+**Playtest final** : green, 0 blocker — `variety.counts` affiche
+désormais `{quests:5, events:5, lore:9, camps:5, items:6}`, les deux
+nouveaux rapports `camps` et `items` retournent 0 issue, et le harnais
+est verrouillé par son propre test suite.
+**Total commits** : 4 (1 démarrage + 2 étapes + 1 clôture)
+
+**Priorité suggérée pour le prochain run** : génération pure — c'est
+à nouveau le moment d'une rotation contenu après cet aller-retour
+infra. Candidats équivalents : (a) 3-5 quêtes additionnelles qui
+exploiteraient les nouveaux camps comme cibles (objective_type
+`win_campaigns` avec `target_camp_id` si on étend le schéma), ou (b)
+3-4 nouveaux événements narratifs qui réagissent à la prophétie du
+douzième Seigneur maintenant bien étoffée. Option (b) est la plus
+directe et ne demande aucun changement de schéma.
+
+---
