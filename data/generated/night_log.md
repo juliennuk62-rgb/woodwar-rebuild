@@ -202,4 +202,56 @@ l'infrastructure du harnais pour refermer la boucle.
   narratif, au passage, pour enrichir le fil).
 - **Étape 3** : Commit de clôture avec bilan.
 
-### Étape 1 — Commit de démarrage
+### Étape 1 — Commit de démarrage — ✅
+
+### Étape 2 — Extension playtest.py (variety + feasibility) — ✅
+
+**Changements dans `scripts/playtest.py`** :
+
+- `check_content_variety()` compte désormais cinq catégories au lieu de
+  trois : quests/events/lore/**camps**/**items**. Le nouveau
+  `variety.counts` affiche immédiatement combien de contenu existe dans
+  chaque bucket — c'est le signal principal que l'agent lit pour choisir
+  sa prochaine génération.
+- Même fonction : détection de **doublons d'id cross-content**. Si un
+  quest et un camp partagent un id, le playtest lève un issue. C'était
+  un angle mort critique — la boucle de chargement de `game_data.py`
+  écraserait silencieusement l'une des deux entrées.
+- Nouveau `check_camps_feasibility()` — vérifie pv_max ∈ [300, 100k],
+  biome/archetype/ai_pattern dans les whitelists de `game_logic.py`,
+  difficulty_tier ∈ [1, 5], loot non-négatif, et flagge les camps
+  non-triviaux (pv ≥ 500) qui droppent zéro loot (camp PvE inutile).
+- Nouveau `check_items_feasibility()` — vérifie buff_effect,
+  buff_multiplier ∈ [0.5, 2.5], duration ∈ [60, 7200], drop_weight
+  ∈ [1, 10], et flagge toute collision d'id avec les items legacy
+  (< 100) qui casserait le merge de `GameData.__init__`.
+- `run_all()` inclut les deux nouveaux rapports et leurs issues dans la
+  liste globale des blockers.
+
+**Nouveau fichier `tests/test_playtest.py`** (10 tests) :
+
+- `PlaytestVarietyTests` — 2 tests : `counts` contient bien les cinq
+  clés, et un doublon cross-content est bien détecté.
+- `PlaytestCampsFeasibilityTests` — 4 tests : les camps actuels sont
+  propres, et trois smoke tests injectent des camps défectueux
+  (pv_max=50, archetype='dragon', loot=0 pour pv=5000) pour vérifier
+  que le check les rejette.
+- `PlaytestItemsFeasibilityTests` — 3 tests : items actuels propres,
+  rejet de buff_multiplier=10 et d'un id legacy=50.
+- `PlaytestRunAllTests` — 1 test qui vérifie qu'un issue camps remonte
+  bien dans `report['blockers']` et bascule `status` à `yellow`.
+
+**Résultat immédiat sur le rapport playtest** :
+
+```
+variety.counts: {quests: 5, events: 5, lore: 6, camps: 5, items: 6}
+camps: {camp_count: 5, issues: []}
+items: {item_count: 6, issues: []}
+```
+
+Les 5 camps et 6 items générés au run précédent sont désormais
+visibles, comptés, et validés à chaque playtest. Une régression future
+(pv_max=0, buff_multiplier aberrant, doublon d'id) fera immédiatement
+basculer le status en `yellow` avec un blocker explicite.
+
+Tests : 79 → 89 (dix nouveaux). Tout vert.
