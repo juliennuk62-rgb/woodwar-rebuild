@@ -205,6 +205,107 @@ class GeneratedDataTests(unittest.TestCase):
                     f"Generated item {item_id} collides with legacy range",
                 )
 
+    def test_generated_camps_follow_schema(self):
+        """Each generated camp must have id, name_fr, pv_max in
+        [300, 100000], and — when present — archetype/ai_pattern/
+        difficulty_tier drawn from the whitelists used by game_logic.py."""
+        path = GENERATED_DIR / "camps.json"
+        if not path.exists():
+            return
+        with path.open(encoding="utf-8") as f:
+            data = json.load(f)
+        valid_archetypes = {"kobold", "ambusher", "troll", "wraith", "boss"}
+        valid_patterns = {
+            "passive", "aggressive", "armored", "evasive", "regenerator",
+        }
+        seen_ids = set()
+        for c in data.get("camps", []):
+            cid = c.get("id")
+            self.assertIsNotNone(cid, "camp missing id")
+            self.assertNotIn(cid, seen_ids, f"Duplicate camp id: {cid}")
+            seen_ids.add(cid)
+            self.assertIn("name_fr", c, f"camp {cid} missing name_fr")
+            pv = c.get("pv_max")
+            self.assertIsInstance(pv, int, f"camp {cid} pv_max not int")
+            self.assertGreaterEqual(
+                pv, 300, f"camp {cid} pv_max {pv} below floor 300",
+            )
+            self.assertLessEqual(
+                pv, 100000, f"camp {cid} pv_max {pv} above ceiling 100000",
+            )
+            arch = c.get("archetype")
+            if arch is not None:
+                self.assertIn(
+                    arch, valid_archetypes,
+                    f"camp {cid} invalid archetype: {arch}",
+                )
+            pattern = c.get("ai_pattern")
+            if pattern is not None:
+                self.assertIn(
+                    pattern, valid_patterns,
+                    f"camp {cid} invalid ai_pattern: {pattern}",
+                )
+            tier = c.get("difficulty_tier")
+            if tier is not None:
+                self.assertIsInstance(tier, int)
+                self.assertGreaterEqual(tier, 1)
+                self.assertLessEqual(tier, 5)
+
+    def test_generated_items_follow_schema(self):
+        """Each generated item must declare a valid buff_effect, a
+        buff_multiplier within [0.5, 2.5], a duration in [60, 7200]
+        seconds, and a drop_weight in [1, 10]."""
+        path = GENERATED_DIR / "items.json"
+        if not path.exists():
+            return
+        with path.open(encoding="utf-8") as f:
+            data = json.load(f)
+        valid_buff_effects = {
+            "train_speed", "attack_power", "camp_gold",
+            "camp_wood", "camp_mana", "fret_capacity",
+        }
+        seen_ids = set()
+        for i in data.get("items", []):
+            iid = i.get("id")
+            self.assertIsNotNone(iid, "generated item missing id")
+            self.assertNotIn(iid, seen_ids, f"Duplicate item id: {iid}")
+            seen_ids.add(iid)
+            self.assertIn("name_fr", i, f"item {iid} missing name_fr")
+            buff = i.get("buff_effect")
+            if buff is not None:
+                self.assertIn(
+                    buff, valid_buff_effects,
+                    f"item {iid} invalid buff_effect: {buff}",
+                )
+                mult = i.get("buff_multiplier")
+                self.assertIsNotNone(
+                    mult, f"item {iid} has buff_effect but no multiplier",
+                )
+                self.assertGreaterEqual(
+                    mult, 0.5, f"item {iid} buff_multiplier {mult} below 0.5",
+                )
+                self.assertLessEqual(
+                    mult, 2.5, f"item {iid} buff_multiplier {mult} above 2.5",
+                )
+                dur = i.get("buff_duration_seconds")
+                self.assertIsNotNone(
+                    dur, f"item {iid} has buff_effect but no duration",
+                )
+                self.assertGreaterEqual(
+                    dur, 60, f"item {iid} duration {dur}s below 60s floor",
+                )
+                self.assertLessEqual(
+                    dur, 7200, f"item {iid} duration {dur}s above 7200s ceiling",
+                )
+            drop = i.get("drop_weight")
+            if drop is not None:
+                self.assertGreaterEqual(
+                    drop, 1, f"item {iid} drop_weight {drop} below 1",
+                )
+                self.assertLessEqual(
+                    drop, 10, f"item {iid} drop_weight {drop} above 10",
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

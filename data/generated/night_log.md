@@ -147,4 +147,28 @@ les fusionne automatiquement dans `items['items']` via la boucle déjà en
 place dans game_data.py:75-77 — aucune modif du code de chargement n'a
 été nécessaire.
 
+### Étape 4 — Tests unitaires dédiés camps + items — ✅
 
+Deux nouveaux tests dans `tests/test_data.py` pour verrouiller les
+schémas qu'on vient de remplir :
+
+- `test_generated_camps_follow_schema` — vérifie l'unicité des ids, la
+  présence de name_fr, pv_max int dans [300, 100000], et quand ils sont
+  renseignés : archetype ∈ {kobold, ambusher, troll, wraith, boss},
+  ai_pattern ∈ {passive, aggressive, armored, evasive, regenerator},
+  difficulty_tier ∈ [1, 5]. Les whitelists sont copiées 1:1 depuis
+  game_logic.py (ENEMY_ARCHETYPES, AI_PATTERN_TUNING).
+- `test_generated_items_follow_schema` — vérifie l'unicité des ids, la
+  présence de name_fr, et pour tout item qui déclare un buff : effect
+  dans la whitelist, multiplier dans [0.5, 2.5], duration dans [60, 7200],
+  drop_weight dans [1, 10].
+
+Total tests : 77 → 79 (deux nouveaux). Tous les camps et items du run
+actuel passent ces tests, et tout futur run qui violerait un de ces
+invariants sera bloqué au niveau du CI avant merge.
+
+**Tests finaux** : 79/79
+**Playtest final** : green, 0 blocker
+**Total commits** : 5 (1 démarrage + 3 étapes + 1 clôture)
+
+---
