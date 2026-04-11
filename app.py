@@ -709,6 +709,15 @@ def create_app() -> Flask:
                 biome_meta = game_logic.BIOMES.get(
                     c.biome, game_logic.BIOMES["foret"]
                 )
+                arch_meta = game_logic.ENEMY_ARCHETYPES.get(
+                    c.archetype, game_logic.ENEMY_ARCHETYPES["kobold"]
+                )
+                respawn_iso = (
+                    c.respawn_at.replace(microsecond=0).isoformat() + "Z"
+                    if c.respawn_at is not None and not alive
+                    else None
+                )
+                hp_pct = round(100 * c.pv_current / max(1, c.pv_max), 1) if alive else 0
                 camps_view.append(
                     {
                         "id": c.id,
@@ -717,8 +726,13 @@ def create_app() -> Flask:
                         "biome": c.biome,
                         "biome_label": biome_meta["label"],
                         "image": biome_meta["image"],
+                        "archetype": c.archetype,
+                        "archetype_label": arch_meta["label_fr"],
+                        "ai_pattern": c.ai_pattern,
+                        "difficulty_tier": c.difficulty_tier,
                         "pv_max": c.pv_max,
                         "pv_current": c.pv_current if alive else 0,
+                        "hp_pct": hp_pct,
                         "loot": {
                             "gold": c.loot_gold,
                             "wood": c.loot_wood,
@@ -727,6 +741,7 @@ def create_app() -> Flask:
                         "alive": alive,
                         "respawn_in": respawn_in,
                         "respawn_in_fmt": _format_duration(respawn_in) if respawn_in else None,
+                        "respawn_iso": respawn_iso,
                     }
                 )
 

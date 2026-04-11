@@ -572,10 +572,45 @@ def resolve_combat(
 
     pv_before = camp.pv_current
 
+    # ----- AI pattern resolution -----
+    #
+    # Apply the camp's archetype/AI pattern BEFORE comparing damage to HP.
+    # Each pattern can mutate `effective_damage` and `extra_player_loss_ratio`.
+    pattern = (camp.ai_pattern or "passive").lower()
+    pattern_meta = AI_PATTERN_TUNING.get(pattern, {})
+    pattern_log: list[str] = []  # short notes for the combat report
+    effective_damage = total_damage
+    extra_loss_ratio = 0.0
+
+    if pattern == "evasive":
+        if random.random() < pattern_meta.get("dodge_chance", 0.0):
+            effective_damage = 0
+            pattern_log.append("✦ L'ennemi esquive entièrement l'assaut.")
+        else:
+            pattern_log.append("✦ L'ennemi tente une esquive — sans succès.")
+
+    elif pattern == "armored":
+        ignored = pattern_meta.get("damage_ignored", 0.0)
+        absorbed = int(effective_damage * ignored)
+        effective_damage = max(0, effective_damage - absorbed)
+        pattern_log.append(f"✦ Armure : {absorbed} dégâts absorbés.")
+
+    elif pattern == "aggressive":
+        # Counter-attack hits the player after the assault.
+        counter = pattern_meta.get("counter_ratio", 0.0)
+        extra_loss_ratio += counter
+        pattern_log.append(
+            f"✦ Contre-attaque : +{int(counter * 100)}% de pertes additionnelles."
+        )
+
+    elif pattern == "regenerator":
+        # Will be applied AFTER outcome resolution if the camp survives.
+        pass
+
     # Resolve outcome.
     relic_dropped = None
     item_dropped = None
-    if total_damage >= camp.pv_current:
+    if effective_damage >= camp.pv_current:
         outcome = "victory"
         pv_after = 0
         # Bundle B: apply camp_gold/wood/mana buffs to the loot.
@@ -621,12 +656,23 @@ def resolve_combat(
             }
     else:
         outcome = "weakened"
-        pv_after = camp.pv_current - total_damage
+        pv_after = camp.pv_current - effective_damage
         loot = {"gold": 0, "wood": 0, "mana": 0}
         if total_defense > 0:
             loss_ratio = min(0.80, camp.pv_current / total_defense * 0.5)
         else:
             loss_ratio = 0.80
+
+        # Regenerator pattern: if the camp survived, it heals back 15% of pv_max.
+        if pattern == "regenerator":
+            regen = int(camp.pv_max * pattern_meta.get("regen_ratio", 0.0))
+            healed = min(regen, camp.pv_max - pv_after)
+            if healed > 0:
+                pv_after += healed
+                pattern_log.append(f"✦ Régénération : +{healed} PV restaurés.")
+
+    # Apply the aggressive counter-attack to player losses (added to base ratio).
+    loss_ratio = min(0.95, loss_ratio + extra_loss_ratio)
 
     # Apply losses to each unit type proportionally (dracos are immortal here
     # — a deliberate simplification; in the original only their defense
@@ -675,6 +721,7 @@ def resolve_combat(
         "log_id": log.id,
         "outcome": outcome,
         "total_damage": total_damage,
+        "effective_damage": effective_damage,
         "total_defense": total_defense,
         "pv_before": pv_before,
         "pv_after": pv_after,
@@ -684,6 +731,9 @@ def resolve_combat(
         "relic_dropped": relic_dropped,
         "item_dropped": item_dropped,
         "draco_damage": draco_dmg,
+        "ai_pattern": pattern,
+        "ai_pattern_log": pattern_log,
+        "archetype": camp.archetype,
     }
 
 
@@ -868,6 +918,57 @@ BIOMES: dict[str, dict] = {
 
 _BIOME_KEYS = list(BIOMES.keys())
 
+# ----- Phase 11 (enemies AI) -------------------------------------------------
+
+# Each archetype has visual flavor + a HP / loot multiplier on top of the
+# base biome difficulty.
+ENEMY_ARCHETYPES: dict[str, dict] = {
+    "kobold": {
+        "label_fr": "Kobolds",
+        "hp_mult": 1.0,
+        "loot_mult": 1.0,
+        "default_pattern": "passive",
+        "tier_min": 1, "tier_max": 3,
+    },
+    "ambusher": {
+        "label_fr": "Embusqueurs",
+        "hp_mult": 0.85,
+        "loot_mult": 1.15,
+        "default_pattern": "evasive",
+        "tier_min": 2, "tier_max": 4,
+    },
+    "troll": {
+        "label_fr": "Trolls",
+        "hp_mult": 1.6,
+        "loot_mult": 1.3,
+        "default_pattern": "armored",
+        "tier_min": 2, "tier_max": 4,
+    },
+    "wraith": {
+        "label_fr": "Spectres",
+        "hp_mult": 0.75,
+        "loot_mult": 1.25,
+        "default_pattern": "aggressive",
+        "tier_min": 3, "tier_max": 5,
+    },
+    "boss": {
+        "label_fr": "Champion",
+        "hp_mult": 3.0,
+        "loot_mult": 2.5,
+        "default_pattern": "regenerator",
+        "tier_min": 4, "tier_max": 5,
+    },
+}
+
+# AI pattern numeric tuning, used by resolve_combat.
+AI_PATTERN_TUNING: dict[str, dict] = {
+    "passive":     {},
+    "aggressive":  {"counter_ratio": 0.20},  # 20% of player damage hits back
+    "armored":     {"damage_ignored": 0.30},  # 30% of incoming damage absorbed
+    "evasive":     {"dodge_chance": 0.20},    # 20% chance to dodge entirely
+    "regenerator": {"regen_ratio": 0.15},     # heals 15% of pv_max per attack survived
+}
+
 # Thematic descriptions per biome (rotated randomly when seeding).
 _BIOME_NAMES: dict[str, list[str]] = {
     "marecage": [
@@ -893,12 +994,29 @@ _BIOME_NAMES: dict[str, list[str]] = {
 }
 
 
+def _archetype_for_tier(rng: "random.Random", tier_idx: int, count_per_biome: int) -> str:
+    """Pick a thematic archetype for a camp at the given tier index.
+
+    Lower tiers are mostly kobolds, higher tiers introduce trolls,
+    ambushers, wraiths, and bosses. Tier indexing is 0..count_per_biome-1.
+    """
+    # Map raw tier index to a 1..5 difficulty tier band.
+    tier = 1 + min(4, tier_idx * 5 // max(1, count_per_biome))
+    candidates = [
+        name for name, meta in ENEMY_ARCHETYPES.items()
+        if meta["tier_min"] <= tier <= meta["tier_max"]
+    ]
+    if not candidates:
+        return "kobold"
+    return rng.choice(candidates)
+
+
 def seed_kobold_camps(db_session: "Session") -> int:
     """Generate a grid of ~60 procedural camps across all biomes.
 
     Only runs if no camps exist yet. Defense values form a geometric
     progression so early camps are beatable by a starter army and late ones
-    require real investment.
+    require real investment. Each camp gets an archetype + AI pattern.
     """
     from models import KoboldCamp
 
@@ -915,21 +1033,37 @@ def seed_kobold_camps(db_session: "Session") -> int:
         meta = BIOMES[biome_key]
         names_pool = _BIOME_NAMES[biome_key]
         for tier in range(count_per_biome):
-            # Geometric progression: tier 0 ~300 PV, tier 11 ~50k PV.
-            base_pv = int(300 * (1.6 ** tier) * meta["difficulty"])
-            # Small jitter per camp for variety.
+            # Pick an archetype appropriate for the tier band.
+            archetype = _archetype_for_tier(rng, tier, count_per_biome)
+            arch_meta = ENEMY_ARCHETYPES[archetype]
+            ai_pattern = arch_meta["default_pattern"]
+            difficulty_tier = 1 + min(4, tier * 5 // max(1, count_per_biome))
+
+            # Geometric progression: tier 0 ~300 PV, tier 11 ~50k PV,
+            # then archetype HP multiplier on top.
+            base_pv = int(300 * (1.6 ** tier) * meta["difficulty"] * arch_meta["hp_mult"])
             pv_max = base_pv + rng.randint(-base_pv // 10, base_pv // 10)
-            loot_gold = int(pv_max * 0.45)
-            loot_wood = int(pv_max * 0.20)
-            loot_mana = int(pv_max * 0.10)
+
+            loot_mult = arch_meta["loot_mult"]
+            loot_gold = int(pv_max * 0.45 * loot_mult)
+            loot_wood = int(pv_max * 0.20 * loot_mult)
+            loot_mana = int(pv_max * 0.10 * loot_mult)
+
+            archetype_label = arch_meta["label_fr"]
+            biome_label = meta["label"].lower()
+            description = f"Un camp {biome_label} occupé par des {archetype_label.lower()}."
+
             camps_to_create.append({
                 "name": rng.choice(names_pool),
-                "description": f"Un camp {meta['label'].lower()}.",
+                "description": description,
                 "biome": biome_key,
                 "pv_max": pv_max,
                 "loot_gold": loot_gold,
                 "loot_wood": loot_wood,
                 "loot_mana": loot_mana,
+                "archetype": archetype,
+                "ai_pattern": ai_pattern,
+                "difficulty_tier": difficulty_tier,
             })
 
     # Shuffle so biomes are mixed in the grid (like the original game).
@@ -945,6 +1079,9 @@ def seed_kobold_camps(db_session: "Session") -> int:
             loot_gold=data["loot_gold"],
             loot_wood=data["loot_wood"],
             loot_mana=data["loot_mana"],
+            archetype=data["archetype"],
+            ai_pattern=data["ai_pattern"],
+            difficulty_tier=data["difficulty_tier"],
         )
         db_session.add(camp)
     db_session.commit()

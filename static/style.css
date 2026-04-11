@@ -2109,3 +2109,52 @@ textarea:focus {
   animation: ww-fade-in 0.35s ease both;
 }
 
+/* ===============================================================
+   Enemy archetypes (Feature 1)
+   =============================================================== */
+
+.camp-tile-archetype {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin: 0.5em 0;
+  font-size: 0.78em;
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+}
+
+.camp-archetype-tag,
+.camp-pattern-tag,
+.camp-tier-tag {
+  display: inline-block;
+  padding: 0.18em 0.55em;
+  border-radius: 3px;
+  border: 1px solid var(--ww-border-light);
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--ww-fg);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.camp-archetype-tag {
+  border-color: var(--ww-link);
+  color: var(--ww-link);
+  font-weight: bold;
+}
+
+/* Color shift per archetype family */
+.camp-tile-archetype[data-archetype="kobold"]   .camp-archetype-tag { color: var(--ww-vert);        border-color: var(--ww-vert); }
+.camp-tile-archetype[data-archetype="ambusher"] .camp-archetype-tag { color: var(--tab-brown-fg);   border-color: var(--tab-brown-fg); }
+.camp-tile-archetype[data-archetype="troll"]    .camp-archetype-tag { color: var(--ww-orange);      border-color: var(--ww-orange); }
+.camp-tile-archetype[data-archetype="wraith"]   .camp-archetype-tag { color: var(--tab-violet-fg);  border-color: var(--tab-violet-fg); }
+.camp-tile-archetype[data-archetype="boss"]     .camp-archetype-tag {
+  color: var(--ww-red);
+  border-color: var(--ww-red);
+  text-shadow: 0 0 8px rgba(255, 69, 69, 0.7);
+  animation: ww-pulse 2.4s ease-in-out infinite;
+}
+
+.camp-tier-tag {
+  color: var(--ww-gold);
+  border-color: var(--ww-gold);
+}
+

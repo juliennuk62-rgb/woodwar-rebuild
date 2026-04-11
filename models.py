@@ -192,8 +192,24 @@ class KoboldCamp(Base):
     # When the camp respawns after being destroyed (None = alive).
     respawn_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
+    # ----- Phase 11 (enemies AI) ------------------------------------
+    # Archetype determines visual + base stats multiplier:
+    #  kobold (default), troll, wraith, ambusher, boss
+    archetype: Mapped[str] = mapped_column(String(16), default="kobold", nullable=False)
+
+    # AI pattern affects damage calculation in resolve_combat:
+    #  passive    — no special effect (default)
+    #  aggressive — counter-attacks for X% of player damage
+    #  armored    — ignores X% of incoming damage
+    #  evasive    — chance to fully avoid an attack
+    #  regenerator — restores Y% of pv_max per attack until killed
+    ai_pattern: Mapped[str] = mapped_column(String(16), default="passive", nullable=False)
+
+    # 1 = easy, 2 = normal, 3 = hard, 4 = nightmare, 5 = legendary
+    difficulty_tier: Mapped[int] = mapped_column(Integer, default=2, nullable=False)
+
     def __repr__(self) -> str:
-        return f"<KoboldCamp id={self.id} name={self.name!r} biome={self.biome} pv={self.pv_current}/{self.pv_max}>"
+        return f"<KoboldCamp id={self.id} name={self.name!r} biome={self.biome} arch={self.archetype} pv={self.pv_current}/{self.pv_max}>"
 
 
 class CombatLog(Base):

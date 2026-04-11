@@ -45,9 +45,19 @@
           <div class="camp-tile-expanded">
             <div class="camp-tile-name">{{ camp.name }}</div>
             <div class="camp-tile-desc">{{ camp.description }}</div>
+
+            <div class="camp-tile-archetype" data-archetype="{{ camp.archetype }}">
+              <span class="camp-archetype-tag">{{ camp.archetype_label }}</span>
+              <span class="camp-pattern-tag">IA : {{ camp.ai_pattern }}</span>
+              <span class="camp-tier-tag">★ × {{ camp.difficulty_tier }}</span>
+            </div>
+
             <div class="camp-tile-stats">
               PV : <strong>{{ "{:,}".format(camp.pv_current).replace(",", " ") }}</strong>
               / {{ "{:,}".format(camp.pv_max).replace(",", " ") }}
+              {% if camp.alive %}
+                <div data-progress="{{ camp.hp_pct }}" style="margin-top: 0.4em;"></div>
+              {% endif %}
             </div>
             <div class="camp-tile-loot">
               Butin : {{ "{:,}".format(camp.loot.gold).replace(",", " ") }} or ·
@@ -57,7 +67,14 @@
 
             {% if not camp.alive %}
               <div class="camp-tile-dead-msg">
-                Détruit — respawn dans {{ camp.respawn_in_fmt }}
+                Détruit — respawn dans
+                {% if camp.respawn_iso %}
+                  <span data-countdown-until="{{ camp.respawn_iso }}" data-countdown-reload>
+                    {{ camp.respawn_in_fmt }}
+                  </span>
+                {% else %}
+                  {{ camp.respawn_in_fmt }}
+                {% endif %}
               </div>
             {% elif army %}
               <form method="post" action="{{ url_for('attack', camp_id=camp.id) }}" class="camp-tile-form">

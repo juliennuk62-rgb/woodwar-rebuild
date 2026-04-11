@@ -42,6 +42,36 @@ features majeures.
 
 **Tests** : 41/41 OK
 
+#### Feature 1 — Système d'ennemis (archétypes + IA + difficulté)
+
+**Added**
+- 5 archétypes d'ennemis dans `ENEMY_ARCHETYPES` : `kobold`, `ambusher`,
+  `troll`, `wraith`, `boss`. Chacun avec `hp_mult`, `loot_mult`,
+  `default_pattern`, `tier_min/max`.
+- 5 patterns d'IA dans `AI_PATTERN_TUNING` :
+  - `passive` — défense classique
+  - `aggressive` — counter-attack 20% sur le joueur
+  - `armored` — absorbe 30% des dégâts entrants
+  - `evasive` — 20% de chance d'esquive totale
+  - `regenerator` — soigne 15% du `pv_max` quand survit (boss)
+- 3 nouvelles colonnes sur `KoboldCamp` : `archetype`, `ai_pattern`,
+  `difficulty_tier` (1..5).
+- Migration auto au démarrage : `db._ensure_schema()` ajoute les colonnes
+  manquantes via ALTER TABLE (idempotent, safe pour les bases existantes).
+- `seed_kobold_camps` étendu : chaque camp reçoit un archétype thématique
+  selon son tier (kobolds bas tier, boss haut tier).
+- `resolve_combat` honore le pattern : journal `ai_pattern_log`,
+  `effective_damage` (vs `total_damage`), counter ratio, esquive,
+  régénération.
+- Page `/campagnes` affiche désormais 3 tags par camp : archétype,
+  pattern IA, tier ★. Couleur shift par archétype (boss en rouge pulsé).
+- Barre de progression HP sur les camps vivants (réutilise `data-progress`).
+- Countdown live + reload sur les camps en respawn.
+- `tests/test_enemies.py` (12 tests) : valide structure des archétypes,
+  cohérence des patterns, distribution des tiers.
+
+**Tests** : 53/53 OK · **Playtest** : green, 0 blockers
+
 ## [0.10.0] — 2026-04-11 — Bundle B + automatisation nocturne
 
 ### Added
