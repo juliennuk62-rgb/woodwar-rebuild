@@ -11,5 +11,14 @@
       "commit_sha": "string (optional)"
     }
   },
-  "runs": []
+  "runs": [
+    {
+      "run_id": "run_20260411_quests_01",
+      "started_at": "2026-04-11T12:00:00Z",
+      "completed_at": "2026-04-11T12:00:00Z",
+      "theme": "quests",
+      "entries_added": 5,
+      "summary_fr": "Cinq nouvelles quêtes ancrées dans les clans Gaelyn, Langwen, Amaraldor, Isorfidia et Maneldar : recrutement, bûcheronnage, campagnes vs Ombres de Mazar, collecte de Mana pour les Oracles, et duel d'honneur PvP sous l'œil de Fenrir."
+    }
+  ]
 }
