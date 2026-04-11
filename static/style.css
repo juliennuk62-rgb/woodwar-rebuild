@@ -2469,3 +2469,308 @@ textarea:focus {
   font-size: 0.85em;
 }
 
+/* =================================================================
+   Builder modal — opens when the player clicks the kingdom map.
+   Two sections : "À construire" + "À améliorer".
+   =================================================================*/
+
+.ww-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 100;
+  padding: 3em 1em 1em;
+  overflow-y: auto;
+  backdrop-filter: blur(2px);
+}
+
+.ww-modal-overlay.is-open {
+  display: flex;
+  animation: ww-fade-in 0.22s ease both;
+}
+
+.ww-modal {
+  width: min(960px, 100%);
+  background: linear-gradient(180deg, #1a1408 0%, #120a04 100%);
+  border: 2px solid var(--ww-border-light);
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    0 12px 48px rgba(0, 0, 0, 0.75),
+    0 0 60px rgba(254, 163, 21, 0.1);
+  position: relative;
+  padding: 0;
+}
+
+.ww-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9em 1.2em;
+  border-bottom: 1px solid var(--ww-border-dark);
+  background: linear-gradient(180deg, rgba(254, 163, 21, 0.08), transparent);
+}
+
+.ww-modal-title {
+  margin: 0;
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+  font-size: 1.25em;
+  color: var(--ww-bright-lime);
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.ww-modal-close {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--ww-border-light);
+  color: var(--ww-fg);
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  font-size: 1.1em;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+.ww-modal-close:hover {
+  border-color: var(--ww-red);
+  color: var(--ww-red);
+}
+.ww-modal-close:active {
+  transform: scale(0.92);
+}
+
+.ww-modal-body {
+  padding: 1.2em;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.ww-modal-section {
+  margin-bottom: 1.8em;
+}
+.ww-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.ww-modal-section-title {
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+  font-size: 1em;
+  color: var(--ww-link);
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.8em;
+  padding-bottom: 0.35em;
+  border-bottom: 1px dashed var(--ww-border-light);
+}
+
+.ww-modal-section-hint {
+  color: var(--tab-brown-fg);
+  font-size: 0.85em;
+  margin: -0.4em 0 0.8em;
+}
+
+.ww-modal-empty {
+  color: var(--tab-brown-fg);
+  font-style: italic;
+  font-size: 0.9em;
+  padding: 0.5em 0;
+}
+
+/* Build rows (for both sections) */
+
+.ww-builder-row {
+  display: grid;
+  grid-template-columns: 58px 1fr auto;
+  gap: 0.9em;
+  align-items: center;
+  padding: 0.7em 0.8em;
+  margin-bottom: 0.55em;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--ww-border-dark);
+  border-left: 3px solid var(--ww-border-light);
+  border-radius: 4px;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.ww-builder-row:hover {
+  border-left-color: var(--ww-link);
+  background: rgba(254, 163, 21, 0.06);
+}
+
+.ww-builder-row-upgrading {
+  border-left-color: var(--ww-gold);
+}
+
+.ww-builder-row-maxed {
+  border-left-color: var(--ww-vert);
+  opacity: 0.85;
+}
+
+.ww-builder-row-insufficient {
+  opacity: 0.6;
+}
+
+.ww-builder-picto {
+  width: 58px;
+  height: 58px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--ww-border-dark);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.ww-builder-picto img {
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: auto;
+}
+
+.ww-builder-picto-fallback {
+  color: var(--tab-brown-fg);
+  font-size: 1.5em;
+}
+
+.ww-builder-info {
+  min-width: 0;
+}
+
+.ww-builder-name {
+  color: var(--ww-fg);
+  font-weight: bold;
+  font-size: 0.98em;
+}
+
+.ww-builder-sub {
+  color: var(--tab-brown-fg);
+  font-size: 0.8em;
+  margin-top: 0.15em;
+}
+
+.ww-builder-sub .ww-builder-prod {
+  color: var(--ww-bright-lime);
+}
+
+.ww-builder-cost {
+  color: var(--ww-gold);
+  font-size: 0.85em;
+  margin-top: 0.3em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ww-builder-cost-item {
+  display: inline-block;
+  margin-right: 0.55em;
+}
+
+.ww-builder-cost-item.is-insufficient {
+  color: var(--ww-red);
+}
+
+.ww-builder-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  align-items: flex-end;
+}
+
+.ww-builder-btn {
+  background: linear-gradient(180deg, #2a2512 0%, #1a1408 100%);
+  color: var(--ww-bright-lime);
+  border: 1px solid var(--ww-border-light);
+  padding: 0.4em 0.9em;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.82em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+  min-width: 140px;
+  transition: all 0.18s ease;
+}
+
+.ww-builder-btn:hover:not(:disabled) {
+  border-color: var(--ww-link);
+  color: var(--ww-link);
+  box-shadow: 0 0 10px rgba(254, 163, 21, 0.3);
+}
+
+.ww-builder-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ww-builder-btn-primary {
+  background: linear-gradient(180deg, var(--ww-link) 0%, #b76e0a 100%);
+  color: var(--ww-bg);
+  border-color: var(--ww-link);
+}
+.ww-builder-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.15);
+  color: var(--ww-bg);
+}
+
+.ww-builder-btn-queue {
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--tab-brown-fg);
+  font-size: 0.75em;
+  padding: 0.28em 0.7em;
+  min-width: 100px;
+}
+.ww-builder-btn-queue:hover:not(:disabled) {
+  border-color: var(--ww-bright-lime);
+  color: var(--ww-bright-lime);
+}
+
+.ww-builder-upgrading {
+  color: var(--ww-gold);
+  font-size: 0.8em;
+  font-style: italic;
+  text-align: right;
+}
+
+.ww-builder-maxed {
+  color: var(--ww-vert);
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+/* Make the map tiles visually clickable (cursor hint on hover) */
+.carte_div {
+  cursor: pointer;
+}
+.carte_div .carte-tile-link,
+.carte_div .carte-tile-empty {
+  transition: filter 0.2s ease;
+}
+.carte_div:hover .carte-tile-link,
+.carte_div:hover .carte-tile-empty {
+  filter: brightness(1.08);
+}
+
+@media (max-width: 640px) {
+  .ww-builder-row {
+    grid-template-columns: 48px 1fr;
+  }
+  .ww-builder-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 0.4em;
+  }
+  .ww-modal-body {
+    max-height: 80vh;
+  }
+}
+

@@ -208,12 +208,76 @@
     });
   }
 
+  // ----------------- Builder modal -----------------
+
+  /**
+   * Wire any element with `data-open-builder` (typically the kingdom map)
+   * so clicking it opens the modal #builder-modal. The modal can be
+   * closed via its `.ww-modal-close` button, the ESC key, or clicking
+   * the overlay background (outside the inner .ww-modal).
+   */
+  function initBuilderModal(root) {
+    var modal = (root || document).querySelector('#builder-modal');
+    if (!modal) return;
+    if (modal._wwInit) return;
+    modal._wwInit = true;
+
+    function open() {
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    // Open triggers: any [data-open-builder] element.
+    var triggers = document.querySelectorAll('[data-open-builder]');
+    triggers.forEach(function (el) {
+      el.addEventListener('click', function (ev) {
+        // Don't trigger on form submissions or nested links.
+        if (ev.target.closest('form') || ev.target.closest('a[href]')) {
+          return;
+        }
+        ev.preventDefault();
+        open();
+      });
+      // Keyboard accessibility — Enter/Space on focused map.
+      el.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          open();
+        }
+      });
+    });
+
+    // Close button.
+    var closeBtn = modal.querySelector('.ww-modal-close');
+    if (closeBtn) closeBtn.addEventListener('click', close);
+
+    // Click on the dim overlay (outside .ww-modal) closes.
+    modal.addEventListener('click', function (ev) {
+      if (ev.target === modal) close();
+    });
+
+    // ESC key closes when open.
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && modal.classList.contains('is-open')) {
+        close();
+      }
+    });
+  }
+
   // ----------------- Public init -----------------
 
   function refresh(root) {
     initCountdowns(root);
     initProgressBars(root);
     initActionFeedback(root);
+    initBuilderModal(root);
   }
 
   if (document.readyState === "loading") {

@@ -137,8 +137,13 @@
         </div>
       </div>
 
-      {# The map of the kingdom --- #}
+      {# The map of the kingdom — click to open the builder modal --- #}
       <div class="carte_div"
+           data-open-builder
+           role="button"
+           tabindex="0"
+           aria-label="Ouvrir le chantier du royaume"
+           title="Cliquez pour ouvrir le chantier"
            style="background-image: url('{{ url_for('legacy_asset', filename='terrain0_2.jpg') }}');">
         <div class="carte-body">
           <div class="carte-938">
@@ -147,8 +152,8 @@
                 {% for cell in row %}
                   <div class="carte_height_width">
                     {% if cell %}
-                      <a href="{{ url_for('dashboard') }}#batiments" class="carte-tile-link"
-                         title="{{ cell.name }} — Niveau {{ cell.level }}">
+                      <div class="carte-tile-link"
+                           title="{{ cell.name }} — Niveau {{ cell.level }}">
                         <div class="carte-tile-base"
                              style="background-image: url('{{ url_for('legacy_asset', filename=cell.sprite) }}');">
                           {% if cell.overlay %}
@@ -157,12 +162,12 @@
                                  class="carte-tile-overlay">
                           {% endif %}
                         </div>
-                      </a>
+                      </div>
                     {% else %}
-                      <a href="{{ url_for('dashboard') }}#batiments" class="carte-tile-empty">
+                      <div class="carte-tile-empty">
                         <img src="{{ url_for('legacy_asset', filename='compas.png') }}"
                              class="carte-tile-compas" alt="">
-                      </a>
+                      </div>
                     {% endif %}
                   </div>
                 {% endfor %}
@@ -172,11 +177,11 @@
         </div>
 
         <div class="carte-footer">
-          <a href="{{ url_for('dashboard') }}#batiments" class="bottom_sol">
+          <span class="bottom_sol">
             ⚜ Vos tourelles apportent actuellement
             {{ "{:,}".format((player.gold + player.wood + player.mana) // 10).replace(",", " ") }}
-            point en renfort.
-          </a>
+            point en renfort. <em style="color: var(--ww-link);">— Cliquez la carte pour le chantier</em>
+          </span>
         </div>
       </div>
     </div>
@@ -238,77 +243,174 @@
     </div>
   </div>
 
-  <div class="card">
-    <h2>Bâtiments — construction et amélioration</h2>
-    <p style="color: var(--tab-brown-fg); font-size: 0.9em;">
-      Construisez les producteurs en premier pour obtenir un revenu passif.
-      Les formules de coût et de temps sont directement reprises du jeu original (<code>nivprix.php</code>).
-    </p>
+  {# ---------------------------------------------------------------
+     Builder modal — hidden by default, opens on map click.
+     Two sections: buildings to construct (not owned yet) and
+     buildings to upgrade (already owned).
+     --------------------------------------------------------------- #}
+  <div class="ww-modal-overlay" id="builder-modal" aria-hidden="true">
+    <div class="ww-modal" role="dialog" aria-modal="true" aria-labelledby="builder-modal-title">
+      <div class="ww-modal-header">
+        <h2 class="ww-modal-title" id="builder-modal-title">⚒ Chantier du royaume</h2>
+        <button type="button" class="ww-modal-close" aria-label="Fermer">✕</button>
+      </div>
 
-    <div class="buildings-grid">
-      {% for b in buildings %}
-        <div class="building-card building-role-{{ b.role }}">
-          {% if b.image %}
-            <div class="building-image">
-              <img src="{{ url_for('legacy_asset', filename=b.image) }}" alt="{{ b.name }}" loading="lazy">
-            </div>
-          {% endif %}
-          <div class="building-header">
-            <div class="building-name">{{ b.name }}</div>
-            <div class="building-level">
-              {% if b.owned %}Niveau {{ b.level }}{% else %}Non construit{% endif %}
-            </div>
-          </div>
+      <div class="ww-modal-body">
 
-          {% if b.owned and b.production_per_hour and b.resource_produced %}
-            <div class="building-production">
-              Produit {{ "{:,.1f}".format(b.production_per_hour).replace(",", " ") }}
-              {% if b.resource_produced == 'gold' %}or{% elif b.resource_produced == 'wood' %}bois{% else %}mana{% endif %}/h
-            </div>
-          {% endif %}
-
-          {% if b.upgrading %}
-            <div class="building-upgrading">
-              ⚙ Amélioration vers le niveau {{ b.upgrading_to }}
-              <br>
-              <small>
-                <span data-countdown-until="{{ b.upgrading_until_iso }}"
-                      {% if b.upgrading_started_iso %}data-countdown-from="{{ b.upgrading_started_iso }}"{% endif %}
-                      data-countdown-label="Reste"
-                      data-countdown-reload>
-                  {{ b.upgrade_remaining_fmt }}
-                </span>
-              </small>
-            </div>
-          {% elif b.at_max %}
-            <div class="building-maxed">Niveau maximum atteint</div>
+        {# ----- Section 1: buildings to construct ----- #}
+        {% set to_build = buildings | rejectattr('owned') | list %}
+        <div class="ww-modal-section">
+          <h3 class="ww-modal-section-title">À construire</h3>
+          <p class="ww-modal-section-hint">
+            Bâtiments non encore érigés. Construisez d'abord les producteurs
+            (mine, scierie, fontaine) pour assurer un revenu passif.
+          </p>
+          {% if to_build %}
+            {% for b in to_build %}
+              {% set can_afford = player.gold >= b.next_cost.or and player.wood >= b.next_cost.bois %}
+              <div class="ww-builder-row {% if not can_afford %}ww-builder-row-insufficient{% endif %}">
+                <div class="ww-builder-picto">
+                  {% if b.image %}
+                    <img src="{{ url_for('legacy_asset', filename=b.image) }}" alt="{{ b.name }}" loading="lazy">
+                  {% else %}
+                    <span class="ww-builder-picto-fallback">⚒</span>
+                  {% endif %}
+                </div>
+                <div class="ww-builder-info">
+                  <div class="ww-builder-name">{{ b.name }}</div>
+                  <div class="ww-builder-sub">
+                    Non construit · {{ b.role }}
+                  </div>
+                  <div class="ww-builder-cost">
+                    <span class="ww-builder-cost-item {% if player.gold < b.next_cost.or %}is-insufficient{% endif %}">
+                      {{ "{:,}".format(b.next_cost.or).replace(",", " ") }} or
+                    </span>
+                    <span class="ww-builder-cost-item {% if player.wood < b.next_cost.bois %}is-insufficient{% endif %}">
+                      {{ "{:,}".format(b.next_cost.bois).replace(",", " ") }} bois
+                    </span>
+                    <span class="ww-builder-cost-item">
+                      ⏱ {% if b.next_cost.time > 60 %}{{ (b.next_cost.time // 60) }} min{% else %}{{ b.next_cost.time }}s{% endif %}
+                    </span>
+                  </div>
+                </div>
+                <div class="ww-builder-actions">
+                  <form method="post" action="{{ url_for('build', building_id=b.id) }}" style="margin:0;">
+                    <button type="submit" class="ww-builder-btn ww-builder-btn-primary ww-action"
+                      {% if not can_afford %}disabled title="Ressources insuffisantes"{% endif %}>
+                      ⚒ Construire
+                    </button>
+                  </form>
+                  <form method="post" action="{{ url_for('build_queue_add', building_id=b.id) }}" style="margin:0;">
+                    <button type="submit" class="ww-builder-btn ww-builder-btn-queue ww-action"
+                            title="Ajouter à la file de construction automatique">
+                      ➕ File
+                    </button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
           {% else %}
-            <div class="building-cost">
-              {{ "{:,}".format(b.next_cost.or).replace(",", " ") }} or ·
-              {{ "{:,}".format(b.next_cost.bois).replace(",", " ") }} bois
-              {% if b.next_cost.time > 60 %}
-                · {{ (b.next_cost.time // 60) }} min
-              {% else %}
-                · {{ b.next_cost.time }}s
-              {% endif %}
+            <div class="ww-modal-empty">
+              Tous les bâtiments du royaume sont déjà construits.
+              Rendez-vous dans la section du dessous pour les améliorer.
             </div>
-            <form method="post" action="{{ url_for('build', building_id=b.id) }}" style="display: inline;">
-              <button type="submit" class="ww-action"
-                {% if player.gold < b.next_cost.or or player.wood < b.next_cost.bois %}
-                  disabled title="Ressources insuffisantes"
-                {% endif %}>
-                {% if b.owned %}Améliorer → L{{ b.level + 1 }}{% else %}Construire{% endif %}
-              </button>
-            </form>
-            <form method="post" action="{{ url_for('build_queue_add', building_id=b.id) }}" style="display: inline;">
-              <button type="submit" class="ww-action queue-add-btn"
-                      title="Ajouter à la file de construction (auto)">
-                ➕ File
-              </button>
-            </form>
           {% endif %}
         </div>
-      {% endfor %}
+
+        {# ----- Section 2: buildings to upgrade ----- #}
+        {% set owned_buildings = buildings | selectattr('owned') | list %}
+        <div class="ww-modal-section">
+          <h3 class="ww-modal-section-title">À améliorer</h3>
+          <p class="ww-modal-section-hint">
+            Vos bâtiments existants. Chaque niveau augmente production ou
+            débloque de nouvelles unités.
+          </p>
+          {% if owned_buildings %}
+            {% for b in owned_buildings %}
+              {% set can_afford = b.next_cost and player.gold >= b.next_cost.or and player.wood >= b.next_cost.bois %}
+              <div class="ww-builder-row
+                          {% if b.upgrading %}ww-builder-row-upgrading
+                          {% elif b.at_max %}ww-builder-row-maxed
+                          {% elif not can_afford %}ww-builder-row-insufficient{% endif %}">
+                <div class="ww-builder-picto">
+                  {% if b.image %}
+                    <img src="{{ url_for('legacy_asset', filename=b.image) }}" alt="{{ b.name }}" loading="lazy">
+                  {% else %}
+                    <span class="ww-builder-picto-fallback">⚒</span>
+                  {% endif %}
+                </div>
+                <div class="ww-builder-info">
+                  <div class="ww-builder-name">{{ b.name }} · <span style="color: var(--ww-link);">Niveau {{ b.level }}</span></div>
+                  <div class="ww-builder-sub">
+                    {% if b.production_per_hour and b.resource_produced %}
+                      <span class="ww-builder-prod">
+                        +{{ "{:,.1f}".format(b.production_per_hour).replace(",", " ") }}
+                        {% if b.resource_produced == 'gold' %}or{% elif b.resource_produced == 'wood' %}bois{% else %}mana{% endif %}/h
+                      </span>
+                    {% else %}
+                      {{ b.role }}
+                    {% endif %}
+                  </div>
+                  {% if b.upgrading %}
+                    <div class="ww-builder-upgrading">
+                      ⚙ Amélioration → L{{ b.upgrading_to }} ·
+                      <span data-countdown-until="{{ b.upgrading_until_iso }}"
+                            {% if b.upgrading_started_iso %}data-countdown-from="{{ b.upgrading_started_iso }}"{% endif %}
+                            data-countdown-label="Reste"
+                            data-countdown-reload>
+                        {{ b.upgrade_remaining_fmt }}
+                      </span>
+                    </div>
+                  {% elif b.at_max %}
+                    <div class="ww-builder-cost">
+                      <span class="ww-builder-maxed">✦ Niveau max ({{ b.max_level }}) atteint</span>
+                    </div>
+                  {% else %}
+                    <div class="ww-builder-cost">
+                      Coût L{{ b.level + 1 }} :
+                      <span class="ww-builder-cost-item {% if player.gold < b.next_cost.or %}is-insufficient{% endif %}">
+                        {{ "{:,}".format(b.next_cost.or).replace(",", " ") }} or
+                      </span>
+                      <span class="ww-builder-cost-item {% if player.wood < b.next_cost.bois %}is-insufficient{% endif %}">
+                        {{ "{:,}".format(b.next_cost.bois).replace(",", " ") }} bois
+                      </span>
+                      <span class="ww-builder-cost-item">
+                        ⏱ {% if b.next_cost.time > 60 %}{{ (b.next_cost.time // 60) }} min{% else %}{{ b.next_cost.time }}s{% endif %}
+                      </span>
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="ww-builder-actions">
+                  {% if b.upgrading %}
+                    <span class="ww-builder-upgrading">En cours…</span>
+                  {% elif b.at_max %}
+                    <span class="ww-builder-maxed">✦ Max</span>
+                  {% else %}
+                    <form method="post" action="{{ url_for('build', building_id=b.id) }}" style="margin:0;">
+                      <button type="submit" class="ww-builder-btn ww-builder-btn-primary ww-action"
+                        {% if not can_afford %}disabled title="Ressources insuffisantes"{% endif %}>
+                        ⬆ Améliorer → L{{ b.level + 1 }}
+                      </button>
+                    </form>
+                    <form method="post" action="{{ url_for('build_queue_add', building_id=b.id) }}" style="margin:0;">
+                      <button type="submit" class="ww-builder-btn ww-builder-btn-queue ww-action"
+                              title="Ajouter à la file de construction automatique">
+                        ➕ File
+                      </button>
+                    </form>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="ww-modal-empty">
+              Vous n'avez encore construit aucun bâtiment. Commencez par
+              la section du dessus.
+            </div>
+          {% endif %}
+        </div>
+
+      </div>
     </div>
   </div>
 
