@@ -494,6 +494,29 @@ class PlayerItem(Base):
         return f"<PlayerItem player={self.player_id} item={self.item_id} x{self.count}>"
 
 
+class PvPCooldown(Base):
+    """A per-(attacker, defender) cooldown enforced after a PvP attack.
+
+    Used to prevent farming the same opponent over and over. The row
+    expires (logically) at expires_at — we keep the row for history
+    but ignore it when expires_at is in the past.
+    """
+
+    __tablename__ = "pvp_cooldowns"
+    __table_args__ = (
+        UniqueConstraint("attacker_id", "defender_id", name="uq_pvp_cooldown_pair"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    attacker_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
+    defender_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
+    last_attack_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"<PvPCooldown {self.attacker_id}->{self.defender_id} expires={self.expires_at}>"
+
+
 class PlayerQuest(Base):
     """A quest the player has accepted from the daily-generated pool.
 

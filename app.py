@@ -899,6 +899,43 @@ def create_app() -> Flask:
 
     # ----- PvP (attack another player) -----------------------------------
 
+    @app.route("/pvp")
+    @auth.login_required
+    def pvp_arena():
+        """Matchmaking arena: show fair opponents + the player's PvP rate state."""
+        user = auth.current_user()
+        with SessionLocal() as s:
+            player = s.query(Player).filter(Player.user_id == user.id).one()
+            game_logic.apply_production_tick(s, player)
+            s.commit()
+
+            opponents = game_logic.find_matchmaking_opponents(s, player)
+            cd_view = game_logic.get_pvp_cooldown_view(s, player)
+
+            # Annotate each opponent with their clan info for UI display.
+            for o in opponents:
+                u = s.get(User, o["user_id"])
+                clan = game_data.clan_by_id(u.clan_id) if u and u.clan_id else None
+                o["clan"] = clan or {"name": "—", "color": "#888"}
+
+            stock = game_logic.unit_stock(player)
+            army_view = []
+            for unit in game_data.units["units"]:
+                uid = unit["id"]
+                count = stock.get(uid, 0)
+                if count > 0:
+                    army_view.append(
+                        {"id": uid, "name": unit["name_fr"], "count": count}
+                    )
+
+            return render_template(
+                "pvp.html",
+                player=player,
+                opponents=opponents,
+                cooldown_view=cd_view,
+                army=army_view,
+            )
+
     @app.route("/joueurs")
     @auth.login_required
     def joueurs():

@@ -2247,3 +2247,130 @@ textarea:focus {
   border-left: 3px solid var(--ww-link);
 }
 
+/* ===============================================================
+   PvP arena (Feature 2)
+   =============================================================== */
+
+.pvp-rate-card {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--ww-border-light);
+  border-radius: 4px;
+  padding: 0.8em 1em;
+  margin-top: 0.6em;
+}
+
+.pvp-rate-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4em;
+}
+
+.pvp-rate-label {
+  color: var(--tab-brown-fg);
+  font-size: 0.9em;
+}
+
+.pvp-rate-value {
+  color: var(--ww-bright-lime);
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.pvp-rate-hint {
+  margin: 0.6em 0 0;
+  color: var(--tab-brown-fg);
+  font-size: 0.82em;
+}
+
+.pvp-opponents-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 0.8em;
+  margin-top: 0.6em;
+}
+
+.pvp-opponent-card {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--ww-border-light);
+  border-radius: 4px;
+  padding: 0.8em 1em;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.pvp-opponent-card:hover {
+  border-color: var(--ww-link);
+  box-shadow: 0 0 14px rgba(254, 163, 21, 0.25);
+}
+
+.pvp-opponent-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.3em;
+}
+
+.pvp-opponent-name {
+  font-weight: bold;
+  font-size: 1.05em;
+}
+
+.pvp-opponent-meta {
+  font-size: 0.82em;
+  color: var(--tab-brown-fg);
+}
+
+.pvp-diff-up    { color: var(--ww-red);         font-weight: bold; }
+.pvp-diff-down  { color: var(--ww-vert);        font-weight: bold; }
+.pvp-diff-equal { color: var(--tab-brown-fg);   font-weight: bold; }
+
+.pvp-opponent-stats {
+  font-size: 0.82em;
+  color: var(--ww-fg);
+  margin: 0.4em 0 0.6em;
+}
+
+.pvp-attack-form {
+  margin-top: 0.5em;
+}
+
+.pvp-attack-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.3em;
+  margin-bottom: 0.5em;
+}
+
+.pvp-attack-inputs label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75em;
+  color: var(--tab-brown-fg);
+}
+
+.pvp-attack-inputs input[type="number"] {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--ww-border-light);
+  color: var(--ww-fg);
+  padding: 0.2em 0.4em;
+  border-radius: 2px;
+}
+
+.attack-btn {
+  background: linear-gradient(180deg, var(--ww-red), #8a1b1b);
+  border: 1px solid var(--ww-red);
+  color: var(--ww-fg);
+  padding: 0.4em 0.9em;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pvp-no-army {
+  color: var(--tab-brown-fg);
+  font-style: italic;
+  font-size: 0.85em;
+  margin: 0;
+}
+

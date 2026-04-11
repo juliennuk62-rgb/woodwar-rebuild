@@ -106,6 +106,43 @@ features majeures.
 
 **Tests** : 60/60 OK · **Playtest** : green, 0 blockers
 
+#### Feature 2 — Mode PvP (matchmaking + cooldowns + anti-farm)
+
+**Added**
+- Modèle `PvPCooldown` (attacker_id, defender_id, last_attack_at,
+  expires_at) avec contrainte unique sur la paire.
+- Constants dans `game_logic` :
+  - `PVP_TARGET_COOLDOWN_SEC = 1800` (30 min entre 2 attaques sur la
+    même cible)
+  - `PVP_ATTACKS_PER_HOUR = 10` (rate limit anti-farm global)
+  - `PVP_MATCHMAKING_LEVEL_RANGE = 3` (±3 niveaux pour le matchmaking)
+  - `PVP_MINIMUM_LEVEL = 1`
+- Fonctions :
+  - `can_attack_target(attacker, defender)` → (ok, reason_fr) — gate
+    centralisée appelée par `resolve_pvp_combat` (cooldown, rate limit,
+    diplomatie alliée, niveau min, self-attack)
+  - `register_pvp_cooldown(attacker, defender)` — créé/refresh la ligne
+    après un combat
+  - `find_matchmaking_opponents(attacker)` — retourne les Seigneurs au
+    rang ±3, hors cooldown, hors même alliance, triés par proximité de
+    niveau puis richesse
+  - `get_pvp_cooldown_view(attacker)` — snapshot du rate limit
+  - `_pvp_cooldown_active`, `_pvp_attacks_last_hour` (helpers internes)
+- Route `/pvp` : nouvelle page Arène avec :
+  - Carte de l'état du rate limit (X / 10 attaques utilisées + barre de
+    progression réutilisant `data-progress`)
+  - Hint sur la fenêtre de niveau et le cooldown par cible
+  - Liste de cibles recommandées avec clan coloré, niveau différentiel
+    (+/-/=), ressources, total unités, formulaire d'attaque inline
+- `/joueurs` toujours dispo pour parcourir tous les Seigneurs sans filtre
+- Lien "Arène" dans la nav
+- `resolve_pvp_combat` appelle maintenant `can_attack_target` au début et
+  `register_pvp_cooldown` après une attaque
+- `tests/test_pvp.py` (8 tests) : self-attack, cooldown, rate limit,
+  matchmaking range, exclusion self/cooldown, view consistency
+
+**Tests** : 68/68 OK · **Playtest** : green, 0 blockers
+
 ## [0.10.0] — 2026-04-11 — Bundle B + automatisation nocturne
 
 ### Added

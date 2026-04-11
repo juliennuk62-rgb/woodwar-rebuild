@@ -763,15 +763,14 @@ def resolve_pvp_combat(
     """
     from models import CombatLog  # local
 
-    if attacker.id == defender.id:
-        raise ValueError("Vous ne pouvez pas attaquer votre propre royaume.")
+    # Anti-farm + cooldown + diplomatic + level checks (Feature 2).
+    ok, reason = can_attack_target(db_session, attacker, defender)
+    if not ok:
+        raise ValueError(reason or "Cible invalide.")
 
-    # Diplomatic gate: cannot attack allies (same alliance or ally relation).
+    # Fetch the diplomacy status (the allies-block gate is already
+    # applied inside can_attack_target above).
     status, loot_mult = pvp_diplomacy_adjustment(db_session, attacker, defender)
-    if status == "allied":
-        raise ValueError(
-            "Vous ne pouvez pas attaquer un allié. Rompez d'abord la diplomatie."
-        )
 
     att_relics = player_relic_ids(attacker)
     def_relics = player_relic_ids(defender)
@@ -890,6 +889,9 @@ def resolve_pvp_combat(
     )
     db_session.add(log)
     db_session.flush()
+
+    # Register the per-target cooldown to enforce anti-farm.
+    register_pvp_cooldown(db_session, attacker.id, defender.id)
 
     return {
         "log_id": log.id,
@@ -2284,3 +2286,218 @@ def abandon_quest(db_session: "Session", player: "Player", quest_db_id: int) -> 
     if pq.status == "claimed":
         raise ValueError("Quête déjà réclamée, impossible d'abandonner.")
     pq.status = "abandoned"
+
+
+# ===========================================================================
+# Phase 13 — PvP matchmaking + cooldowns + anti-farm (Feature 2)
+# ===========================================================================
+
+# Per-target cooldown after a PvP attack (in seconds).
+PVP_TARGET_COOLDOWN_SEC = 30 * 60  # 30 minutes
+
+# Global rate limit: max distinct attacks per hour for one attacker.
+PVP_ATTACKS_PER_HOUR = 10
+
+# Matchmaking: how many levels above/below the player are considered fair.
+PVP_MATCHMAKING_LEVEL_RANGE = 3
+
+# Minimum player level required to be eligible for PvP at all.
+PVP_MINIMUM_LEVEL = 1
+
+# How many candidates to show in the matchmaking page.
+PVP_MATCHMAKING_LIMIT = 8
+
+
+def _pvp_cooldown_active(db_session: "Session", attacker_id: int, defender_id: int) -> "PvPCooldown | None":
+    """Return the cooldown row if currently active, None otherwise."""
+    from models import PvPCooldown
+
+    now = datetime.utcnow()
+    cd = (
+        db_session.query(PvPCooldown)
+        .filter(
+            PvPCooldown.attacker_id == attacker_id,
+            PvPCooldown.defender_id == defender_id,
+            PvPCooldown.expires_at > now,
+        )
+        .one_or_none()
+    )
+    return cd
+
+
+def _pvp_attacks_last_hour(db_session: "Session", attacker_id: int) -> int:
+    """Count how many attacks the attacker has launched in the last hour."""
+    from models import PvPCooldown
+
+    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+    return (
+        db_session.query(PvPCooldown)
+        .filter(
+            PvPCooldown.attacker_id == attacker_id,
+            PvPCooldown.last_attack_at > one_hour_ago,
+        )
+        .count()
+    )
+
+
+def can_attack_target(
+    db_session: "Session",
+    attacker: "Player",
+    defender: "Player",
+) -> tuple[bool, str | None]:
+    """Anti-farm gate. Returns (True, None) or (False, reason_fr)."""
+    if attacker.id == defender.id:
+        return False, "Vous ne pouvez pas attaquer votre propre royaume."
+
+    if attacker.level < PVP_MINIMUM_LEVEL:
+        return False, f"Vous devez être niveau {PVP_MINIMUM_LEVEL} pour attaquer."
+
+    # Cooldown gate (per target).
+    cd = _pvp_cooldown_active(db_session, attacker.id, defender.id)
+    if cd is not None:
+        remaining = int((cd.expires_at - datetime.utcnow()).total_seconds())
+        return False, (
+            f"Vous avez déjà attaqué ce Seigneur récemment. "
+            f"Prochaine attaque possible dans ~{remaining // 60} min."
+        )
+
+    # Global rate limit.
+    recent = _pvp_attacks_last_hour(db_session, attacker.id)
+    if recent >= PVP_ATTACKS_PER_HOUR:
+        return False, (
+            f"Limite anti-farm : maximum {PVP_ATTACKS_PER_HOUR} attaques "
+            f"par heure. Réessayez plus tard."
+        )
+
+    # Diplomatic gate (allies cannot be attacked).
+    status, _ = pvp_diplomacy_adjustment(db_session, attacker, defender)
+    if status == "allied":
+        return False, "Vous ne pouvez pas attaquer un allié."
+
+    return True, None
+
+
+def register_pvp_cooldown(
+    db_session: "Session",
+    attacker_id: int,
+    defender_id: int,
+) -> None:
+    """Insert or refresh the cooldown row for an attacker/defender pair."""
+    from models import PvPCooldown
+
+    now = datetime.utcnow()
+    expires = now + timedelta(seconds=PVP_TARGET_COOLDOWN_SEC)
+
+    cd = (
+        db_session.query(PvPCooldown)
+        .filter(
+            PvPCooldown.attacker_id == attacker_id,
+            PvPCooldown.defender_id == defender_id,
+        )
+        .one_or_none()
+    )
+    if cd is None:
+        cd = PvPCooldown(
+            attacker_id=attacker_id,
+            defender_id=defender_id,
+            last_attack_at=now,
+            expires_at=expires,
+        )
+        db_session.add(cd)
+    else:
+        cd.last_attack_at = now
+        cd.expires_at = expires
+
+
+def find_matchmaking_opponents(
+    db_session: "Session",
+    attacker: "Player",
+    limit: int = PVP_MATCHMAKING_LIMIT,
+) -> list[dict]:
+    """Return a list of fair PvP candidates for the player.
+
+    Selection rules:
+    - Different player than the attacker
+    - Level within PVP_MATCHMAKING_LEVEL_RANGE of the attacker
+    - Not currently on per-target cooldown
+    - Not the same alliance (if attacker is in one)
+    Sorted by level proximity, then by gold (richer = juicier).
+    """
+    from models import Player, User, PvPCooldown
+    from sqlalchemy.orm import joinedload
+
+    lvl_min = max(1, attacker.level - PVP_MATCHMAKING_LEVEL_RANGE)
+    lvl_max = attacker.level + PVP_MATCHMAKING_LEVEL_RANGE
+
+    query = (
+        db_session.query(User, Player)
+        .join(Player, Player.user_id == User.id)
+        .filter(Player.id != attacker.id)
+        .filter(Player.level >= lvl_min)
+        .filter(Player.level <= lvl_max)
+    )
+
+    rows = query.all()
+    if not rows:
+        return []
+
+    # Build a set of defender_ids that are currently on cooldown.
+    now = datetime.utcnow()
+    on_cd = {
+        cd.defender_id
+        for cd in db_session.query(PvPCooldown)
+        .filter(
+            PvPCooldown.attacker_id == attacker.id,
+            PvPCooldown.expires_at > now,
+        )
+        .all()
+    }
+
+    # Optionally exclude same-alliance members.
+    same_alliance_player_ids: set[int] = set()
+    my_alliance_id = player_alliance_id(db_session, attacker)
+    if my_alliance_id is not None:
+        from models import AllianceMember
+        members = (
+            db_session.query(AllianceMember)
+            .filter(AllianceMember.alliance_id == my_alliance_id)
+            .all()
+        )
+        same_alliance_player_ids = {m.player_id for m in members}
+
+    candidates = []
+    for u, p in rows:
+        if p.id in on_cd:
+            continue
+        if p.id in same_alliance_player_ids:
+            continue
+        candidates.append({
+            "user_id": u.id,
+            "username": u.username,
+            "player_id": p.id,
+            "level": p.level,
+            "gold": p.gold,
+            "wood": p.wood,
+            "mana": p.mana,
+            "level_diff": p.level - attacker.level,
+            "total_units": sum(pu.count for pu in p.units),
+        })
+
+    # Sort: closest level first, then richest.
+    candidates.sort(key=lambda c: (abs(c["level_diff"]), -c["gold"]))
+    return candidates[:limit]
+
+
+def get_pvp_cooldown_view(
+    db_session: "Session",
+    attacker: "Player",
+) -> dict:
+    """Return a snapshot of the attacker's PvP rate-limit state."""
+    recent = _pvp_attacks_last_hour(db_session, attacker.id)
+    return {
+        "attacks_used": recent,
+        "attacks_max": PVP_ATTACKS_PER_HOUR,
+        "attacks_remaining": max(0, PVP_ATTACKS_PER_HOUR - recent),
+        "target_cooldown_minutes": PVP_TARGET_COOLDOWN_SEC // 60,
+        "matchmaking_level_range": PVP_MATCHMAKING_LEVEL_RANGE,
+    }
