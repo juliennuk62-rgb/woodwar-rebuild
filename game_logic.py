@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from game_data import game_data
+from utils import utcnow
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -223,7 +224,7 @@ def apply_production_tick(db_session: "Session", player: "Player") -> dict:
     Returns a dict of credits applied: {gold, wood, mana, completed_upgrades}.
     Mutates the player in place (the caller is responsible for commit).
     """
-    now = datetime.utcnow()
+    now = utcnow()
     elapsed = (now - player.last_tick).total_seconds()
     if elapsed < 0:
         elapsed = 0
@@ -528,7 +529,7 @@ def resolve_combat(
     from models import CombatLog, PlayerRelic, PlayerUnit  # local import
 
     # Validate camp is alive.
-    now = datetime.utcnow()
+    now = utcnow()
     if camp.respawn_at is not None and camp.respawn_at > now:
         raise ValueError("Ce camp a été détruit récemment, il est en train de se reformer.")
     if camp.respawn_at is not None and camp.respawn_at <= now:
@@ -1094,7 +1095,7 @@ def refresh_camps(db_session: "Session") -> int:
     """Respawn camps whose cooldown has elapsed. Returns count refreshed."""
     from models import KoboldCamp
 
-    now = datetime.utcnow()
+    now = utcnow()
     refreshed = 0
     camps = db_session.query(KoboldCamp).filter(KoboldCamp.respawn_at <= now).all()
     for camp in camps:
@@ -1543,7 +1544,7 @@ def set_diplomacy(
         )
         .one_or_none()
     )
-    now = datetime.utcnow()
+    now = utcnow()
     if row is None:
         row = AllianceDiplomacy(
             alliance_low_id=low,
@@ -1739,7 +1740,7 @@ def get_or_create_game_state(db_session: "Session") -> "GameState":
 
 def season_day(state: "GameState") -> int:
     """Return the day number of the current season (1-indexed)."""
-    delta = datetime.utcnow() - state.season_started_at
+    delta = utcnow() - state.season_started_at
     return int(delta.total_seconds() // 86400) + 1
 
 
@@ -1831,7 +1832,7 @@ def drop_random_item(db_session: "Session", player: "Player") -> int | None:
 
 def clean_expired_buffs(db_session: "Session", player: "Player") -> int:
     """Remove buffs whose expires_at has passed. Returns count removed."""
-    now = datetime.utcnow()
+    now = utcnow()
     to_delete = [b for b in player.buffs if b.expires_at <= now]
     for b in to_delete:
         db_session.delete(b)
@@ -1846,7 +1847,7 @@ def active_multiplier(player: "Player", effect: str) -> float:
 
     Expired buffs are ignored (caller should clean them periodically).
     """
-    now = datetime.utcnow()
+    now = utcnow()
     total = 1.0
     for b in player.buffs:
         if b.effect == effect and b.expires_at > now:
@@ -1869,7 +1870,7 @@ def use_item(db_session: "Session", player: "Player", item_id: int) -> dict:
         raise ValueError("Vous ne possédez pas cet objet.")
 
     effect, mult, duration, label = _ITEM_EFFECTS[item_id]
-    expires = datetime.utcnow() + timedelta(seconds=duration)
+    expires = utcnow() + timedelta(seconds=duration)
     buff = ActiveBuff(
         player_id=player.id,
         effect=effect,
@@ -1925,7 +1926,7 @@ def start_training(
             f"(actuel : {caserne_lvl})."
         )
 
-    if player.training_unit_id != 0 and player.training_completes_at and player.training_completes_at > datetime.utcnow():
+    if player.training_unit_id != 0 and player.training_completes_at and player.training_completes_at > utcnow():
         raise ValueError("Une formation est déjà en cours. Attendez sa fin.")
 
     cost = unit["cost"]
@@ -1951,7 +1952,7 @@ def start_training(
     seconds_per_unit = max(1, unit["time"] * speed_mult)
     total_seconds = int(seconds_per_unit * quantity)
 
-    now = datetime.utcnow()
+    now = utcnow()
     player.training_unit_id = unit_id
     player.training_quantity = quantity
     player.training_started_at = now
@@ -1975,7 +1976,7 @@ def collect_training(db_session: "Session", player: "Player") -> dict | None:
         return None
     if player.training_completes_at is None:
         return None
-    if player.training_completes_at > datetime.utcnow():
+    if player.training_completes_at > utcnow():
         return None
 
     unit_id = player.training_unit_id
@@ -2267,7 +2268,7 @@ def claim_quest_reward(db_session: "Session", player: "Player", quest_db_id: int
         )
 
     pq.status = "claimed"
-    pq.claimed_at = datetime.utcnow()
+    pq.claimed_at = utcnow()
     player.gold += pq.reward_gold
     player.xp += pq.reward_xp
     return {
@@ -2312,7 +2313,7 @@ def _pvp_cooldown_active(db_session: "Session", attacker_id: int, defender_id: i
     """Return the cooldown row if currently active, None otherwise."""
     from models import PvPCooldown
 
-    now = datetime.utcnow()
+    now = utcnow()
     cd = (
         db_session.query(PvPCooldown)
         .filter(
@@ -2329,7 +2330,7 @@ def _pvp_attacks_last_hour(db_session: "Session", attacker_id: int) -> int:
     """Count how many attacks the attacker has launched in the last hour."""
     from models import PvPCooldown
 
-    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+    one_hour_ago = utcnow() - timedelta(hours=1)
     return (
         db_session.query(PvPCooldown)
         .filter(
@@ -2355,7 +2356,7 @@ def can_attack_target(
     # Cooldown gate (per target).
     cd = _pvp_cooldown_active(db_session, attacker.id, defender.id)
     if cd is not None:
-        remaining = int((cd.expires_at - datetime.utcnow()).total_seconds())
+        remaining = int((cd.expires_at - utcnow()).total_seconds())
         return False, (
             f"Vous avez déjà attaqué ce Seigneur récemment. "
             f"Prochaine attaque possible dans ~{remaining // 60} min."
@@ -2385,7 +2386,7 @@ def register_pvp_cooldown(
     """Insert or refresh the cooldown row for an attacker/defender pair."""
     from models import PvPCooldown
 
-    now = datetime.utcnow()
+    now = utcnow()
     expires = now + timedelta(seconds=PVP_TARGET_COOLDOWN_SEC)
 
     cd = (
@@ -2442,7 +2443,7 @@ def find_matchmaking_opponents(
         return []
 
     # Build a set of defender_ids that are currently on cooldown.
-    now = datetime.utcnow()
+    now = utcnow()
     on_cd = {
         cd.defender_id
         for cd in db_session.query(PvPCooldown)
@@ -2528,7 +2529,7 @@ def auto_farm_run(
     """
     from models import KoboldCamp
 
-    now = datetime.utcnow()
+    now = utcnow()
 
     # Total damage the army can produce right now (used as our "ceiling").
     relic_ids = player_relic_ids(player)
@@ -2730,7 +2731,7 @@ def process_build_queue(
             player_id=player.id,
             building_id=bid,
             level=0,
-            upgrading_until=datetime.utcnow() + timedelta(seconds=cost["time"]),
+            upgrading_until=utcnow() + timedelta(seconds=cost["time"]),
             upgrading_to=1,
         )
         db_session.add(pb)
@@ -2740,7 +2741,7 @@ def process_build_queue(
         if pb not in player.buildings:
             player.buildings.append(pb)
     else:
-        pb.upgrading_until = datetime.utcnow() + timedelta(seconds=cost["time"])
+        pb.upgrading_until = utcnow() + timedelta(seconds=cost["time"])
         pb.upgrading_to = pb.level + 1
 
     db_session.delete(next_item)

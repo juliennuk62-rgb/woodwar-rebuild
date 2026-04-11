@@ -18,6 +18,8 @@ _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
+from utils import utcnow
+
 from flask import (
     Flask,
     flash,
@@ -121,7 +123,7 @@ def _build_dashboard_view(player: Player) -> list[dict]:
         upgrading_started_iso = None
         if pb is not None and pb.upgrading_until is not None:
             upgrading = True
-            remaining = (pb.upgrading_until - datetime.utcnow()).total_seconds()
+            remaining = (pb.upgrading_until - utcnow()).total_seconds()
             upgrade_remaining = max(0, int(remaining))
             upgrading_until_iso = (
                 pb.upgrading_until.replace(microsecond=0).isoformat() + "Z"
@@ -319,8 +321,8 @@ def create_app() -> Flask:
                             password_hash=auth.hash_password(password),
                             email=email,
                             clan_id=clan_id,
-                            created_at=datetime.utcnow(),
-                            last_seen=datetime.utcnow(),
+                            created_at=utcnow(),
+                            last_seen=utcnow(),
                         )
                         s.add(user)
                         s.flush()  # populate user.id
@@ -359,7 +361,7 @@ def create_app() -> Flask:
                 if user is None or not auth.verify_password(user.password_hash, password):
                     flash("Pseudo ou mot de passe incorrect.", "error")
                 else:
-                    user.last_seen = datetime.utcnow()
+                    user.last_seen = utcnow()
                     s.commit()
                     auth.login_user(user)
                     return redirect(url_for("dashboard"))
@@ -579,7 +581,7 @@ def create_app() -> Flask:
                 )
             else:
                 # Upgrades take the prescribed time from nivprix.php.
-                pb.upgrading_until = datetime.utcnow() + timedelta(seconds=cost["time"])
+                pb.upgrading_until = utcnow() + timedelta(seconds=cost["time"])
                 pb.upgrading_to = pb.level + 1
                 flash(
                     f"{building_name} en amélioration vers le niveau {pb.level + 1} "
@@ -622,7 +624,7 @@ def create_app() -> Flask:
             training_info = None
             if player.training_unit_id != 0 and player.training_completes_at is not None:
                 unit_meta = game_data.unit_by_id(player.training_unit_id)
-                remaining = int((player.training_completes_at - datetime.utcnow()).total_seconds())
+                remaining = int((player.training_completes_at - utcnow()).total_seconds())
                 started_iso = (
                     player.training_started_at.replace(microsecond=0).isoformat() + "Z"
                     if player.training_started_at is not None
@@ -713,7 +715,7 @@ def create_app() -> Flask:
             game_logic.refresh_camps(s)
             s.commit()
 
-            now = datetime.utcnow()
+            now = utcnow()
             camps = s.query(KoboldCamp).order_by(KoboldCamp.pv_max).all()
             camps_view = []
             for c in camps:
@@ -1188,7 +1190,7 @@ def create_app() -> Flask:
             messages_view = list(reversed(messages))
 
             # Alliance meta displayed in the header (mimics vb_ht3).
-            age_delta = datetime.utcnow() - alliance.created_at
+            age_delta = utcnow() - alliance.created_at
             age_days = max(1, age_delta.days)
             if age_days < 14:
                 age_label = f"il y a {age_days} jour{'s' if age_days > 1 else ''}"
@@ -1544,7 +1546,7 @@ def create_app() -> Flask:
                     "usable": pi.item_id in usable_ids,
                 })
 
-            now = datetime.utcnow()
+            now = utcnow()
             buffs_view = []
             for b in sorted(player.buffs, key=lambda x: x.expires_at):
                 if b.expires_at <= now:

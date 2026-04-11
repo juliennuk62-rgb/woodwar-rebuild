@@ -190,6 +190,42 @@ features majeures.
 
 **Tests** : 77/77 OK · **Playtest** : green, 0 blockers · **Smoke** : ✓
 
+#### Bugfixes — `datetime.utcnow` deprecation + `auto-merge.yml`
+
+**Fixed — `datetime.utcnow()` deprecation (Python 3.12+)**
+- Nouveau module `utils.py` avec helper `utcnow()` qui retourne un
+  `datetime` naive UTC via `datetime.now(timezone.utc).replace(tzinfo=None)`
+  — zéro dépendance, zéro warning, API identique à l'ancien `datetime.utcnow()`.
+- Migré les 47 occurrences réparties dans :
+  - `models.py` : 17 `default=datetime.utcnow` → `default=utcnow`
+  - `app.py` : 9 `datetime.utcnow()` → `utcnow()`
+  - `game_logic.py` : 21 `datetime.utcnow()` → `utcnow()`
+- Vérifié avec `python -W error::DeprecationWarning -m unittest discover tests`
+  → 77/77 OK, zéro deprecation warning promu en erreur.
+- Pas de migration DB nécessaire : `utcnow()` retourne toujours un naive
+  UTC, parfaitement compatible avec les colonnes `DateTime` existantes
+  (qui sont toutes naive).
+
+**Fixed — `auto-merge.yml` ne se déclenchait jamais**
+- Avant : workflow triggeré sur `pull_request`, mais l'agent du trigger
+  faisait juste `git push` sur `claude/**` sans jamais appeler `gh pr create`
+  → le workflow ne tournait jamais → 9 branches orphelines accumulées.
+- Après : workflow triggeré sur `push: branches: claude/**`, avec pipeline :
+  1. Checkout
+  2. Install deps + run full unittest suite + playtest
+  3. Étape `ensure_pr` : cherche une PR ouverte pour la branche ; si
+     absente, la crée via `gh pr create` en tirant le titre/body du
+     dernier commit
+  4. Merge la PR (`gh pr merge --merge --delete-branch --admin`)
+  5. Si l'une des étapes échoue, poste un commentaire sur la PR avec
+     un lien vers les logs de l'action.
+- Nettoyé les 9 branches `claude/*` orphelines via
+  `git push origin --delete` (toutes redondantes, même fix déjà mergé).
+- Le prochain run de l'agent nocturne devrait maintenant se merger
+  automatiquement.
+
+**Tests** : 77/77 OK · **Playtest** : green, 0 blockers
+
 ## [0.10.0] — 2026-04-11 — Bundle B + automatisation nocturne
 
 ### Added

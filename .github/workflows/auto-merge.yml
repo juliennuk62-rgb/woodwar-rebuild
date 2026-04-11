@@ -1,24 +1,30 @@
 name: Auto-merge Claude PRs
 
+# The nightly-improver agent pushes directly to branches under `claude/**`
+# without opening a PR. This workflow reacts to those pushes, creates the
+# PR on the fly if needed, runs the full test suite, then merges the PR
+# into main and deletes the branch.
+#
+# Designed to unblock the auto-merge loop that was previously wired to
+# `on: pull_request` (which never fired because no PR was ever opened).
+
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches:
+      - 'claude/**'
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  auto-merge:
-    # Only auto-merge PRs opened on branches starting with "claude/".
-    if: startsWith(github.head_ref, 'claude/')
+  auto-pr-and-merge:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.head_ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -32,21 +38,70 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run test suite
-        id: tests
-        run: |
-          python -m unittest tests.test_data tests.test_logic tests.test_routes -v
+        run: python -m unittest discover tests -v
 
       - name: Run playtest simulator
-        id: playtest
         run: python scripts/playtest.py
 
-      - name: Merge PR
-        if: success()
+      - name: Ensure a PR exists for this branch
+        id: ensure_pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr merge ${{ github.event.pull_request.number }} \
-            --repo ${{ github.repository }} \
+          set -euo pipefail
+          BRANCH="${GITHUB_REF_NAME}"
+          echo "branch=$BRANCH"
+
+          # Is there already an open PR from this branch?
+          PR_NUMBER=$(gh pr list \
+            --repo "${GITHUB_REPOSITORY}" \
+            --head "$BRANCH" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [ -z "$PR_NUMBER" ]; then
+            # Derive title from the last commit subject, body from its body.
+            TITLE=$(git log -1 --pretty=%s)
+            BODY_RAW=$(git log -1 --pretty=%b)
+            # Fallback if the commit body is empty.
+            if [ -z "$BODY_RAW" ]; then
+              BODY_RAW="Automated PR created by auto-merge.yml for branch \`$BRANCH\`."
+            fi
+            PR_URL=$(gh pr create \
+              --repo "${GITHUB_REPOSITORY}" \
+              --base main \
+              --head "$BRANCH" \
+              --title "$TITLE" \
+              --body "$BODY_RAW")
+            echo "Created PR: $PR_URL"
+            PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
+          else
+            echo "Found existing PR #$PR_NUMBER for branch $BRANCH"
+          fi
+
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Merge PR and delete branch
+        if: success() && steps.ensure_pr.outputs.pr_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          PR_NUMBER="${{ steps.ensure_pr.outputs.pr_number }}"
+          echo "Merging PR #$PR_NUMBER"
+          gh pr merge "$PR_NUMBER" \
+            --repo "${GITHUB_REPOSITORY}" \
             --merge \
             --delete-branch \
             --admin
+
+      - name: On failure — comment on the PR (if one was created)
+        if: failure() && steps.ensure_pr.outputs.pr_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.ensure_pr.outputs.pr_number }}"
+          gh pr comment "$PR_NUMBER" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --body "❌ Auto-merge failed in workflow [\`${{ github.workflow }}\` #${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}). Tests or playtest did not pass. Review the logs and fix before a manual merge."

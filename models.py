@@ -29,6 +29,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db import Base
+from utils import utcnow
 
 
 class User(Base):
@@ -39,7 +40,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(256), nullable=False)
     email: Mapped[str | None] = mapped_column(String(128), nullable=True)
     clan_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     last_seen: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     player: Mapped["Player"] = relationship(back_populates="user", uselist=False)
@@ -80,8 +81,8 @@ class Player(Base):
     training_completes_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Timestamps
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    last_tick: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    last_tick: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     user: Mapped[User] = relationship(back_populates="player")
     buildings: Mapped[list["PlayerBuilding"]] = relationship(
@@ -138,7 +139,7 @@ class PlayerBuilding(Base):
     upgrading_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     upgrading_to: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     player: Mapped[Player] = relationship(back_populates="buildings")
 
@@ -236,7 +237,7 @@ class CombatLog(Base):
     units_sent_json: Mapped[str] = mapped_column(String(512), default="{}")
     units_lost_json: Mapped[str] = mapped_column(String(512), default="{}")
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     def __repr__(self) -> str:
         return f"<CombatLog id={self.id} {self.outcome} vs {self.camp_name}>"
@@ -254,7 +255,7 @@ class PlayerRelic(Base):
     player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
     # Reference into rebuild/data/relics.json (1..12)
     relic_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    acquired_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    acquired_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     player: Mapped[Player] = relationship(back_populates="relics")
 
@@ -297,7 +298,7 @@ class Alliance(Base):
     tag: Mapped[str] = mapped_column(String(5), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(Text, default="")
     founder_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     members: Mapped[list["AllianceMember"]] = relationship(
         back_populates="alliance",
@@ -328,7 +329,7 @@ class AllianceMember(Base):
     alliance_id: Mapped[int] = mapped_column(ForeignKey("alliances.id"), nullable=False)
     player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
     role: Mapped[str] = mapped_column(String(16), default="member", nullable=False)  # founder|member
-    joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    joined_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     alliance: Mapped[Alliance] = relationship(back_populates="members")
 
@@ -350,7 +351,7 @@ class AllianceInvitation(Base):
     alliance_id: Mapped[int] = mapped_column(ForeignKey("alliances.id"), nullable=False)
     player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     alliance: Mapped[Alliance] = relationship(back_populates="invitations")
 
@@ -368,7 +369,7 @@ class AllianceMessage(Base):
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     sender_name: Mapped[str] = mapped_column(String(32), nullable=False)  # denormalized for speed
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     alliance: Mapped[Alliance] = relationship(back_populates="messages")
 
@@ -396,7 +397,7 @@ class PrivateMessage(Base):
     is_read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     archived_by_recipient: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     archived_by_sender: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     def __repr__(self) -> str:
         return f"<PrivateMessage id={self.id} from={self.sender_id} to={self.recipient_id}>"
@@ -421,7 +422,7 @@ class AllianceDiplomacy(Base):
     relation: Mapped[str] = mapped_column(String(16), default="neutral", nullable=False)
     # Who proposed / last updated the relation (for future "proposal" workflow).
     updated_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     def __repr__(self) -> str:
         return (
@@ -447,7 +448,7 @@ class PlayerAchievement(Base):
     player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
     # Reference into rebuild/data/achievements.json (0..15)
     achievement_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    earned_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    earned_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     player: Mapped[Player] = relationship(back_populates="achievements")
 
@@ -462,7 +463,7 @@ class GameState(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
     current_season: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
-    season_started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    season_started_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     season_label: Mapped[str] = mapped_column(String(64), default="Saison 1 — Aube")
 
     def __repr__(self) -> str:
@@ -486,7 +487,7 @@ class PlayerItem(Base):
     player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
     item_id: Mapped[int] = mapped_column(Integer, nullable=False)
     count: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
-    acquired_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    acquired_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     player: Mapped[Player] = relationship(back_populates="items")
 
@@ -509,7 +510,7 @@ class BuildQueueItem(Base):
     building_id: Mapped[int] = mapped_column(Integer, nullable=False)
     # Position in the queue: lowest first.
     position: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     def __repr__(self) -> str:
         return f"<BuildQueueItem player={self.player_id} bat={self.building_id} pos={self.position}>"
@@ -531,7 +532,7 @@ class PvPCooldown(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     attacker_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
     defender_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
-    last_attack_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    last_attack_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     def __repr__(self) -> str:
@@ -566,7 +567,7 @@ class PlayerQuest(Base):
     objective_count: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     objective_type: Mapped[str] = mapped_column(String(32), default="train_units", nullable=False)
 
-    accepted_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    accepted_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     claimed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Frozen rewards at accept time (so retroactive balance changes don't
@@ -598,7 +599,7 @@ class ActiveBuff(Base):
     multiplier: Mapped[float] = mapped_column(default=1.0, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     source_item_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     player: Mapped[Player] = relationship(back_populates="buffs")
 
