@@ -19,11 +19,49 @@
     </div>
   </div>
 
+  {% set active_quests = player_quests | selectattr('status', 'in', ['active', 'claimable']) | list %}
+  {% if active_quests %}
+    <div class="card">
+      <h2>⚜ Vos quêtes en cours</h2>
+      <div class="quests-list">
+        {% for pq in active_quests %}
+          <div class="quest-card quest-active quest-status-{{ pq.status }}">
+            <div class="quest-head">
+              <span class="quest-name">{{ pq.name_fr }}</span>
+              <span class="quest-reward">+{{ pq.reward_xp }} XP · +{{ pq.reward_gold }} or</span>
+            </div>
+            <div class="quest-desc">{{ pq.description_fr }}</div>
+            <div class="quest-progress-row">
+              <div data-progress="{{ pq.progress_pct }}" style="width: 70%; display: inline-block;"></div>
+              <span class="quest-progress-text">{{ pq.progress }} / {{ pq.objective_count }}</span>
+            </div>
+            <div class="quest-actions">
+              {% if pq.status == 'claimable' %}
+                <form method="post" action="{{ url_for('claim_quest_route', pq_id=pq.id) }}" style="display:inline;">
+                  <button type="submit" class="ww-action quest-claim-btn">⚜ Réclamer la récompense</button>
+                </form>
+              {% endif %}
+              <form method="post" action="{{ url_for('abandon_quest_route', pq_id=pq.id) }}" style="display:inline;">
+                <button type="submit" class="ww-action quest-abandon-btn">Abandonner</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
   {% if quests %}
     <div class="card">
       <h2>Quêtes du jour</h2>
+      <p style="color: var(--tab-brown-fg); font-size: 0.9em;">
+        Acceptez une quête pour la suivre dans votre journal. La progression
+        est mise à jour en temps réel selon votre activité (combats, formation,
+        construction, ressources accumulées).
+      </p>
       <div class="quests-list">
         {% for q in quests %}
+          {% set pq = pq_by_quest_id.get(q.id) %}
           <div class="quest-card quest-{{ q.difficulty or 'medium' }}">
             <div class="quest-head">
               <span class="quest-name">{{ q.name_fr }}</span>
@@ -33,6 +71,21 @@
             {% if q.lore_hook %}
               <div class="quest-lore">« {{ q.lore_hook }} »</div>
             {% endif %}
+            <div class="quest-actions">
+              {% if pq is none %}
+                <form method="post" action="{{ url_for('accept_quest_route', quest_id=q.id) }}" style="display:inline;">
+                  <button type="submit" class="ww-action quest-accept-btn">⚔ Accepter la quête</button>
+                </form>
+              {% elif pq.status == 'active' %}
+                <span class="quest-status-tag quest-status-active">En cours · {{ pq.progress }} / {{ pq.objective_count }}</span>
+              {% elif pq.status == 'claimable' %}
+                <span class="quest-status-tag quest-status-claimable">★ Objectif atteint — à réclamer</span>
+              {% elif pq.status == 'claimed' %}
+                <span class="quest-status-tag quest-status-claimed">✓ Réclamée</span>
+              {% elif pq.status == 'abandoned' %}
+                <span class="quest-status-tag quest-status-abandoned">Abandonnée</span>
+              {% endif %}
+            </div>
           </div>
         {% endfor %}
       </div>

@@ -1308,7 +1308,15 @@ def create_app() -> Flask:
         with SessionLocal() as s:
             player = s.query(Player).filter(Player.user_id == user.id).one()
             game_logic.apply_production_tick(s, player)
+
+            # Compute the player's quest state (active + claimable + claimed)
+            # — list_player_quests will auto-promote to "claimable" if the
+            # objective is reached, so we commit to persist that state.
+            player_quests = game_logic.list_player_quests(s, player)
             s.commit()
+
+            # Index of the player's quests by quest_id for the template.
+            pq_by_quest_id = {q["quest_id"]: q for q in player_quests}
 
             lore_entries = sorted(
                 game_data.generated_lore,
@@ -1337,12 +1345,63 @@ def create_app() -> Flask:
                 lore_entries=lore_entries,
                 quests=quests,
                 events=events,
+                player_quests=player_quests,
+                pq_by_quest_id=pq_by_quest_id,
                 total_lore=len(game_data.generated_lore),
                 total_quests=len(game_data.generated_quests),
                 total_events=len(game_data.generated_events),
                 total_camps=len(game_data.generated_camps),
                 total_items=len(game_data.generated_items),
             )
+
+    @app.route("/quete/<quest_id>/accepter", methods=["POST"])
+    @auth.login_required
+    def accept_quest_route(quest_id: str):
+        user = auth.current_user()
+        with SessionLocal() as s:
+            player = s.query(Player).filter(Player.user_id == user.id).one()
+            try:
+                game_logic.accept_quest(s, player, quest_id)
+                s.commit()
+                flash("Quête acceptée. Bonne chance, Seigneur.", "success")
+            except ValueError as e:
+                s.rollback()
+                flash(str(e), "error")
+            return redirect(url_for("rumeurs_page"))
+
+    @app.route("/quete/<int:pq_id>/reclamer", methods=["POST"])
+    @auth.login_required
+    def claim_quest_route(pq_id: int):
+        user = auth.current_user()
+        with SessionLocal() as s:
+            player = s.query(Player).filter(Player.user_id == user.id).one()
+            try:
+                result = game_logic.claim_quest_reward(s, player, pq_id)
+                s.commit()
+                flash(
+                    f"Récompense réclamée : +{result['reward_gold']} or, "
+                    f"+{result['reward_xp']} XP.",
+                    "success",
+                )
+            except ValueError as e:
+                s.rollback()
+                flash(str(e), "error")
+            return redirect(url_for("rumeurs_page"))
+
+    @app.route("/quete/<int:pq_id>/abandonner", methods=["POST"])
+    @auth.login_required
+    def abandon_quest_route(pq_id: int):
+        user = auth.current_user()
+        with SessionLocal() as s:
+            player = s.query(Player).filter(Player.user_id == user.id).one()
+            try:
+                game_logic.abandon_quest(s, player, pq_id)
+                s.commit()
+                flash("Quête abandonnée.", "success")
+            except ValueError as e:
+                s.rollback()
+                flash(str(e), "error")
+            return redirect(url_for("rumeurs_page"))
 
     # ----- Bundle B: inventory, items, spy, market ------------------------
 

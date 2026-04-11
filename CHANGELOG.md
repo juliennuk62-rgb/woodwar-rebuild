@@ -72,6 +72,40 @@ features majeures.
 
 **Tests** : 53/53 OK · **Playtest** : green, 0 blockers
 
+#### Feature 3 — Mode Campagne (acceptation + progression + récompenses)
+
+**Added**
+- Modèle `PlayerQuest` (player_id, quest_id, status, snapshot_value,
+  objective_count, objective_type, accepted_at, claimed_at, frozen
+  reward_gold + reward_xp). Status ∈ {active, claimable, claimed, abandoned}.
+- `game_logic.QUEST_OBJECTIVE_FIELDS` mapping objective_type → counter joueur :
+  - `train_units` → `total_units_trained`
+  - `win_campaigns` → `pve_victories`
+  - `win_pvp` → `total_victories - pve_victories` (computed)
+  - `earn_gold/wood/mana` → `gold/wood/mana` (snapshot delta)
+  - `build_level` → max niveau de bâtiment
+  - `own_relic` → nombre de reliques
+- Fonctions :
+  - `accept_quest(player, quest_id)` — snapshot du compteur, status=active
+  - `list_player_quests(player)` — auto-promote vers `claimable` quand
+    la progression atteint l'objectif
+  - `claim_quest_reward(player, pq_id)` — crédite gold + XP, status=claimed
+  - `abandon_quest(player, pq_id)`
+- Routes Flask :
+  - `POST /quete/<quest_id>/accepter`
+  - `POST /quete/<int:pq_id>/reclamer`
+  - `POST /quete/<int:pq_id>/abandonner`
+- UI sur `/rumeurs` :
+  - Section "⚜ Vos quêtes en cours" en haut, avec barre de progression
+    (réutilise `data-progress`) et bouton "Réclamer la récompense" qui
+    pulse quand l'objectif est atteint
+  - Boutons "Accepter la quête" sur chaque carte de quête disponible
+  - Tags d'état (en cours, ★ objectif atteint, ✓ réclamée, abandonnée)
+- `tests/test_quests.py` (7 tests) : accept/snapshot/progress/claim/abandon
+  via une base SQLite in-memory pour pas polluer le dev DB.
+
+**Tests** : 60/60 OK · **Playtest** : green, 0 blockers
+
 ## [0.10.0] — 2026-04-11 — Bundle B + automatisation nocturne
 
 ### Added

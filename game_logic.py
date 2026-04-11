@@ -2123,3 +2123,164 @@ def top_warriors(db_session: "Session", limit: int = 20) -> list[tuple["User", i
         .all()
     )
     return [(u, int(v or 0), int(t or 0)) for u, v, t in rows]
+
+
+# ===========================================================================
+# Phase 12 — Campaign mode (PlayerQuest accept / progress / claim)
+# ===========================================================================
+
+# Map quest objective_type → (player attribute, label_fr).
+# A quest's progress is tracked by snapshotting this attribute at accept
+# time and comparing the current value at any later request.
+QUEST_OBJECTIVE_FIELDS = {
+    "train_units":   ("total_units_trained", "unités formées"),
+    "win_campaigns": ("pve_victories",       "campagnes gagnées"),
+    "win_pvp":       ("_pvp_victories",      "victoires PvP"),  # computed
+    "earn_gold":     ("gold",                "or accumulé"),
+    "earn_wood":     ("wood",                "bois accumulé"),
+    "earn_mana":     ("mana",                "mana accumulé"),
+    "build_level":   ("_max_building_level", "niveau de bâtiment"),
+    "own_relic":     ("_relic_count",        "reliques possédées"),
+}
+
+
+def _quest_counter_value(player: "Player", objective_type: str) -> int:
+    """Return the current value of the player counter relevant to a quest."""
+    if objective_type == "win_pvp":
+        return max(0, player.total_victories - player.pve_victories)
+    if objective_type == "_max_building_level" or objective_type == "build_level":
+        if not player.buildings:
+            return 0
+        return max(b.level for b in player.buildings)
+    if objective_type == "_relic_count" or objective_type == "own_relic":
+        return len(player.relics)
+    field, _ = QUEST_OBJECTIVE_FIELDS.get(
+        objective_type, (objective_type, objective_type)
+    )
+    return int(getattr(player, field, 0) or 0)
+
+
+def _quest_meta_by_id(quest_id: str) -> dict | None:
+    """Look up a generated quest by id (from data/generated/quests.json)."""
+    for q in game_data.generated_quests:
+        if q.get("id") == quest_id:
+            return q
+    return None
+
+
+def list_player_quests(db_session: "Session", player: "Player") -> list[dict]:
+    """Return active and recently claimed quests for the player, with progress."""
+    from models import PlayerQuest
+
+    rows = (
+        db_session.query(PlayerQuest)
+        .filter(PlayerQuest.player_id == player.id)
+        .order_by(PlayerQuest.id.desc())
+        .all()
+    )
+    out = []
+    for pq in rows:
+        meta = _quest_meta_by_id(pq.quest_id)
+        current = _quest_counter_value(player, pq.objective_type)
+        progress = max(0, current - pq.snapshot_value)
+        progress = min(progress, pq.objective_count)
+        # Auto-promote to claimable if objective met.
+        if pq.status == "active" and progress >= pq.objective_count:
+            pq.status = "claimable"
+        pct = round(100 * progress / max(1, pq.objective_count), 1)
+        out.append({
+            "id": pq.id,
+            "quest_id": pq.quest_id,
+            "name_fr": meta.get("name_fr", pq.quest_id) if meta else pq.quest_id,
+            "description_fr": meta.get("description_fr", "") if meta else "",
+            "objective_type": pq.objective_type,
+            "objective_count": pq.objective_count,
+            "progress": progress,
+            "progress_pct": pct,
+            "status": pq.status,
+            "reward_gold": pq.reward_gold,
+            "reward_xp": pq.reward_xp,
+            "claimed_at": pq.claimed_at,
+        })
+    return out
+
+
+def accept_quest(db_session: "Session", player: "Player", quest_id: str) -> "PlayerQuest":
+    """Insert a PlayerQuest row for the given quest, snapshotting counters."""
+    from models import PlayerQuest
+
+    meta = _quest_meta_by_id(quest_id)
+    if meta is None:
+        raise ValueError("Cette quête n'existe pas.")
+
+    existing = (
+        db_session.query(PlayerQuest)
+        .filter(
+            PlayerQuest.player_id == player.id,
+            PlayerQuest.quest_id == quest_id,
+        )
+        .one_or_none()
+    )
+    if existing is not None:
+        if existing.status == "claimed":
+            raise ValueError("Cette quête a déjà été réclamée.")
+        if existing.status in ("active", "claimable"):
+            raise ValueError("Cette quête est déjà active.")
+
+    objective_type = meta.get("objective_type", "train_units")
+    objective_count = int(meta.get("objective_count", 1))
+    snapshot = _quest_counter_value(player, objective_type)
+
+    pq = PlayerQuest(
+        player_id=player.id,
+        quest_id=quest_id,
+        status="active",
+        snapshot_value=snapshot,
+        objective_count=objective_count,
+        objective_type=objective_type,
+        reward_gold=int(meta.get("reward_gold", 0)),
+        reward_xp=int(meta.get("reward_xp", 0)),
+    )
+    db_session.add(pq)
+    db_session.flush()
+    return pq
+
+
+def claim_quest_reward(db_session: "Session", player: "Player", quest_db_id: int) -> dict:
+    """Mark a claimable quest as claimed and credit gold + XP to the player."""
+    from models import PlayerQuest
+
+    pq = db_session.get(PlayerQuest, quest_db_id)
+    if pq is None or pq.player_id != player.id:
+        raise ValueError("Quête introuvable.")
+    if pq.status == "claimed":
+        raise ValueError("Cette quête a déjà été réclamée.")
+
+    # Recompute progress to confirm it's actually claimable.
+    current = _quest_counter_value(player, pq.objective_type)
+    progress = max(0, current - pq.snapshot_value)
+    if progress < pq.objective_count:
+        raise ValueError(
+            f"Objectif non atteint ({progress}/{pq.objective_count})."
+        )
+
+    pq.status = "claimed"
+    pq.claimed_at = datetime.utcnow()
+    player.gold += pq.reward_gold
+    player.xp += pq.reward_xp
+    return {
+        "quest_id": pq.quest_id,
+        "reward_gold": pq.reward_gold,
+        "reward_xp": pq.reward_xp,
+    }
+
+
+def abandon_quest(db_session: "Session", player: "Player", quest_db_id: int) -> None:
+    from models import PlayerQuest
+
+    pq = db_session.get(PlayerQuest, quest_db_id)
+    if pq is None or pq.player_id != player.id:
+        raise ValueError("Quête introuvable.")
+    if pq.status == "claimed":
+        raise ValueError("Quête déjà réclamée, impossible d'abandonner.")
+    pq.status = "abandoned"

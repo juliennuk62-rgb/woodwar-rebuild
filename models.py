@@ -494,6 +494,46 @@ class PlayerItem(Base):
         return f"<PlayerItem player={self.player_id} item={self.item_id} x{self.count}>"
 
 
+class PlayerQuest(Base):
+    """A quest the player has accepted from the daily-generated pool.
+
+    Tracks acceptance, progression snapshot, and completion / claim state.
+
+    quest_id is the string id of a quest from data/generated/quests.json
+    (e.g. "qst_recrues_eolric"). We don't FK to a quests table because
+    quests live in JSON, not SQL.
+    """
+
+    __tablename__ = "player_quests"
+    __table_args__ = (
+        UniqueConstraint("player_id", "quest_id", name="uq_player_quest"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
+    quest_id: Mapped[str] = mapped_column(String(64), nullable=False)
+
+    # active | claimable | claimed | abandoned
+    status: Mapped[str] = mapped_column(String(16), default="active", nullable=False)
+
+    # Snapshot of the relevant counter at accept time. Progress is computed
+    # as max(0, current - snapshot_value).
+    snapshot_value: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    objective_count: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    objective_type: Mapped[str] = mapped_column(String(32), default="train_units", nullable=False)
+
+    accepted_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    claimed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    # Frozen rewards at accept time (so retroactive balance changes don't
+    # invalidate already-active quests).
+    reward_gold: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    reward_xp: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"<PlayerQuest player={self.player_id} quest={self.quest_id} {self.status}>"
+
+
 class ActiveBuff(Base):
     """A timed effect currently active on a player."""
 

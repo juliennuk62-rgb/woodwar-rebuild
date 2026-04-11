@@ -52,6 +52,7 @@ _SCHEMA_PATCHES: list[tuple[str, str, str]] = [
     ("kobold_camps", "archetype",       "ALTER TABLE kobold_camps ADD COLUMN archetype VARCHAR(16) NOT NULL DEFAULT 'kobold'"),
     ("kobold_camps", "ai_pattern",      "ALTER TABLE kobold_camps ADD COLUMN ai_pattern VARCHAR(16) NOT NULL DEFAULT 'passive'"),
     ("kobold_camps", "difficulty_tier", "ALTER TABLE kobold_camps ADD COLUMN difficulty_tier INTEGER NOT NULL DEFAULT 2"),
+    # Phase 12 (campaign mode — PlayerQuest is created by create_all if missing)
 ]
 
 
