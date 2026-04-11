@@ -19,6 +19,14 @@
       "theme": "quests",
       "entries_added": 5,
       "summary_fr": "Cinq nouvelles quêtes ancrées dans les clans Gaelyn, Langwen, Amaraldor, Isorfidia et Maneldar : recrutement, bûcheronnage, campagnes vs Ombres de Mazar, collecte de Mana pour les Oracles, et duel d'honneur PvP sous l'œil de Fenrir."
+    },
+    {
+      "run_id": "run_20260411_events_lore_01",
+      "started_at": "2026-04-11T13:00:00Z",
+      "completed_at": "2026-04-11T13:00:00Z",
+      "theme": "mixed",
+      "entries_added": 11,
+      "summary_fr": "Correction du blocker qst_duel_maneldar (5→12 pour hard tier), cinq événements aléatoires (Caravane de Thulmis, Aura vacillante, Festin de la Lune Rousse, Ombre d'Akkrongär, Bestiaire d'Amaraldor), six rumeurs/bulletins/prophéties/chants/fables, et ajout d'une section « Événements qui rôdent » sur la page Rumeurs."
     }
   ]
 }

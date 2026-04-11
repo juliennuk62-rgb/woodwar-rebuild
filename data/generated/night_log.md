@@ -28,3 +28,61 @@ prenne le relais tout seul.
 **Priorité suggérée pour le prochain run** : corriger `qst_duel_maneldar` (passer `objective_count` de 5 à 10 et ajuster la récompense proportionnellement).
 
 ---
+
+## Run 2026-04-11T13:00:00Z — Blocker levé + événements + rumeurs + vitrine UI
+
+**Priorité choisie** : 1 (blocker playtest) + 3 (contenu manquant) + 6 (polish UI)
+**Cause** : Le playtest signalait un seul blocker — `qst_duel_maneldar` avec `win_pvp=5`
+(trop facile pour hard tier, attendu ≥ 10). Par ailleurs, les compteurs variety
+montraient `events=0` et `lore=0` : deux catégories de contenu entièrement vides.
+Enfin la page `/rumeurs` n'affichait les événements que sous forme de compteur —
+l'agent précédent avait posé le réservoir, il restait à ouvrir le robinet.
+
+**Travail effectué** :
+- **Blocker corrigé** : `qst_duel_maneldar` passe de 5 → 12 victoires PvP (au lieu
+  de 10 minimum, un chiffre narrativement plus fort et raccord avec le motif des
+  douze lunes d'acier). Récompenses rehaussées proportionnellement :
+  `reward_gold` 6800 → 9200, `reward_xp` 7400 → 9800. Description et lore_hook
+  réécrits pour intégrer le nouveau chiffre et un registre nominatif tenu par
+  les bardes de Legamir.
+- **5 événements générés** dans `data/generated/events.json` — narratifs français
+  avec 3 choix chacun, effets d'économie et buffs variés :
+  - `evt_caravane_thulmis` (neutral, weight 40) — marchand Blöstrom + Kobolds.
+  - `evt_oracle_aura_vacillante` (hostile, weight 25) — Oracle Mazar d'Isorfidia,
+    buff attack_power 1.25x / 48h.
+  - `evt_festin_gaelyn` (peaceful, weight 60) — Lune Rousse, buff camp_wood 1.5x / 24h.
+  - `evt_traitre_akkrongar` (hostile, weight 15) — bannière à trois lunes dans
+    les marécages de l'Est.
+  - `evt_bestiaire_amaraldor` (neutral, weight 30) — jeune Draco blessé, buff
+    train_speed 1.4x / 7 jours.
+- **6 entrées lore générées** dans `data/generated/lore.json` — une par catégorie
+  (bulletin, prophétie, rumeur, chant, fable, + un second bulletin qui boucle
+  narrativement sur la correction du Ban d'honneur des Maneldar) :
+  - `lore_bulletin_tourelles_brouillard` — les Tourelles reprennent vie.
+  - `lore_prophetie_baiser_fenrir` — le douzième Seigneur marqué par le givre.
+  - `lore_rumeur_draco_albatre` — Draco blanc aperçu dans les cols Gleoryn.
+  - `lore_chant_bucherons_langwen` — refrain des bûcherons repris par les Orghana.
+  - `lore_fable_corbeau_argent` — conte Amaraldor, cent ans sans se poser.
+  - `lore_bulletin_duel_maneldar` — correction officielle du ban (5 → 12), auto-
+    référentielle avec le fix du blocker.
+- **Polish UI** : nouvelle section « Événements qui rôdent » sur `/rumeurs`
+  (`app.py:1273-1302`, `templates/rumeurs.html`, `static/style.css`). Affiche les
+  6 événements les plus fortement pondérés avec titre, tag difficulté, narratif,
+  et liste des choix possibles. Palette cohérente avec `.quest-*` et `.lore-*`
+  (peaceful=vert, neutral=lien, hostile=rouge). Zéro nouvelle dépendance.
+- **runs.json** mis à jour avec `run_20260411_events_lore_01` (theme=mixed,
+  entries_added=11).
+
+**Tests** : 41/41 green (test_data 16, test_logic 14, test_routes 11). Smoke test
+manuel du endpoint `/rumeurs` authentifié : status 200, les sections
+« Événements qui rôdent », Caravane de Thulmis, Aura vacillante, Tourelles du
+Brouillard, et « douze rivaux » sont toutes présentes dans le HTML rendu.
+**Playtest** : **green**, 0 blocker (contre 1 au run précédent).
+**Commit** : (à venir)
+
+**Priorité suggérée pour le prochain run** : camps Kobolds générés (camps=0
+dans variety), puis items générés (items=0). Ou ajouter un test unitaire
+dédié aux événements (`test_generated_events_follow_schema`) pour verrouiller
+la structure des choix/effects comme c'est déjà fait pour les quêtes.
+
+---

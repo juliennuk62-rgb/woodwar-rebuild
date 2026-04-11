@@ -1774,6 +1774,61 @@ tr.message-unread td { background: rgba(254, 163, 21, 0.08); font-weight: 500; }
   line-height: 1.5;
 }
 
+/* Events preview */
+
+.events-preview {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6em;
+  margin-top: 0.8em;
+}
+
+.event-card {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid var(--ww-border-dark);
+  border-left: 3px solid var(--ww-border-light);
+  padding: 0.8em 1em;
+}
+.event-peaceful { border-left-color: #7cc97c; }
+.event-neutral  { border-left-color: var(--ww-link); }
+.event-hostile  { border-left-color: var(--ww-red); }
+
+.event-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1em;
+  margin-bottom: 0.3em;
+}
+.event-title {
+  color: var(--ww-fg);
+  font-weight: bold;
+  font-variant: small-caps;
+  font-size: 1.05em;
+}
+.event-tag {
+  color: var(--tab-brown-fg);
+  font-size: 0.75em;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+}
+.event-narrative {
+  color: var(--ww-lime);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+.event-choices {
+  margin: 0.5em 0 0 0;
+  padding: 0.5em 0 0 1.2em;
+  border-top: 1px dashed var(--ww-border-dark);
+  color: var(--tab-brown-fg);
+  font-size: 0.85em;
+  font-style: italic;
+}
+.event-choices li {
+  margin-bottom: 0.2em;
+}
+
 /* ---------------------------------------------------------------
    Season banner + prouesses
    --------------------------------------------------------------- */

@@ -1283,11 +1283,20 @@ def create_app() -> Flask:
                 reverse=True,
             )[:10]
 
+            # Latest events — displayed as a flavor preview so players can
+            # see what situations may appear on their dashboard.
+            events = sorted(
+                game_data.generated_events,
+                key=lambda e: e.get("weight", 0),
+                reverse=True,
+            )[:6]
+
             return render_template(
                 "rumeurs.html",
                 player=player,
                 lore_entries=lore_entries,
                 quests=quests,
+                events=events,
                 total_lore=len(game_data.generated_lore),
                 total_quests=len(game_data.generated_quests),
                 total_events=len(game_data.generated_events),

@@ -24,7 +24,205 @@
       "difficulty": "string (peaceful|neutral|hostile)",
       "created_at": "ISO 8601"
     },
-    "last_generated_at": null
+    "last_generated_at": "2026-04-11T13:00:00Z"
   },
-  "events": []
+  "events": [
+    {
+      "id": "evt_caravane_thulmis",
+      "title_fr": "La Caravane de Thulmis",
+      "narrative_fr": "Un attelage poussiéreux s'arrête au pied de votre donjon. Le meneur, un vieux marchand du nom de Blöstrom, dit revenir de Thulmis avec un chargement de cuivre et trois prisonniers Kobolds qu'il a capturés dans les cols. Il réclame asile pour la nuit et propose d'échanger une partie de son minerai contre du pain et du sel. Les sentinelles de la porte attendent votre décision.",
+      "choices": [
+        {
+          "label_fr": "Accepter le troc : pain, sel, et couverture militaire.",
+          "outcome_fr": "Blöstrom vous cède cinq cents pièces et jure au nom de Fenrir qu'il reviendra avec deux fois plus. Les Kobolds prisonniers disparaissent avant l'aube — nul ne sait comment.",
+          "effect": {
+            "gold": 500,
+            "wood": -120,
+            "mana": 0
+          }
+        },
+        {
+          "label_fr": "Refuser l'hospitalité et fouiller la caravane.",
+          "outcome_fr": "Vos hommes trouvent un coffret scellé au plomb et un parchemin gravé d'une rune d'Isorfidia. Blöstrom s'enfuit à cheval, hurlant que vous le regretterez, mais l'objet est précieux.",
+          "effect": {
+            "gold": 0,
+            "wood": 0,
+            "mana": 320
+          }
+        },
+        {
+          "label_fr": "Emprisonner le marchand et questionner les Kobolds.",
+          "outcome_fr": "Les Kobolds crachent sur vos bottes puis se mordent la langue. Blöstrom, lui, meurt d'effroi dans sa cellule. L'affaire laisse un goût amer dans tout le Royaume.",
+          "effect": {
+            "gold": -150,
+            "wood": 0,
+            "mana": -80
+          }
+        }
+      ],
+      "weight": 40,
+      "difficulty": "neutral",
+      "created_at": "2026-04-11T13:00:00Z"
+    },
+    {
+      "id": "evt_oracle_aura_vacillante",
+      "title_fr": "L'Aura vacillante de l'Oracle",
+      "narrative_fr": "La jeune Oracle Mazar, envoyée par les Isorfidia pour bénir vos forges, s'effondre en plein chant. L'Aura autour d'elle bat comme un cœur malade, et les Tourelles du bastion nord crépitent par intermittence. Un vieux druide Amaraldor murmure qu'il faut trancher — vite.",
+      "choices": [
+        {
+          "label_fr": "Détourner le flux magique des Tourelles vers l'Oracle.",
+          "outcome_fr": "L'Oracle retrouve son souffle et scelle votre arsenal d'une bénédiction qui dopera vos attaques pour deux jours. Mais les Tourelles restent muettes une longue demi-nuit.",
+          "effect": {
+            "gold": 0,
+            "wood": 0,
+            "mana": -400,
+            "buff_effect": "attack_power",
+            "buff_multiplier": 1.25,
+            "buff_duration_seconds": 172800
+          }
+        },
+        {
+          "label_fr": "Sacrifier quinze flacons de Mana pour la purifier.",
+          "outcome_fr": "Les Oracles d'Isorfidia, prévenues par un corbeau d'argent, vous envoient un présent : un fret supplémentaire, et la promesse d'un Chant au prochain solstice.",
+          "effect": {
+            "gold": 0,
+            "wood": 0,
+            "mana": -700,
+            "buff_effect": "fret_capacity",
+            "buff_multiplier": 1.3,
+            "buff_duration_seconds": 129600
+          }
+        },
+        {
+          "label_fr": "Laisser la jeune Oracle à son sort — le Royaume passe d'abord.",
+          "outcome_fr": "Mazar expire dans un souffle de givre. Les Isorfidia fronceront peut-être un sourcil, mais vos Tourelles bourdonnent à nouveau et votre trésor reste intact.",
+          "effect": {
+            "gold": 200,
+            "wood": 0,
+            "mana": 0
+          }
+        }
+      ],
+      "weight": 25,
+      "difficulty": "hostile",
+      "created_at": "2026-04-11T13:00:00Z"
+    },
+    {
+      "id": "evt_festin_gaelyn",
+      "title_fr": "Le Festin de la Lune Rousse",
+      "narrative_fr": "Les anciens du clan Gaelyn frappent à votre porte avec trois barriques de cervoise et une carcasse d'aurochs entière. C'est la Lune Rousse, fête sacrée où chaque Seigneur est tenu d'ouvrir sa table aux bûcherons et aux charbonniers. Refuser serait se déshonorer ; accepter videra un peu la grange, mais ravivera la flamme au cœur des ouvriers.",
+      "choices": [
+        {
+          "label_fr": "Ouvrir les portes et servir jusqu'à l'aube.",
+          "outcome_fr": "Les bûcherons, revigorés, reprennent la hache au matin avec une ardeur doublée. Vos réserves ont fondu, mais les forêts vont chanter.",
+          "effect": {
+            "gold": -300,
+            "wood": 0,
+            "mana": 0,
+            "buff_effect": "camp_wood",
+            "buff_multiplier": 1.5,
+            "buff_duration_seconds": 86400
+          }
+        },
+        {
+          "label_fr": "N'offrir que le minimum protocolaire.",
+          "outcome_fr": "Les Gaelyn repartent polis mais froids. Aucun gain, aucune perte, mais la prochaine requête du clan aura un ton plus sec.",
+          "effect": {
+            "gold": -50,
+            "wood": 0,
+            "mana": 0
+          }
+        },
+        {
+          "label_fr": "Réquisitionner les barriques au nom du Royaume.",
+          "outcome_fr": "Vos sentinelles, éméchées, laissent passer un messager Kobold cette nuit-là. Le trésor gagne un peu, l'honneur perd beaucoup.",
+          "effect": {
+            "gold": 400,
+            "wood": -80,
+            "mana": -40
+          }
+        }
+      ],
+      "weight": 60,
+      "difficulty": "peaceful",
+      "created_at": "2026-04-11T13:00:00Z"
+    },
+    {
+      "id": "evt_traitre_akkrongar",
+      "title_fr": "L'Ombre d'Akkrongär",
+      "narrative_fr": "Un éclaireur Maneldar surgit, hagard : il a vu dans les marécages de l'Est un cavalier sans visage portant la bannière à trois lunes du Traître Akkrongär. Cette bannière-là n'a pas flotté depuis cent ans. Les bardes en parlent comme on parle d'un cauchemar qu'il vaut mieux ne pas réveiller.",
+      "choices": [
+        {
+          "label_fr": "Lever une petite expédition et pister le cavalier.",
+          "outcome_fr": "Vos hommes reviennent à trois sur dix, mais rapportent une plaque d'épaule gravée d'une rune oubliée — un objet qui vaut cher aux Oracles.",
+          "effect": {
+            "gold": -600,
+            "wood": 0,
+            "mana": 180
+          }
+        },
+        {
+          "label_fr": "Prévenir les Isorfidia et rester terré au donjon.",
+          "outcome_fr": "Les Oracles chantent trois nuits d'affilée pour repousser le mauvais augure. Vous n'avez rien perdu, rien gagné, mais le sommeil du Royaume reste lourd.",
+          "effect": {
+            "gold": 0,
+            "wood": 0,
+            "mana": -120
+          }
+        },
+        {
+          "label_fr": "Ordonner aux bardes de ne jamais prononcer ce nom.",
+          "outcome_fr": "Le silence pèse. Personne n'en reparle. Mais trois jours plus tard, un corbeau d'argent laisse tomber à vos pieds une dent noire, sans explication.",
+          "effect": {
+            "gold": 0,
+            "wood": 0,
+            "mana": -40
+          }
+        }
+      ],
+      "weight": 15,
+      "difficulty": "hostile",
+      "created_at": "2026-04-11T13:00:00Z"
+    },
+    {
+      "id": "evt_bestiaire_amaraldor",
+      "title_fr": "Le Bestiaire d'Amaraldor",
+      "narrative_fr": "Une délégation du clan Amaraldor, chargée de cages et de filets tressés d'or, vous propose un marché : ils vous confient pour une saison un jeune Draco à l'aile blessée, contre promesse de le nourrir et de le soigner. Les Bestiaires jurent qu'il vous sera rendu au centuple, mais les Dracos, on le sait, ne sont jamais vraiment dressés.",
+      "choices": [
+        {
+          "label_fr": "Accepter — un Draco sous son toit, c'est une fierté.",
+          "outcome_fr": "Le jeune Draco rugit dans la cour et, par son seul souffle, enflamme les forges : l'entraînement de vos recrues va plus vite cette semaine.",
+          "effect": {
+            "gold": -250,
+            "wood": -100,
+            "mana": 0,
+            "buff_effect": "train_speed",
+            "buff_multiplier": 1.4,
+            "buff_duration_seconds": 604800
+          }
+        },
+        {
+          "label_fr": "Refuser poliment — trop dangereux.",
+          "outcome_fr": "Les Amaraldor hochent la tête avec une pointe de déception. L'un d'eux laisse tomber, par inadvertance, une bourse de trois cents pièces.",
+          "effect": {
+            "gold": 300,
+            "wood": 0,
+            "mana": 0
+          }
+        },
+        {
+          "label_fr": "Accepter, puis vendre le Draco aux Kuran contre or.",
+          "outcome_fr": "Les Kuran paient bien mais la nouvelle se répand : le Seigneur qui vend un Draco dort mal la nuit suivante. Les Amaraldor ne vous parleront plus pour une saison entière.",
+          "effect": {
+            "gold": 1800,
+            "wood": 0,
+            "mana": -200
+          }
+        }
+      ],
+      "weight": 30,
+      "difficulty": "neutral",
+      "created_at": "2026-04-11T13:00:00Z"
+    }
+  ]
 }
