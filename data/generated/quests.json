@@ -67,14 +67,14 @@
     {
       "id": "qst_duel_maneldar",
       "name_fr": "Le Duel des Maneldar",
-      "description_fr": "Le clan Maneldar, irrité par l'arrogance des Seigneurs étrangers, lance un ban d'honneur : celui qui vaincra cinq rivaux sur le champ de bataille recevra l'hommage de Fenrir en personne. La couronne de victoire ne se décroche qu'avec des mains rouges.",
+      "description_fr": "Le clan Maneldar, irrité par l'arrogance des Seigneurs étrangers, lance un ban d'honneur : celui qui vaincra douze rivaux sur le champ de bataille recevra l'hommage de Fenrir en personne. La couronne de victoire ne se décroche qu'avec des mains rouges, et les Maneldar ne considèrent pas un duel comme terminé tant que l'adversaire n'a pas plié deux fois le genou.",
       "objective_type": "win_pvp",
-      "objective_count": 5,
-      "reward_gold": 6800,
-      "reward_xp": 7400,
+      "objective_count": 12,
+      "reward_gold": 9200,
+      "reward_xp": 9800,
       "difficulty": "hard",
       "created_at": "2026-04-11T12:00:00Z",
-      "lore_hook": "On dit que Fenrir lui-même pose un baiser de givre sur l'épaulière du vainqueur, et que ce baiser, gravé à vie, fait trembler les Kobolds rien qu'à sa vue au détour d'une forêt de brouillard."
+      "lore_hook": "On dit que Fenrir lui-même pose un baiser de givre sur l'épaulière du vainqueur, et que ce baiser, gravé à vie, fait trembler les Kobolds rien qu'à sa vue au détour d'une forêt de brouillard. Les bardes de Legamir tiennent un registre nominatif des douze victoires — douze comme les lunes d'acier d'un hiver sans Oracles."
     }
   ]
 }

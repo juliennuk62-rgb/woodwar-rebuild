@@ -39,6 +39,35 @@
     </div>
   {% endif %}
 
+  {% if events %}
+    <div class="card">
+      <h2>Événements qui rôdent</h2>
+      <p style="color: var(--tab-brown-fg); font-size: 0.9em;">
+        Voici les situations qui pourraient frapper à la porte de votre donjon
+        lors de votre prochaine visite au tableau de commande. Chaque événement
+        offre plusieurs réponses possibles.
+      </p>
+      <div class="events-preview">
+        {% for e in events %}
+          <div class="event-card event-{{ e.difficulty or 'neutral' }}">
+            <div class="event-head">
+              <span class="event-title">{{ e.title_fr }}</span>
+              <span class="event-tag">{{ e.difficulty or 'neutral' }}</span>
+            </div>
+            <div class="event-narrative">{{ e.narrative_fr }}</div>
+            {% if e.choices %}
+              <ul class="event-choices">
+                {% for c in e.choices %}
+                  <li>{{ c.label_fr }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
   {% if lore_entries %}
     <div class="card">
       <h2>Feed du royaume</h2>
