@@ -1810,6 +1810,104 @@
       },
       "blockers": [],
       "status": "green"
+    },
+    {
+      "generated_at": "2026-04-11T15:13:43+00:00",
+      "economy": {
+        "final_level": 15,
+        "final_gold": 0,
+        "milestones": {
+          "level_1_hours": 0.01,
+          "level_3_hours": 20.63,
+          "level_5_hours": 133.26,
+          "level_8_hours": 482.85,
+          "level_10_hours": 931.25,
+          "level_12_hours": 1689.63,
+          "level_15_hours": 3919.67
+        },
+        "simulated_hours": 3919.67
+      },
+      "combat": {
+        "min_damage": 400,
+        "max_damage": 14000,
+        "max_min_ratio": 35.0,
+        "unit_count": 12,
+        "units": {
+          "1": {
+            "name": "Guerrier",
+            "damage_x10": 400
+          },
+          "2": {
+            "name": "Paladin",
+            "damage_x10": 450
+          },
+          "3": {
+            "name": "Animiste Boréale",
+            "damage_x10": 14000
+          },
+          "4": {
+            "name": "Elfe",
+            "damage_x10": 2500
+          },
+          "5": {
+            "name": "Nécromancien",
+            "damage_x10": 1000
+          },
+          "6": {
+            "name": "Magicien",
+            "damage_x10": 1900
+          },
+          "7": {
+            "name": "Sorcière",
+            "damage_x10": 900
+          },
+          "8": {
+            "name": "Druide",
+            "damage_x10": 3100
+          },
+          "9": {
+            "name": "Dryade",
+            "damage_x10": 2600
+          },
+          "10": {
+            "name": "Assassin",
+            "damage_x10": 7300
+          },
+          "11": {
+            "name": "Nain",
+            "damage_x10": 6000
+          },
+          "12": {
+            "name": "Traître Kobold",
+            "damage_x10": 11000
+          }
+        },
+        "blockers": []
+      },
+      "quests": {
+        "quest_count": 5,
+        "issues": []
+      },
+      "variety": {
+        "counts": {
+          "quests": 5,
+          "events": 5,
+          "lore": 9,
+          "camps": 5,
+          "items": 6
+        },
+        "issues": []
+      },
+      "camps": {
+        "camp_count": 5,
+        "issues": []
+      },
+      "items": {
+        "item_count": 6,
+        "issues": []
+      },
+      "blockers": [],
+      "status": "green"
     }
   ]
 }

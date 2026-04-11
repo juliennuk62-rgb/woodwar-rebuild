@@ -306,3 +306,33 @@ douzième Seigneur maintenant bien étoffée. Option (b) est la plus
 directe et ne demande aucun changement de schéma.
 
 ---
+
+## Run 2026-04-12T00:00:00Z — Quêtes ancrées camps + événements prophétie
+
+**Priorité choisie** : 3 (contenu sous-servi) — rotation pure génération
+**Cause** : État repo impeccable (tests 89/89, playtest green, 0 blocker).
+Le run précédent refermait la boucle playtest ; celui-ci revient sur la
+génération de contenu comme suggéré. Les compteurs actuels sont
+`{quests:5, events:5, lore:9, camps:5, items:6}`. Les quêtes, en
+particulier, n'ont qu'un seul exemplaire de chaque `objective_type` et
+aucune ne cite nommément les nouveaux camps tier 1→5 générés deux runs
+plus tôt. C'est une occasion directe de tisser contenu-ancien et
+contenu-nouveau.
+
+**Anti-répétition** : les 3 derniers runs ont touché quests (blocker
++ events+lore), camps+items+schema tests, et playtest infra+3 lore.
+Ce run vise quests + events, deux catégories absentes du dernier cycle.
+
+**Plan du run** (chaque étape = son propre commit vert) :
+- **Étape 1** : Commit de démarrage (ce message).
+- **Étape 2** : Générer 4 quêtes additionnelles qui nomment explicitement
+  les camps (un lien narratif par tier), avec variété d'`objective_type`
+  et plusieurs `hard`.
+- **Étape 3** : Générer 3 événements qui font avancer la prophétie du
+  douzième Seigneur (posée dans `lore_prophetie_baiser_fenrir` et
+  `lore_bulletin_duel_maneldar`), difficultés variées.
+- **Étape 4** : Commit de clôture avec bilan.
+
+### Étape 1 — Commit de démarrage — ✅
+
+---
