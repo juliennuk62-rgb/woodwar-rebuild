@@ -12,7 +12,74 @@
       "drop_weight": "int (1-10, 10=very common, 1=legendary)",
       "created_at": "ISO 8601"
     },
-    "last_generated_at": null
+    "last_generated_at": "2026-04-11T22:00:00Z"
   },
-  "items": []
+  "items": [
+    {
+      "id": 100,
+      "name_fr": "Cor de Legamir",
+      "description_fr": "Un cor de chasse taillé dans la corne d'un vieux bouquetin des monts Maneldar, cerclé de fer par les forgerons de Legamir. Les bardes y ont gravé douze entailles pour chacun des Douze Seigneurs.",
+      "effect_fr": "Souffler dans le cor accélère le recrutement des unités pendant une heure.",
+      "buff_effect": "train_speed",
+      "buff_multiplier": 1.5,
+      "buff_duration_seconds": 3600,
+      "drop_weight": 6,
+      "created_at": "2026-04-11T22:00:00Z"
+    },
+    {
+      "id": 101,
+      "name_fr": "Hache votive des Orghana",
+      "description_fr": "Une hache à double tranchant marquée du sceau de la tribu Orghana, offerte par les bûcherons de Langwen avant chaque campagne. Sa lame est frottée à la résine de pin noir pour ne jamais ternir.",
+      "effect_fr": "Le porteur frappe plus fort lors des assauts contre les camps Kobolds.",
+      "buff_effect": "attack_power",
+      "buff_multiplier": 1.35,
+      "buff_duration_seconds": 2400,
+      "drop_weight": 5,
+      "created_at": "2026-04-11T22:00:00Z"
+    },
+    {
+      "id": 102,
+      "name_fr": "Bourse d'écaille Draco",
+      "description_fr": "Une bourse de cuir doublée d'écailles de Draco blessé, trouvée dans les cendres d'un bivouac Amaraldor. Sa doublure donne à l'or qu'elle contient un léger reflet vert.",
+      "effect_fr": "Double presque le butin d'or ramené des campagnes pendant un long quart de tour.",
+      "buff_effect": "camp_gold",
+      "buff_multiplier": 1.9,
+      "buff_duration_seconds": 1800,
+      "drop_weight": 3,
+      "created_at": "2026-04-11T22:00:00Z"
+    },
+    {
+      "id": 103,
+      "name_fr": "Scie runique de Thulmis",
+      "description_fr": "Une scie de bûcheron dont la lame est gravée d'une rune d'Aura venue des ateliers d'Isorfidia. On dit qu'elle mord le bois comme si chaque tronc était déjà prêt à tomber.",
+      "effect_fr": "Ramène plus de bois à chaque campagne réussie pendant une heure.",
+      "buff_effect": "camp_wood",
+      "buff_multiplier": 1.7,
+      "buff_duration_seconds": 3600,
+      "drop_weight": 5,
+      "created_at": "2026-04-11T22:00:00Z"
+    },
+    {
+      "id": 104,
+      "name_fr": "Reliquaire d'Isorfidia",
+      "description_fr": "Un petit coffret d'ébène scellé par les Oracles d'Isorfidia pour retenir les échos d'une Aura défaillante. Lorsqu'on l'ouvre, une brume bleutée s'échappe et s'accroche aux porteurs.",
+      "effect_fr": "Multiplie par deux et demi le Mana récolté pendant la campagne suivante.",
+      "buff_effect": "camp_mana",
+      "buff_multiplier": 2.5,
+      "buff_duration_seconds": 1200,
+      "drop_weight": 2,
+      "created_at": "2026-04-11T22:00:00Z"
+    },
+    {
+      "id": 105,
+      "name_fr": "Harnais de portage Gleoryn",
+      "description_fr": "Un harnais tressé par les muletiers Gleoryn pour les longs convois qui traversent les cols enneigés. Ses sangles renforcées supportent deux fois plus qu'un harnais ordinaire sans casser le dos des bêtes.",
+      "effect_fr": "Augmente nettement la capacité de fret des bataillons en campagne.",
+      "buff_effect": "fret_capacity",
+      "buff_multiplier": 1.8,
+      "buff_duration_seconds": 5400,
+      "drop_weight": 4,
+      "created_at": "2026-04-11T22:00:00Z"
+    }
+  ]
 }

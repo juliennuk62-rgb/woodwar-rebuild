@@ -27,6 +27,14 @@
       "theme": "mixed",
       "entries_added": 11,
       "summary_fr": "Correction du blocker qst_duel_maneldar (5→12 pour hard tier), cinq événements aléatoires (Caravane de Thulmis, Aura vacillante, Festin de la Lune Rousse, Ombre d'Akkrongär, Bestiaire d'Amaraldor), six rumeurs/bulletins/prophéties/chants/fables, et ajout d'une section « Événements qui rôdent » sur la page Rumeurs."
+    },
+    {
+      "run_id": "run_20260411_camps_items_01",
+      "started_at": "2026-04-11T22:00:00Z",
+      "completed_at": "2026-04-11T22:00:00Z",
+      "theme": "mixed",
+      "entries_added": 11,
+      "summary_fr": "Cinq camps Kobolds couvrant les cinq biomes et les tiers 1→5 (Bourbier de Blöstrom, Clairière d'Eolric, Bivouac des Murmures, Nid d'Aigle de Vank, Forteresse Oubliée d'Akkrongär), six items ids 100-105 un par buff_effect (Cor de Legamir, Hache votive Orghana, Bourse d'écaille Draco, Scie runique Thulmis, Reliquaire Isorfidia, Harnais Gleoryn), et deux tests unitaires qui verrouillent les schémas de camps et items générés."
     }
   ]
 }
