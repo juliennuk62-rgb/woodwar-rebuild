@@ -335,4 +335,50 @@ Ce run vise quests + events, deux catégories absentes du dernier cycle.
 
 ### Étape 1 — Commit de démarrage — ✅
 
+### Étape 2 — 4 quêtes ancrées aux camps — ✅
+
+Quatre quêtes ajoutées à `data/generated/quests.json` (5 → 9), chacune
+nommant explicitement un des camps générés deux runs plus tôt, et
+chacune exerçant un `objective_type` jusque-là sous-représenté ou
+inédit :
+
+- **`qst_coffret_blostrom`** (easy, `earn_gold` 400, 450/380) — ancre
+  sur `camp_bourbier_blostrom` (tier 1, marécage). Blöstrom revient à
+  la Grande Taverne de Legamir avec une carte trempée du coffret scellé
+  au plomb. Premier usage du type `earn_gold` dans les quêtes générées.
+- **`qst_embuscade_clairiere_eolric`** (medium, `train_units` 45,
+  1150/1380) — ancre sur `camp_clairiere_eolric` (tier 2, forêt). Les
+  bûcherons Langwen supplient qu'on lève une compagnie complète contre
+  les embusqueurs des douze souches.
+- **`qst_miroir_isorfidia`** (medium, `build_level` 8, 1850/1750) —
+  ancre sur `camp_brume_isorfidia` (tier 3, brouillard). Premier usage
+  de `build_level` : les Oracles demandent une tour-miroir du huitième
+  niveau pour percer la brume des Bivouacs.
+- **`qst_couronne_akkrongar`** (hard, `own_relic` 5, 8600/9800) —
+  ancre sur `camp_forteresse_akkrongar` (tier 5, fortifié). Premier
+  usage de `own_relic` : cinq reliques pour briser le heaume rouillé
+  du Champion Kobold et venger le Traître. Cinq reliques = cinq ères
+  = cinq cierges, résonne avec la prophétie Maneldar.
+
+Le seul camp non cité est `camp_nid_vank` (tier 4, montagnes) — gardé
+pour un prochain run, puisqu'il mérite sa propre quête dédiée avec
+sans doute un objective `earn_mana` ou `win_campaigns` très corsé.
+
+**Distribution des objective_types après ajout** (9 quêtes totales) :
+`train_units:2, earn_wood:1, win_campaigns:1, earn_mana:1, win_pvp:1,
+earn_gold:1, build_level:1, own_relic:1`. Six types sur huit couverts,
+soit +3 types par rapport à avant le run.
+
+**Détail qui a failli planter** : première version de
+`qst_couronne_akkrongar` avec `own_relic=3`, playtest a immédiatement
+flaggé "feels too easy for hard tier (expected >= 5)". Seuil codé dans
+`scripts/playtest.py:202` (`{"hard": (5, 12)}`). Corrigé à 5 en
+ajustant le narratif : "trois prophéties" → "cinq prophéties", "cinq
+ères du Royaume", "cinq cierges sur l'autel des cols". Le chiffre 5
+est plus fort narrativement que 3 et raccorde mieux avec les cinq
+biomes/camps.
+
+Tests : 89/89 vert. Playtest : green, 0 blocker. `variety.counts.quests`
+passe de 5 à 9.
+
 ---

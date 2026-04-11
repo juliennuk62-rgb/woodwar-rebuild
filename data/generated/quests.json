@@ -13,7 +13,7 @@
       "created_at": "ISO 8601",
       "lore_hook": "string (1-3 sentences of narrative flavor)"
     },
-    "last_generated_at": "2026-04-11T12:00:00Z"
+    "last_generated_at": "2026-04-12T00:00:00Z"
   },
   "quests": [
     {
@@ -75,6 +75,54 @@
       "difficulty": "hard",
       "created_at": "2026-04-11T12:00:00Z",
       "lore_hook": "On dit que Fenrir lui-même pose un baiser de givre sur l'épaulière du vainqueur, et que ce baiser, gravé à vie, fait trembler les Kobolds rien qu'à sa vue au détour d'une forêt de brouillard. Les bardes de Legamir tiennent un registre nominatif des douze victoires — douze comme les lunes d'acier d'un hiver sans Oracles."
+    },
+    {
+      "id": "qst_coffret_blostrom",
+      "name_fr": "Le Coffret du Bourbier",
+      "description_fr": "Le vieux marchand Blöstrom est revenu à la Grande Taverne de Legamir, trempé jusqu'aux os et tenant dans sa main une carte à demi effacée. Il jure sur la barbe de Fenrir qu'un coffret scellé au plomb repose au fond de la mare centrale du Bourbier, et que la bourse qui l'entoure vaudrait bien quatre cents pièces pour qui oserait l'aller chercher. Rassemblez quatre cents pièces d'or dans votre trésor pour financer l'expédition et sceller l'accord avec le marchand.",
+      "objective_type": "earn_gold",
+      "objective_count": 400,
+      "reward_gold": 450,
+      "reward_xp": 380,
+      "difficulty": "easy",
+      "created_at": "2026-04-12T00:00:00Z",
+      "lore_hook": "Les bardes Orghana, qui recopient chaque soir la carte trempée de Blöstrom, prétendent que les sangsues du bourbier recrachent parfois des pièces frappées à l'effigie d'un Seigneur dont nul ne se souvient. Le Bourbier de Blöstrom, dit-on, rend toujours un peu de son or à qui l'aborde avec patience — et beaucoup plus à qui y laisse un serment."
+    },
+    {
+      "id": "qst_embuscade_clairiere_eolric",
+      "name_fr": "L'Embuscade de la Clairière",
+      "description_fr": "Les bûcherons Langwen n'osent plus franchir les douze souches gravées de la Clairière d'Eolric : une bande d'embusqueurs Kobolds s'y est installée et prélève sa dîme sur chaque charge de bois. Le vieux druide Eolric lui-même, depuis sa tour de Legamir, a dépêché un corbeau d'argent : il faut lever une compagnie complète et ratisser les fougères. Entraînez quarante-cinq unités pour briser l'embuscade et rendre aux bûcherons la libre traversée.",
+      "objective_type": "train_units",
+      "objective_count": 45,
+      "reward_gold": 1150,
+      "reward_xp": 1380,
+      "difficulty": "medium",
+      "created_at": "2026-04-12T00:00:00Z",
+      "lore_hook": "On raconte que les douze souches de la Clairière grognent encore au passage d'un Seigneur digne — et que le grognement couvre juste assez de bruit pour démasquer un embusqueur avant qu'il ne bande son arc. Les Orghana chantent : « Qui sauve le bûcheron Langwen sauve deux forêts à la fois ; qui sauve deux forêts à la fois finit par sauver un Royaume. »"
+    },
+    {
+      "id": "qst_miroir_isorfidia",
+      "name_fr": "Le Miroir d'Isorfidia",
+      "description_fr": "Les Oracles d'Isorfidia demandent audience : les Spectres chuchoteurs du Bivouac des Murmures dévorent l'Aura de tous les éclaireurs qu'on y envoie, et tant qu'on ne verra pas par-dessus le brouillard, aucune campagne victorieuse n'est envisageable. Élevez une de vos tours jusqu'au huitième niveau pour y poser un miroir d'Isorfidia — les Oracles jurent qu'il déchirera la brume sur un rayon de trois lieues.",
+      "objective_type": "build_level",
+      "objective_count": 8,
+      "reward_gold": 1850,
+      "reward_xp": 1750,
+      "difficulty": "medium",
+      "created_at": "2026-04-12T00:00:00Z",
+      "lore_hook": "Les Oracles psalmodient qu'un seul miroir correctement taillé et posé au huitième étage d'une tour suffirait à rendre aux cols de Gleoryn leur couleur d'avant le Grand Retrait. Le miroir, disent-elles, n'est pas d'argent mais de patience — et ne reflète que les Seigneurs qui ont tenu parole trois fois de suite."
+    },
+    {
+      "id": "qst_couronne_akkrongar",
+      "name_fr": "La Couronne Oubliée d'Akkrongär",
+      "description_fr": "La Forteresse Oubliée d'Akkrongär est scellée par un Champion Kobold au heaume rouillé qui se régénère tant qu'aucune relique ancienne n'est brandie devant lui. Les Oracles d'Isorfidia ont recoupé cinq prophéties et sont formelles : il faut cinq reliques en votre possession — une par ère du Royaume — pour qu'une voix assez ancienne sorte de votre arsenal et fasse tomber le heaume. Rassemblez cinq reliques et venez briser le Traître dans son propre souterrain.",
+      "objective_type": "own_relic",
+      "objective_count": 5,
+      "reward_gold": 8600,
+      "reward_xp": 9800,
+      "difficulty": "hard",
+      "created_at": "2026-04-12T00:00:00Z",
+      "lore_hook": "Les bardes de Legamir promettent trois cent douze vers au premier Seigneur qui fera tomber le heaume rouillé, et l'un d'eux — le vieux Thulmis à l'œil blanc — a déjà commencé à composer le couplet final, lequel ne sera chanté que le jour où la Forteresse s'effondrera. Cinq reliques, cinq ères, cinq cierges sur l'autel des cols : la prophétie du baiser de Fenrir dit que le douzième Seigneur sera marqué par le givre, et les Oracles affirment que c'est dans ce bastion-là que le givre attend."
     }
   ]
 }

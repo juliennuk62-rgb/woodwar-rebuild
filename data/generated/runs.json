@@ -43,6 +43,14 @@
       "theme": "infra",
       "entries_added": 3,
       "summary_fr": "Refonte du harnais playtest pour compter et valider camps + items (angle mort depuis leur création). check_content_variety étendu à 5 catégories + détection de doublons d'id cross-content, deux nouveaux scenarios check_camps_feasibility et check_items_feasibility avec remontée dans report['blockers'], et dix tests unitaires dans tests/test_playtest.py verrouillant le contrat du harnais (79→89 tests). Polish narratif en bonus : trois entrées lore (rumeur Blöstrom, bulletin Nid de Vank, chant Forteresse Akkrongär) qui tissent les camps dans le fil existant (lore 6→9)."
+    },
+    {
+      "run_id": "run_20260412_quests_camps_01",
+      "started_at": "2026-04-12T00:00:00Z",
+      "completed_at": "2026-04-12T00:10:00Z",
+      "theme": "quests",
+      "entries_added": 4,
+      "summary_fr": "Quatre quêtes additionnelles ancrées aux nouveaux camps : qst_coffret_blostrom (easy, earn_gold, camp_bourbier_blostrom), qst_embuscade_clairiere_eolric (medium, train_units, camp_clairiere_eolric), qst_miroir_isorfidia (medium, build_level, camp_brume_isorfidia), et qst_couronne_akkrongar (hard, own_relic, camp_forteresse_akkrongar). Trois nouveaux objective_types activés (earn_gold, build_level, own_relic) ; 6/8 types couverts au total. Seul camp non cité : camp_nid_vank, gardé pour un run ultérieur."
     }
   ]
 }
