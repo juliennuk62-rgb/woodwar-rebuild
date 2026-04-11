@@ -1,0 +1,231 @@
+name: Discord Notify
+
+on:
+  push:
+    branches:
+      - main
+      - 'claude/**'
+  pull_request:
+    types: [opened, closed, ready_for_review]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout (for commit info)
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Build and send Discord embed
+        env:
+          WEBHOOK: https://discord.com/api/webhooks/1491933524779864155/0aB3HVR4APxFXMmrwkbAKdAQ8mfp5Kp2vCEB1Lz2vo8uTFWC6NkRvfaP4X74LhYhjhe9
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          PUSH_COMMITS_JSON: ${{ toJSON(github.event.commits) }}
+          PR_ACTION: ${{ github.event.action }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          PR_ADDITIONS: ${{ github.event.pull_request.additions }}
+          PR_DELETIONS: ${{ github.event.pull_request.deletions }}
+          PR_CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          WORKFLOW_URL: ${{ github.event.workflow_run.html_url }}
+          WORKFLOW_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          WORKFLOW_RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
+          WORKFLOW_EVENT: ${{ github.event.workflow_run.event }}
+        run: |
+          python3 <<'PYEOF'
+          import json
+          import os
+          import subprocess
+          import sys
+          import urllib.error
+          import urllib.request
+          from datetime import datetime, timezone
+
+          webhook = os.environ["WEBHOOK"]
+          event = os.environ["EVENT_NAME"]
+          actor = os.environ.get("ACTOR", "?")
+          repo = os.environ.get("REPO", "?")
+          now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+          COLORS = {
+              "blue":   0x3498db,
+              "green":  0x2ecc71,
+              "yellow": 0xf1c40f,
+              "red":    0xe74c3c,
+              "purple": 0x9b59b6,
+              "gold":   0xf39c12,
+              "gray":   0x95a5a6,
+          }
+
+          def make_embed(title, desc, color, fields, url=None):
+              embed = {
+                  "title": title[:256],
+                  "description": (desc or "")[:4000],
+                  "color": COLORS.get(color, COLORS["gray"]),
+                  "timestamp": now,
+                  "footer": {"text": f"Woodwar nightly improver -- {repo}"},
+              }
+              if url:
+                  embed["url"] = url
+              if fields:
+                  embed["fields"] = [
+                      {"name": n[:256], "value": (v or "-")[:1024], "inline": True}
+                      for n, v in fields
+                  ][:25]
+              return embed
+
+          embed = None
+
+          if event == "push":
+              ref = os.environ.get("REF", "?")
+              sha = os.environ.get("SHA", "")[:7]
+              try:
+                  commits = json.loads(os.environ.get("PUSH_COMMITS_JSON") or "[]")
+              except json.JSONDecodeError:
+                  commits = []
+
+              if ref == "main":
+                  title = f"Commit mergé sur main - {sha}"
+                  color = "green"
+              elif ref.startswith("claude/"):
+                  title = f"Agent a poussé sur {ref} - {sha}"
+                  color = "blue"
+              else:
+                  title = f"Push sur {ref} - {sha}"
+                  color = "gray"
+
+              # Commit message subject (first line)
+              msg_subject = "-"
+              if commits:
+                  first = commits[-1].get("message", "")
+                  msg_subject = first.split("\n", 1)[0]
+              desc_lines = [f"**{msg_subject}**"]
+              if commits:
+                  desc_lines.append("")
+                  for c in commits[-5:]:
+                      cmsg = c.get("message", "").split("\n", 1)[0]
+                      csha = (c.get("id") or "")[:7]
+                      desc_lines.append(f"- `{csha}` {cmsg}")
+              desc = "\n".join(desc_lines)
+
+              fields = [
+                  ("Branche", ref),
+                  ("Auteur", actor),
+                  ("Nb commits", str(len(commits))),
+              ]
+              embed = make_embed(title, desc, color, fields, url=f"https://github.com/{repo}/commit/{os.environ.get('SHA', '')}")
+
+          elif event == "pull_request":
+              action = os.environ.get("PR_ACTION", "?")
+              pr_num = os.environ.get("PR_NUMBER", "?")
+              pr_title = os.environ.get("PR_TITLE", "(no title)")
+              pr_url = os.environ.get("PR_URL", "")
+              pr_branch = os.environ.get("PR_BRANCH", "?")
+              merged = os.environ.get("PR_MERGED", "false") == "true"
+
+              if action == "opened":
+                  title = f"PR #{pr_num} ouverte"
+                  color = "yellow"
+                  emoji = ""
+              elif action == "closed" and merged:
+                  title = f"PR #{pr_num} mergée - auto-merge réussi"
+                  color = "green"
+                  emoji = ""
+              elif action == "closed":
+                  title = f"PR #{pr_num} fermée sans merge"
+                  color = "red"
+                  emoji = ""
+              else:
+                  title = f"PR #{pr_num} - {action}"
+                  color = "gray"
+                  emoji = ""
+
+              desc = f"**{pr_title}**\n\nBranche: `{pr_branch}`"
+              fields = [
+                  ("Diff", f"+{os.environ.get('PR_ADDITIONS', '?')} / -{os.environ.get('PR_DELETIONS', '?')}"),
+                  ("Fichiers", os.environ.get("PR_CHANGED_FILES", "?")),
+                  ("Auteur", actor),
+              ]
+              embed = make_embed(title, desc, color, fields, url=pr_url)
+
+          elif event == "workflow_run":
+              wf_name = os.environ.get("WORKFLOW_NAME", "?")
+              conclusion = os.environ.get("WORKFLOW_CONCLUSION", "unknown")
+              wf_url = os.environ.get("WORKFLOW_URL", "")
+              wf_branch = os.environ.get("WORKFLOW_HEAD_BRANCH", "?")
+              wf_num = os.environ.get("WORKFLOW_RUN_NUMBER", "?")
+              wf_event = os.environ.get("WORKFLOW_EVENT", "?")
+
+              if conclusion == "success":
+                  title = f"{wf_name} #{wf_num} - tests VERTS"
+                  color = "green"
+                  desc = "41 tests + playtest verts. Safe to merge."
+              elif conclusion == "failure":
+                  title = f"{wf_name} #{wf_num} - tests CASSÉS"
+                  color = "red"
+                  desc = "Un ou plusieurs tests ont échoué. PR bloquée, revert recommandé."
+              elif conclusion == "cancelled":
+                  title = f"{wf_name} #{wf_num} - annulé"
+                  color = "gray"
+                  desc = "Workflow cancelled."
+              else:
+                  title = f"{wf_name} #{wf_num} - {conclusion}"
+                  color = "gray"
+                  desc = f"Conclusion: {conclusion}"
+
+              fields = [
+                  ("Branche", wf_branch),
+                  ("Déclenché par", wf_event),
+                  ("Conclusion", conclusion),
+              ]
+              embed = make_embed(title, desc, color, fields, url=wf_url)
+
+          else:
+              # Unknown event — still send a minimal notif.
+              embed = make_embed(
+                  f"Event {event}",
+                  f"Unhandled event type.",
+                  "gray",
+                  [("Actor", actor), ("Repo", repo)],
+              )
+
+          if embed is None:
+              print("No embed built; skipping")
+              sys.exit(0)
+
+          payload = json.dumps({"embeds": [embed]}).encode("utf-8")
+          req = urllib.request.Request(
+              webhook,
+              data=payload,
+              headers={
+                  "Content-Type": "application/json",
+                  "User-Agent": "WoodwarNightlyImprover-GHActions/1.0",
+              },
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=15) as resp:
+                  print(f"Discord OK: HTTP {resp.getcode()}")
+          except urllib.error.HTTPError as e:
+              body = e.read().decode("utf-8", "replace")[:500]
+              print(f"Discord HTTP {e.code}: {body}", file=sys.stderr)
+              sys.exit(1)
+          except Exception as e:
+              print(f"Discord error: {e}", file=sys.stderr)
+              sys.exit(1)
+          PYEOF
