@@ -35,6 +35,14 @@
       "theme": "mixed",
       "entries_added": 11,
       "summary_fr": "Cinq camps Kobolds couvrant les cinq biomes et les tiers 1→5 (Bourbier de Blöstrom, Clairière d'Eolric, Bivouac des Murmures, Nid d'Aigle de Vank, Forteresse Oubliée d'Akkrongär), six items ids 100-105 un par buff_effect (Cor de Legamir, Hache votive Orghana, Bourse d'écaille Draco, Scie runique Thulmis, Reliquaire Isorfidia, Harnais Gleoryn), et deux tests unitaires qui verrouillent les schémas de camps et items générés."
+    },
+    {
+      "run_id": "run_20260411_playtest_infra_01",
+      "started_at": "2026-04-11T23:30:00Z",
+      "completed_at": "2026-04-11T23:55:00Z",
+      "theme": "infra",
+      "entries_added": 3,
+      "summary_fr": "Refonte du harnais playtest pour compter et valider camps + items (angle mort depuis leur création). check_content_variety étendu à 5 catégories + détection de doublons d'id cross-content, deux nouveaux scenarios check_camps_feasibility et check_items_feasibility avec remontée dans report['blockers'], et dix tests unitaires dans tests/test_playtest.py verrouillant le contrat du harnais (79→89 tests). Polish narratif en bonus : trois entrées lore (rumeur Blöstrom, bulletin Nid de Vank, chant Forteresse Akkrongär) qui tissent les camps dans le fil existant (lore 6→9)."
     }
   ]
 }

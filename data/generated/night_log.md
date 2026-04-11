@@ -288,3 +288,21 @@ affichera automatiquement sans aucun changement côté template.
 Playtest : `variety.counts.lore` passe de 6 → 9, zéro issue, status
 green. Tests : 89/89, inchangé — aucun test schéma de lore n'est
 cassé par les ajouts.
+
+**Tests finaux** : 89/89 green (79 + 10 nouveaux dans test_playtest.py)
+**Playtest final** : green, 0 blocker — `variety.counts` affiche
+désormais `{quests:5, events:5, lore:9, camps:5, items:6}`, les deux
+nouveaux rapports `camps` et `items` retournent 0 issue, et le harnais
+est verrouillé par son propre test suite.
+**Total commits** : 4 (1 démarrage + 2 étapes + 1 clôture)
+
+**Priorité suggérée pour le prochain run** : génération pure — c'est
+à nouveau le moment d'une rotation contenu après cet aller-retour
+infra. Candidats équivalents : (a) 3-5 quêtes additionnelles qui
+exploiteraient les nouveaux camps comme cibles (objective_type
+`win_campaigns` avec `target_camp_id` si on étend le schéma), ou (b)
+3-4 nouveaux événements narratifs qui réagissent à la prophétie du
+douzième Seigneur maintenant bien étoffée. Option (b) est la plus
+directe et ne demande aucun changement de schéma.
+
+---
