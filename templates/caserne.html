@@ -38,8 +38,15 @@
       <h2>⚙ Formation en cours</h2>
       <p>
         <strong class="alter">{{ training_info.quantity }} × {{ training_info.unit_name }}</strong>
-        en cours de formation.<br>
-        Fin dans <strong>{{ training_info.remaining_fmt }}</strong>.
+        en cours de formation.
+      </p>
+      <p>
+        Fin dans
+        <span data-countdown-until="{{ training_info.completes_iso }}"
+              {% if training_info.started_iso %}data-countdown-from="{{ training_info.started_iso }}"{% endif %}
+              data-countdown-reload>
+          {{ training_info.remaining_fmt }}
+        </span>
       </p>
       <p style="color: var(--tab-brown-fg); font-size: 0.85em;">
         Utilisez un Elixir ardent depuis votre <a href="{{ url_for('inventaire_page') }}">inventaire</a>

@@ -270,7 +270,15 @@
           {% if b.upgrading %}
             <div class="building-upgrading">
               ⚙ Amélioration vers le niveau {{ b.upgrading_to }}
-              <br><small>Reste ~{{ b.upgrade_remaining_fmt }}</small>
+              <br>
+              <small>
+                <span data-countdown-until="{{ b.upgrading_until_iso }}"
+                      {% if b.upgrading_started_iso %}data-countdown-from="{{ b.upgrading_started_iso }}"{% endif %}
+                      data-countdown-label="Reste"
+                      data-countdown-reload>
+                  {{ b.upgrade_remaining_fmt }}
+                </span>
+              </small>
             </div>
           {% elif b.at_max %}
             <div class="building-maxed">Niveau maximum atteint</div>

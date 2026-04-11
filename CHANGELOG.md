@@ -1,0 +1,83 @@
+# Changelog — Woodwar Rebuild
+
+Toutes les modifications notables du projet sont consignées ici. Format
+inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
+
+## [Non publié]
+
+### Session de développement autonome 2026-04-11
+
+Démarrage d'une session de développement non-stop pour incorporer 7
+features majeures.
+
+#### Features 5 + 6 + 7 — Polish visuel, countdowns live, progress bars
+
+**Added**
+- `static/woodwar.js` — module vanilla JS (zéro dépendance) avec :
+  - **Countdown** : transforme tout `<span data-countdown-until="ISO">`
+    en compteur live mis à jour à la seconde, avec barre de progression
+    optionnelle (via `data-countdown-from`) qui change de couleur
+    (vert → jaune → rouge) à mesure que le temps approche.
+    Reload automatique de la page sur fin si `data-countdown-reload`.
+  - **ProgressBar** : tout élément avec `data-progress="42"` devient
+    une barre de progression rendue avec gradient.
+  - **ActionFeedback** : pulse animation sur `.ww-action` et spinner
+    overlay sur `<form method="post">` pendant le submit.
+  - Auto-init au DOMContentLoaded + `WW.refresh()` pour contenu injecté.
+- Styles CSS associés (`static/style.css`) :
+  - `.ww-cd-time`, `.ww-cd-bar`, `.ww-cd-bar-fill[data-zone]`
+  - `.ww-progress`, `.ww-progress-fill`, `.ww-progress-label`
+  - `.ww-action:hover`, `.ww-action-clicked`, `.ww-form-pending`
+  - Transitions globales sur `.card`, `a`, `button`, inputs (focus glow)
+  - Animation `ww-fade-in` sur les enfants directs de `.container`
+- `base.html` charge `woodwar.js` en `defer`.
+- `caserne.html` : la formation en cours utilise un countdown live
+  + barre de progression + reload auto à la fin.
+- `dashboard.html` : chaque bâtiment en cours d'amélioration affiche
+  un countdown live + barre de progression + reload auto à la fin.
+- `app.py` : expose `training_started_iso`, `training_completes_iso`,
+  `upgrading_until_iso`, `upgrading_started_iso` dans les contextes.
+  La date de début d'upgrade est reconstruite à partir de la durée
+  d'origine (pas besoin de migration DB).
+
+**Tests** : 41/41 OK
+
+## [0.10.0] — 2026-04-11 — Bundle B + automatisation nocturne
+
+### Added
+- Suite de tests `tests/test_data.py` (21), `tests/test_logic.py` (9),
+  `tests/test_routes.py` (11). Total : 41 tests verts.
+- Simulateur playtest `scripts/playtest.py` — économie, combat, quest
+  feasibility, content variety. Produit `data/generated/playtest_reports.json`.
+- GitHub Actions :
+  - `.github/workflows/ci.yml` — tests sur PR
+  - `.github/workflows/auto-merge.yml` — auto-merge des branches `claude/*`
+  - `.github/workflows/discord-notify.yml` — notifications Discord sur push
+- Helper `scripts/discord_notify.py` (stdlib uniquement)
+- Remote Trigger `Woodwar nightly improver` (toutes les heures)
+- Génération automatique de contenu : 5 quêtes, 5 événements, 6 entrées lore
+- Section "Événements qui rôdent" sur `/rumeurs`
+
+### Fixed
+- Blocker `qst_duel_maneldar` : `objective_count` 5 → 12 (cohérent avec
+  le tier hard win_pvp ≥ 10), récompenses 6800 → 9200 or, 7400 → 9800 XP
+
+### Known issues
+- `auto-merge.yml` se déclenche `on: pull_request` mais l'agent du trigger
+  fait `git push` sans créer de PR → workflow jamais déclenché. À fixer.
+
+## [0.9.0] — Bundle B (Content & depth)
+
+### Added
+- Inventaire avec items utilisables
+- Training timé (caserne)
+- Espionnage (coût mana)
+- Marché (échange ressources avec ratio 2:1)
+- Buffs temporaires (`ActiveBuff`)
+- Drops d'items sur victoires PvE
+
+## [0.1.0 — 0.8.0] — Phases 0 à 9
+
+Reconstruction complète du jeu PHP legacy Woodwar (2007-2012) en
+Python/Flask/SQLAlchemy/SQLite. Phases : auth, clans, buildings, units,
+combat, relics, alliances, diplomacy, seasons, achievements.

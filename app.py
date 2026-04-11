@@ -117,10 +117,23 @@ def _build_dashboard_view(player: Player) -> list[dict]:
         prod = game_logic.production_per_hour(bid, current_level) if current_level > 0 else None
         upgrading = False
         upgrade_remaining = None
+        upgrading_until_iso = None
+        upgrading_started_iso = None
         if pb is not None and pb.upgrading_until is not None:
             upgrading = True
             remaining = (pb.upgrading_until - datetime.utcnow()).total_seconds()
             upgrade_remaining = max(0, int(remaining))
+            upgrading_until_iso = (
+                pb.upgrading_until.replace(microsecond=0).isoformat() + "Z"
+            )
+            # Reconstruct the start time from the upgrade cost duration
+            # because PlayerBuilding doesn't store it explicitly (yet).
+            in_progress_cost = game_logic.upgrade_cost(bid, current_level)
+            if in_progress_cost is not None:
+                started = pb.upgrading_until - timedelta(seconds=in_progress_cost["time"])
+                upgrading_started_iso = (
+                    started.replace(microsecond=0).isoformat() + "Z"
+                )
 
         view.append(
             {
@@ -135,6 +148,8 @@ def _build_dashboard_view(player: Player) -> list[dict]:
                 "upgrading_to": pb.upgrading_to if pb is not None else None,
                 "upgrade_remaining_seconds": upgrade_remaining,
                 "upgrade_remaining_fmt": _format_duration(upgrade_remaining) if upgrade_remaining is not None else None,
+                "upgrading_until_iso": upgrading_until_iso,
+                "upgrading_started_iso": upgrading_started_iso,
                 "production_per_hour": prod,
                 "resource_produced": game_logic.PRODUCERS.get(bid),
                 "next_cost": cost,
@@ -593,11 +608,21 @@ def create_app() -> Flask:
             if player.training_unit_id != 0 and player.training_completes_at is not None:
                 unit_meta = game_data.unit_by_id(player.training_unit_id)
                 remaining = int((player.training_completes_at - datetime.utcnow()).total_seconds())
+                started_iso = (
+                    player.training_started_at.replace(microsecond=0).isoformat() + "Z"
+                    if player.training_started_at is not None
+                    else None
+                )
+                completes_iso = (
+                    player.training_completes_at.replace(microsecond=0).isoformat() + "Z"
+                )
                 training_info = {
                     "unit_name": unit_meta["name_fr"] if unit_meta else "?",
                     "quantity": player.training_quantity,
                     "remaining_seconds": max(0, remaining),
                     "remaining_fmt": _format_duration(max(0, remaining)),
+                    "started_iso": started_iso,
+                    "completes_iso": completes_iso,
                 }
 
             units_view = []
