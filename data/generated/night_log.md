@@ -128,4 +128,23 @@ les quêtes, événements et rumeurs déjà générés. Les archetypes/patterns
 utilisent exactement le vocabulaire d'ENEMY_ARCHETYPES + AI_PATTERN_TUNING
 de game_logic.py pour permettre une intégration future dans seed_kobold_camps.
 
+### Étape 3 — 6 items générés — ✅
+
+Six items ajoutés à `data/generated/items.json` (id 100-105), un par
+`buff_effect` de la whitelist (train_speed, attack_power, camp_gold,
+camp_wood, camp_mana, fret_capacity) :
+
+- `100 Cor de Legamir` — train_speed 1.5x / 1h (drop 6).
+- `101 Hache votive des Orghana` — attack_power 1.35x / 40min (drop 5).
+- `102 Bourse d'écaille Draco` — camp_gold 1.9x / 30min (drop 3, rare).
+- `103 Scie runique de Thulmis` — camp_wood 1.7x / 1h (drop 5).
+- `104 Reliquaire d'Isorfidia` — camp_mana 2.5x / 20min (drop 2, légendaire).
+- `105 Harnais de portage Gleoryn` — fret_capacity 1.8x / 1h30 (drop 4).
+
+Les multiplicateurs restent dans [0.5, 2.5], les durées dans [60, 7200],
+et chaque item cite un clan ou un lieu du lore établi. GameData.__init__
+les fusionne automatiquement dans `items['items']` via la boucle déjà en
+place dans game_data.py:75-77 — aucune modif du code de chargement n'a
+été nécessaire.
+
 
