@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import { formatEuros, formatNumber } from '../utils/numberFormat.js';
@@ -15,44 +16,43 @@ export default function HUD() {
   const ghId = useGameStore((s) => s.activeGreenhouse);
   const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
   const season = useGameStore((s) => s.market.currentSeason);
-  const lifetimeEarned = useGameStore((s) => s.currency.lifetimeEuros);
   const config = GREENHOUSES[ghId];
+  const getIncome = useGameStore((s) => s.getIncomePerSecond);
+
+  // €/s mis à jour 2× par seconde — pas la peine de re-render React à chaque tick
+  const [income, setIncome] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setIncome(getIncome()), 500);
+    return () => clearInterval(id);
+  }, [getIncome]);
 
   const usedSlots = greenhouse.plants.length;
 
   return (
-    <>
-      <header className="hud-top">
-        <div className="hud-brand">
-          <div className="hud-brand-title">Le Jardin d'Agnès</div>
-          <div className="hud-brand-sub">{config.icon} {config.name}</div>
-        </div>
+    <header className="hud-top">
+      <div className="hud-brand">
+        <div className="hud-brand-title">Le Jardin d'Agnès</div>
+        <div className="hud-brand-sub">{config.icon} {config.name}</div>
+      </div>
 
-        <div className="hud-stats">
-          <Stat icon="💶" label="Euros" value={formatEuros(euros)} accent="green" />
-          <Stat icon="🌱" label="Graines rares" value={formatNumber(rareSeeds)} accent="gold" />
-          <Stat icon="📊" label="Total gagné" value={formatEuros(lifetimeEarned)} />
-        </div>
+      <div className="hud-stats">
+        <Stat icon="💶" label="Euros" value={formatEuros(euros)} accent="green" />
+        <Stat icon="📈" label="€ / s" value={formatNumber(income, { decimals: 1 })} accent="gold" subtle />
+        <Stat icon="🌱" label="Graines rares" value={formatNumber(rareSeeds)} subtle />
+      </div>
 
-        <div className="hud-meta">
-          <div className="hud-pill">{SEASON_LABELS[season] ?? '🌱 ...'}</div>
-          <div className="hud-pill">Slots {usedSlots}/{greenhouse.slots}</div>
-        </div>
-      </header>
-
-      <footer className="hud-bottom">
-        <div className="hud-tip">
-          Clique un pot vide pour planter · Clique une fleur mature pour récolter (+25 %)
-        </div>
+      <div className="hud-meta">
+        <div className="hud-pill">{SEASON_LABELS[season] ?? '🌱 ...'}</div>
+        <div className="hud-pill">Slots {usedSlots}/{greenhouse.slots}</div>
         <DebugMenu />
-      </footer>
-    </>
+      </div>
+    </header>
   );
 }
 
-function Stat({ icon, label, value, accent }) {
+function Stat({ icon, label, value, accent, subtle }) {
   return (
-    <div className={`hud-stat ${accent ? `hud-stat--${accent}` : ''}`}>
+    <div className={`hud-stat ${accent ? `hud-stat--${accent}` : ''} ${subtle ? 'hud-stat--subtle' : ''}`}>
       <span className="hud-stat-icon">{icon}</span>
       <div className="hud-stat-text">
         <div className="hud-stat-label">{label}</div>
@@ -71,7 +71,7 @@ function DebugMenu() {
   };
   return (
     <button className="hud-debug" onClick={onReset} title="Reset partie">
-      ⟲ reset
+      ⟲
     </button>
   );
 }

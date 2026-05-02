@@ -2,6 +2,16 @@ import { create } from 'zustand';
 import { PLANTS } from '../config/plants.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import { GAME_CONFIG } from '../config/gameConfig.js';
+import { GARDENERS } from '../config/gardeners.js';
+import { UPGRADE_TYPES, upgradeCost } from '../config/upgrades.js';
+import {
+  computePlantRevenue,
+  computeIncomePerSecond,
+  computeCost,
+  computeBulkCost,
+  computeMaxAffordable,
+  hasAnyGardener,
+} from '../engine/economy.js';
 import { loadSave, applyOfflineProgress } from '../engine/save.js';
 
 function makeInitialGreenhouseState(id) {
@@ -10,7 +20,7 @@ function makeInitialGreenhouseState(id) {
     unlocked: id === 'temperate',
     slots: cfg.initialSlots,
     plants: [],     // { slotId, speciesId, plantedAt }
-    gardeners: [],
+    gardeners: [],  // tableau d'IDs (string)
     upgrades: { lighting: 0, irrigation: 0, climate: 0, soil: 0 },
     prestige: { count: 0, tokens: 0, lifetimeEarned: 0 },
   };
@@ -50,7 +60,7 @@ function makeInitialState() {
     market: {
       currentSeason: 'spring',
       weather: 'sunny',
-      prices: {},  // multiplicateur par espèce, calculé dans tick.js
+      prices: {},
     },
 
     expeditions: { active: [], completed: 0 },
@@ -65,8 +75,9 @@ function makeInitialState() {
     },
 
     // Volatile — pas sauvegardé
-    floatingNumbers: [],   // { id, slotId, amount, kind, createdAt }
-    offlineGains: null,    // { duration, euros, plants, shownAt } ou null
+    floatingNumbers: [],
+    offlineGains: null,
+    activePanel: null,   // 'shop' | 'gardeners' | 'upgrades' | null
     ready: false,
   };
 }
@@ -102,18 +113,25 @@ export const useGameStore = create((set, get) => ({
   spendEuros: (amount) => {
     const s = get();
     if (s.currency.euros < amount) return false;
-    set({
-      currency: { ...s.currency, euros: s.currency.euros - amount },
-    });
+    set({ currency: { ...s.currency, euros: s.currency.euros - amount } });
     return true;
   },
 
   // ─── Plantation ──────────────────────────────────────────────────
-  // Coût d'une graine : baseCost × 1.08^owned (GDD §06).
   getSeedCost: (speciesId) => {
-    const plant = PLANTS[speciesId];
     const owned = get().species[speciesId]?.owned ?? 0;
-    return Math.ceil(plant.seedCost * Math.pow(GAME_CONFIG.seedCostGrowth, owned));
+    return computeCost(speciesId, owned);
+  },
+
+  getBulkCost: (speciesId, qty) => {
+    const owned = get().species[speciesId]?.owned ?? 0;
+    return computeBulkCost(speciesId, owned, qty);
+  },
+
+  getMaxAffordable: (speciesId) => {
+    const owned = get().species[speciesId]?.owned ?? 0;
+    const budget = get().currency.euros;
+    return computeMaxAffordable(speciesId, owned, budget);
   },
 
   isSpeciesUnlocked: (speciesId) => {
@@ -129,24 +147,20 @@ export const useGameStore = create((set, get) => ({
     const gh = s.greenhouses[ghId];
     if (!gh) return false;
     if (gh.plants.some((p) => p.slotId === slotId)) return false;
-
     if (!get().isSpeciesUnlocked(speciesId)) return false;
 
     const cost = get().getSeedCost(speciesId);
     if (!get().spendEuros(cost)) return false;
-
-    const newPlant = {
-      slotId,
-      speciesId,
-      plantedAt: Date.now(),
-    };
 
     set((cur) => ({
       greenhouses: {
         ...cur.greenhouses,
         [ghId]: {
           ...cur.greenhouses[ghId],
-          plants: [...cur.greenhouses[ghId].plants, newPlant],
+          plants: [
+            ...cur.greenhouses[ghId].plants,
+            { slotId, speciesId, plantedAt: Date.now() },
+          ],
         },
       },
       species: {
@@ -161,7 +175,24 @@ export const useGameStore = create((set, get) => ({
     return true;
   },
 
-  // Récolte manuelle (clic sur plante mature) — bonus +25% vs. auto-vente
+  // Plante autant de graines que possible sur les slots vides — utilisé par
+  // le bouton "Max" du shop quand on choisit une espèce à planter en masse.
+  plantSeedBulk: (speciesId, quantity) => {
+    let planted = 0;
+    for (let i = 0; i < quantity; i++) {
+      const ghId = get().activeGreenhouse;
+      const gh = get().greenhouses[ghId];
+      const freeSlot = findFreeSlot(gh);
+      if (freeSlot === -1) break;
+      if (!get().plantSeed(freeSlot, speciesId)) break;
+      planted++;
+    }
+    return planted;
+  },
+
+  // ─── Récolte ─────────────────────────────────────────────────────
+  // GDD §07 : sans jardinier, le slot reste vide après vente. Avec jardinier,
+  // la plante est replantée automatiquement (cycle continu).
   harvestPlant: (slotId, opts = {}) => {
     const s = get();
     const ghId = s.activeGreenhouse;
@@ -173,16 +204,24 @@ export const useGameStore = create((set, get) => ({
     const elapsed = (Date.now() - plant.plantedAt) / 1000;
     if (elapsed < species.growTime) return 0;
 
-    const market = s.market.prices[plant.speciesId] ?? 1.0;
-    const manualBonus = opts.manual ? 1.25 : 1.0;
-    const revenue = Math.floor(species.baseRevenue * market * manualBonus);
+    const revenue = computePlantRevenue(plant, gh, s.market.prices, { manual: !!opts.manual });
+
+    // Replantation auto si au moins 1 jardinier embauché dans cette serre.
+    let newPlants;
+    if (hasAnyGardener(gh)) {
+      newPlants = gh.plants.map((p) =>
+        p.slotId === slotId ? { ...p, plantedAt: Date.now() } : p
+      );
+    } else {
+      newPlants = gh.plants.filter((p) => p.slotId !== slotId);
+    }
 
     set((cur) => ({
       greenhouses: {
         ...cur.greenhouses,
         [ghId]: {
           ...cur.greenhouses[ghId],
-          plants: cur.greenhouses[ghId].plants.filter((p) => p.slotId !== slotId),
+          plants: newPlants,
           prestige: {
             ...cur.greenhouses[ghId].prestige,
             lifetimeEarned: cur.greenhouses[ghId].prestige.lifetimeEarned + revenue,
@@ -216,7 +255,82 @@ export const useGameStore = create((set, get) => ({
     return revenue;
   },
 
-  // ─── Slots & Floating numbers ────────────────────────────────────
+  // ─── Jardiniers ──────────────────────────────────────────────────
+  hireGardener: (gardenerId) => {
+    const s = get();
+    const g = GARDENERS[gardenerId];
+    if (!g) return false;
+    const ghId = g.greenhouseId;
+    const gh = s.greenhouses[ghId];
+    if (!gh) return false;
+    if (gh.gardeners.includes(gardenerId)) return false;
+
+    if (!get().spendEuros(g.cost)) return false;
+
+    set((cur) => ({
+      greenhouses: {
+        ...cur.greenhouses,
+        [ghId]: {
+          ...cur.greenhouses[ghId],
+          gardeners: [...cur.greenhouses[ghId].gardeners, gardenerId],
+        },
+      },
+      stats: {
+        ...cur.stats,
+        firstGardenerAt: cur.stats.firstGardenerAt ?? Date.now(),
+      },
+    }));
+    return true;
+  },
+
+  // ─── Upgrades de serre ───────────────────────────────────────────
+  getUpgradeCost: (typeId) => {
+    const ghId = get().activeGreenhouse;
+    const level = get().greenhouses[ghId].upgrades[typeId] ?? 0;
+    return upgradeCost(typeId, level);
+  },
+
+  buyUpgrade: (typeId) => {
+    const s = get();
+    const ghId = s.activeGreenhouse;
+    const gh = s.greenhouses[ghId];
+    const upgrade = UPGRADE_TYPES[typeId];
+    if (!upgrade) return false;
+    const level = gh.upgrades[typeId] ?? 0;
+    if (level >= upgrade.maxLevel) return false;
+
+    const cost = upgradeCost(typeId, level);
+    if (!get().spendEuros(cost)) return false;
+
+    set((cur) => ({
+      greenhouses: {
+        ...cur.greenhouses,
+        [ghId]: {
+          ...cur.greenhouses[ghId],
+          upgrades: {
+            ...cur.greenhouses[ghId].upgrades,
+            [typeId]: level + 1,
+          },
+        },
+      },
+    }));
+    return true;
+  },
+
+  // ─── Income forecast ─────────────────────────────────────────────
+  getIncomePerSecond: () => {
+    const s = get();
+    const gh = s.greenhouses[s.activeGreenhouse];
+    return computeIncomePerSecond(gh, s.market.prices);
+  },
+
+  // ─── UI panel ────────────────────────────────────────────────────
+  setActivePanel: (panel) => set({ activePanel: panel }),
+  togglePanel: (panel) => set((s) => ({
+    activePanel: s.activePanel === panel ? null : panel,
+  })),
+
+  // ─── Floating numbers & ticks ────────────────────────────────────
   removeFloatingNumber: (id) => set((s) => ({
     floatingNumbers: s.floatingNumbers.filter((f) => f.id !== id),
   })),
@@ -237,5 +351,13 @@ export const useGameStore = create((set, get) => ({
   },
 }));
 
-// Expose utilitaire pour le moteur (tick.js, save.js) sans import circulaire
 useGameStore.makeInitialState = makeInitialState;
+
+function findFreeSlot(gh) {
+  if (!gh) return -1;
+  const used = new Set(gh.plants.map((p) => p.slotId));
+  for (let i = 0; i < gh.slots; i++) {
+    if (!used.has(i)) return i;
+  }
+  return -1;
+}

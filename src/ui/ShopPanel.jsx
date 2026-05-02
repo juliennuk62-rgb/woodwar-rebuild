@@ -4,10 +4,14 @@ import { GREENHOUSES } from '../config/greenhouses.js';
 import { PLANTS } from '../config/plants.js';
 import { formatEuros, formatDuration } from '../utils/numberFormat.js';
 
-// Panneau qui s'ouvre quand on clique un pot vide.
-// Liste les espèces disponibles dans la serre active, débloquées ou non.
+// Panneau de plantation. S'ouvre via :
+//   1. clic sur un pot vide       → mode "slot précis" (planter sur ce slot)
+//   2. bouton du PanelLauncher    → mode "boutique" (acheter en masse)
 export default function ShopPanel() {
   const [slotId, setSlotId] = useState(null);
+  const activePanel = useGameStore((s) => s.activePanel);
+  const setActivePanel = useGameStore((s) => s.setActivePanel);
+
   const ghId = useGameStore((s) => s.activeGreenhouse);
   const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
   const config = GREENHOUSES[ghId];
@@ -15,7 +19,9 @@ export default function ShopPanel() {
   const lifetimeEuros = useGameStore((s) => s.currency.lifetimeEuros);
   const market = useGameStore((s) => s.market.prices);
   const plant = useGameStore((s) => s.plantSeed);
+  const plantBulk = useGameStore((s) => s.plantSeedBulk);
   const getCost = useGameStore((s) => s.getSeedCost);
+  const getMaxAffordable = useGameStore((s) => s.getMaxAffordable);
   const isUnlocked = useGameStore((s) => s.isSpeciesUnlocked);
 
   useEffect(() => {
@@ -24,69 +30,132 @@ export default function ShopPanel() {
     return () => window.removeEventListener('jardin:open-shop', onOpen);
   }, []);
 
-  if (slotId === null) return null;
+  const open = slotId !== null || activePanel === 'shop';
+  if (!open) return null;
 
-  const onPlant = (speciesId) => {
-    const ok = plant(slotId, speciesId);
-    if (ok) setSlotId(null);
+  const slotMode = slotId !== null;
+
+  const close = () => {
+    setSlotId(null);
+    if (activePanel === 'shop') setActivePanel(null);
+  };
+
+  const onPlantOne = (id) => {
+    if (slotMode) {
+      const ok = plant(slotId, id);
+      if (ok) close();
+    } else {
+      // Trouve un slot libre
+      const used = new Set(greenhouse.plants.map((p) => p.slotId));
+      let free = -1;
+      for (let i = 0; i < greenhouse.slots; i++) if (!used.has(i)) { free = i; break; }
+      if (free !== -1) plant(free, id);
+    }
+  };
+
+  const onPlantBulk = (id, qty) => {
+    if (qty === 'max') qty = Math.min(getMaxAffordable(id), freeSlotsLeft(greenhouse));
+    if (qty <= 0) return;
+    plantBulk(id, qty);
   };
 
   return (
     <>
-      <div className="shop-backdrop" onClick={() => setSlotId(null)} />
-      <aside className="shop-panel">
-        <div className="shop-header">
+      <div className="panel-backdrop" onClick={close} />
+      <aside className="side-panel">
+        <header className="side-panel-header">
           <div>
-            <div className="shop-title">Planter une graine</div>
-            <div className="shop-sub">Slot #{slotId + 1} · {config.name}</div>
+            <div className="side-panel-title">{slotMode ? 'Planter une graine' : 'Boutique'}</div>
+            <div className="side-panel-sub">
+              {slotMode ? `Slot #${slotId + 1} · ${config.name}` : `${config.icon} ${config.name}`}
+            </div>
           </div>
-          <button className="shop-close" onClick={() => setSlotId(null)} aria-label="Fermer">×</button>
-        </div>
+          <button className="side-panel-close" onClick={close} aria-label="Fermer">×</button>
+        </header>
 
-        <div className="shop-list">
-          {config.species.map((id) => {
-            const species = PLANTS[id];
-            const cost = getCost(id);
-            const unlocked = isUnlocked(id);
-            const canAfford = euros >= cost;
-            const marketMult = market[id] ?? 1.0;
-            const sellPrice = Math.floor(species.baseRevenue * marketMult);
+        <div className="side-panel-body">
+          {!slotMode && (
+            <p className="panel-intro">
+              Achète et plante des graines en masse. Le coût grimpe à chaque graine
+              du même type achetée. Vise les pics de marché pour vendre au meilleur prix.
+            </p>
+          )}
 
-            return (
-              <button
-                key={id}
-                className={`shop-card ${!unlocked ? 'shop-card--locked' : ''} ${!canAfford && unlocked ? 'shop-card--poor' : ''}`}
-                onClick={() => unlocked && canAfford && onPlant(id)}
-                disabled={!unlocked || !canAfford}
-              >
-                <div className="shop-card-icon">{unlocked ? species.icon : '🔒'}</div>
-                <div className="shop-card-body">
-                  <div className="shop-card-title">{species.name}</div>
-                  <div className="shop-card-desc">
-                    {unlocked
-                      ? species.description
-                      : `Débloquée à ${formatEuros(species.unlockCost)} gagnés (actuel : ${formatEuros(lifetimeEuros)})`}
-                  </div>
-                  {unlocked && (
-                    <div className="shop-card-stats">
-                      <span>⏱ {formatDuration(species.growTime)}</span>
-                      <span>💰 {formatEuros(sellPrice)}</span>
-                      <span className={marketMult >= 1 ? 'good' : 'bad'}>
-                        Marché ×{marketMult.toFixed(2).replace('.', ',')}
-                      </span>
+          <div className="cards">
+            {config.species.map((id) => {
+              const species = PLANTS[id];
+              const cost = getCost(id);
+              const unlocked = isUnlocked(id);
+              const canAfford = euros >= cost;
+              const marketMult = market[id] ?? 1.0;
+              const sellPrice = Math.floor(species.baseRevenue * marketMult);
+              const freeSlots = freeSlotsLeft(greenhouse);
+
+              return (
+                <div
+                  key={id}
+                  className={`shop-card ${!unlocked ? 'locked' : ''} ${!canAfford && unlocked ? 'poor' : ''}`}
+                >
+                  <div className="shop-card-icon">{unlocked ? species.icon : '🔒'}</div>
+                  <div className="shop-card-body">
+                    <div className="shop-card-title">{species.name}</div>
+                    <div className="shop-card-desc">
+                      {unlocked
+                        ? species.description
+                        : `Débloquée à ${formatEuros(species.unlockCost)} gagnés (actuel : ${formatEuros(lifetimeEuros)})`}
                     </div>
-                  )}
-                </div>
-                {unlocked && (
-                  <div className="shop-card-cost">
-                    <span className={canAfford ? 'good' : 'bad'}>{formatEuros(cost)}</span>
+                    {unlocked && (
+                      <div className="shop-card-stats">
+                        <span>⏱ {formatDuration(species.growTime)}</span>
+                        <span>💰 {formatEuros(sellPrice)}</span>
+                        <span className={marketMult >= 1 ? 'good' : 'bad'}>
+                          ×{marketMult.toFixed(2).replace('.', ',')}
+                        </span>
+                      </div>
+                    )}
+
+                    {unlocked && (
+                      <div className="shop-card-actions">
+                        <button
+                          className="btn-plant"
+                          disabled={!canAfford || (!slotMode && freeSlots <= 0)}
+                          onClick={() => onPlantOne(id)}
+                        >
+                          {slotMode ? `Planter · ${formatEuros(cost)}` : `×1 · ${formatEuros(cost)}`}
+                        </button>
+                        {!slotMode && (
+                          <>
+                            <button
+                              className="btn-plant-mini"
+                              disabled={freeSlots < 10 || getMaxAffordable(id) < 10}
+                              onClick={() => onPlantBulk(id, 10)}
+                              title="Planter 10 si possible"
+                            >
+                              ×10
+                            </button>
+                            <button
+                              className="btn-plant-mini"
+                              disabled={freeSlots <= 0 || getMaxAffordable(id) <= 0}
+                              onClick={() => onPlantBulk(id, 'max')}
+                              title="Planter le max possible"
+                            >
+                              Max
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
-              </button>
-            );
-          })}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </aside>
     </>
   );
+}
+
+function freeSlotsLeft(greenhouse) {
+  return greenhouse.slots - greenhouse.plants.length;
 }

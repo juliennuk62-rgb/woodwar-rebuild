@@ -13,9 +13,8 @@ import FloatingNumber3D from './FloatingNumber3D.jsx';
 // d'interaction + particules à la floraison + floating numbers attachés.
 export default function PlantSlot({ slot }) {
   const ghId = useGameStore((s) => s.activeGreenhouse);
-  const plant = useGameStore((s) =>
-    s.greenhouses[ghId].plants.find((p) => p.slotId === slot.id)
-  );
+  const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
+  const plant = greenhouse.plants.find((p) => p.slotId === slot.id);
   const harvest = useGameStore((s) => s.harvestPlant);
   const slotFloats = useGameStore((s) =>
     s.floatingNumbers.filter((f) => f.slotId === slot.id)
@@ -32,7 +31,7 @@ export default function PlantSlot({ slot }) {
       wasMatureRef.current = false;
       return;
     }
-    const { ratio } = getPlantStage(plant);
+    const { ratio } = getPlantStage(plant, undefined, greenhouse);
     if (Math.abs(ratio - growth) > 0.005) setGrowth(ratio);
 
     // Détection de floraison → spawn particules de pollen une fois

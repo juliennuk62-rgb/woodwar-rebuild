@@ -37,13 +37,13 @@ function tick() {
     lastMarketUpdate = now;
   }
 
-  // 2) Auto-récolte des plantes matures (sans jardinier on récolte quand même
-  //    en MVP — Prompt 3 ajoutera la nuance manuel/jardinier)
+  // 2) Auto-vente des plantes matures. La logique replant/non-replant est
+  //    gérée dans le store en fonction de la présence d'un jardinier.
   const ghId = store.activeGreenhouse;
   const gh = store.greenhouses[ghId];
   if (gh && gh.plants.length) {
     for (const plant of gh.plants) {
-      const { stage } = getPlantStage(plant, now);
+      const { stage } = getPlantStage(plant, now, gh);
       if (stage === 'mature') {
         store.harvestPlant(plant.slotId, { manual: false });
       }
