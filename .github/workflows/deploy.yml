@@ -2,7 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - claude/create-game-from-html-y7fYu
   workflow_dispatch:
 
 permissions:
