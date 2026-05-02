@@ -77,6 +77,9 @@ function tick() {
     }
   }
 
+  // ── 5. Expéditions : on ne réclame pas auto, on laisse au joueur le plaisir
+  //    d'ouvrir la "caisse" — c'est juste une feature visuelle dans le panneau.
+
   store.setLastTick(now);
 }
 

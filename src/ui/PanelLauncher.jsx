@@ -1,6 +1,7 @@
 import { useGameStore } from '../store/gameStore.js';
 import { GARDENERS_BY_GREENHOUSE } from '../config/gardeners.js';
 import { UPGRADE_LIST } from '../config/upgrades.js';
+import { EXPEDITION_LIST } from '../config/expeditions.js';
 
 // Dock du bas : 3 boutons qui ouvrent Shop / Jardiniers / Upgrades.
 // Sur mobile, le dock prend toute la largeur. Sur desktop, il flotte au centre.
@@ -14,6 +15,7 @@ export default function PanelLauncher() {
   const ghId = useGameStore((s) => s.activeGreenhouse);
   const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
   const lifetimeEuros = useGameStore((s) => s.currency.lifetimeEuros);
+  const expeditions = useGameStore((s) => s.expeditions);
 
   const buttons = [
     {
@@ -39,6 +41,12 @@ export default function PanelLauncher() {
       label: 'Améliorations',
       icon: '🛠️',
       hint: upgradesAffordable(euros, greenhouse),
+    },
+    {
+      id: 'expeditions',
+      label: 'Expéditions',
+      icon: '🧭',
+      hint: expeditionsHint(euros, lifetimeEuros, expeditions),
     },
   ];
 
@@ -80,4 +88,13 @@ function upgradesAffordable(euros, gh) {
     const cost = Math.round(u.baseCost * Math.pow(u.costGrowth, lvl));
     return euros >= cost;
   });
+}
+
+function expeditionsHint(euros, lifetime, expeditions) {
+  // Dot doré si une expédition est terminée et attend d'être réclamée
+  const now = Date.now();
+  if ((expeditions?.active ?? []).some((e) => now >= e.endsAt)) return true;
+  // Sinon : si on peut lancer France et qu'aucune n'est en cours
+  if ((expeditions?.active ?? []).length === 0 && euros >= 200) return true;
+  return false;
 }

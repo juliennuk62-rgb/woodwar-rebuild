@@ -14,6 +14,8 @@ import {
 } from '../engine/economy.js';
 import { loadSave, applyOfflineProgress } from '../engine/save.js';
 import { SEASONS, SEASON_DURATION_MS, WEATHER_DURATION_MS, pickWeatherForSeason } from '../mechanics/weather.js';
+import { canStart, buildExpedition, generateReward } from '../mechanics/expeditions.js';
+import { EXPEDITIONS } from '../config/expeditions.js';
 
 function makeInitialGreenhouseState(id) {
   const cfg = GREENHOUSES[id];
@@ -101,6 +103,7 @@ function makeInitialState() {
     offlineGains: null,
     activePanel: null,
     upgradeFlash: null,    // { typeId, ts } — pour animer la carte qui vient d'être achetée
+    currentDiscovery: null, // { speciesId, expeditionId } — modale de découverte
     ready: false,
   };
 }
@@ -377,6 +380,66 @@ export const useGameStore = create((set, get) => ({
   dismissOnboarding: () => set((s) => ({
     onboarding: { ...s.onboarding, dismissed: true },
   })),
+
+  // ─── Expéditions (Prompt 6) ──────────────────────────────────────
+  canStartExpedition: (destinationId) => canStart(destinationId, get()),
+
+  startExpedition: (destinationId) => {
+    const s = get();
+    const check = canStart(destinationId, s);
+    if (!check.ok) return false;
+    const dest = EXPEDITIONS[destinationId];
+    if (!get().spendEuros(dest.cost)) return false;
+    const exp = buildExpedition(destinationId, Date.now());
+    set((cur) => ({
+      expeditions: {
+        ...cur.expeditions,
+        active: [...(cur.expeditions.active ?? []), exp],
+      },
+    }));
+    return true;
+  },
+
+  // Réclame le butin d'une expédition terminée. Crée la modale de découverte
+  // si une nouvelle espèce est tombée.
+  claimExpedition: (expeditionId) => {
+    const s = get();
+    const exp = (s.expeditions.active ?? []).find((e) => e.id === expeditionId);
+    if (!exp) return null;
+    if (Date.now() < exp.endsAt) return null;
+
+    const reward = generateReward(exp.destinationId, s.species);
+
+    set((cur) => {
+      const newSpecies = { ...cur.species };
+      if (reward.speciesId && !newSpecies[reward.speciesId]?.discovered) {
+        newSpecies[reward.speciesId] = {
+          ...(newSpecies[reward.speciesId] ?? {}),
+          discovered: true,
+          owned: 0,
+          totalGrown: 0,
+        };
+      }
+      return {
+        currency: {
+          ...cur.currency,
+          rareSeeds: cur.currency.rareSeeds + reward.rareSeeds,
+        },
+        species: newSpecies,
+        expeditions: {
+          ...cur.expeditions,
+          active: cur.expeditions.active.filter((e) => e.id !== expeditionId),
+          completed: (cur.expeditions.completed ?? 0) + 1,
+        },
+        currentDiscovery: reward.speciesId
+          ? { speciesId: reward.speciesId, expeditionId, rareSeeds: reward.rareSeeds }
+          : cur.currentDiscovery,
+      };
+    });
+    return reward;
+  },
+
+  dismissDiscovery: () => set({ currentDiscovery: null }),
 
   // ─── Save export / import ────────────────────────────────────────
   exportSave: () => {

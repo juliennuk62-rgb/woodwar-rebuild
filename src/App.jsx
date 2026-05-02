@@ -5,8 +5,10 @@ import ShopPanel from './ui/ShopPanel.jsx';
 import GardenersPanel from './ui/GardenersPanel.jsx';
 import UpgradesPanel from './ui/UpgradesPanel.jsx';
 import MarketPanel from './ui/MarketPanel.jsx';
+import ExpeditionPanel from './ui/ExpeditionPanel.jsx';
 import SettingsModal from './ui/SettingsModal.jsx';
 import OfflineModal from './ui/OfflineModal.jsx';
+import DiscoveryModal from './ui/DiscoveryModal.jsx';
 import PanelLauncher from './ui/PanelLauncher.jsx';
 import PlantsList from './ui/PlantsList.jsx';
 import Onboarding from './ui/Onboarding.jsx';
@@ -39,8 +41,10 @@ export default function App() {
       {activePanel === 'gardeners' && <GardenersPanel />}
       {activePanel === 'upgrades' && <UpgradesPanel />}
       {activePanel === 'market' && <MarketPanel />}
+      {activePanel === 'expeditions' && <ExpeditionPanel />}
       <SettingsModal />
       <Onboarding />
+      <DiscoveryModal />
       <OfflineModal />
     </>
   );
