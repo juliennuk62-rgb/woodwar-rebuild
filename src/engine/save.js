@@ -1,8 +1,8 @@
 // Sauvegarde / chargement / progression offline.
 import { useGameStore } from '../store/gameStore.js';
 import { GAME_CONFIG } from '../config/gameConfig.js';
-import { PLANTS } from '../config/plants.js';
-import { computeAllMarketPrices, getPlantStage } from './economy.js';
+import { computePlantRevenue, getPlantStage, getGrowTime } from './economy.js';
+import { SEASON_DURATION_MS, WEATHER_DURATION_MS } from '../mechanics/weather.js';
 
 // Champs volatiles à exclure du save
 const VOLATILE = ['floatingNumbers', 'offlineGains', 'ready'];
@@ -32,9 +32,19 @@ export function loadSave() {
     if (!raw) return null;
     const data = JSON.parse(raw);
     if (!data || data.version !== GAME_CONFIG.version) {
-      // Pas encore de migration en Prompt 1 — on ignore les saves d'autres versions.
+      // Pas encore de migration entre majeures — on ignore les saves d'autres versions.
       return null;
     }
+    // Patch léger : ajoute les champs marché/saison s'ils manquent (saves Prompt 1-3)
+    const now = Date.now();
+    data.market = data.market ?? {};
+    if (!data.market.seasonEndsAt)  data.market.seasonEndsAt  = now + SEASON_DURATION_MS;
+    if (!data.market.weatherEndsAt) data.market.weatherEndsAt = now + WEATHER_DURATION_MS;
+    if (!data.market.seasonStartedAt) data.market.seasonStartedAt = now;
+    if (!data.market.history)        data.market.history        = {};
+    if (!data.market.salesSinceTick) data.market.salesSinceTick = {};
+    if (!data.market.weather)        data.market.weather        = 'sunny';
+    if (!data.market.currentSeason)  data.market.currentSeason  = 'spring';
     return data;
   } catch (e) {
     console.warn('[Jardin d\'Agnès] Save corrompue, on repart à zéro :', e);
@@ -75,22 +85,21 @@ export function applyOfflineProgress() {
   const gh = store.greenhouses[ghId];
   if (!gh || !gh.plants.length) return { duration: elapsedMs, euros: 0, plants: 0, capped: false };
 
-  const marketPrices = computeAllMarketPrices(now);
+  // On utilise l'état marché courant (saison/météo) pour estimer le revenu offline.
+  // Calculer l'évolution exacte sur N heures serait disproportionné — c'est un MVP.
   let totalEuros = 0;
   let totalPlants = 0;
   const newPlants = [];
 
   for (const plant of gh.plants) {
-    const species = PLANTS[plant.speciesId];
-    const market = marketPrices[plant.speciesId] ?? 1.0;
-    const revenuePerCycle = Math.floor(species.baseRevenue * market * eff);
-    const cycleSeconds = species.growTime;
+    const cycleSeconds = getGrowTime(plant.speciesId, gh);
+    const revenuePerCycle = Math.floor(
+      computePlantRevenue(plant, gh, store.market, { manual: false }) * eff
+    );
 
-    // Combien de cycles ont eu le temps de se compléter ?
     const elapsedSec = Math.min(elapsedMs / 1000, GAME_CONFIG.offlineCapMs / 1000);
-    const { remaining } = getPlantStage(plant, lastSave);
+    const { remaining } = getPlantStage(plant, lastSave, gh);
 
-    // Premier cycle : il faut finir le temps restant
     let secondsLeft = elapsedSec;
     let cycles = 0;
 
@@ -99,12 +108,11 @@ export function applyOfflineProgress() {
         cycles += 1;
         secondsLeft -= remaining;
       } else {
-        // Plante toujours en croissance — on garde son plantedAt original
         newPlants.push(plant);
         continue;
       }
     } else {
-      cycles += 1;  // déjà mature au moment du retour
+      cycles += 1; // déjà mature au moment du retour
     }
 
     cycles += Math.floor(secondsLeft / cycleSeconds);
@@ -113,7 +121,6 @@ export function applyOfflineProgress() {
     totalEuros += cycles * revenuePerCycle;
     totalPlants += cycles;
 
-    // On replante un nouveau cycle — décalé du temps déjà écoulé sur le cycle suivant
     newPlants.push({
       ...plant,
       plantedAt: now - secondsLeft * 1000,

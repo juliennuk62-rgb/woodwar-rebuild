@@ -2,20 +2,13 @@ import { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import { formatEuros, formatNumber } from '../utils/numberFormat.js';
-
-const SEASON_LABELS = {
-  spring: '🌸 Printemps',
-  summer: '☀️ Été',
-  autumn: '🍂 Automne',
-  winter: '❄️ Hiver',
-};
+import WeatherWidget from './WeatherWidget.jsx';
 
 export default function HUD() {
   const euros = useGameStore((s) => s.currency.euros);
   const rareSeeds = useGameStore((s) => s.currency.rareSeeds);
   const ghId = useGameStore((s) => s.activeGreenhouse);
   const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
-  const season = useGameStore((s) => s.market.currentSeason);
   const config = GREENHOUSES[ghId];
   const getIncome = useGameStore((s) => s.getIncomePerSecond);
 
@@ -42,7 +35,7 @@ export default function HUD() {
       </div>
 
       <div className="hud-meta">
-        <div className="hud-pill">{SEASON_LABELS[season] ?? '🌱 ...'}</div>
+        <WeatherWidget />
         <div className="hud-pill">Slots {usedSlots}/{greenhouse.slots}</div>
         <DebugMenu />
       </div>

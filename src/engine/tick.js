@@ -1,22 +1,29 @@
-// Boucle de jeu principale.
-// Toutes les 100ms : check des plantes mûres, mise à jour du marché.
+// Boucle de jeu principale : 10 fps logique (100 ms).
+//   1. Marché : recalcule les prix toutes les 5 s avec pression d'offre + historique
+//   2. Météo : tirage d'un nouvel épisode toutes les ~90 s
+//   3. Saisons : transition du cycle toutes les 10 min réelles
+//   4. Plantes : auto-vente à maturité (replant auto si jardinier)
 import { useGameStore } from '../store/gameStore.js';
 import { GAME_CONFIG } from '../config/gameConfig.js';
-import { computeAllMarketPrices, getPlantStage } from './economy.js';
+import { getPlantStage } from './economy.js';
+import { marketTick, MARKET_TICK_MS } from '../mechanics/market.js';
+import {
+  SEASON_DURATION_MS,
+  WEATHER_DURATION_MS,
+  nextSeason,
+  pickWeatherForSeason,
+} from '../mechanics/weather.js';
 
 let intervalId = null;
 let lastMarketUpdate = 0;
 
 export function startGameLoop() {
   if (intervalId) return;
-  // Init store si pas déjà fait
   const store = useGameStore.getState();
-  if (!store.ready) {
-    store.init();
-  }
-  // Premier prix de marché immédiat pour éviter l'écran "tout à 0"
-  useGameStore.getState().setMarketPrices(computeAllMarketPrices(Date.now()));
+  if (!store.ready) store.init();
 
+  // Tick initial du marché : sinon les prix démarrent vides
+  bumpMarket(Date.now());
   intervalId = setInterval(tick, GAME_CONFIG.tickIntervalMs);
 }
 
@@ -31,14 +38,34 @@ function tick() {
   const now = Date.now();
   const store = useGameStore.getState();
 
-  // 1) Rafraîchir les prix du marché (1×/sec)
-  if (now - lastMarketUpdate >= GAME_CONFIG.marketUpdateMs) {
-    store.setMarketPrices(computeAllMarketPrices(now));
+  // ── 1. Marché ──────────────────────────────────────────────
+  if (now - lastMarketUpdate >= MARKET_TICK_MS) {
+    bumpMarket(now);
     lastMarketUpdate = now;
   }
 
-  // 2) Auto-vente des plantes matures. La logique replant/non-replant est
-  //    gérée dans le store en fonction de la présence d'un jardinier.
+  // ── 2. Météo ───────────────────────────────────────────────
+  if (now >= (store.market.weatherEndsAt ?? 0)) {
+    const newWeather = pickWeatherForSeason(store.market.currentSeason);
+    store.patchMarket({
+      weather: newWeather,
+      weatherEndsAt: now + WEATHER_DURATION_MS,
+    });
+  }
+
+  // ── 3. Saison ──────────────────────────────────────────────
+  if (now >= (store.market.seasonEndsAt ?? 0)) {
+    const newSeason = nextSeason(store.market.currentSeason);
+    store.patchMarket({
+      currentSeason: newSeason,
+      seasonStartedAt: now,
+      seasonEndsAt: now + SEASON_DURATION_MS,
+      weather: pickWeatherForSeason(newSeason),
+      weatherEndsAt: now + WEATHER_DURATION_MS,
+    });
+  }
+
+  // ── 4. Auto-vente des plantes matures ──────────────────────
   const ghId = store.activeGreenhouse;
   const gh = store.greenhouses[ghId];
   if (gh && gh.plants.length) {
@@ -51,4 +78,10 @@ function tick() {
   }
 
   store.setLastTick(now);
+}
+
+function bumpMarket(now) {
+  const store = useGameStore.getState();
+  const result = marketTick(store.market, now);
+  store.patchMarket(result);
 }

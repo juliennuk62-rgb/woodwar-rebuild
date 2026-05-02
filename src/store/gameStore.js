@@ -13,6 +13,7 @@ import {
   hasAnyGardener,
 } from '../engine/economy.js';
 import { loadSave, applyOfflineProgress } from '../engine/save.js';
+import { SEASONS, SEASON_DURATION_MS, WEATHER_DURATION_MS, pickWeatherForSeason } from '../mechanics/weather.js';
 
 function makeInitialGreenhouseState(id) {
   const cfg = GREENHOUSES[id];
@@ -59,8 +60,13 @@ function makeInitialState() {
 
     market: {
       currentSeason: 'spring',
+      seasonStartedAt: Date.now(),
+      seasonEndsAt: Date.now() + SEASON_DURATION_MS,
       weather: 'sunny',
+      weatherEndsAt: Date.now() + WEATHER_DURATION_MS,
       prices: {},
+      history: {},          // { speciesId: [last 12 prices] }
+      salesSinceTick: {},   // { speciesId: count } — reset à chaque marketTick
     },
 
     expeditions: { active: [], completed: 0 },
@@ -204,7 +210,7 @@ export const useGameStore = create((set, get) => ({
     const elapsed = (Date.now() - plant.plantedAt) / 1000;
     if (elapsed < species.growTime) return 0;
 
-    const revenue = computePlantRevenue(plant, gh, s.market.prices, { manual: !!opts.manual });
+    const revenue = computePlantRevenue(plant, gh, s.market, { manual: !!opts.manual });
 
     // Replantation auto si au moins 1 jardinier embauché dans cette serre.
     let newPlants;
@@ -240,6 +246,13 @@ export const useGameStore = create((set, get) => ({
         ...cur.currency,
         euros: cur.currency.euros + revenue,
         lifetimeEuros: cur.currency.lifetimeEuros + revenue,
+      },
+      market: {
+        ...cur.market,
+        salesSinceTick: {
+          ...cur.market.salesSinceTick,
+          [plant.speciesId]: (cur.market.salesSinceTick?.[plant.speciesId] ?? 0) + 1,
+        },
       },
       floatingNumbers: [
         ...cur.floatingNumbers,
@@ -321,7 +334,7 @@ export const useGameStore = create((set, get) => ({
   getIncomePerSecond: () => {
     const s = get();
     const gh = s.greenhouses[s.activeGreenhouse];
-    return computeIncomePerSecond(gh, s.market.prices);
+    return computeIncomePerSecond(gh, s.market);
   },
 
   // ─── UI panel ────────────────────────────────────────────────────
@@ -337,6 +350,22 @@ export const useGameStore = create((set, get) => ({
 
   setMarketPrices: (prices) => set((s) => ({
     market: { ...s.market, prices },
+  })),
+
+  // Patch arbitraire de l'objet market — utilisé par marketTick et le cycle saison/météo
+  patchMarket: (patch) => set((s) => ({
+    market: { ...s.market, ...patch },
+  })),
+
+  // Incrémente le compteur de ventes pour pousser le prix à la baisse
+  recordSale: (speciesId) => set((s) => ({
+    market: {
+      ...s.market,
+      salesSinceTick: {
+        ...s.market.salesSinceTick,
+        [speciesId]: (s.market.salesSinceTick?.[speciesId] ?? 0) + 1,
+      },
+    },
   })),
 
   setLastTick: (t) => set({ lastTick: t }),

@@ -23,6 +23,12 @@ export default function PanelLauncher() {
       hint: shopAffordable(euros, lifetimeEuros, ghId),
     },
     {
+      id: 'market',
+      label: 'Marché',
+      icon: '📈',
+      hint: false,
+    },
+    {
       id: 'gardeners',
       label: 'Jardiniers',
       icon: '👩‍🌾',

@@ -4,6 +4,7 @@ import HUD from './ui/HUD.jsx';
 import ShopPanel from './ui/ShopPanel.jsx';
 import GardenersPanel from './ui/GardenersPanel.jsx';
 import UpgradesPanel from './ui/UpgradesPanel.jsx';
+import MarketPanel from './ui/MarketPanel.jsx';
 import OfflineModal from './ui/OfflineModal.jsx';
 import PanelLauncher from './ui/PanelLauncher.jsx';
 import PlantsList from './ui/PlantsList.jsx';
@@ -35,6 +36,7 @@ export default function App() {
       <ShopPanel />
       {activePanel === 'gardeners' && <GardenersPanel />}
       {activePanel === 'upgrades' && <UpgradesPanel />}
+      {activePanel === 'market' && <MarketPanel />}
       <OfflineModal />
     </>
   );

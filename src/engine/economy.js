@@ -1,9 +1,15 @@
 // Calculs économiques purs — sans effet de bord, testables.
-// GDD §06 (Devises & Économie) + §07 (Mécaniques) + Prompt 3.
+// GDD §06 (Devises & Économie) + §07 (Mécaniques) + Prompt 3 + Prompt 4.
 import { PLANTS } from '../config/plants.js';
 import { GAME_CONFIG } from '../config/gameConfig.js';
 import { GARDENERS } from '../config/gardeners.js';
 import { UPGRADE_TYPES } from '../config/upgrades.js';
+import {
+  getSeasonMultiplier,
+  getSeasonRevenueMultiplier,
+  getSeasonGrowthMultiplier,
+  getWeatherEffect,
+} from '../mechanics/weather.js';
 
 // ─── Marché ───────────────────────────────────────────────────
 export function computeMarketMultiplier(time, seed = 0) {
@@ -91,27 +97,45 @@ export function hasAnyGardener(greenhouse) {
 }
 
 // ─── Revenu d'une vente ──────────────────────────────────────
-export function computePlantRevenue(plant, greenhouse, marketPrices, opts = {}) {
+// `marketState` = { prices, currentSeason, weather } — `marketPrices` accepté
+// aussi pour la rétro-compat. Le revenu prend en compte saison + météo.
+export function computePlantRevenue(plant, greenhouse, marketState, opts = {}) {
   const species = PLANTS[plant.speciesId];
-  const market = marketPrices[plant.speciesId] ?? 1.0;
+  const prices = marketState?.prices ?? marketState ?? {};
+  const season = marketState?.currentSeason ?? 'spring';
+  const weather = marketState?.weather ?? 'sunny';
+
+  const market = prices[plant.speciesId] ?? 1.0;
   const upgrade = getUpgradeMultiplier(greenhouse);
   const prestige = getPrestigeMultiplier(greenhouse);
   const gardener = 1 + getGardenerBonus(greenhouse, plant.speciesId);
   const manual = opts.manual ? 1 + getManualBonus(greenhouse) : 1;
+  const seasonGlobal = getSeasonRevenueMultiplier(season);
+  const seasonSpecies = 1 + getSeasonMultiplier(plant.speciesId, season);
+  const weatherBonus = 1 + getWeatherEffect(weather).revenueBonus;
 
-  return Math.floor(species.baseRevenue * market * upgrade * prestige * gardener * manual);
+  return Math.floor(
+    species.baseRevenue *
+    market *
+    upgrade *
+    prestige *
+    gardener *
+    manual *
+    seasonGlobal *
+    seasonSpecies *
+    weatherBonus
+  );
 }
 
 // ─── Revenu prévisionnel par seconde ─────────────────────────
 // Pour afficher un €/s dans le HUD : on simule le revenu horaire de chaque plante
 // et on divise par son cycle complet.
-export function computeIncomePerSecond(greenhouse, marketPrices) {
+export function computeIncomePerSecond(greenhouse, marketState) {
   if (!greenhouse?.plants?.length) return 0;
   let total = 0;
   for (const plant of greenhouse.plants) {
-    const species = PLANTS[plant.speciesId];
     const grow = getGrowTime(plant.speciesId, greenhouse);
-    const revenue = computePlantRevenue(plant, greenhouse, marketPrices, { manual: false });
+    const revenue = computePlantRevenue(plant, greenhouse, marketState, { manual: false });
     // Sans jardinier : la plante ne se replante pas, donc le revenu n'est pas continu.
     // On l'inclut quand même comme estimation "par cycle moyen" — c'est l'idée d'un
     // tycoon : "potentiellement ce que tu peux faire en €/s si tu replantes".
