@@ -1,65 +1,97 @@
-# Woodwar Rebuild
+# Le Jardin d'Agnès 🌱
 
-Réécriture moderne du jeu Woodwar à partir de la spec extraite du code PHP legacy.
+> Idle tycoon botanique en 3D isométrique — navigateur, gratuit.
 
-## Structure
+Tu incarnes Agnès, botaniste ambitieuse. À partir d'une modeste serre tempérée,
+tu cultives, vends, croises et explores pour bâtir un empire floral mondial.
 
-```
-rebuild/
-├── app.py              # Application Flask + routes
-├── db.py               # Configuration SQLAlchemy + SQLite
-├── models.py           # Modèles ORM (User, Player, ...)
-├── game_data.py        # Chargement des fichiers data/*.json
-├── requirements.txt    # Dépendances Python
-├── data/               # Règles du jeu (source de vérité)
-│   ├── units.json      #   12 unités avec stats + coûts dérivés
-│   ├── buildings.json  #   16 bâtiments
-│   ├── clans.json      #   8 clans
-│   ├── dracos.json     #   4 dracos
-│   ├── relics.json     #   12 reliques
-│   └── rules.json      #   constantes globales (config.php)
-└── woodwar.db          # Base SQLite (créée au premier lancement)
-```
+---
 
-## Démarrage
+## État du projet
+
+**Prompt 1 / 10 — Fondations & Architecture** ✅
+
+- [x] Setup React 18 + Vite + Zustand + Three.js + R3F + break_infinity.js
+- [x] Structure du projet conforme au GDD
+- [x] gameConfig statique : 5 espèces de la Serre Tempérée
+- [x] Store Zustand avec save/load localStorage + autosave 5s
+- [x] Boucle de jeu (tick.js, économie, marché dynamique)
+- [x] Scène 3D isométrique R3F (sol + 6 pots + plantes procédurales)
+- [x] HUD HTML overlay (€, graines rares, saison, slots)
+- [x] Plantation, croissance temps réel, auto-récolte, récolte manuelle bonus
+- [x] Gains offline (capés à 12 h, efficacité 50 %)
+- [x] Floating numbers
+- [x] CI GitHub Pages
+
+À venir : **Prompts 2 → 10** (modèles 3D détaillés, marché/météo, expéditions,
+hybridation, prestige, quêtes, audio, lancement). Voir `docs/gdd.html`.
+
+---
+
+## Démarrer en local
 
 ```bash
-cd rebuild
-pip install -r requirements.txt
-python app.py
+npm install
+npm run dev
 ```
 
-Le serveur écoute sur **http://localhost:5002** (port choisi pour ne pas entrer en conflit avec WoodwarBis sur 5001 ni Woodwar9 sur 5000).
+Le jeu tourne sur `http://localhost:5173`.
 
-## Endpoints actuels
+## Build de production
 
-| Route | Description |
-|-------|-------------|
-| `GET /` | Page d'accueil avec inventaire des données chargées |
-| `GET /api/health` | Santé du serveur + compteurs |
-| `GET /api/data/units` | Les 12 unités |
-| `GET /api/data/buildings` | Les 16 bâtiments |
-| `GET /api/data/clans` | Les 8 clans |
-| `GET /api/data/dracos` | Les 4 dracos |
-| `GET /api/data/relics` | Les 12 reliques |
-| `GET /api/data/rules` | Constantes globales |
+```bash
+npm run build
+npm run preview
+```
 
-## Phases
+## Déploiement
 
-Voir `../SPEC.md` pour la stratégie complète.
+Le workflow `.github/workflows/deploy.yml` publie automatiquement la branche
+`main` sur GitHub Pages — accessible à
+`https://juliennuk62-rgb.github.io/woodwar-rebuild/`.
 
-- **Phase 0** ✅ Extraction des données en JSON
-- **Phase 1** ✅ Squelette Flask + SQLite + endpoints de lecture
-- **Phase 2** ⏳ Auth (inscription, login, sessions)
-- **Phase 3** ⏳ Ressources & production passive
-- **Phase 4** ⏳ Bâtiments constructibles
-- **Phase 5** ⏳ Unités et combat basique
-- **Phase 6** ⏳ Alliances, reliques, dracos, contenu complet
+> Pense à activer Pages dans **Settings → Pages → Source = GitHub Actions**
+> au premier déploiement.
 
-## Conventions
+---
 
-- **Les données JSON de `data/` font foi** — si on veut modifier l'équilibrage, on modifie le JSON, pas le code.
-- **Tous les prix d'unités sont calculés depuis `damage` et `defense`** via les formules documentées dans `data/units.json`.
-- **Encoding** : UTF-8 partout. Les caractères `�` du code PHP original sont corrigés lors de l'extraction.
-- **Pas de monétisation** dans le rebuild (PayPal, Allopass, CMI, SMS retirés).
-- **Pas de Facebook** dans le rebuild (SDK, like buttons, invitations retirés).
+## Architecture
+
+```
+src/
+├── config/      gameConfig, plants, greenhouses (statique)
+├── store/       gameStore Zustand (état dynamique)
+├── engine/      tick, économie, save/load, offline progress
+├── three/       Scène R3F isométrique, pots, plantes procédurales
+├── ui/          HUD, ShopPanel, OfflineModal, FloatingNumbers (HTML overlay)
+├── utils/       formatage de nombres, wrapper Decimal
+└── styles/      CSS global — palette du GDD §02
+docs/
+└── gdd.html     Game Design Document complet (référence)
+```
+
+## Stack
+
+| Couche       | Lib                 | Pourquoi                                         |
+|--------------|---------------------|--------------------------------------------------|
+| Framework    | React 18 + Vite     | UI overlay rapide, HMR                           |
+| State        | Zustand             | Léger, parfait pour idle games                   |
+| 3D           | Three.js + R3F      | Scène isométrique navigateur                     |
+| Big numbers  | break_infinity.js   | Préparer la croissance exponentielle des €       |
+| Save         | localStorage        | MVP — cloud save (Supabase) prévu en V2          |
+
+## Choix techniques
+
+- **Caméra orthographique** position `[12, 12, 12]` zoom `48` — vue iso parfaite.
+- **Tick logique 10 fps** (100 ms) — visuel à 60 fps via R3F. Évite de faire
+  bouillir le CPU.
+- **Plantes 100 % procédurales** en primitives Three.js (cylindre + sphères)
+  pour rester sous les 500 polys/plante. Les vrais `.glb` arrivent en Prompt 2.
+- **Toon-friendly** : `MeshLambertMaterial` partout, pas de PBR, pas d'ombres
+  dynamiques — perfs garanties.
+- **Pas de UI 3D** : tout le HUD est en HTML/CSS par-dessus le canvas
+  (`position: fixed`).
+
+---
+
+Made with 🌿 — passion project, gratuit.

@@ -1,0 +1,58 @@
+// Configuration des serres — pour Prompt 1, seule la Serre Tempérée est jouable.
+// Les autres sont définies pour préparer Prompt 8 (Serres 2-4 & Prestige).
+export const GREENHOUSES = {
+  temperate: {
+    id: 'temperate',
+    name: "Serre d'Agnès",
+    icon: '🏡',
+    biome: 'Tempéré (France)',
+    unlockCost: 0,
+    initialSlots: 6,
+    slotsTiers: [6, 12, 24],
+    prestigeToken: { id: 'goldPollen', name: "Pollen d'or", icon: '🌟' },
+    species: ['daisy', 'tulip', 'rose', 'lavender', 'peony'],
+    floorColor: '#3a4a32',
+    accentColor: '#7ec87a',
+  },
+  tropical: {
+    id: 'tropical',
+    name: 'Serre Tropicale',
+    icon: '🌴',
+    biome: 'Tropical (Indonésie)',
+    unlockCost: 50000,
+    initialSlots: 6,
+    slotsTiers: [6, 12, 24],
+    prestigeToken: { id: 'rareNectar', name: 'Nectar rare', icon: '💧' },
+    species: [],
+    floorColor: '#2e4a3a',
+    accentColor: '#88c4d8',
+  },
+  arid: {
+    id: 'arid',
+    name: 'Serre Aride',
+    icon: '🌵',
+    biome: 'Désertique (Maroc)',
+    unlockCost: 500000,
+    initialSlots: 6,
+    slotsTiers: [6, 12, 24],
+    prestigeToken: { id: 'preciousResin', name: 'Résine précieuse', icon: '🏺' },
+    species: [],
+    floorColor: '#4a3a2e',
+    accentColor: '#d4a84b',
+  },
+  arctic: {
+    id: 'arctic',
+    name: 'Serre Polaire',
+    icon: '❄️',
+    biome: 'Arctique (Islande)',
+    unlockCost: 5000000,
+    initialSlots: 6,
+    slotsTiers: [6, 12, 24],
+    prestigeToken: { id: 'iceCrystal', name: 'Cristal de glace', icon: '❄️' },
+    species: [],
+    floorColor: '#3a4a52',
+    accentColor: '#88c4d8',
+  },
+};
+
+export const GREENHOUSE_LIST = Object.values(GREENHOUSES);
