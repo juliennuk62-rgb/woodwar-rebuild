@@ -1,44 +1,60 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGameStore } from '../store/gameStore.js';
 import { PLANTS } from '../config/plants.js';
 import { getPlantStage } from '../engine/economy.js';
+import { getToonGradient } from './toon.js';
+import { clickWasDrag } from './IsometricCamera.jsx';
 import PlantMesh from './PlantMesh.jsx';
+import PollenBurst from './PollenBurst.jsx';
+import FloatingNumber3D from './FloatingNumber3D.jsx';
 
-// Une case de plantation — gère son propre état d'animation pour ne pas
-// re-render tout l'arbre React à chaque tick.
+// Pot de plantation : pot en terre cuite + plante (si plantée) + halo
+// d'interaction + particules à la floraison + floating numbers attachés.
 export default function PlantSlot({ slot }) {
   const ghId = useGameStore((s) => s.activeGreenhouse);
   const plant = useGameStore((s) =>
     s.greenhouses[ghId].plants.find((p) => p.slotId === slot.id)
   );
   const harvest = useGameStore((s) => s.harvestPlant);
-  const openShop = useGameStore.getState; // setter défini dans HUD via context simple
+  const slotFloats = useGameStore((s) =>
+    s.floatingNumbers.filter((f) => f.slotId === slot.id)
+  );
+
   const [hover, setHover] = useState(false);
   const [growth, setGrowth] = useState(0);
+  const wasMatureRef = useRef(false);
+  const [burstId, setBurstId] = useState(0);
 
   useFrame(() => {
     if (!plant) {
-      setGrowth(0);
+      if (growth !== 0) setGrowth(0);
+      wasMatureRef.current = false;
       return;
     }
     const { ratio } = getPlantStage(plant);
     if (Math.abs(ratio - growth) > 0.005) setGrowth(ratio);
+
+    // Détection de floraison → spawn particules de pollen une fois
+    const isMature = ratio >= 1;
+    if (isMature && !wasMatureRef.current) {
+      setBurstId((id) => id + 1);
+    }
+    wasMatureRef.current = isMature;
   });
 
-  const onClick = () => {
+  const onClick = (e) => {
+    if (clickWasDrag()) return;
+    e?.stopPropagation?.();
     if (!plant) {
-      // Demande au HUD d'ouvrir le shop pour ce slot.
       window.dispatchEvent(new CustomEvent('jardin:open-shop', { detail: { slotId: slot.id } }));
       return;
     }
-    if (growth >= 1) {
-      harvest(slot.id, { manual: true });
-    }
+    if (growth >= 1) harvest(slot.id, { manual: true });
   };
 
-  const accentColor = plant ? PLANTS[plant.speciesId].color : '#243026';
   const ready = plant && growth >= 1;
+  const accent = plant ? PLANTS[plant.speciesId].petalColor : '#7ec87a';
 
   return (
     <group
@@ -47,35 +63,51 @@ export default function PlantSlot({ slot }) {
       onPointerOut={() => { setHover(false); document.body.style.cursor = ''; }}
       onClick={onClick}
     >
-      <Pot color={accentColor} hovered={hover || ready} />
+      <Pot accentHover={hover || ready} ready={ready} accent={accent} />
       {plant && <PlantMesh species={PLANTS[plant.speciesId]} growth={growth} />}
+      {plant && burstId > 0 && <PollenBurst key={burstId} color={accent} />}
+      {slotFloats.map((f) => (
+        <FloatingNumber3D
+          key={f.id}
+          id={f.id}
+          amount={f.amount}
+          kind={f.kind}
+          createdAt={f.createdAt}
+        />
+      ))}
     </group>
   );
 }
 
-function Pot({ color, hovered }) {
-  const ringColor = hovered ? color : '#2a3326';
+function Pot({ accentHover, ready, accent }) {
+  const grad = useMemo(() => getToonGradient(), []);
+  const ringColor = ready ? accent : (accentHover ? '#d4a84b' : '#3a3326');
+
   return (
     <group>
       {/* Pot en terre cuite */}
       <mesh position={[0, 0.15, 0]}>
-        <cylinderGeometry args={[0.45, 0.4, 0.3, 12]} />
-        <meshLambertMaterial color="#5a3a22" />
+        <cylinderGeometry args={[0.45, 0.4, 0.3, 14]} />
+        <meshToonMaterial color="#a85a35" gradientMap={grad} />
       </mesh>
-      {/* Liseré du pot */}
+      {/* Liseré supérieur */}
       <mesh position={[0, 0.3, 0]}>
-        <cylinderGeometry args={[0.46, 0.46, 0.05, 12]} />
-        <meshLambertMaterial color="#3a2410" />
+        <cylinderGeometry args={[0.46, 0.46, 0.05, 14]} />
+        <meshToonMaterial color="#7a3f22" gradientMap={grad} />
       </mesh>
-      {/* Halo de sélection */}
-      <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.55, 0.65, 24]} />
-        <meshBasicMaterial color={ringColor} transparent opacity={hovered ? 0.7 : 0.25} />
-      </mesh>
-      {/* Terre dans le pot */}
+      {/* Terre */}
       <mesh position={[0, 0.32, 0]}>
-        <cylinderGeometry args={[0.4, 0.4, 0.05, 12]} />
-        <meshLambertMaterial color="#1a1208" />
+        <cylinderGeometry args={[0.4, 0.4, 0.04, 14]} />
+        <meshToonMaterial color="#3a2410" gradientMap={grad} />
+      </mesh>
+      {/* Halo de sélection — anneau au sol */}
+      <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.55, 0.7, 28]} />
+        <meshBasicMaterial
+          color={ringColor}
+          transparent
+          opacity={ready ? 0.85 : (accentHover ? 0.6 : 0.18)}
+        />
       </mesh>
     </group>
   );

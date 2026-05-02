@@ -3,7 +3,6 @@ import GreenhouseScene from './three/GreenhouseScene.jsx';
 import HUD from './ui/HUD.jsx';
 import ShopPanel from './ui/ShopPanel.jsx';
 import OfflineModal from './ui/OfflineModal.jsx';
-import FloatingNumbers from './ui/FloatingNumbers.jsx';
 import { useGameStore } from './store/gameStore.js';
 import { startGameLoop, stopGameLoop } from './engine/tick.js';
 import { setupAutosave } from './engine/save.js';
@@ -30,7 +29,6 @@ export default function App() {
       <HUD />
       <ShopPanel />
       <OfflineModal />
-      <FloatingNumbers />
     </>
   );
 }

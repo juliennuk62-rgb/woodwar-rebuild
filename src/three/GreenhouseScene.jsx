@@ -1,31 +1,12 @@
-import { Canvas, useThree } from '@react-three/fiber';
-import { Suspense, useEffect, useMemo } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Suspense, useMemo } from 'react';
 import { useGameStore } from '../store/gameStore.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import GreenhouseFloor from './GreenhouseFloor.jsx';
 import PlantSlot from './PlantSlot.jsx';
+import IsometricCamera from './IsometricCamera.jsx';
 
-// Vue isométrique : caméra orthographique placée en (12, 12, 12) et qui
-// regarde l'origine. Le zoom est adaptatif pour que la serre tienne dans
-// l'écran sur tous les formats (mobile portrait, paysage, desktop).
 const ISO_POSITION = [12, 12, 12];
-
-// On veut voir au minimum cette zone (en world units) — la serre fait 12×10.
-const MIN_FRAME_WIDTH = 15;
-const MIN_FRAME_HEIGHT = 12;
-
-function CameraRig() {
-  const { camera, size } = useThree();
-  useEffect(() => {
-    camera.position.set(ISO_POSITION[0], ISO_POSITION[1], ISO_POSITION[2]);
-    camera.lookAt(0, 0, 0);
-    const zoomFromW = size.width / MIN_FRAME_WIDTH;
-    const zoomFromH = size.height / MIN_FRAME_HEIGHT;
-    camera.zoom = Math.max(20, Math.min(zoomFromW, zoomFromH));
-    camera.updateProjectionMatrix();
-  }, [camera, size.width, size.height]);
-  return null;
-}
 
 export default function GreenhouseScene() {
   const ghId = useGameStore((s) => s.activeGreenhouse);
@@ -38,14 +19,15 @@ export default function GreenhouseScene() {
       <Canvas
         orthographic
         camera={{ position: ISO_POSITION, near: 0.1, far: 200, zoom: 40 }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
         dpr={[1, 2]}
         flat
         shadows={false}
       >
-        <CameraRig />
+        <IsometricCamera />
+
         <color attach="background" args={['#0d110e']} />
-        <fog attach="fog" args={['#0d110e', 28, 60]} />
+        <fog attach="fog" args={['#0d110e', 30, 70]} />
 
         <SceneLights accent={config.accentColor} />
 
@@ -63,8 +45,8 @@ export default function GreenhouseScene() {
 function SceneLights({ accent }) {
   return (
     <>
-      <ambientLight intensity={0.65} color="#e8eee6" />
-      <directionalLight position={[10, 14, 6]} intensity={1.1} color="#fff5d8" />
+      <ambientLight intensity={0.6} color="#e8eee6" />
+      <directionalLight position={[10, 14, 6]} intensity={1.0} color="#fff5d8" />
       <directionalLight position={[-8, 6, -4]} intensity={0.35} color={accent} />
     </>
   );
