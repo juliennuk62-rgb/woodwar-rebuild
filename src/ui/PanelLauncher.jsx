@@ -43,16 +43,18 @@ export default function PanelLauncher() {
   ];
 
   return (
-    <nav className="panel-launcher">
+    <nav className="panel-launcher" aria-label="Panneaux du jeu">
       {buttons.map((b) => (
         <button
           key={b.id}
           className={`launcher-btn ${active === b.id ? 'active' : ''} ${b.hint ? 'available' : ''}`}
           onClick={() => toggle(b.id)}
+          aria-label={`Ouvrir ${b.label}${b.hint ? ' — items achetables disponibles' : ''}`}
+          aria-pressed={active === b.id}
         >
-          <span className="launcher-icon">{b.icon}</span>
+          <span className="launcher-icon" aria-hidden="true">{b.icon}</span>
           <span className="launcher-label">{b.label}</span>
-          {b.hint && <span className="launcher-dot" />}
+          {b.hint && <span className="launcher-dot" aria-hidden="true" />}
         </button>
       ))}
     </nav>

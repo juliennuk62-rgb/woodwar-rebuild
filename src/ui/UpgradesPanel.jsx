@@ -10,6 +10,7 @@ export default function UpgradesPanel() {
   const euros = useGameStore((s) => s.currency.euros);
   const buy = useGameStore((s) => s.buyUpgrade);
   const close = useGameStore((s) => s.setActivePanel);
+  const flash = useGameStore((s) => s.upgradeFlash);
 
   return (
     <>
@@ -36,8 +37,12 @@ export default function UpgradesPanel() {
               const canAfford = euros >= cost && level < max;
               const isMax = level >= max;
 
+              const flashing = flash?.typeId === u.id;
               return (
-                <div key={u.id} className={`upgrade-card ${!canAfford && !isMax ? 'poor' : ''} ${isMax ? 'maxed' : ''}`}>
+                <div
+                  key={u.id}
+                  className={`upgrade-card ${!canAfford && !isMax ? 'poor' : ''} ${isMax ? 'maxed' : ''} ${flashing ? 'flashing' : ''}`}
+                >
                   <div className="upgrade-icon">{u.icon}</div>
                   <div className="upgrade-body">
                     <div className="upgrade-row">

@@ -56,15 +56,15 @@ function Stat({ icon, label, value, accent, subtle }) {
 }
 
 function DebugMenu() {
-  const reset = useGameStore((s) => s.hardReset);
-  const onReset = () => {
-    if (confirm('Réinitialiser complètement la partie ? (action irréversible)')) {
-      reset();
-    }
-  };
+  const open = useGameStore((s) => s.setActivePanel);
   return (
-    <button className="hud-debug" onClick={onReset} title="Reset partie">
-      ⟲
+    <button
+      className="hud-debug"
+      onClick={() => open('settings')}
+      title="Réglages"
+      aria-label="Ouvrir les réglages"
+    >
+      ⚙️
     </button>
   );
 }

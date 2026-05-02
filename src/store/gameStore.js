@@ -80,10 +80,27 @@ function makeInitialState() {
       totalHybridsCreated: 0,
     },
 
+    // Réglages persistés (Prompt 5)
+    settings: {
+      reducedMotion: false,
+      sfxVolume: 0.7,        // utilisé en Prompt 10
+      musicVolume: 0.4,
+      muted: false,
+      lang: 'fr',
+    },
+
+    // Tutoriel guidé (Prompt 5). step va de 0 (pas commencé) à 6 (fini).
+    onboarding: {
+      step: 0,
+      dismissed: false,
+      lastSeenStep: 0,
+    },
+
     // Volatile — pas sauvegardé
     floatingNumbers: [],
     offlineGains: null,
-    activePanel: null,   // 'shop' | 'gardeners' | 'upgrades' | null
+    activePanel: null,
+    upgradeFlash: null,    // { typeId, ts } — pour animer la carte qui vient d'être achetée
     ready: false,
   };
 }
@@ -327,6 +344,7 @@ export const useGameStore = create((set, get) => ({
         },
       },
     }));
+    get().flashUpgrade(typeId);
     return true;
   },
 
@@ -342,6 +360,60 @@ export const useGameStore = create((set, get) => ({
   togglePanel: (panel) => set((s) => ({
     activePanel: s.activePanel === panel ? null : panel,
   })),
+
+  // ─── Settings ────────────────────────────────────────────────────
+  updateSettings: (patch) => set((s) => ({
+    settings: { ...s.settings, ...patch },
+  })),
+
+  // ─── Onboarding ──────────────────────────────────────────────────
+  // Avance d'une étape uniquement si on est sur la précédente.
+  // L'onboarding écoute les actions du joueur via Onboarding.jsx (subscribe).
+  advanceOnboarding: (toStep) => set((s) => {
+    if (s.onboarding.dismissed) return {};
+    if (toStep <= s.onboarding.step) return {};
+    return { onboarding: { ...s.onboarding, step: toStep, lastSeenStep: toStep } };
+  }),
+  dismissOnboarding: () => set((s) => ({
+    onboarding: { ...s.onboarding, dismissed: true },
+  })),
+
+  // ─── Save export / import ────────────────────────────────────────
+  exportSave: () => {
+    const s = get();
+    const data = {};
+    for (const k of Object.keys(s)) {
+      if (typeof s[k] === 'function') continue;
+      if (['floatingNumbers', 'offlineGains', 'upgradeFlash', 'ready'].includes(k)) continue;
+      data[k] = s[k];
+    }
+    return JSON.stringify(data);
+  },
+
+  importSave: (json) => {
+    try {
+      const data = JSON.parse(json);
+      if (!data || data.version !== GAME_CONFIG.version) {
+        console.warn('Save d\'une version incompatible');
+        return false;
+      }
+      try { localStorage.setItem(GAME_CONFIG.saveKey, json); } catch (e) {}
+      set({ ...data, floatingNumbers: [], offlineGains: null, ready: true });
+      return true;
+    } catch (e) {
+      console.warn('Import save échoué :', e);
+      return false;
+    }
+  },
+
+  // ─── Upgrade flash (visual feedback) ─────────────────────────────
+  flashUpgrade: (typeId) => {
+    set({ upgradeFlash: { typeId, ts: Date.now() } });
+    setTimeout(() => set((s) => {
+      if (s.upgradeFlash?.typeId === typeId) return { upgradeFlash: null };
+      return {};
+    }), 500);
+  },
 
   // ─── Floating numbers & ticks ────────────────────────────────────
   removeFloatingNumber: (id) => set((s) => ({

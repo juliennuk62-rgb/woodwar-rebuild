@@ -37,6 +37,35 @@ button {
   cursor: pointer;
 }
 button:disabled { cursor: not-allowed; opacity: .4; }
+/* Accessibilité tactile : tous les boutons d'action (panels, dock) font ≥ 44px */
+.side-panel button,
+.panel-launcher button,
+.onboarding-card button,
+.btn-plant, .btn-plant-mini, .btn-hire, .btn-upgrade,
+.btn-secondary, .btn-danger {
+  min-height: 44px;
+}
+
+/* Accessibilité — Prompt 5 */
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Réduit les animations à la demande (toggle dans Réglages OU OS) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+.reduced-motion *, .reduced-motion *::before, .reduced-motion *::after {
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
+}
 
 /* ─── Loader ─────────────────────────────────────────────────── */
 .loader {
@@ -161,16 +190,17 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 }
 .hud-debug {
   font-family: 'DM Mono', monospace;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--muted);
   border: 1px solid var(--border);
   background: rgba(19,26,20,.9);
-  width: 32px; height: 32px;
+  width: 36px; height: 36px;
+  min-height: 36px;
   border-radius: 8px;
   display: grid;
   place-items: center;
 }
-.hud-debug:hover { color: var(--rose); border-color: var(--rose); }
+.hud-debug:hover { color: var(--green); border-color: var(--green); }
 
 /* ─── Sidebar gauche : liste des plantes ─────────────────────── */
 .plants-list {
@@ -776,6 +806,226 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   font-family: 'DM Mono', monospace;
   font-size: 10px;
   color: var(--muted);
+}
+
+/* ─── Onboarding (tutoriel guidé) ───────────────────────────── */
+.onboarding-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,17,14,.65);
+  backdrop-filter: blur(3px);
+  z-index: 40;
+  animation: fade-in .25s ease;
+}
+.onboarding-card {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(440px, 92vw);
+  background: var(--surface);
+  border: 1px solid var(--green2);
+  border-radius: 18px;
+  padding: 22px 22px 18px;
+  z-index: 41;
+  box-shadow: 0 20px 50px rgba(0,0,0,.55);
+  animation: onb-pop .3s ease;
+}
+@keyframes onb-pop {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+.onboarding-step {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+.onboarding-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+.onboarding-card p {
+  font-size: 14px;
+  color: var(--green-pale);
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+.onboarding-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.onboarding-skip {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: underline;
+  padding: 4px 8px;
+  text-underline-offset: 4px;
+}
+.onboarding-skip:hover { color: var(--text); }
+.onboarding-cta {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 20px;
+  background: var(--green);
+  color: var(--bg);
+  border-radius: 10px;
+  transition: background .15s ease;
+  margin-left: auto;
+}
+.onboarding-cta:not(:disabled):hover { background: var(--green2); }
+
+/* ─── Settings modal ───────────────────────────────────────── */
+.settings-section {
+  margin-bottom: 22px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.settings-section:last-child { border-bottom: none; padding-bottom: 0; }
+.settings-section-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 12px;
+}
+.settings-section-body { display: flex; flex-direction: column; gap: 12px; }
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.settings-row--toggle {
+  align-items: flex-start;
+}
+.settings-row label {
+  font-size: 13px;
+  color: var(--text);
+}
+.settings-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.slider-group { display: flex; align-items: center; gap: 8px; }
+.slider-group input[type="range"] {
+  width: 130px;
+  accent-color: var(--green);
+}
+.slider-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  width: 36px;
+  text-align: right;
+}
+.settings-select {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+/* Toggle switch */
+.toggle {
+  width: 46px;
+  height: 26px;
+  border-radius: 100px;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: all .15s ease;
+  flex-shrink: 0;
+}
+.toggle.on {
+  background: var(--green);
+  border-color: var(--green);
+}
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text);
+  transition: transform .15s ease;
+}
+.toggle.on .toggle-thumb {
+  transform: translateX(20px);
+  background: var(--bg);
+}
+
+.btn-secondary {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  text-align: center;
+}
+.btn-secondary:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+.btn-danger {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 12px 14px;
+  background: rgba(224,122,122,.1);
+  border: 1px solid rgba(224,122,122,.4);
+  color: var(--rose);
+  border-radius: 10px;
+}
+.btn-danger:hover { background: rgba(224,122,122,.2); }
+.settings-textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  resize: vertical;
+  min-height: 64px;
+}
+.settings-notice {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--green);
+  margin-top: 4px;
+}
+
+/* ─── Flash sur upgrade achetée ───────────────────────────── */
+.upgrade-card.flashing {
+  animation: flash-buy .5s ease-out;
+}
+@keyframes flash-buy {
+  0% {
+    background: rgba(126,200,122,.4);
+    border-color: var(--green);
+    transform: scale(1.03);
+  }
+  100% {
+    background: var(--surface2);
+    border-color: var(--border);
+    transform: scale(1);
+  }
 }
 
 /* ─── Floating numbers en 3D (ancrés via drei <Html>) ────────── */

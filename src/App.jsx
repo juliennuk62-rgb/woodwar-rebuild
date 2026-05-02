@@ -5,9 +5,11 @@ import ShopPanel from './ui/ShopPanel.jsx';
 import GardenersPanel from './ui/GardenersPanel.jsx';
 import UpgradesPanel from './ui/UpgradesPanel.jsx';
 import MarketPanel from './ui/MarketPanel.jsx';
+import SettingsModal from './ui/SettingsModal.jsx';
 import OfflineModal from './ui/OfflineModal.jsx';
 import PanelLauncher from './ui/PanelLauncher.jsx';
 import PlantsList from './ui/PlantsList.jsx';
+import Onboarding from './ui/Onboarding.jsx';
 import { useGameStore } from './store/gameStore.js';
 import { startGameLoop, stopGameLoop } from './engine/tick.js';
 import { setupAutosave } from './engine/save.js';
@@ -37,6 +39,8 @@ export default function App() {
       {activePanel === 'gardeners' && <GardenersPanel />}
       {activePanel === 'upgrades' && <UpgradesPanel />}
       {activePanel === 'market' && <MarketPanel />}
+      <SettingsModal />
+      <Onboarding />
       <OfflineModal />
     </>
   );
