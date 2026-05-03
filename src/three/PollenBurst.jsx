@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useGameStore } from '../store/gameStore.js';
 
 // Particules de pollen à la floraison (GDD §09 — Direction Artistique).
 // Système de points légers : ~24 particules dorées qui s'élèvent et fadent.
@@ -9,10 +10,13 @@ const COUNT = 24;
 const LIFETIME = 1.8;
 
 export default function PollenBurst({ color = '#f5d050' }) {
+  const reducedMotion = useGameStore((s) => s.settings?.reducedMotion);
   const ref = useRef();
   const geom = useMemo(() => buildGeometry(), []);
   const mat = useMemo(() => buildMaterial(color), [color]);
   const startTime = useRef(null);
+
+  if (reducedMotion) return null;
   const data = useMemo(() => {
     const arr = [];
     for (let i = 0; i < COUNT; i++) {

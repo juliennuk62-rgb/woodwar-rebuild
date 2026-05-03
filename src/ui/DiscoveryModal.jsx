@@ -18,9 +18,13 @@ export default function DiscoveryModal() {
   const discovery = useGameStore((s) => s.currentDiscovery);
   const dismiss = useGameStore((s) => s.dismissDiscovery);
   const greenhouses = useGameStore((s) => s.greenhouses);
+  // On laisse passer la modale Offline en premier — sinon les 2 se chevauchent
+  // au retour d'un long offline.
+  const offlineGains = useGameStore((s) => s.offlineGains);
   const state = useGameStore.getState();
 
   if (!discovery) return null;
+  if (offlineGains && (offlineGains.euros > 0 || offlineGains.plants > 0)) return null;
   const species = getSpeciesData(discovery.speciesId, state);
   if (!species) return null;
   const isHybrid = !!species.isHybrid;

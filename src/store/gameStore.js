@@ -189,19 +189,21 @@ export const useGameStore = create((set, get) => ({
 
   // ─── Plantation ──────────────────────────────────────────────────
   getSeedCost: (speciesId) => {
-    const owned = get().species[speciesId]?.owned ?? 0;
-    return computeCost(speciesId, owned);
+    const s = get();
+    const owned = s.species[speciesId]?.owned ?? 0;
+    return computeCost(speciesId, owned, s);
   },
 
   getBulkCost: (speciesId, qty) => {
-    const owned = get().species[speciesId]?.owned ?? 0;
-    return computeBulkCost(speciesId, owned, qty);
+    const s = get();
+    const owned = s.species[speciesId]?.owned ?? 0;
+    return computeBulkCost(speciesId, owned, qty, s);
   },
 
   getMaxAffordable: (speciesId) => {
-    const owned = get().species[speciesId]?.owned ?? 0;
-    const budget = get().currency.euros;
-    return computeMaxAffordable(speciesId, owned, budget);
+    const s = get();
+    const owned = s.species[speciesId]?.owned ?? 0;
+    return computeMaxAffordable(speciesId, owned, s.currency.euros, s);
   },
 
   isSpeciesUnlocked: (speciesId) => {
@@ -806,6 +808,8 @@ export const useGameStore = create((set, get) => ({
         console.warn('Save d\'une version incompatible');
         return false;
       }
+      // Sanity checks : on ne fait pas confiance au JSON importé
+      sanitizeSave(data);
       try { localStorage.setItem(GAME_CONFIG.saveKey, json); } catch (e) {}
       set({ ...data, floatingNumbers: [], offlineGains: null, ready: true });
       return true;
@@ -870,4 +874,34 @@ function findFreeSlot(gh) {
     if (!used.has(i)) return i;
   }
   return -1;
+}
+
+// Borne / nettoie les valeurs d'une save importée pour éviter les états
+// incohérents (currency négative, hybrides mal formés, etc.).
+function sanitizeSave(data) {
+  if (data.currency) {
+    data.currency.euros = Math.max(0, Number(data.currency.euros) || 0);
+    data.currency.rareSeeds = Math.max(0, Math.floor(Number(data.currency.rareSeeds) || 0));
+    data.currency.lifetimeEuros = Math.max(
+      data.currency.euros,
+      Number(data.currency.lifetimeEuros) || 0
+    );
+  }
+  if (data.hybrids && typeof data.hybrids === 'object') {
+    for (const id of Object.keys(data.hybrids)) {
+      const h = data.hybrids[id];
+      if (
+        !h?.id ||
+        !h?.name ||
+        typeof h?.growTime !== 'number' ||
+        typeof h?.baseRevenue !== 'number'
+      ) {
+        delete data.hybrids[id];
+      }
+    }
+  }
+  // Recherche en cours : si techId invalide, on annule
+  if (data.research?.inProgress?.techId && !TECHS[data.research.inProgress.techId]) {
+    data.research.inProgress = null;
+  }
 }

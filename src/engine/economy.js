@@ -61,8 +61,9 @@ export function getPlantStage(plant, now = Date.now(), greenhouse = null, state 
 }
 
 // ─── Multiplicateurs ─────────────────────────────────────────
-// Lighting + recherche réduisent growTime. Trait "fast_grower" sur un hybride
-// le divise par 2 directement dans hybrid.growTime — donc déjà appliqué.
+// growTime appliqué : lighting (-10% par niveau) × recherche × saison × météo.
+// Le trait "fast_grower" d'un hybride est déjà appliqué directement dans son
+// hybrid.growTime quand il est créé.
 export function getGrowTime(speciesId, greenhouse, state) {
   const species = getSpeciesData(speciesId, state);
   if (!species) return 60;
@@ -70,9 +71,14 @@ export function getGrowTime(speciesId, greenhouse, state) {
   const lightReduction = lightLevel * UPGRADE_TYPES.lighting.effectPerLevel;
   const research = state?.research?.unlocked ?? [];
   const researchReduction = getResearchBonuses(research).growTimeReduction;
-  // Les deux réductions s'appliquent multiplicativement
-  const factor = (1 - lightReduction) * (1 - researchReduction);
-  return species.growTime * Math.max(0.2, factor);
+  // Saison & météo : printemps +10% pousse → growTime / 1.10 ; hiver -20% → ×1.25
+  const season = state?.market?.currentSeason ?? 'spring';
+  const weather = state?.market?.weather ?? 'sunny';
+  const seasonGrowth = getSeasonGrowthMultiplier(season);
+  const weatherGrowth = 1 + (getWeatherEffect(weather).growthBonus ?? 0);
+  const growthMul = Math.max(0.4, seasonGrowth * weatherGrowth);
+  const factor = (1 - lightReduction) * (1 - researchReduction) / growthMul;
+  return species.growTime * Math.max(0.15, factor);
 }
 
 // Bonus manuel : +25% de base + bonus irrigation
@@ -181,31 +187,38 @@ export function getEffectiveSlots(greenhouse, state = null) {
 }
 
 // ─── Coûts (graines, jardiniers, upgrades) ────────────────────
-// cost(n) = baseCost × 1.08^owned (GDD §06)
-export function computeCost(speciesId, owned) {
-  const plant = PLANTS[speciesId];
+// cost(n) = baseCost × 1.08^owned (GDD §06).
+// Pour les hybrides (state.hybrids), on a besoin de `state` pour résoudre
+// l'espèce — le call site est responsable de le fournir.
+export function computeCost(speciesId, owned, state) {
+  const plant = getSpeciesData(speciesId, state);
+  if (!plant) return Infinity;
+  // Trait "eternal" sur un hybride : coût fixe, jamais d'inflation.
+  if (plant.trait === 'eternal') return Math.ceil(plant.seedCost);
   return Math.ceil(plant.seedCost * Math.pow(GAME_CONFIG.seedCostGrowth, owned));
 }
 
-// Coût pour acheter `quantity` graines d'un coup, formule fermée :
-// somme géométrique : baseCost × r^owned × (r^q - 1) / (r - 1)
-export function computeBulkCost(speciesId, owned, quantity) {
-  const plant = PLANTS[speciesId];
+// Coût pour acheter `quantity` graines d'un coup (formule fermée).
+export function computeBulkCost(speciesId, owned, quantity, state) {
+  const plant = getSpeciesData(speciesId, state);
+  if (!plant || quantity <= 0) return 0;
+  if (plant.trait === 'eternal') return Math.ceil(plant.seedCost * quantity);
   const r = GAME_CONFIG.seedCostGrowth;
-  if (quantity <= 0) return 0;
   if (r === 1) return Math.ceil(plant.seedCost * quantity);
   const sum = (Math.pow(r, quantity) - 1) / (r - 1);
   return Math.ceil(plant.seedCost * Math.pow(r, owned) * sum);
 }
 
 // Combien de graines on peut s'offrir avec `budget` euros, partant de `owned`.
-// Inversion de la formule géométrique. Renvoie 0 si rien d'achetable.
-export function computeMaxAffordable(speciesId, owned, budget) {
-  const plant = PLANTS[speciesId];
+export function computeMaxAffordable(speciesId, owned, budget, state) {
+  const plant = getSpeciesData(speciesId, state);
+  if (!plant) return 0;
+  if (plant.trait === 'eternal') {
+    return Math.max(0, Math.floor(budget / plant.seedCost));
+  }
   const r = GAME_CONFIG.seedCostGrowth;
   const c0 = plant.seedCost * Math.pow(r, owned);
   if (budget < c0) return 0;
-  // budget >= c0 × (r^q - 1) / (r - 1)  →  q <= log_r(1 + budget × (r-1)/c0)
   const q = Math.floor(Math.log(1 + (budget * (r - 1)) / c0) / Math.log(r));
   return Math.max(0, q);
 }

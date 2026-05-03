@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useGameStore } from '../store/gameStore.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import { PLANTS } from '../config/plants.js';
+import { getSpeciesData } from '../engine/economy.js';
 import { formatEuros, formatDuration } from '../utils/numberFormat.js';
 
 // Panneau de plantation. S'ouvre via :
@@ -14,6 +15,7 @@ export default function ShopPanel() {
 
   const ghId = useGameStore((s) => s.activeGreenhouse);
   const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
+  const hybrids = useGameStore((s) => s.hybrids);
   const config = GREENHOUSES[ghId];
   const euros = useGameStore((s) => s.currency.euros);
   const lifetimeEuros = useGameStore((s) => s.currency.lifetimeEuros);
@@ -23,6 +25,19 @@ export default function ShopPanel() {
   const getCost = useGameStore((s) => s.getSeedCost);
   const getMaxAffordable = useGameStore((s) => s.getMaxAffordable);
   const isUnlocked = useGameStore((s) => s.isSpeciesUnlocked);
+
+  // On plante les hybrides du joueur en plus des espèces natives configurées
+  // pour la serre. Règle simple : un hybride dont le biome correspond à la
+  // serre y est plantable. Les hybrides "cross-biome" (biome === 'hybrid')
+  // sont plantables dans la Tempérée par défaut tant que la Complexe Botanique
+  // n'existe pas (ce sera un Prompt futur).
+  const speciesIds = useMemo(() => {
+    const native = config.species.slice();
+    const hybridIds = Object.values(hybrids)
+      .filter((h) => h.biome === ghId || (h.biome === 'hybrid' && ghId === 'temperate'))
+      .map((h) => h.id);
+    return [...native, ...hybridIds];
+  }, [config.species, hybrids, ghId]);
 
   useEffect(() => {
     const onOpen = (e) => setSlotId(e.detail.slotId);
@@ -82,8 +97,9 @@ export default function ShopPanel() {
           )}
 
           <div className="cards">
-            {config.species.map((id) => {
-              const species = PLANTS[id];
+            {speciesIds.map((id) => {
+              const species = PLANTS[id] ?? hybrids[id];
+              if (!species) return null;
               const cost = getCost(id);
               const unlocked = isUnlocked(id);
               const canAfford = euros >= cost;

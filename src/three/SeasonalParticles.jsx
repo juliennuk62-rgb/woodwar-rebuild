@@ -14,6 +14,7 @@ const TOP_Y = 5;
 
 export default function SeasonalParticles() {
   const season = useGameStore((s) => s.market.currentSeason);
+  const reducedMotion = useGameStore((s) => s.settings?.reducedMotion);
   const ref = useRef();
   const data = useMemo(() => buildParticleData(), []);
   const geom = useMemo(() => buildGeometry(), []);
@@ -32,6 +33,7 @@ export default function SeasonalParticles() {
 
   useFrame((_, delta) => {
     if (!ref.current) return;
+    if (reducedMotion) return; // les particules restent figées
     const positions = ref.current.geometry.attributes.position;
     for (let i = 0; i < COUNT; i++) {
       const d = data[i];
@@ -40,6 +42,8 @@ export default function SeasonalParticles() {
     }
     positions.needsUpdate = true;
   });
+
+  if (reducedMotion) return null; // option : les cacher complètement
 
   return <points ref={ref} geometry={geom} material={material} />;
 }
