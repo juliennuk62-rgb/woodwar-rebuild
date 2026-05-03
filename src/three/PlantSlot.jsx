@@ -70,7 +70,6 @@ export default function PlantSlot({ slot }) {
       {slotFloats.map((f) => (
         <FloatingNumber3D
           key={f.id}
-          id={f.id}
           amount={f.amount}
           kind={f.kind}
           createdAt={f.createdAt}

@@ -88,6 +88,7 @@ export function loadSave() {
     if (!data.quests.daily)   data.quests.daily   = { lastRefresh: null, active: [] };
     if (!data.quests.weekly)  data.quests.weekly  = { points: 0 };
     if (!data.expeditions)    data.expeditions    = { active: [], completed: 0 };
+    data.permanentBonuses = data.permanentBonuses ?? { revenueBonus: 0 };
 
     // Vérification checksum en arrière-plan (non-bloquante)
     const expected = localStorage.getItem(HASH_KEY);

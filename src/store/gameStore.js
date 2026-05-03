@@ -113,6 +113,11 @@ function makeInitialState() {
       daily: { lastRefresh: null, active: [] },
       weekly: { points: 0 },
     },
+
+    // Bonus permanents accumulés par certaines récompenses (q_first_prestige
+    // donne +10% revenu permanent par exemple). Stocké séparément des
+    // achievements parce que ce ne sont pas des achievements.
+    permanentBonuses: { revenueBonus: 0 },
     stats: {
       totalPlantsGrown: 0,
       totalEarned: 0,
@@ -763,6 +768,14 @@ export const useGameStore = create((set, get) => ({
         next.currency = {
           ...(next.currency ?? cur.currency),
           rareSeeds: cur.currency.rareSeeds + reward.rareSeeds,
+        };
+      }
+      // Bonus permanents (story quest q_first_prestige notamment)
+      const bonus = reward.achievementBonus?.revenueBonus;
+      if (bonus) {
+        next.permanentBonuses = {
+          ...cur.permanentBonuses,
+          revenueBonus: (cur.permanentBonuses?.revenueBonus ?? 0) + bonus,
         };
       }
       return next;

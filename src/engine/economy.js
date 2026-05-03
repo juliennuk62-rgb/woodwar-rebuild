@@ -141,6 +141,7 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
   const research = state?.research?.unlocked ?? [];
   const researchBonus = 1 + getResearchBonuses(research).revenueBonus;
   const achievementBonus = 1 + getAchievementBonus(state?.quests?.claimed ?? {});
+  const permanentBonus = 1 + (state?.permanentBonuses?.revenueBonus ?? 0);
 
   return Math.floor(
     species.baseRevenue *
@@ -153,7 +154,8 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
     seasonSpecies *
     weatherBonus *
     researchBonus *
-    achievementBonus
+    achievementBonus *
+    permanentBonus
   );
 }
 
