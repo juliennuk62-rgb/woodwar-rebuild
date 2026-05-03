@@ -2,7 +2,21 @@ import { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import { formatEuros, formatNumber } from '../utils/numberFormat.js';
+import { getAchievementBonus } from '../mechanics/quests.js';
+import { getResearchBonuses } from '../mechanics/research.js';
 import WeatherWidget from './WeatherWidget.jsx';
+
+// Calcule le multiplicateur global "joueur" (les bonus qui s'appliquent
+// partout, pas spécifiques à une serre). Stable pour l'affichage HUD.
+function computeGlobalMultiplier(s) {
+  const a = getAchievementBonus(s.quests?.claimed ?? {}).revenueBonus ?? 0;
+  const r = getResearchBonuses(s.research?.unlocked ?? []).revenueBonus ?? 0;
+  const p = s.permanentBonuses?.revenueBonus ?? 0;
+  const now = Date.now();
+  const water = (now < s.waterBoostEndsAt) ? 1 + (s.waterBoostStacks ?? 0) * 0.25 : 1;
+  const bee = (s.activeBoost && s.activeBoost.endsAt > now) ? (s.activeBoost.multiplier ?? 1) : 1;
+  return (1 + a) * (1 + r) * (1 + p) * water * bee;
+}
 
 // HUD façon Satisfactory : un seul chiffre central HUGE (€/s) avec couleur
 // gradient, et le reste replié en pills discrètes autour. Le brand titre
@@ -15,10 +29,16 @@ export default function HUD() {
   const config = GREENHOUSES[ghId];
   const setViewMode = useGameStore((s) => s.setViewMode);
 
-  // €/s mis à jour 2×/s. Lecture via getState() pour stabilité du timer.
+  // €/s + multiplicateur global mis à jour 2×/s. Lecture via getState()
+  // pour stabilité du timer.
   const [income, setIncome] = useState(0);
+  const [multi, setMulti] = useState(1);
   useEffect(() => {
-    const tick = () => setIncome(useGameStore.getState().getIncomePerSecond());
+    const tick = () => {
+      const s = useGameStore.getState();
+      setIncome(s.getIncomePerSecond());
+      setMulti(computeGlobalMultiplier(s));
+    };
     tick();
     const id = setInterval(tick, 500);
     return () => clearInterval(id);
@@ -48,6 +68,14 @@ export default function HUD() {
         <div className="hud-hero-value">
           + {formatNumber(income, { decimals: 1 })}
           <span className="hud-hero-unit"> €/s</span>
+          {multi > 1.01 && (
+            <span
+              className={`hud-hero-multi ${multi >= 2 ? 'is-hot' : ''}`}
+              title="Multiplicateur global — somme de tous tes bonus actifs (achievements, recherche, prestige, arrosoir, abeille)."
+            >
+              ✨ ×{multi.toFixed(2).replace('.', ',')}
+            </span>
+          )}
         </div>
         <div className="hud-hero-sub">
           <span className="hud-hero-stat">

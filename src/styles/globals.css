@@ -2408,6 +2408,8 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   box-shadow:
     0 0 10px rgba(0, 255, 136, .5),
     0 0 22px rgba(168, 85, 247, .35);
+}
+
 /* ─── Badges data permanents au-dessus des plantes (drei <Html>) ──── */
 .plant-data-badge {
   font-family: 'DM Mono', monospace;
@@ -2780,6 +2782,8 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 }
 .reduced-motion .plants-row-v2--mature {
   transform: none;
+}
+
 /* ─── V4 — Micro-animations modernes (cards, boutons, badges) ────────────
    Tous les effets sont additifs : appliqués sur :hover / :active uniquement,
    donc aucune régression au repos. Respecte prefers-reduced-motion + .reduced-motion
@@ -2957,6 +2961,8 @@ button:disabled { cursor: not-allowed; opacity: .4; }
     0 0 4px rgba(13,17,14,.9),
     0 0 10px rgba(212,168,75,.55);
   box-shadow: 0 0 14px -2px rgba(212,168,75,.35);
+}
+
 /* ─── V5 — Confetti & Prestige flash ─────────────────────────────────────
    Overlay HTML par-dessus le canvas R3F. pointer-events:none pour ne pas
    intercepter les clics. z-index très élevé (au-dessus des modales). */
@@ -3145,6 +3151,56 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   gap: 4px;
 }
 
+/* Multiplicateur global — pill compact à droite du chiffre €/s
+   (la signature Tycoon : on voit d'un coup d'œil son boost actif). */
+.hud-hero-multi {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 12px;
+  padding: 3px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  vertical-align: middle;
+  color: var(--green2);
+  background: rgba(126,200,122,.12);
+  border: 1px solid rgba(126,200,122,.35);
+  border-radius: 999px;
+  letter-spacing: 0;
+  -webkit-text-fill-color: var(--green2);
+  pointer-events: auto;
+  cursor: help;
+  transition: transform .18s ease, background .18s ease;
+}
+.hud-hero-multi:hover {
+  transform: scale(1.04);
+  background: rgba(126,200,122,.18);
+}
+.hud-hero-multi.is-hot {
+  color: var(--gold);
+  -webkit-text-fill-color: var(--gold);
+  background: rgba(212,168,75,.14);
+  border-color: rgba(212,168,75,.5);
+  animation: hud-multi-pulse 1.4s ease-in-out infinite;
+}
+@keyframes hud-multi-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212,168,75,.0); }
+  50%      { box-shadow: 0 0 14px 0 rgba(212,168,75,.45); }
+}
+.theme-neon .hud-hero-multi {
+  color: #00ff88;
+  -webkit-text-fill-color: #00ff88;
+  border-color: rgba(0,255,136,.5);
+  background: rgba(0,255,136,.1);
+}
+.theme-neon .hud-hero-multi.is-hot {
+  color: #ffd166;
+  -webkit-text-fill-color: #ffd166;
+  border-color: rgba(255,209,102,.6);
+  background: rgba(255,209,102,.12);
+}
+
 /* Thème néon : pousse encore les glows du hero */
 .theme-neon .hud-hero-value {
   filter: drop-shadow(0 0 18px rgba(0,255,136,.55));
@@ -3167,6 +3223,7 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   .hud-hero-value { font-size: 38px; }
   .hud-hero-unit { font-size: 14px; }
   .hud-hero-sub { font-size: 11px; gap: 10px; }
+  .hud-hero-multi { font-size: 11px; margin-left: 6px; padding: 2px 7px; }
   .hud-pill { padding: 6px 10px; font-size: 11px; }
   .hud-pill-text { display: none; }
 }
