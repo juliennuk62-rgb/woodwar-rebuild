@@ -2,122 +2,105 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import { getToonGradient } from './toon.js';
 
-// Sol en bois chaud (#8B6914) + charpente métallique (#C8C8B0)
-// + panneaux de verre semi-transparents (rgba(200,230,200,0.15)).
-// Palette directe du GDD §13 — Prompt 2.
-const WOOD = '#8b6914';
-const WOOD_DARK = '#6a4f0f';
-const METAL = '#c8c8b0';
-const METAL_DARK = '#9a9a86';
-const GLASS = '#bfe0bf';
+// Couleur du sol + charpente + verre selon le biome de la serre (Prompt 8).
+// Tempérée → bois chaud + métal. Tropicale → bois sombre + verre vert.
+// Aride → grès + ironwork + verre safran. Arctique → ice-blue + steel.
+const THEMES = {
+  temperate: { wood: '#8b6914', woodDark: '#6a4f0f', metal: '#c8c8b0', metalDark: '#9a9a86', glass: '#bfe0bf' },
+  tropical:  { wood: '#5e3a20', woodDark: '#42271a', metal: '#9bc4a8', metalDark: '#6f9a82', glass: '#a8d4c8' },
+  arid:      { wood: '#a87a4a', woodDark: '#7a5530', metal: '#c8b88c', metalDark: '#9a8a64', glass: '#e8d8a8' },
+  arctic:    { wood: '#a0b8c0', woodDark: '#7a8a90', metal: '#c8d4e0', metalDark: '#8aa0b0', glass: '#d8e8f0' },
+};
 
 const FLOOR_WIDTH = 13;
 const FLOOR_DEPTH = 10;
 const WALL_HEIGHT = 3.2;
 
-export default function GreenhouseFloor({ accent = '#7ec87a' }) {
+export default function GreenhouseFloor({ accent = '#7ec87a', biome = 'temperate' }) {
   const grad = useMemo(() => getToonGradient(), []);
   const planks = useMemo(() => buildPlankPositions(), []);
   const grid = useMemo(() => buildGridGeometry(), []);
+  const theme = THEMES[biome] ?? THEMES.temperate;
 
   return (
     <group>
-      {/* ── Sol en bois ───────────────────────────────────────── */}
-      <mesh position={[0, -0.05, 0]} receiveShadow={false}>
+      {/* ── Sol ───────────────────────────────────────────────── */}
+      <mesh position={[0, -0.05, 0]}>
         <boxGeometry args={[FLOOR_WIDTH, 0.08, FLOOR_DEPTH]} />
-        <meshToonMaterial color={WOOD} gradientMap={grad} />
+        <meshToonMaterial color={theme.wood} gradientMap={grad} />
       </mesh>
-
-      {/* Lattes de bois — fines bandes pour donner du grain */}
       {planks.map((p, i) => (
         <mesh key={i} position={[0, 0, p]}>
           <boxGeometry args={[FLOOR_WIDTH - 0.1, 0.005, 0.04]} />
-          <meshToonMaterial color={WOOD_DARK} gradientMap={grad} />
+          <meshToonMaterial color={theme.woodDark} gradientMap={grad} />
         </mesh>
       ))}
-
-      {/* Liseré accent pour bien voir le périmètre */}
       <mesh position={[0, 0.005, 0]}>
         <boxGeometry args={[FLOOR_WIDTH + 0.2, 0.012, FLOOR_DEPTH + 0.2]} />
         <meshBasicMaterial color={accent} transparent opacity={0.18} />
       </mesh>
-
-      {/* Grille douce — repère pour les slots */}
       <lineSegments geometry={grid}>
         <lineBasicMaterial color={accent} transparent opacity={0.1} />
       </lineSegments>
 
-      {/* ── Charpente métallique ──────────────────────────────── */}
-      <Frame grad={grad} />
-
-      {/* ── Panneaux de verre ────────────────────────────────── */}
-      <GlassPanels />
+      <Frame grad={grad} theme={theme} />
+      <GlassPanels glass={theme.glass} />
     </group>
   );
 }
 
-// Charpente : 4 piliers d'angle + 4 traverses hautes + 2 poutres faîtières
-function Frame({ grad }) {
+function Frame({ grad, theme }) {
   const halfW = FLOOR_WIDTH / 2;
   const halfD = FLOOR_DEPTH / 2;
   const corners = [
     [-halfW,  halfD], [ halfW,  halfD],
     [-halfW, -halfD], [ halfW, -halfD],
   ];
-
   return (
     <group>
-      {/* Piliers d'angle */}
       {corners.map(([x, z], i) => (
         <mesh key={i} position={[x, WALL_HEIGHT / 2, z]}>
           <cylinderGeometry args={[0.08, 0.08, WALL_HEIGHT, 6]} />
-          <meshToonMaterial color={METAL} gradientMap={grad} />
+          <meshToonMaterial color={theme.metal} gradientMap={grad} />
         </mesh>
       ))}
-
-      {/* Traverses hautes — 4 cadres au sommet des piliers */}
       <mesh position={[0, WALL_HEIGHT, halfD]}>
         <boxGeometry args={[FLOOR_WIDTH, 0.08, 0.08]} />
-        <meshToonMaterial color={METAL} gradientMap={grad} />
+        <meshToonMaterial color={theme.metal} gradientMap={grad} />
       </mesh>
       <mesh position={[0, WALL_HEIGHT, -halfD]}>
         <boxGeometry args={[FLOOR_WIDTH, 0.08, 0.08]} />
-        <meshToonMaterial color={METAL} gradientMap={grad} />
+        <meshToonMaterial color={theme.metal} gradientMap={grad} />
       </mesh>
       <mesh position={[ halfW, WALL_HEIGHT, 0]}>
         <boxGeometry args={[0.08, 0.08, FLOOR_DEPTH]} />
-        <meshToonMaterial color={METAL_DARK} gradientMap={grad} />
+        <meshToonMaterial color={theme.metalDark} gradientMap={grad} />
       </mesh>
       <mesh position={[-halfW, WALL_HEIGHT, 0]}>
         <boxGeometry args={[0.08, 0.08, FLOOR_DEPTH]} />
-        <meshToonMaterial color={METAL_DARK} gradientMap={grad} />
+        <meshToonMaterial color={theme.metalDark} gradientMap={grad} />
       </mesh>
-
-      {/* Poutre faîtière */}
       <mesh position={[0, WALL_HEIGHT + 1.2, 0]}>
         <boxGeometry args={[FLOOR_WIDTH, 0.1, 0.1]} />
-        <meshToonMaterial color={METAL} gradientMap={grad} />
+        <meshToonMaterial color={theme.metal} gradientMap={grad} />
       </mesh>
-
-      {/* Toit en pente — 2 pans qui se rejoignent au faîte */}
       <mesh position={[0, WALL_HEIGHT + 0.6, halfD / 2]} rotation={[Math.PI / 6, 0, 0]}>
         <boxGeometry args={[FLOOR_WIDTH, 0.04, FLOOR_DEPTH * 0.6]} />
-        <meshLambertMaterial color={GLASS} transparent opacity={0.2} />
+        <meshLambertMaterial color={theme.glass} transparent opacity={0.2} />
       </mesh>
       <mesh position={[0, WALL_HEIGHT + 0.6, -halfD / 2]} rotation={[-Math.PI / 6, 0, 0]}>
         <boxGeometry args={[FLOOR_WIDTH, 0.04, FLOOR_DEPTH * 0.6]} />
-        <meshLambertMaterial color={GLASS} transparent opacity={0.2} />
+        <meshLambertMaterial color={theme.glass} transparent opacity={0.2} />
       </mesh>
     </group>
   );
 }
 
-// 4 panneaux de verre semi-transparents avec montants discrets
-function GlassPanels() {
+function GlassPanels({ glass }) {
   const halfW = FLOOR_WIDTH / 2;
   const halfD = FLOOR_DEPTH / 2;
   const wallProps = (
-    <meshLambertMaterial color={GLASS} transparent opacity={0.12} depthWrite={false} />
+    <meshLambertMaterial color={glass} transparent opacity={0.12} depthWrite={false} />
   );
   return (
     <>

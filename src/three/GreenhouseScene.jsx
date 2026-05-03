@@ -35,7 +35,7 @@ export default function GreenhouseScene() {
         <SceneLights season={season} accent={config.accentColor} />
 
         <Suspense fallback={null}>
-          <GreenhouseFloor color={config.floorColor} accent={config.accentColor} />
+          <GreenhouseFloor accent={config.accentColor} biome={ghId} />
           {slots.map((slot) => (
             <PlantSlot key={slot.id} slot={slot} />
           ))}

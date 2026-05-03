@@ -65,14 +65,14 @@ function tick() {
     });
   }
 
-  // ── 4. Auto-vente des plantes matures ──────────────────────
-  const ghId = store.activeGreenhouse;
-  const gh = store.greenhouses[ghId];
-  if (gh && gh.plants.length) {
+  // ── 4. Auto-vente des plantes matures dans TOUTES les serres débloquées
+  for (const ghId of Object.keys(store.greenhouses)) {
+    const gh = store.greenhouses[ghId];
+    if (!gh.unlocked || !gh.plants.length) continue;
     for (const plant of gh.plants) {
       const { stage } = getPlantStage(plant, now, gh, store);
       if (stage === 'mature') {
-        store.harvestPlant(plant.slotId, { manual: false });
+        store.harvestPlant(plant.slotId, { manual: false, greenhouseId: ghId });
       }
     }
   }

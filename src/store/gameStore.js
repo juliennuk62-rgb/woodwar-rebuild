@@ -26,6 +26,7 @@ import {
   hybridizationCost,
   hybridizationDurationMs,
 } from '../mechanics/hybridation.js';
+import { getPrestigePreview, buildPrestigeReset } from '../engine/prestige.js';
 
 function makeInitialGreenhouseState(id) {
   const cfg = GREENHOUSES[id];
@@ -229,17 +230,63 @@ export const useGameStore = create((set, get) => ({
     return planted;
   },
 
+  // ─── Navigation entre serres (Prompt 8) ──────────────────────────
+  switchGreenhouse: (id) => {
+    const s = get();
+    if (!s.greenhouses[id]?.unlocked) return false;
+    set({ activeGreenhouse: id });
+    return true;
+  },
+
+  unlockGreenhouse: (id) => {
+    const s = get();
+    const gh = s.greenhouses[id];
+    const config = GREENHOUSES[id];
+    if (!gh || !config) return false;
+    if (gh.unlocked) return false;
+    if (s.currency.euros < config.unlockCost) return false;
+    set((cur) => ({
+      currency: { ...cur.currency, euros: cur.currency.euros - config.unlockCost },
+      greenhouses: {
+        ...cur.greenhouses,
+        [id]: { ...cur.greenhouses[id], unlocked: true },
+      },
+      activeGreenhouse: id,
+    }));
+    return true;
+  },
+
+  // ─── Prestige ────────────────────────────────────────────────────
+  getPrestigePreview: (greenhouseId) => getPrestigePreview(greenhouseId, get()),
+
+  applyPrestige: (greenhouseId) => {
+    const s = get();
+    const reset = buildPrestigeReset(greenhouseId, s);
+    if (!reset) return null;
+    set((cur) => ({
+      greenhouses: { ...cur.greenhouses, [greenhouseId]: reset.newGh },
+      stats: {
+        ...cur.stats,
+        firstPrestigeAt: cur.stats.firstPrestigeAt ?? Date.now(),
+      },
+    }));
+    return reset.tokensGained;
+  },
+
   // ─── Récolte ─────────────────────────────────────────────────────
   // GDD §07 : sans jardinier, le slot reste vide après vente. Avec jardinier,
   // la plante est replantée automatiquement (cycle continu).
+  // `opts.greenhouseId` permet de récolter une plante d'une serre non-active
+  // (utile pour le tick qui doit gérer toutes les serres débloquées).
   harvestPlant: (slotId, opts = {}) => {
     const s = get();
-    const ghId = s.activeGreenhouse;
+    const ghId = opts.greenhouseId ?? s.activeGreenhouse;
     const gh = s.greenhouses[ghId];
-    const plant = gh.plants.find((p) => p.slotId === slotId);
+    const plant = gh?.plants?.find((p) => p.slotId === slotId);
     if (!plant) return 0;
 
-    const species = PLANTS[plant.speciesId];
+    const species = PLANTS[plant.speciesId] ?? s.hybrids[plant.speciesId];
+    if (!species) return 0;
     const elapsed = (Date.now() - plant.plantedAt) / 1000;
     if (elapsed < species.growTime) return 0;
 
@@ -290,8 +337,9 @@ export const useGameStore = create((set, get) => ({
       floatingNumbers: [
         ...cur.floatingNumbers,
         {
-          id: `${slotId}-${Date.now()}`,
+          id: `${ghId}-${slotId}-${Date.now()}`,
           slotId,
+          greenhouseId: ghId,
           amount: revenue,
           kind: opts.manual ? 'manual' : 'auto',
           createdAt: Date.now(),
@@ -364,11 +412,16 @@ export const useGameStore = create((set, get) => ({
     return true;
   },
 
-  // ─── Income forecast ─────────────────────────────────────────────
+  // ─── Income forecast (somme sur toutes serres débloquées) ────────
   getIncomePerSecond: () => {
     const s = get();
-    const gh = s.greenhouses[s.activeGreenhouse];
-    return computeIncomePerSecond(gh, s.market, s);
+    let total = 0;
+    for (const id of Object.keys(s.greenhouses)) {
+      const gh = s.greenhouses[id];
+      if (!gh.unlocked) continue;
+      total += computeIncomePerSecond(gh, s.market, s);
+    }
+    return total;
   },
 
   // ─── UI panel ────────────────────────────────────────────────────

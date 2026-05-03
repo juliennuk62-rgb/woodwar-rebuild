@@ -16,7 +16,9 @@ export default function PlantSlot({ slot }) {
   const plant = greenhouse.plants.find((p) => p.slotId === slot.id);
   const harvest = useGameStore((s) => s.harvestPlant);
   const slotFloats = useGameStore((s) =>
-    s.floatingNumbers.filter((f) => f.slotId === slot.id)
+    s.floatingNumbers.filter(
+      (f) => f.slotId === slot.id && (f.greenhouseId == null || f.greenhouseId === s.activeGreenhouse)
+    )
   );
 
   const [hover, setHover] = useState(false);

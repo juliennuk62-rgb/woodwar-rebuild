@@ -8,6 +8,8 @@ import MarketPanel from './ui/MarketPanel.jsx';
 import ExpeditionPanel from './ui/ExpeditionPanel.jsx';
 import LabPanel from './ui/LabPanel.jsx';
 import SettingsModal from './ui/SettingsModal.jsx';
+import GreenhouseSelector from './ui/GreenhouseSelector.jsx';
+import PrestigeModal from './ui/PrestigeModal.jsx';
 import OfflineModal from './ui/OfflineModal.jsx';
 import DiscoveryModal from './ui/DiscoveryModal.jsx';
 import PanelLauncher from './ui/PanelLauncher.jsx';
@@ -36,6 +38,8 @@ export default function App() {
     <>
       <GreenhouseScene />
       <HUD />
+      <GreenhouseSelector />
+      <PrestigeModal />
       <PlantsList />
       <PanelLauncher />
       <ShopPanel />

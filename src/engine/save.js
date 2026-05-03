@@ -81,53 +81,56 @@ export function applyOfflineProgress() {
   elapsedMs = Math.min(elapsedMs, GAME_CONFIG.offlineCapMs);
   const eff = GAME_CONFIG.offlineEfficiency;
 
-  const ghId = store.activeGreenhouse;
-  const gh = store.greenhouses[ghId];
-  if (!gh || !gh.plants.length) return { duration: elapsedMs, euros: 0, plants: 0, capped: false };
-
-  // On utilise l'état marché courant (saison/météo) pour estimer le revenu offline.
-  // Calculer l'évolution exacte sur N heures serait disproportionné — c'est un MVP.
+  // On simule le retour pour TOUTES les serres débloquées (Prompt 8).
   let totalEuros = 0;
   let totalPlants = 0;
-  const newPlants = [];
+  const newGreenhouses = { ...store.greenhouses };
 
-  for (const plant of gh.plants) {
-    const cycleSeconds = getGrowTime(plant.speciesId, gh, store);
-    const revenuePerCycle = Math.floor(
-      computePlantRevenue(plant, gh, store.market, { manual: false }, store) * eff
-    );
+  for (const ghId of Object.keys(store.greenhouses)) {
+    const gh = store.greenhouses[ghId];
+    if (!gh.unlocked || !gh.plants.length) continue;
 
-    const elapsedSec = Math.min(elapsedMs / 1000, GAME_CONFIG.offlineCapMs / 1000);
-    const { remaining } = getPlantStage(plant, lastSave, gh, store);
+    const newPlants = [];
+    for (const plant of gh.plants) {
+      const cycleSeconds = getGrowTime(plant.speciesId, gh, store);
+      const revenuePerCycle = Math.floor(
+        computePlantRevenue(plant, gh, store.market, { manual: false }, store) * eff
+      );
 
-    let secondsLeft = elapsedSec;
-    let cycles = 0;
+      const elapsedSec = Math.min(elapsedMs / 1000, GAME_CONFIG.offlineCapMs / 1000);
+      const { remaining } = getPlantStage(plant, lastSave, gh, store);
 
-    if (remaining > 0) {
-      if (secondsLeft >= remaining) {
-        cycles += 1;
-        secondsLeft -= remaining;
+      let secondsLeft = elapsedSec;
+      let cycles = 0;
+
+      if (remaining > 0) {
+        if (secondsLeft >= remaining) {
+          cycles += 1;
+          secondsLeft -= remaining;
+        } else {
+          newPlants.push(plant);
+          continue;
+        }
       } else {
-        newPlants.push(plant);
-        continue;
+        cycles += 1;
       }
-    } else {
-      cycles += 1; // déjà mature au moment du retour
+
+      cycles += Math.floor(secondsLeft / cycleSeconds);
+      secondsLeft -= Math.floor(secondsLeft / cycleSeconds) * cycleSeconds;
+
+      totalEuros += cycles * revenuePerCycle;
+      totalPlants += cycles;
+
+      newPlants.push({ ...plant, plantedAt: now - secondsLeft * 1000 });
     }
 
-    cycles += Math.floor(secondsLeft / cycleSeconds);
-    secondsLeft -= Math.floor(secondsLeft / cycleSeconds) * cycleSeconds;
-
-    totalEuros += cycles * revenuePerCycle;
-    totalPlants += cycles;
-
-    newPlants.push({
-      ...plant,
-      plantedAt: now - secondsLeft * 1000,
-    });
+    newGreenhouses[ghId] = { ...gh, plants: newPlants };
   }
 
-  // Applique les gains
+  if (totalEuros === 0 && totalPlants === 0) {
+    return { duration: elapsedMs, euros: 0, plants: 0, capped: elapsedMs >= GAME_CONFIG.offlineCapMs };
+  }
+
   useGameStore.setState((s) => ({
     currency: {
       ...s.currency,
@@ -139,10 +142,7 @@ export function applyOfflineProgress() {
       totalPlantsGrown: s.stats.totalPlantsGrown + totalPlants,
       totalEarned: s.stats.totalEarned + totalEuros,
     },
-    greenhouses: {
-      ...s.greenhouses,
-      [ghId]: { ...s.greenhouses[ghId], plants: newPlants },
-    },
+    greenhouses: newGreenhouses,
   }));
 
   return {
