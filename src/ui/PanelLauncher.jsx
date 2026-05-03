@@ -48,6 +48,12 @@ export default function PanelLauncher() {
       icon: '🧭',
       hint: expeditionsHint(euros, lifetimeEuros, expeditions),
     },
+    {
+      id: 'lab',
+      label: 'Labo',
+      icon: '🧬',
+      hint: false,
+    },
   ];
 
   return (

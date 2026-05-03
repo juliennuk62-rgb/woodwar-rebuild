@@ -92,13 +92,13 @@ export function applyOfflineProgress() {
   const newPlants = [];
 
   for (const plant of gh.plants) {
-    const cycleSeconds = getGrowTime(plant.speciesId, gh);
+    const cycleSeconds = getGrowTime(plant.speciesId, gh, store);
     const revenuePerCycle = Math.floor(
-      computePlantRevenue(plant, gh, store.market, { manual: false }) * eff
+      computePlantRevenue(plant, gh, store.market, { manual: false }, store) * eff
     );
 
     const elapsedSec = Math.min(elapsedMs / 1000, GAME_CONFIG.offlineCapMs / 1000);
-    const { remaining } = getPlantStage(plant, lastSave, gh);
+    const { remaining } = getPlantStage(plant, lastSave, gh, store);
 
     let secondsLeft = elapsedSec;
     let cycles = 0;

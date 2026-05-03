@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore.js';
-import { PLANTS } from '../config/plants.js';
-import { getPlantStage } from '../engine/economy.js';
+import { getPlantStage, getSpeciesData } from '../engine/economy.js';
 import { formatDuration } from '../utils/numberFormat.js';
 
 // Sidebar gauche (desktop) : liste les plantes en cours dans la serre active
@@ -28,12 +27,14 @@ export default function PlantsList() {
     );
   }
 
+  const state = useGameStore.getState();
   // Tri : matures d'abord, puis par % de croissance descendant
   const enriched = greenhouse.plants
     .map((p) => {
-      const stage = getPlantStage(p, undefined, greenhouse);
-      return { plant: p, ...stage, species: PLANTS[p.speciesId] };
+      const stage = getPlantStage(p, undefined, greenhouse, state);
+      return { plant: p, ...stage, species: getSpeciesData(p.speciesId, state) };
     })
+    .filter((e) => e.species)
     .sort((a, b) => b.ratio - a.ratio);
 
   return (

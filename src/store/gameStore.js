@@ -16,6 +16,16 @@ import { loadSave, applyOfflineProgress } from '../engine/save.js';
 import { SEASONS, SEASON_DURATION_MS, WEATHER_DURATION_MS, pickWeatherForSeason } from '../mechanics/weather.js';
 import { canStart, buildExpedition, generateReward } from '../mechanics/expeditions.js';
 import { EXPEDITIONS } from '../config/expeditions.js';
+import {
+  TECHS,
+  isUnlockable,
+  getResearchBonuses,
+} from '../mechanics/research.js';
+import {
+  buildHybrid,
+  hybridizationCost,
+  hybridizationDurationMs,
+} from '../mechanics/hybridation.js';
 
 function makeInitialGreenhouseState(id) {
   const cfg = GREENHOUSES[id];
@@ -72,7 +82,10 @@ function makeInitialState() {
     },
 
     expeditions: { active: [], completed: 0 },
-    research: { unlocked: [], inProgress: null },
+    research: { unlocked: [], inProgress: null },  // inProgress: { techId, startedAt, endsAt }
+    hybrids: {},                                    // { hyb_001: { ...speciesData, parent1, parent2, trait, createdAt } }
+    hybridIndex: 0,                                 // incrémente pour générer les IDs
+    lab: { active: [] },                            // { id, parent1, parent2, startedAt, endsAt, cost }
     quests: { story: {}, daily: { lastRefresh: null, active: [] }, weekly: { points: 0 } },
     stats: {
       totalPlantsGrown: 0,
@@ -230,7 +243,7 @@ export const useGameStore = create((set, get) => ({
     const elapsed = (Date.now() - plant.plantedAt) / 1000;
     if (elapsed < species.growTime) return 0;
 
-    const revenue = computePlantRevenue(plant, gh, s.market, { manual: !!opts.manual });
+    const revenue = computePlantRevenue(plant, gh, s.market, { manual: !!opts.manual }, s);
 
     // Replantation auto si au moins 1 jardinier embauché dans cette serre.
     let newPlants;
@@ -355,7 +368,7 @@ export const useGameStore = create((set, get) => ({
   getIncomePerSecond: () => {
     const s = get();
     const gh = s.greenhouses[s.activeGreenhouse];
-    return computeIncomePerSecond(gh, s.market);
+    return computeIncomePerSecond(gh, s.market, s);
   },
 
   // ─── UI panel ────────────────────────────────────────────────────
@@ -440,6 +453,128 @@ export const useGameStore = create((set, get) => ({
   },
 
   dismissDiscovery: () => set({ currentDiscovery: null }),
+
+  // ─── Helpers d'accès aux espèces (natives + hybrides) ────────────
+  getSpeciesData: (speciesId) => {
+    return PLANTS[speciesId] ?? get().hybrids[speciesId] ?? null;
+  },
+
+  // ─── Recherche (Prompt 7) ────────────────────────────────────────
+  canStartResearch: (techId) => {
+    const s = get();
+    const tech = TECHS[techId];
+    if (!tech) return { ok: false, reason: 'unknown' };
+    if (s.research.inProgress) return { ok: false, reason: 'busy' };
+    if (s.research.unlocked.includes(techId)) return { ok: false, reason: 'done' };
+    if (!isUnlockable(techId, s.research.unlocked)) return { ok: false, reason: 'prereq' };
+    if (s.currency.rareSeeds < tech.cost) return { ok: false, reason: 'broke' };
+    return { ok: true };
+  },
+
+  startResearch: (techId) => {
+    const s = get();
+    const check = get().canStartResearch(techId);
+    if (!check.ok) return false;
+    const tech = TECHS[techId];
+    set((cur) => ({
+      currency: { ...cur.currency, rareSeeds: cur.currency.rareSeeds - tech.cost },
+      research: {
+        ...cur.research,
+        inProgress: { techId, startedAt: Date.now(), endsAt: Date.now() + tech.durationMs },
+      },
+    }));
+    return true;
+  },
+
+  // Appelé par tick.js quand le timer arrive à 0
+  completeResearch: () => {
+    const s = get();
+    const ip = s.research.inProgress;
+    if (!ip) return false;
+    if (Date.now() < ip.endsAt) return false;
+    set((cur) => ({
+      research: {
+        unlocked: [...cur.research.unlocked, ip.techId],
+        inProgress: null,
+      },
+    }));
+    return true;
+  },
+
+  getResearchBonuses: () => getResearchBonuses(get().research.unlocked),
+
+  // ─── Hybridation (Prompt 7) ─────────────────────────────────────
+  // On peut hybrider deux espèces qu'on a au moins découvertes (owned >= 1).
+  canHybridize: (parent1Id, parent2Id) => {
+    const s = get();
+    if (!parent1Id || !parent2Id) return { ok: false, reason: 'select' };
+    if (parent1Id === parent2Id) return { ok: false, reason: 'same' };
+    const cost = hybridizationCost(s.research.unlocked);
+    if (s.currency.rareSeeds < cost) return { ok: false, reason: 'broke' };
+    const max = s.research.unlocked.includes('lab_3') ? 2 : 1;
+    if (s.lab.active.length >= max) return { ok: false, reason: 'busy' };
+    if (!PLANTS[parent1Id] || !PLANTS[parent2Id]) return { ok: false, reason: 'unknown' };
+    if (!s.species[parent1Id]?.discovered) return { ok: false, reason: 'undiscovered1' };
+    if (!s.species[parent2Id]?.discovered) return { ok: false, reason: 'undiscovered2' };
+    return { ok: true };
+  },
+
+  startHybridization: (parent1Id, parent2Id) => {
+    const s = get();
+    const check = get().canHybridize(parent1Id, parent2Id);
+    if (!check.ok) return false;
+    const cost = hybridizationCost(s.research.unlocked);
+    const duration = hybridizationDurationMs(PLANTS[parent1Id], PLANTS[parent2Id], s.research.unlocked);
+
+    set((cur) => ({
+      currency: { ...cur.currency, rareSeeds: cur.currency.rareSeeds - cost },
+      lab: {
+        ...cur.lab,
+        active: [
+          ...cur.lab.active,
+          {
+            id: `lab-${Date.now()}`,
+            parent1Id,
+            parent2Id,
+            startedAt: Date.now(),
+            endsAt: Date.now() + duration,
+            cost,
+          },
+        ],
+      },
+    }));
+    return true;
+  },
+
+  // Appelé par tick.js OU par clic sur "Récupérer l'hybride".
+  completeHybridization: (labId) => {
+    const s = get();
+    const job = s.lab.active.find((j) => j.id === labId);
+    if (!job) return null;
+    if (Date.now() < job.endsAt) return null;
+
+    const newIndex = s.hybridIndex + 1;
+    const hybrid = buildHybrid({
+      parent1Id: job.parent1Id,
+      parent2Id: job.parent2Id,
+      hybridIndex: newIndex,
+      researchUnlocked: s.research.unlocked,
+    });
+    if (!hybrid) return null;
+
+    set((cur) => ({
+      hybrids: { ...cur.hybrids, [hybrid.id]: hybrid },
+      hybridIndex: newIndex,
+      lab: { ...cur.lab, active: cur.lab.active.filter((j) => j.id !== labId) },
+      species: {
+        ...cur.species,
+        [hybrid.id]: { discovered: true, owned: 0, totalGrown: 0 },
+      },
+      stats: { ...cur.stats, totalHybridsCreated: (cur.stats.totalHybridsCreated ?? 0) + 1 },
+      currentDiscovery: { speciesId: hybrid.id, source: 'hybrid' },
+    }));
+    return hybrid;
+  },
 
   // ─── Save export / import ────────────────────────────────────────
   exportSave: () => {

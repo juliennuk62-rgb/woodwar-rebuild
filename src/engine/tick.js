@@ -70,16 +70,28 @@ function tick() {
   const gh = store.greenhouses[ghId];
   if (gh && gh.plants.length) {
     for (const plant of gh.plants) {
-      const { stage } = getPlantStage(plant, now, gh);
+      const { stage } = getPlantStage(plant, now, gh, store);
       if (stage === 'mature') {
         store.harvestPlant(plant.slotId, { manual: false });
       }
     }
   }
 
-  // ── 5. Expéditions : on ne réclame pas auto, on laisse au joueur le plaisir
-  //    d'ouvrir la "caisse" — c'est juste une feature visuelle dans le panneau.
+  // ── 5. Recherche : finalisation auto quand le timer expire
+  if (store.research.inProgress && now >= store.research.inProgress.endsAt) {
+    store.completeResearch();
+  }
 
+  // ── 6. Lab (hybridation) : finalisation auto. Une découverte sera proposée
+  //    automatiquement via currentDiscovery.
+  for (const job of store.lab.active ?? []) {
+    if (now >= job.endsAt) {
+      store.completeHybridization(job.id);
+      break; // une seule par tick — la modale s'affichera
+    }
+  }
+
+  // ── 7. Expéditions : réclamées manuellement par le joueur (pas ici).
   store.setLastTick(now);
 }
 

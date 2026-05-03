@@ -1,6 +1,7 @@
 import { useGameStore } from '../store/gameStore.js';
-import { PLANTS } from '../config/plants.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
+import { getSpeciesData } from '../engine/economy.js';
+import { TRAITS } from '../mechanics/hybridation.js';
 import { formatDuration } from '../utils/numberFormat.js';
 
 const BIOME_LABELS = {
@@ -17,10 +18,14 @@ export default function DiscoveryModal() {
   const discovery = useGameStore((s) => s.currentDiscovery);
   const dismiss = useGameStore((s) => s.dismissDiscovery);
   const greenhouses = useGameStore((s) => s.greenhouses);
+  const state = useGameStore.getState();
 
   if (!discovery) return null;
-  const species = PLANTS[discovery.speciesId];
+  const species = getSpeciesData(discovery.speciesId, state);
   if (!species) return null;
+  const isHybrid = !!species.isHybrid;
+  const tagLabel = isHybrid ? 'Hybride synthétisé' : 'Nouvelle découverte';
+  const trait = species.trait ? TRAITS[species.trait] : null;
 
   // La serre où cette espèce peut être plantée
   const targetGh = Object.values(GREENHOUSES).find((g) => g.species.includes(species.id));
@@ -33,7 +38,8 @@ export default function DiscoveryModal() {
         <div className="discovery-banner" style={{ background: `radial-gradient(circle at center, ${species.petalColor}33, transparent 70%)` }}>
           <div className="discovery-icon">{species.icon}</div>
         </div>
-        <div className="discovery-tag">Nouvelle découverte</div>
+        <div className="discovery-tag">{tagLabel}</div>
+        {trait && <div className="discovery-trait">{trait.icon} {trait.name} — {trait.description}</div>}
         <h2 id="disc-title">{species.name}</h2>
         {species.scientificName && (
           <div className="discovery-sci"><em>{species.scientificName}</em></div>

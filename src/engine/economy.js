@@ -1,5 +1,5 @@
 // Calculs économiques purs — sans effet de bord, testables.
-// GDD §06 (Devises & Économie) + §07 (Mécaniques) + Prompt 3 + Prompt 4.
+// GDD §06 (Devises & Économie) + §07 (Mécaniques) + Prompt 3, 4, 7.
 import { PLANTS } from '../config/plants.js';
 import { GAME_CONFIG } from '../config/gameConfig.js';
 import { GARDENERS } from '../config/gardeners.js';
@@ -10,6 +10,14 @@ import {
   getSeasonGrowthMultiplier,
   getWeatherEffect,
 } from '../mechanics/weather.js';
+import { getResearchBonuses } from '../mechanics/research.js';
+import { TRAITS } from '../mechanics/hybridation.js';
+
+// Helper unifié : récupère les données d'une espèce (native PLANTS ou hybride).
+// `state` est optionnel : si non fourni, on ne regarde que PLANTS.
+export function getSpeciesData(speciesId, state) {
+  return PLANTS[speciesId] ?? state?.hybrids?.[speciesId] ?? null;
+}
 
 // ─── Marché ───────────────────────────────────────────────────
 export function computeMarketMultiplier(time, seed = 0) {
@@ -35,12 +43,14 @@ export function computeAllMarketPrices(time) {
 }
 
 // ─── État d'une plante en croissance ─────────────────────────
-// `greenhouse` est optionnel : si fourni, on applique l'upgrade lighting
-// pour réduire le temps de pousse (sinon on prend le growTime de base).
-export function getPlantStage(plant, now = Date.now(), greenhouse = null) {
+// `greenhouse` et `state` sont optionnels : si fournis, on applique
+// les upgrades + bonus de recherche pour réduire le temps de pousse.
+export function getPlantStage(plant, now = Date.now(), greenhouse = null, state = null) {
+  const sp = getSpeciesData(plant.speciesId, state);
+  const baseGrow = sp?.growTime ?? 60;
   const growTime = greenhouse
-    ? getGrowTime(plant.speciesId, greenhouse)
-    : PLANTS[plant.speciesId].growTime;
+    ? getGrowTime(plant.speciesId, greenhouse, state)
+    : baseGrow;
   const elapsed = (now - plant.plantedAt) / 1000;
   const ratio = Math.min(1, elapsed / growTime);
   let stage = 'seed';
@@ -50,13 +60,18 @@ export function getPlantStage(plant, now = Date.now(), greenhouse = null) {
 }
 
 // ─── Multiplicateurs ─────────────────────────────────────────
-// Lighting : réduit growTime
-export function getGrowTime(speciesId, greenhouse) {
-  const species = PLANTS[speciesId];
-  if (!greenhouse) return species.growTime;
-  const lightLevel = greenhouse.upgrades?.lighting ?? 0;
-  const reduction = lightLevel * UPGRADE_TYPES.lighting.effectPerLevel;
-  return species.growTime * Math.max(0.4, 1 - reduction);
+// Lighting + recherche réduisent growTime. Trait "fast_grower" sur un hybride
+// le divise par 2 directement dans hybrid.growTime — donc déjà appliqué.
+export function getGrowTime(speciesId, greenhouse, state) {
+  const species = getSpeciesData(speciesId, state);
+  if (!species) return 60;
+  const lightLevel = greenhouse?.upgrades?.lighting ?? 0;
+  const lightReduction = lightLevel * UPGRADE_TYPES.lighting.effectPerLevel;
+  const research = state?.research?.unlocked ?? [];
+  const researchReduction = getResearchBonuses(research).growTimeReduction;
+  // Les deux réductions s'appliquent multiplicativement
+  const factor = (1 - lightReduction) * (1 - researchReduction);
+  return species.growTime * Math.max(0.2, factor);
 }
 
 // Bonus manuel : +25% de base + bonus irrigation
@@ -98,14 +113,23 @@ export function hasAnyGardener(greenhouse) {
 
 // ─── Revenu d'une vente ──────────────────────────────────────
 // `marketState` = { prices, currentSeason, weather } — `marketPrices` accepté
-// aussi pour la rétro-compat. Le revenu prend en compte saison + météo.
-export function computePlantRevenue(plant, greenhouse, marketState, opts = {}) {
-  const species = PLANTS[plant.speciesId];
+// aussi pour la rétro-compat. Le revenu prend en compte saison + météo + recherche.
+// `state` est optionnel : permet d'accéder aux hybrides + bonus recherche.
+export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, state = null) {
+  const species = getSpeciesData(plant.speciesId, state);
+  if (!species) return 0;
+
   const prices = marketState?.prices ?? marketState ?? {};
   const season = marketState?.currentSeason ?? 'spring';
   const weather = marketState?.weather ?? 'sunny';
 
-  const market = prices[plant.speciesId] ?? 1.0;
+  let market = prices[plant.speciesId] ?? 1.0;
+  // Trait "fragrant" : marché jamais < 1.0
+  const traitId = species.trait;
+  if (traitId && TRAITS[traitId]?.marketFloor) {
+    market = Math.max(market, TRAITS[traitId].marketFloor);
+  }
+
   const upgrade = getUpgradeMultiplier(greenhouse);
   const prestige = getPrestigeMultiplier(greenhouse);
   const gardener = 1 + getGardenerBonus(greenhouse, plant.speciesId);
@@ -113,6 +137,8 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}) {
   const seasonGlobal = getSeasonRevenueMultiplier(season);
   const seasonSpecies = 1 + getSeasonMultiplier(plant.speciesId, season);
   const weatherBonus = 1 + getWeatherEffect(weather).revenueBonus;
+  const research = state?.research?.unlocked ?? [];
+  const researchBonus = 1 + getResearchBonuses(research).revenueBonus;
 
   return Math.floor(
     species.baseRevenue *
@@ -123,25 +149,30 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}) {
     manual *
     seasonGlobal *
     seasonSpecies *
-    weatherBonus
+    weatherBonus *
+    researchBonus
   );
 }
 
 // ─── Revenu prévisionnel par seconde ─────────────────────────
-// Pour afficher un €/s dans le HUD : on simule le revenu horaire de chaque plante
-// et on divise par son cycle complet.
-export function computeIncomePerSecond(greenhouse, marketState) {
+export function computeIncomePerSecond(greenhouse, marketState, state = null) {
   if (!greenhouse?.plants?.length) return 0;
   let total = 0;
   for (const plant of greenhouse.plants) {
-    const grow = getGrowTime(plant.speciesId, greenhouse);
-    const revenue = computePlantRevenue(plant, greenhouse, marketState, { manual: false });
-    // Sans jardinier : la plante ne se replante pas, donc le revenu n'est pas continu.
-    // On l'inclut quand même comme estimation "par cycle moyen" — c'est l'idée d'un
-    // tycoon : "potentiellement ce que tu peux faire en €/s si tu replantes".
+    const grow = getGrowTime(plant.speciesId, greenhouse, state);
+    const revenue = computePlantRevenue(plant, greenhouse, marketState, { manual: false }, state);
     total += revenue / grow;
   }
   return total;
+}
+
+// Slots effectifs : base + bonus recherche (slots_1/2/3 cumulent +2/+6/+12)
+export function getEffectiveSlots(greenhouse, state = null) {
+  if (!greenhouse) return 0;
+  const base = greenhouse.slots ?? 0;
+  const research = state?.research?.unlocked ?? [];
+  const extra = getResearchBonuses(research).extraSlots;
+  return base + extra;
 }
 
 // ─── Coûts (graines, jardiniers, upgrades) ────────────────────

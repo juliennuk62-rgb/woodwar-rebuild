@@ -1263,6 +1263,227 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 }
 .discovery-cta:hover { background: var(--green2); }
 
+/* ─── Lab panel (Prompt 7) ────────────────────────────────── */
+.lab-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border);
+}
+.lab-tab {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  padding: 12px 14px;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  transition: all .15s ease;
+  min-height: auto;
+}
+.lab-tab:hover { color: var(--text); }
+.lab-tab.active {
+  color: var(--green);
+  border-bottom-color: var(--green);
+}
+
+/* ─── Hybridation form ────────────────────────────────────── */
+.hybrid-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.hybrid-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hybrid-form .settings-select { width: 100%; }
+.hybrid-preview {
+  background: var(--surface2);
+  border: 1px dashed rgba(180,168,212,.4);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hybrid-preview-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+.hybrid-preview-row strong { color: var(--text); }
+
+.lab-active { margin-bottom: 18px; }
+.lab-job {
+  display: grid;
+  grid-template-columns: 70px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.lab-job.done { border-color: rgba(180,168,212,.5); background: rgba(180,168,212,.07); }
+.lab-job-icons { font-size: 22px; text-align: center; }
+.lab-job-title { font-family: 'Playfair Display', serif; font-size: 14px; }
+.lab-job-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  margin-bottom: 6px;
+}
+
+/* ─── Research tree ───────────────────────────────────────── */
+.research-active {
+  background: var(--surface2);
+  border: 1px solid var(--green);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.research-active-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+.research-active-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+
+.research-branch { margin-bottom: 18px; }
+.research-branch-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.research-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.research-node {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 4px 12px;
+  align-items: center;
+}
+.research-node.unlocked { border-color: rgba(126,200,122,.5); background: rgba(126,200,122,.06); }
+.research-node.locked { opacity: .5; }
+.research-node.progress { border-color: var(--gold); background: rgba(212,168,75,.05); }
+.research-node-tier {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  grid-row: 1;
+  grid-column: 1;
+}
+.research-node-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  grid-row: 1;
+  grid-column: 2;
+}
+.research-node-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+  grid-row: 2;
+  grid-column: 1 / span 2;
+}
+.research-node .badge,
+.research-node button {
+  grid-row: 1 / span 2;
+  grid-column: 3;
+}
+
+/* ─── Galerie ─────────────────────────────────────────────── */
+.gallery-card {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.gallery-icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 32px;
+}
+.gallery-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+}
+.gallery-sci {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.gallery-stats {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--green-pale);
+  flex-wrap: wrap;
+}
+.gallery-trait {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--gold);
+  margin-top: 5px;
+  letter-spacing: .05em;
+}
+.gallery-parents {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.gallery-owned {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.discovery-trait {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  margin: 4px 0 12px;
+  letter-spacing: .03em;
+}
+
 /* ─── Flash sur upgrade achetée ───────────────────────────── */
 .upgrade-card.flashing {
   animation: flash-buy .5s ease-out;

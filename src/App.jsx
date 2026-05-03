@@ -6,6 +6,7 @@ import GardenersPanel from './ui/GardenersPanel.jsx';
 import UpgradesPanel from './ui/UpgradesPanel.jsx';
 import MarketPanel from './ui/MarketPanel.jsx';
 import ExpeditionPanel from './ui/ExpeditionPanel.jsx';
+import LabPanel from './ui/LabPanel.jsx';
 import SettingsModal from './ui/SettingsModal.jsx';
 import OfflineModal from './ui/OfflineModal.jsx';
 import DiscoveryModal from './ui/DiscoveryModal.jsx';
@@ -42,6 +43,7 @@ export default function App() {
       {activePanel === 'upgrades' && <UpgradesPanel />}
       {activePanel === 'market' && <MarketPanel />}
       {activePanel === 'expeditions' && <ExpeditionPanel />}
+      {activePanel === 'lab' && <LabPanel />}
       <SettingsModal />
       <Onboarding />
       <DiscoveryModal />

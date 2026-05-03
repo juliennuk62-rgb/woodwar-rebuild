@@ -1,8 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGameStore } from '../store/gameStore.js';
-import { PLANTS } from '../config/plants.js';
-import { getPlantStage } from '../engine/economy.js';
+import { getPlantStage, getSpeciesData } from '../engine/economy.js';
 import { getToonGradient } from './toon.js';
 import { clickWasDrag } from './IsometricCamera.jsx';
 import PlantMesh from './PlantMesh.jsx';
@@ -31,7 +30,8 @@ export default function PlantSlot({ slot }) {
       wasMatureRef.current = false;
       return;
     }
-    const { ratio } = getPlantStage(plant, undefined, greenhouse);
+    const state = useGameStore.getState();
+    const { ratio } = getPlantStage(plant, undefined, greenhouse, state);
     if (Math.abs(ratio - growth) > 0.005) setGrowth(ratio);
 
     // Détection de floraison → spawn particules de pollen une fois
@@ -53,7 +53,7 @@ export default function PlantSlot({ slot }) {
   };
 
   const ready = plant && growth >= 1;
-  const accent = plant ? PLANTS[plant.speciesId].petalColor : '#7ec87a';
+  const accent = plant ? getSpeciesData(plant.speciesId, useGameStore.getState()).petalColor : '#7ec87a';
 
   return (
     <group
@@ -63,7 +63,7 @@ export default function PlantSlot({ slot }) {
       onClick={onClick}
     >
       <Pot accentHover={hover || ready} ready={ready} accent={accent} />
-      {plant && <PlantMesh species={PLANTS[plant.speciesId]} growth={growth} />}
+      {plant && <PlantMesh species={getSpeciesData(plant.speciesId, useGameStore.getState())} growth={growth} />}
       {plant && burstId > 0 && <PollenBurst key={burstId} color={accent} />}
       {slotFloats.map((f) => (
         <FloatingNumber3D
