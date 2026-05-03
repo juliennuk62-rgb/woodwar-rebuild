@@ -90,7 +90,18 @@ function shopAffordable(euros, lifetime) {
 
 function gardenersAffordable(euros, gh, ghId) {
   const list = GARDENERS_BY_GREENHOUSE[ghId] ?? [];
-  return list.some((g) => !gh.gardeners.includes(g.id) && euros >= g.cost);
+  // F8 : `gardeners` est désormais un objet `{ [id]: level }` (compat array
+  // pour les vieilles saves). Le coût d'amélioration grimpe avec le niveau.
+  const g = gh?.gardeners;
+  const getLevel = Array.isArray(g)
+    ? (id) => (g.includes(id) ? 1 : 0)
+    : (id) => (g?.[id] ?? 0);
+  return list.some((gar) => {
+    const level = getLevel(gar.id);
+    if (level >= 5) return false;
+    const cost = Math.round(gar.cost * Math.pow(2, level));
+    return euros >= cost;
+  });
 }
 
 function upgradesAffordable(euros, gh) {

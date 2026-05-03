@@ -28,7 +28,13 @@ export const STORY_QUESTS = [
     title: "Agnès n'est plus seule",
     description: 'Embauche ton premier jardinier.',
     target: 1,
-    progress: (s) => Math.max(0, ...Object.values(s.greenhouses).map((g) => g.gardeners?.length ?? 0)),
+    progress: (s) => Math.max(0, ...Object.values(s.greenhouses).map((g) => {
+      // Compat F8 : gardeners peut être array (legacy) ou objet { [id]: level }
+      const gd = g?.gardeners;
+      if (!gd) return 0;
+      if (Array.isArray(gd)) return gd.length;
+      return Object.values(gd).filter((lvl) => lvl > 0).length;
+    })),
     reward: { euros: 200 },
     prereq: 'q_first_euros',
   },

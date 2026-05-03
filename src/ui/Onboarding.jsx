@@ -88,9 +88,14 @@ export default function Onboarding() {
       if (step <= 3 && totalOwned >= 3) {
         advance(4);
       }
-      // Étape 5 : un jardinier embauché
+      // Étape 5 : un jardinier embauché (au moins niveau 1).
+      // `gardeners` est maintenant un objet { [id]: level } depuis F8 ;
+      // on supporte aussi le format legacy array.
       if (step <= 4) {
-        const hired = s.greenhouses[s.activeGreenhouse]?.gardeners?.length ?? 0;
+        const g = s.greenhouses[s.activeGreenhouse]?.gardeners;
+        const hired = Array.isArray(g)
+          ? g.length
+          : (g ? Object.values(g).filter((lvl) => lvl > 0).length : 0);
         if (hired >= 1) advance(5);
       }
       // Étape 6 : conserve l'étape 5 jusqu'au clic suivant
