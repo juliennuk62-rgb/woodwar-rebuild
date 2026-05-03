@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { useGameStore } from '../store/gameStore.js';
-import { getPlantStage, getSpeciesData } from '../engine/economy.js';
+import { getPlantStage, getSpeciesData, computePlantRevenue } from '../engine/economy.js';
 import { isHotPrice } from '../mechanics/market.js';
 import { getToonGradient } from './toon.js';
 import { clickWasDrag } from './IsometricCamera.jsx';
@@ -94,6 +94,23 @@ export default function PlantSlot({ slot }) {
   // naturellement falsy et le badge n'apparaît pas.
   const showHotBadge = plant && growth >= 0.85 && isHotPrice(marketPrice);
 
+  // Badge data permanent : revenu projeté (non-manuel, valeur de base affichée
+  // pour ne pas survendre le +25 %). Calculé uniquement quand un palier (5 %)
+  // change, donc pas de coût au tick.
+  const projectedRevenue = useMemo(() => {
+    if (!plant || !species) return 0;
+    const s = useGameStore.getState();
+    return computePlantRevenue(plant, greenhouse, s.market, { manual: false }, s);
+  }, [plant, species, greenhouse, growth]);
+  const dataBadgeLabel = ready
+    ? `✅ +${projectedRevenue} €`
+    : `🌱 ${Math.round(growth * 100)}%`;
+  const dataBadgeClass = [
+    'plant-data-badge',
+    ready ? 'is-mature' : 'is-growing',
+    reducedMotion ? 'is-static' : '',
+  ].filter(Boolean).join(' ');
+
   return (
     <group
       position={slot.position}
@@ -104,6 +121,11 @@ export default function PlantSlot({ slot }) {
       <Pot accentHover={hover || ready} ready={ready} accent={accent} reducedMotion={reducedMotion} />
       {plant && species && <PlantMesh species={species} growth={growth} />}
       {plant && burstId > 0 && <PollenBurst key={burstId} color={accent} />}
+      {plant && (
+        <Html position={[0, 1.1, 0]} center distanceFactor={8} zIndexRange={[4, 0]} pointerEvents="none">
+          <div className={dataBadgeClass}>{dataBadgeLabel}</div>
+        </Html>
+      )}
       {ready && hover && (
         <Html position={[0, 1.4, 0]} center distanceFactor={8} zIndexRange={[5, 0]} pointerEvents="none">
           <div className="pot-tooltip">Récolter manuellement <strong>+25 %</strong></div>
