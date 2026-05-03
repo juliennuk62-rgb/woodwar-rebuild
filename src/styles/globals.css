@@ -249,6 +249,20 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   animation: pulse 2s ease-in-out infinite;
 }
 .gh-tab-icon { font-size: 16px; }
+.gh-tab-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+  gap: 1px;
+}
+.gh-tab-income {
+  font-size: 9px;
+  color: var(--green-pale);
+  opacity: .85;
+  letter-spacing: .02em;
+}
+.gh-tab-income.active { color: var(--green); opacity: 1; }
 .gh-tab-cost {
   font-size: 10px;
   color: var(--gold);

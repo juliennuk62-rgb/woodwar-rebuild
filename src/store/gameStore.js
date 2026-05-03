@@ -546,6 +546,15 @@ export const useGameStore = create((set, get) => ({
     return total;
   },
 
+  // €/s d'une seule serre — utilisé par GreenhouseSelector pour aider
+  // le joueur à comparer la rentabilité de chacune.
+  getIncomePerSecondForGreenhouse: (greenhouseId) => {
+    const s = get();
+    const gh = s.greenhouses[greenhouseId];
+    if (!gh?.unlocked) return 0;
+    return computeIncomePerSecond(gh, s.market, s);
+  },
+
   // ─── UI panel ────────────────────────────────────────────────────
   setActivePanel: (panel) => set({ activePanel: panel }),
   togglePanel: (panel) => set((s) => ({
