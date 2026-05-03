@@ -24,4 +24,16 @@ export const GAME_CONFIG = {
 
   // Animation
   floatingNumberLifetimeMs: 1400,
+
+  // Abeille dorée (événement type "golden cookie") — spawn aléatoire
+  // entre 5 et 15 min, reste 30 s à l'écran. Si cliquée :
+  //   · 50% → +60 s de revenu (équivalent en € directement)
+  //   · 50% → boost ×2 €/s pendant 60 s
+  beeMinIntervalMs: 5 * 60 * 1000,
+  beeMaxIntervalMs: 15 * 60 * 1000,
+  beeLifetimeMs: 30 * 1000,
+  beeBoostDurationMs: 60 * 1000,
+  beeBoostMultiplier: 2,
+  beeRewardSeconds: 60,
+  beeToastLifetimeMs: 4000,
 };

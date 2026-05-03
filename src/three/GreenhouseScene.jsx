@@ -7,6 +7,7 @@ import GreenhouseFloor from './GreenhouseFloor.jsx';
 import PlantSlot from './PlantSlot.jsx';
 import IsometricCamera from './IsometricCamera.jsx';
 import SeasonalParticles from './SeasonalParticles.jsx';
+import GoldenBee from './GoldenBee.jsx';
 
 const ISO_POSITION = [12, 12, 12];
 
@@ -14,6 +15,7 @@ export default function GreenhouseScene() {
   const ghId = useGameStore((s) => s.activeGreenhouse);
   const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
   const season = useGameStore((s) => s.market.currentSeason);
+  const bee = useGameStore((s) => s.bee);
   const config = GREENHOUSES[ghId];
   const slots = useMemo(() => buildSlotPositions(greenhouse.slots), [greenhouse.slots]);
 
@@ -40,6 +42,7 @@ export default function GreenhouseScene() {
             <PlantSlot key={slot.id} slot={slot} />
           ))}
           <SeasonalParticles />
+          {bee && <GoldenBee />}
         </Suspense>
       </Canvas>
     </div>

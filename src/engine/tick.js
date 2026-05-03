@@ -94,7 +94,21 @@ function tick() {
   // ── 7. Quêtes : reset journalier des dailies
   store.refreshDailiesIfNeeded();
 
-  // ── 8. Expéditions : réclamées manuellement par le joueur (pas ici).
+  // ── 8. Abeille dorée : spawn / auto-dismiss / expiration du boost
+  //   · spawn aléatoire si l'instant prévu est arrivé et qu'aucune abeille
+  //     n'est déjà à l'écran
+  //   · auto-dismiss après beeLifetimeMs si le joueur n'a pas cliqué
+  //   · reset du boost dès qu'il a expiré (sinon ×2 fantôme)
+  if (!store.bee && now >= (store.nextBeeAt ?? 0)) {
+    store.spawnBee();
+  } else if (store.bee && now - store.bee.spawnedAt > GAME_CONFIG.beeLifetimeMs) {
+    store.dismissBee();
+  }
+  if (store.activeBoost && store.activeBoost.endsAt <= now) {
+    useGameStore.setState({ activeBoost: null });
+  }
+
+  // ── 9. Expéditions : réclamées manuellement par le joueur (pas ici).
   store.setLastTick(now);
 }
 

@@ -153,6 +153,9 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
   const researchBonus = 1 + getResearchBonuses(research).revenueBonus;
   const achievementBonus = 1 + (getAchievementBonus(state?.quests?.claimed ?? {}).revenueBonus ?? 0);
   const permanentBonus = 1 + (state?.permanentBonuses?.revenueBonus ?? 0);
+  // Boost temporaire "abeille dorée" : ×N pendant beeBoostDurationMs, sinon 1.
+  const boost = state?.activeBoost;
+  const beeBoost = (boost && boost.endsAt > Date.now()) ? (boost.multiplier ?? 1) : 1;
 
   return Math.floor(
     species.baseRevenue *
@@ -166,7 +169,8 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
     weatherBonus *
     researchBonus *
     achievementBonus *
-    permanentBonus
+    permanentBonus *
+    beeBoost
   );
 }
 

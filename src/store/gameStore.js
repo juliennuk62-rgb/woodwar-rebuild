@@ -126,6 +126,18 @@ function makeInitialState() {
       totalHybridsCreated: 0,
     },
 
+    // Abeille dorée (golden cookie-like) : événement aléatoire qui spawn
+    // une abeille cliquable dans la scène 3D toutes les 5–15 min.
+    //   · `bee`         : abeille active si non-null { x, z, spawnedAt }
+    //   · `nextBeeAt`   : prochain spawn possible (timestamp ms)
+    //   · `activeBoost` : bonus temporaire { multiplier, endsAt } appliqué
+    //                     dans computePlantRevenue
+    //   · `beeToast`    : message éphémère affiché en HUD après un claim
+    bee: null,
+    nextBeeAt: Date.now() + GAME_CONFIG.beeMinIntervalMs,
+    activeBoost: null,
+    beeToast: null,
+
     // Réglages persistés (Prompt 5)
     settings: {
       reducedMotion: false,
@@ -890,7 +902,7 @@ export const useGameStore = create((set, get) => ({
     const data = {};
     for (const k of Object.keys(s)) {
       if (typeof s[k] === 'function') continue;
-      if (['floatingNumbers', 'offlineGains', 'upgradeFlash', 'ready'].includes(k)) continue;
+      if (['floatingNumbers', 'offlineGains', 'upgradeFlash', 'ready', 'bee', 'beeToast'].includes(k)) continue;
       data[k] = s[k];
     }
     return JSON.stringify(data);
@@ -922,6 +934,78 @@ export const useGameStore = create((set, get) => ({
       return {};
     }), 500);
   },
+
+  // ─── Abeille dorée ───────────────────────────────────────────────
+  // Crée une abeille active à une position aléatoire dans la scène.
+  // Le tick programme déjà le prochain `nextBeeAt` au moment du spawn,
+  // pour qu'on n'enchaîne pas deux abeilles si jamais le joueur est AFK
+  // pendant l'événement.
+  spawnBee: () => {
+    const s = get();
+    if (s.bee) return false; // déjà une abeille à l'écran
+    // Position aléatoire dans la zone des slots (~ ±3 unités x/z)
+    const x = (Math.random() - 0.5) * 6;
+    const z = (Math.random() - 0.5) * 6;
+    const now = Date.now();
+    const interval = GAME_CONFIG.beeMinIntervalMs +
+      Math.random() * (GAME_CONFIG.beeMaxIntervalMs - GAME_CONFIG.beeMinIntervalMs);
+    set({
+      bee: { x, z, spawnedAt: now },
+      nextBeeAt: now + GAME_CONFIG.beeLifetimeMs + interval,
+    });
+    audioManager.play('quest');
+    return true;
+  },
+
+  claimBee: () => {
+    const s = get();
+    if (!s.bee) return null;
+    // Tirage 50/50 : reward instantané OU boost temporaire
+    const useBoost = Math.random() < 0.5;
+    const now = Date.now();
+    if (useBoost) {
+      const message = `× ${GAME_CONFIG.beeBoostMultiplier} pendant ${Math.round(GAME_CONFIG.beeBoostDurationMs / 1000)} s ! 🐝`;
+      set({
+        bee: null,
+        activeBoost: {
+          multiplier: GAME_CONFIG.beeBoostMultiplier,
+          endsAt: now + GAME_CONFIG.beeBoostDurationMs,
+        },
+        beeToast: { message, createdAt: now },
+      });
+    } else {
+      // +60 s de revenu : on prend le €/s actuel global × 60
+      const ips = get().getIncomePerSecond();
+      const bonus = Math.max(1, Math.floor(ips * GAME_CONFIG.beeRewardSeconds));
+      set((cur) => ({
+        bee: null,
+        currency: {
+          ...cur.currency,
+          euros: cur.currency.euros + bonus,
+          lifetimeEuros: cur.currency.lifetimeEuros + bonus,
+        },
+        stats: {
+          ...cur.stats,
+          totalEarned: cur.stats.totalEarned + bonus,
+        },
+        beeToast: {
+          message: `+ ${GAME_CONFIG.beeRewardSeconds} secondes de revenu offert ! 🐝`,
+          createdAt: now,
+        },
+      }));
+    }
+    audioManager.play('prestige');
+    // Cleanup automatique du toast
+    setTimeout(() => {
+      const cur = get();
+      if (cur.beeToast?.createdAt === now) set({ beeToast: null });
+    }, GAME_CONFIG.beeToastLifetimeMs);
+    return useBoost ? 'boost' : 'instant';
+  },
+
+  dismissBee: () => set((s) => (s.bee ? { bee: null } : {})),
+
+  clearBeeToast: () => set({ beeToast: null }),
 
   // ─── Floating numbers & ticks ────────────────────────────────────
   removeFloatingNumber: (id) => set((s) => ({

@@ -13,7 +13,11 @@ const HASH_KEY = GAME_CONFIG.saveKey + ':hash';
 // Champs volatiles à exclure du save : ils sont propres à une session et
 // ne doivent pas être restaurés au reload (sinon une modale ouverte
 // réapparaîtrait, un flash visuel persisterait, etc.).
-const VOLATILE = ['floatingNumbers', 'offlineGains', 'upgradeFlash', 'currentDiscovery', 'saveError', 'ready'];
+// `bee` et `beeToast` sont volatils : si le joueur reload pendant qu'une
+// abeille est à l'écran, on n'essaie pas de la restaurer (la position
+// serait dépassée et le décompte des 30 s aussi). `nextBeeAt` et
+// `activeBoost` sont persistés normalement par contre.
+const VOLATILE = ['floatingNumbers', 'offlineGains', 'upgradeFlash', 'currentDiscovery', 'saveError', 'ready', 'bee', 'beeToast'];
 
 export async function saveGame() {
   try {
@@ -114,12 +118,20 @@ export function loadSave() {
     // Prompt 11 — rush moments (milestones lifetime déjà célébrés)
     data.seenMilestones = data.seenMilestones ?? {};
 
+    // Abeille dorée : nextBeeAt persisté ; si manquant (vieille save), on
+    // programme un premier spawn dans 5 min. Si activeBoost expiré au load,
+    // on le nettoie pour éviter un faux bonus visible une fraction de seconde.
+    if (data.nextBeeAt == null) data.nextBeeAt = now + 5 * 60 * 1000;
+    if (data.activeBoost && data.activeBoost.endsAt < now) data.activeBoost = null;
+
     // Champs volatiles : on les nettoie même s'ils sont présents (vieilles
     // saves committées avant l'audit qui les a ajoutés à VOLATILE).
     delete data.currentDiscovery;
     delete data.upgradeFlash;
     delete data.floatingNumbers;
     delete data.offlineGains;
+    delete data.bee;
+    delete data.beeToast;
 
     // Vérification checksum en arrière-plan (non-bloquante)
     const expected = localStorage.getItem(HASH_KEY);
