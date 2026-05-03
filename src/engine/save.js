@@ -107,6 +107,13 @@ export function loadSave() {
     data.mtipsSeen ??= {};
     data.research = data.research ?? { unlocked: [], inProgress: null };
     data.hybrids = data.hybrids ?? {};
+    // F13 — migration trait → traits[] (rétro-compat anciennes saves).
+    if (data.hybrids) {
+      for (const h of Object.values(data.hybrids)) {
+        if (h.trait && !h.traits) h.traits = [h.trait];
+        else if (!h.traits) h.traits = [];
+      }
+    }
     if (data.hybridIndex == null) data.hybridIndex = 0;
     data.lab = data.lab ?? { active: [] };
     data.quests = data.quests ?? {};

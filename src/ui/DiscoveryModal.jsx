@@ -34,7 +34,11 @@ export default function DiscoveryModal() {
   if (!species) return null;
   const isHybrid = !!species.isHybrid;
   const tagLabel = isHybrid ? 'Hybride synthétisé' : 'Nouvelle découverte';
-  const trait = species.trait ? TRAITS[species.trait] : null;
+  // F13 — un hybride peut avoir 0, 1 ou 2 traits. Rétro-compat avec `trait`.
+  const traitIds = Array.isArray(species.traits) && species.traits.length > 0
+    ? species.traits
+    : (species.trait ? [species.trait] : []);
+  const traitList = traitIds.map((id) => TRAITS[id]).filter(Boolean);
 
   // La serre où cette espèce peut être plantée
   const targetGh = Object.values(GREENHOUSES).find((g) => g.species.includes(species.id));
@@ -48,7 +52,18 @@ export default function DiscoveryModal() {
           <div className="discovery-icon">{species.icon}</div>
         </div>
         <div className="discovery-tag">{tagLabel}</div>
-        {trait && <div className="discovery-trait">{trait.icon} {trait.name} — {trait.description}</div>}
+        {traitList.length > 0 && (
+          <div className="discovery-trait">
+            {traitList.map((t, i) => (
+              <span key={t.id}>
+                {i > 0 && ' + '}
+                {t.icon} {t.name}
+              </span>
+            ))}
+            {' — '}
+            {traitList.map((t) => t.description).join(' ')}
+          </div>
+        )}
         <h2 id="disc-title">{species.name}</h2>
         {species.scientificName && (
           <div className="discovery-sci"><em>{species.scientificName}</em></div>

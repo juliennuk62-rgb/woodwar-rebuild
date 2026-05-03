@@ -326,11 +326,27 @@ function GalleryCard({ sp, owned, hybrid }) {
           <span>💰 {sp.baseRevenue} €</span>
           <span>{'⭐'.repeat(Math.min(7, sp.rarity))}</span>
         </div>
-        {hybrid && sp.trait && (
-          <div className="gallery-trait">
-            {TRAITS[sp.trait]?.icon} {TRAITS[sp.trait]?.name}
-          </div>
-        )}
+        {hybrid && (() => {
+          // F13 — affichage de la liste des traits (joints par " + ").
+          const ids = Array.isArray(sp.traits) && sp.traits.length > 0
+            ? sp.traits
+            : (sp.trait ? [sp.trait] : []);
+          if (ids.length === 0) return null;
+          return (
+            <div className="gallery-trait">
+              {ids.map((id, i) => {
+                const t = TRAITS[id];
+                if (!t) return null;
+                return (
+                  <span key={id}>
+                    {i > 0 && ' + '}
+                    {t.icon} {t.name}
+                  </span>
+                );
+              })}
+            </div>
+          );
+        })()}
         {hybrid && (
           <div className="gallery-parents">
             {PLANTS[sp.parent1]?.icon}{PLANTS[sp.parent1]?.name} × {PLANTS[sp.parent2]?.icon}{PLANTS[sp.parent2]?.name}

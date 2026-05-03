@@ -9,8 +9,12 @@ export const HYBRID_BASE_DURATION_MS = 5 * 60 * 1000;
 export const HYBRID_DURATION_PER_RARITY = 90 * 1000; // +90s par point de rareté max parent
 export const TRAIT_CHANCE_SAME_BIOME = 0.05;
 export const TRAIT_CHANCE_CROSS_BIOME = 0.30;
+// Tech lab_3 : chance d'un 2ᵉ trait sur l'hybride.
+export const SECOND_TRAIT_CHANCE = 0.08;
 
 // Traits uniques possibles — GDD §07
+// `weight` (optionnel, défaut 1) module la pondération de la pioche aléatoire :
+// les traits puissants (monarch) sont volontairement rarissimes.
 export const TRAITS = {
   bioluminescent: {
     id: 'bioluminescent',
@@ -19,6 +23,7 @@ export const TRAITS = {
     description: 'Brille dans l\'obscurité. Revenu ×2.',
     revenueMul: 2.0,
     growMul: 1.0,
+    weight: 1,
   },
   fast_grower: {
     id: 'fast_grower',
@@ -27,6 +32,7 @@ export const TRAITS = {
     description: 'Pousse 2× plus vite que prévu.',
     revenueMul: 1.0,
     growMul: 0.5,
+    weight: 1,
   },
   fragrant: {
     id: 'fragrant',
@@ -36,6 +42,7 @@ export const TRAITS = {
     revenueMul: 1.15,
     growMul: 1.0,
     marketFloor: 1.0,
+    weight: 1,
   },
   eternal: {
     id: 'eternal',
@@ -45,10 +52,64 @@ export const TRAITS = {
     revenueMul: 1.0,
     growMul: 1.0,
     flatSeedCost: true,
+    weight: 1,
+  },
+  royal: {
+    id: 'royal',
+    name: 'Royal',
+    icon: '👑',
+    description: 'Lignée noble. Revenu ×1.5 et rareté boostée.',
+    revenueMul: 1.5,
+    growMul: 1.0,
+    rarityBonus: 1,
+    weight: 1,
+  },
+  hardy: {
+    id: 'hardy',
+    name: 'Robuste',
+    icon: '🛡️',
+    description: 'Résiste aux saisons. Revenu ×1.15 et marché ≥ 1.0×.',
+    revenueMul: 1.15,
+    growMul: 1.0,
+    marketFloor: 1.0,
+    weight: 1,
+  },
+  prolific: {
+    id: 'prolific',
+    name: 'Prolifique',
+    icon: '🌾',
+    description: 'Coût de graine divisé par deux à la création.',
+    revenueMul: 1.0,
+    growMul: 1.0,
+    seedCostHalf: true,
+    weight: 1,
+  },
+  monarch: {
+    id: 'monarch',
+    name: 'Monarque',
+    icon: '🦋',
+    description: 'Trait légendaire. Revenu ×1.8 et pousse 0.6×.',
+    revenueMul: 1.8,
+    growMul: 0.6,
+    weight: 0.15, // TRÈS rare
   },
 };
 
 const TRAIT_KEYS = Object.keys(TRAITS);
+
+// Pioche pondérée d'un trait. Évite les doublons via `excludeIds`.
+function pickWeightedTrait(excludeIds = []) {
+  const pool = TRAIT_KEYS.filter((id) => !excludeIds.includes(id));
+  if (pool.length === 0) return null;
+  let total = 0;
+  for (const id of pool) total += TRAITS[id].weight ?? 1;
+  let r = Math.random() * total;
+  for (const id of pool) {
+    r -= TRAITS[id].weight ?? 1;
+    if (r <= 0) return id;
+  }
+  return pool[pool.length - 1];
+}
 
 // Coût d'une hybridation, modulé par les recherches débloquées.
 export function hybridizationCost(researchUnlocked = []) {
@@ -87,45 +148,66 @@ export function buildHybrid({ parent1Id, parent2Id, hybridIndex, researchUnlocke
   let baseRevenue = ((p1.baseRevenue + p2.baseRevenue) / 2) * revenueVariance;
   let rarity = Math.max(p1.rarity, p2.rarity) + 1;
   if (!sameBiome) rarity += 2;
+  let seedCost = Math.max(20, Math.round((p1.seedCost + p2.seedCost) * 1.5));
 
-  // Trait unique possible
-  let trait = null;
+  // Trait(s) unique(s) possible(s)
+  const traits = [];
   if (Math.random() < finalTraitChance) {
-    trait = TRAIT_KEYS[Math.floor(Math.random() * TRAIT_KEYS.length)];
-    const t = TRAITS[trait];
-    growTime *= t.growMul;
-    baseRevenue *= t.revenueMul;
-    if (t.flatSeedCost || t.marketFloor) rarity += 1;
+    const first = pickWeightedTrait();
+    if (first) traits.push(first);
+    // Tech lab_3 : 8% de chance d'un 2ᵉ trait (différent du premier).
+    if (researchUnlocked.includes('lab_3') && Math.random() < SECOND_TRAIT_CHANCE) {
+      const second = pickWeightedTrait(traits);
+      if (second) traits.push(second);
+    }
   }
 
+  // Application multiplicative de tous les traits sélectionnés.
+  for (const tid of traits) {
+    const t = TRAITS[tid];
+    growTime *= t.growMul ?? 1;
+    baseRevenue *= t.revenueMul ?? 1;
+    if (t.flatSeedCost || t.marketFloor) rarity += 1;
+    if (t.rarityBonus) rarity += t.rarityBonus;
+    if (t.seedCostHalf) seedCost = Math.max(1, Math.floor(seedCost / 2));
+  }
+
+  const primaryTrait = traits[0] ?? null;
   const id = `hyb_${String(hybridIndex).padStart(3, '0')}`;
-  const name = generateName(p1, p2, hybridIndex, trait);
+  const name = generateName(p1, p2, hybridIndex, primaryTrait);
   const biome = sameBiome ? p1.biome : 'hybrid';
 
   return {
     id,
     name,
     scientificName: `${p1.id} × ${p2.id}`,
-    icon: trait === 'bioluminescent' ? '🌟' : trait === 'eternal' ? '♾️' : '🌷',
+    icon: primaryTrait === 'bioluminescent' ? '🌟'
+      : primaryTrait === 'eternal' ? '♾️'
+      : primaryTrait === 'monarch' ? '🦋'
+      : primaryTrait === 'royal' ? '👑'
+      : '🌷',
     biome,
     rarity,
     growTime: Math.round(growTime),
     baseRevenue: Math.round(baseRevenue),
-    seedCost: Math.max(20, Math.round((p1.seedCost + p2.seedCost) * 1.5)),
+    seedCost,
     color: blendColor(p1.color, p2.color),
     petalColor: blendColor(p1.petalColor, p2.petalColor),
     height: (p1.height + p2.height) / 2,
-    description: trait
-      ? `Hybride aux propriétés uniques — ${TRAITS[trait].description}`
+    description: traits.length
+      ? `Hybride aux propriétés uniques — ${traits.map((t) => TRAITS[t].description).join(' ')}`
       : `Croisement réussi entre ${p1.name} et ${p2.name}.`,
-    poetic: trait
-      ? `${TRAITS[trait].icon} ${TRAITS[trait].name} — l\'inattendu surgit du laboratoire.`
+    poetic: traits.length
+      ? `${traits.map((t) => `${TRAITS[t].icon} ${TRAITS[t].name}`).join(' + ')} — l\'inattendu surgit du laboratoire.`
       : `Né du croisement patient de deux lignées.`,
     // Métadonnées hybride
     isHybrid: true,
     parent1: parent1Id,
     parent2: parent2Id,
-    trait,
+    // Nouveau format : liste des traits. `trait` reste exposé pour la
+    // rétro-compatibilité avec d'éventuels call sites legacy.
+    traits,
+    trait: primaryTrait,
     createdAt: Date.now(),
   };
 }
@@ -136,6 +218,10 @@ function generateName(p1, p2, index, trait) {
     fast_grower: 'Flèche',
     fragrant: 'Aubépine',
     eternal: 'Vivace',
+    royal: 'Couronne',
+    hardy: 'Rempart',
+    prolific: 'Gerbe',
+    monarch: 'Monarque',
   };
   if (trait && traitPrefix[trait]) {
     return `${traitPrefix[trait]} de ${p1.name.split(' ').slice(-1)[0]}`;

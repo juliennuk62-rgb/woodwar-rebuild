@@ -20,6 +20,14 @@ export function getSpeciesData(speciesId, state) {
   return PLANTS[speciesId] ?? state?.hybrids?.[speciesId] ?? null;
 }
 
+// F13 — un hybride peut avoir 1 ou 2 traits dans `traits[]`. Rétro-compat avec
+// l'ancien champ scalaire `trait` (toujours peuplé par buildHybrid).
+function hasTrait(species, traitId) {
+  if (!species) return false;
+  if (Array.isArray(species.traits) && species.traits.includes(traitId)) return true;
+  return species.trait === traitId;
+}
+
 // ─── Marché ───────────────────────────────────────────────────
 export function computeMarketMultiplier(time, seed = 0) {
   const wave = Math.sin(time * GAME_CONFIG.marketFrequency + seed) * GAME_CONFIG.marketAmplitude;
@@ -136,10 +144,17 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
   const weather = marketState?.weather ?? 'sunny';
 
   let market = prices[plant.speciesId] ?? 1.0;
-  // Trait "fragrant" : marché jamais < 1.0
-  const traitId = species.trait;
-  if (traitId && TRAITS[traitId]?.marketFloor) {
-    market = Math.max(market, TRAITS[traitId].marketFloor);
+  // Traits multiples : on n'applique ici que les effets qui dépendent de l'état
+  // du marché (marketFloor pour fragrant/hardy). Les `revenueMul`/`growMul`
+  // sont déjà baked dans species.baseRevenue / species.growTime à la création.
+  // Rétro-compat : si `traits` n'est pas défini, on retombe sur `trait` legacy.
+  const traitIds = Array.isArray(species.traits) && species.traits.length > 0
+    ? species.traits
+    : (species.trait ? [species.trait] : []);
+  for (const tid of traitIds) {
+    const t = TRAITS[tid];
+    if (!t) continue;
+    if (t.marketFloor) market = Math.max(market, t.marketFloor);
   }
 
   const upgrade = getUpgradeMultiplier(greenhouse);
@@ -203,7 +218,7 @@ export function computeCost(speciesId, owned, state) {
   const plant = getSpeciesData(speciesId, state);
   if (!plant) return Infinity;
   // Trait "eternal" sur un hybride : coût fixe, jamais d'inflation.
-  if (plant.trait === 'eternal') return Math.ceil(plant.seedCost);
+  if (hasTrait(plant, 'eternal')) return Math.ceil(plant.seedCost);
   return Math.ceil(plant.seedCost * Math.pow(GAME_CONFIG.seedCostGrowth, owned));
 }
 
@@ -211,7 +226,7 @@ export function computeCost(speciesId, owned, state) {
 export function computeBulkCost(speciesId, owned, quantity, state) {
   const plant = getSpeciesData(speciesId, state);
   if (!plant || quantity <= 0) return 0;
-  if (plant.trait === 'eternal') return Math.ceil(plant.seedCost * quantity);
+  if (hasTrait(plant, 'eternal')) return Math.ceil(plant.seedCost * quantity);
   const r = GAME_CONFIG.seedCostGrowth;
   if (r === 1) return Math.ceil(plant.seedCost * quantity);
   const sum = (Math.pow(r, quantity) - 1) / (r - 1);
@@ -222,7 +237,7 @@ export function computeBulkCost(speciesId, owned, quantity, state) {
 export function computeMaxAffordable(speciesId, owned, budget, state) {
   const plant = getSpeciesData(speciesId, state);
   if (!plant) return 0;
-  if (plant.trait === 'eternal') {
+  if (hasTrait(plant, 'eternal')) {
     return Math.max(0, Math.floor(budget / plant.seedCost));
   }
   const r = GAME_CONFIG.seedCostGrowth;
