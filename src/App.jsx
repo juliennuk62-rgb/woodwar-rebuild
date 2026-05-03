@@ -21,6 +21,7 @@ import Onboarding from './ui/Onboarding.jsx';
 import ContextualTips from './ui/ContextualTips.jsx';
 import MilestoneTips from './ui/MilestoneTips.jsx';
 import ConfettiBurst from './ui/ConfettiBurst.jsx';
+import WorldMap from './ui/WorldMap.jsx';
 import { useGameStore } from './store/gameStore.js';
 import { startGameLoop, stopGameLoop } from './engine/tick.js';
 import { setupAutosave } from './engine/save.js';
@@ -30,6 +31,8 @@ import { Events as Analytics } from './utils/analytics.js';
 export default function App() {
   const ready = useGameStore((s) => s.ready);
   const activePanel = useGameStore((s) => s.activePanel);
+  const viewMode = useGameStore((s) => s.viewMode);
+  const isMap = viewMode === 'map';
 
   useEffect(() => {
     startGameLoop();
@@ -54,18 +57,19 @@ export default function App() {
   return (
     <>
       <GreenhouseScene />
-      <HUD />
-      <GreenhouseSelector />
-      <PrestigeModal />
-      <PlantsList />
-      <PanelLauncher />
-      <ShopPanel />
-      {activePanel === 'gardeners' && <GardenersPanel />}
-      {activePanel === 'upgrades' && <UpgradesPanel />}
-      {activePanel === 'market' && <MarketPanel />}
-      {activePanel === 'expeditions' && <ExpeditionPanel />}
-      {activePanel === 'lab' && <LabPanel />}
-      {activePanel === 'quests' && <QuestsPanel />}
+      {!isMap && <HUD />}
+      {!isMap && <GreenhouseSelector />}
+      {!isMap && <PrestigeModal />}
+      {!isMap && <PlantsList />}
+      {!isMap && <PanelLauncher />}
+      {!isMap && <ShopPanel />}
+      {!isMap && activePanel === 'gardeners' && <GardenersPanel />}
+      {!isMap && activePanel === 'upgrades' && <UpgradesPanel />}
+      {!isMap && activePanel === 'market' && <MarketPanel />}
+      {!isMap && activePanel === 'expeditions' && <ExpeditionPanel />}
+      {!isMap && activePanel === 'lab' && <LabPanel />}
+      {!isMap && activePanel === 'quests' && <QuestsPanel />}
+      <WorldMap />
       <SettingsModal />
       <Onboarding />
       <ContextualTips />

@@ -174,6 +174,7 @@ function makeInitialState() {
     upgradeFlash: null,    // { typeId, ts } — pour animer la carte qui vient d'être achetée
     currentDiscovery: null, // { speciesId, expeditionId } — modale de découverte
     saveError: null,       // 'quota' | 'unknown' — bannière visible si la sauvegarde échoue
+    viewMode: 'greenhouse', // 'greenhouse' | 'map' — vue d'ensemble façon Satisfactory
     ready: false,
   };
 }
@@ -596,6 +597,7 @@ export const useGameStore = create((set, get) => ({
 
   // ─── UI panel ────────────────────────────────────────────────────
   setActivePanel: (panel) => set({ activePanel: panel }),
+  setViewMode: (mode) => set({ viewMode: mode }),
   togglePanel: (panel) => set((s) => ({
     activePanel: s.activePanel === panel ? null : panel,
   })),

@@ -3050,3 +3050,411 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   .confetti-layer { display: none; }
 }
 
+
+/* ───────────────────────────────────────────────────────────────
+   HUD HERO (Satisfactory style) — un seul GROS chiffre €/s
+   au centre, tout le reste en pills repliées sur les côtés.
+   ─────────────────────────────────────────────────────────── */
+.hud-top--hero {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+}
+.hud-top--hero .hud-side {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  pointer-events: auto;
+}
+.hud-side-left { justify-content: flex-start; }
+.hud-side-right { justify-content: flex-end; }
+
+.hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 100px;
+  background: rgba(19,26,20,.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+.hud-pill-action {
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.hud-pill-action:hover {
+  border-color: var(--green);
+  color: var(--green);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(126,200,122,.18);
+}
+.hud-pill-text {
+  font-weight: 500;
+}
+
+.hud-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  user-select: none;
+  text-align: center;
+}
+.hud-hero-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -.02em;
+  background: linear-gradient(180deg, var(--green) 0%, var(--green2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 6px 18px rgba(126,200,122,.35));
+  transition: filter .25s ease;
+}
+.hud-hero-unit {
+  font-family: 'DM Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  vertical-align: middle;
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+.hud-hero-sub {
+  display: flex;
+  gap: 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--green-pale);
+}
+.hud-hero-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Thème néon : pousse encore les glows du hero */
+.theme-neon .hud-hero-value {
+  filter: drop-shadow(0 0 18px rgba(0,255,136,.55));
+}
+
+/* Mobile : on rétrécit le chiffre et on aligne en colonne */
+@media (max-width: 720px) {
+  .hud-top--hero {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .hud-side-left, .hud-side-right {
+    justify-content: center;
+    order: 2;
+    flex-wrap: wrap;
+  }
+  .hud-side-right { order: 3; }
+  .hud-hero { order: 1; }
+  .hud-hero-value { font-size: 38px; }
+  .hud-hero-unit { font-size: 14px; }
+  .hud-hero-sub { font-size: 11px; gap: 10px; }
+  .hud-pill { padding: 6px 10px; font-size: 11px; }
+  .hud-pill-text { display: none; }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   WORLDMAP — vue d'ensemble plein écran (Satisfactory style)
+   ─────────────────────────────────────────────────────────── */
+.worldmap-overlay {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(1200px 800px at 20% 10%, rgba(126,200,122,.10), transparent 60%),
+    radial-gradient(900px 700px at 90% 90%, rgba(212,168,75,.08), transparent 60%),
+    linear-gradient(180deg, #0a0e0b 0%, #0d110e 100%);
+  z-index: 50;
+  overflow-y: auto;
+  padding: 32px 40px 60px;
+  animation: worldmap-fade-in .25s ease;
+}
+@keyframes worldmap-fade-in {
+  from { opacity: 0; transform: scale(.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+.theme-neon .worldmap-overlay {
+  background:
+    radial-gradient(1200px 800px at 20% 10%, rgba(0,255,136,.08), transparent 60%),
+    radial-gradient(900px 700px at 90% 90%, rgba(168,85,247,.08), transparent 60%),
+    linear-gradient(180deg, #06031a 0%, #0a0118 100%);
+}
+
+.worldmap-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.worldmap-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(19,26,20,.8);
+  border: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all .15s ease;
+  min-height: 44px;
+}
+.worldmap-back:hover {
+  border-color: var(--green);
+  color: var(--green);
+  transform: translateX(-2px);
+}
+.worldmap-title {
+  text-align: center;
+}
+.worldmap-title-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.worldmap-title h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1;
+  margin-top: 4px;
+  background: linear-gradient(135deg, var(--green) 0%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.worldmap-season {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 100px;
+  background: rgba(19,26,20,.8);
+  border: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+.worldmap-season-icon { font-size: 18px; line-height: 1; }
+
+/* Bandeau résumé : 4 stats globales */
+.worldmap-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 36px;
+}
+.worldmap-summary-stat {
+  background: rgba(19,26,20,.7);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.worldmap-summary-stat.is-big {
+  background: linear-gradient(135deg, rgba(126,200,122,.12), rgba(126,200,122,.02));
+  border-color: rgba(126,200,122,.35);
+}
+.worldmap-summary-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.worldmap-summary-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+}
+.worldmap-summary-stat.is-big .worldmap-summary-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--green);
+}
+.worldmap-summary-stat.is-gold .worldmap-summary-value { color: var(--gold); }
+.worldmap-summary-stat.is-seed .worldmap-summary-value { color: var(--green-pale); }
+
+/* Grille de cards — 5 serres */
+.worldmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.worldmap-card {
+  background: rgba(19,26,20,.85);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all .25s cubic-bezier(.22,1.5,.36,1);
+}
+.worldmap-card.is-unlocked:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 14px 40px rgba(0,0,0,.4),
+              0 0 0 1px var(--accent),
+              0 0 30px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.worldmap-card.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent),
+              0 0 28px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.worldmap-card.is-locked {
+  opacity: .75;
+}
+
+.worldmap-card-banner {
+  position: relative;
+  height: 120px;
+  display: grid;
+  place-items: center;
+}
+.worldmap-card-icon {
+  font-size: 64px;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,.45));
+}
+.worldmap-card-badge,
+.worldmap-card-tokens {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 100px;
+}
+.worldmap-card-badge {
+  background: var(--accent);
+  color: #0a0e0b;
+  font-weight: 600;
+}
+.worldmap-card-tokens {
+  background: rgba(212,168,75,.18);
+  color: var(--gold);
+  border: 1px solid rgba(212,168,75,.4);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.worldmap-card-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+.worldmap-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+}
+.worldmap-card-biome {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: -8px;
+}
+.worldmap-card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: var(--surface2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-top: auto;
+}
+.worldmap-card-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.worldmap-card-stat-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.worldmap-card-stat-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.worldmap-card-stat-value.good { color: var(--green); }
+
+.worldmap-card-cta {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #0a0e0b;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .03em;
+  cursor: pointer;
+  transition: all .15s ease;
+  min-height: 44px;
+}
+.worldmap-card-cta:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.worldmap-card-cta:disabled {
+  cursor: not-allowed;
+  background: var(--surface3);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.worldmap-card-cta--unlock {
+  background: linear-gradient(120deg, var(--gold), var(--accent));
+}
+
+@media (max-width: 720px) {
+  .worldmap-overlay { padding: 16px 12px 40px; }
+  .worldmap-header { grid-template-columns: 1fr; gap: 12px; }
+  .worldmap-back { justify-self: start; }
+  .worldmap-season { justify-self: center; }
+  .worldmap-title h1 { font-size: 28px; }
+  .worldmap-summary { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .worldmap-summary-stat { padding: 12px; }
+  .worldmap-summary-value { font-size: 18px; }
+  .worldmap-summary-stat.is-big .worldmap-summary-value { font-size: 24px; }
+  .worldmap-grid { grid-template-columns: 1fr; }
+}

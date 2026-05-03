@@ -4,58 +4,70 @@ import { GREENHOUSES } from '../config/greenhouses.js';
 import { formatEuros, formatNumber } from '../utils/numberFormat.js';
 import WeatherWidget from './WeatherWidget.jsx';
 
+// HUD façon Satisfactory : un seul chiffre central HUGE (€/s) avec couleur
+// gradient, et le reste replié en pills discrètes autour. Le brand titre
+// est minimal (juste l'icône de la serre active dans une pill).
 export default function HUD() {
   const euros = useGameStore((s) => s.currency.euros);
   const rareSeeds = useGameStore((s) => s.currency.rareSeeds);
   const ghId = useGameStore((s) => s.activeGreenhouse);
   const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
   const config = GREENHOUSES[ghId];
-  // On lit la fonction directement depuis le store via getState() — sinon
-  // le sélecteur retournerait potentiellement une nouvelle référence à
-  // chaque tick, recréant l'interval et fuyant des timers.
-  const getIncome = () => useGameStore.getState().getIncomePerSecond();
+  const setViewMode = useGameStore((s) => s.setViewMode);
 
-  // €/s mis à jour 2× par seconde — pas la peine de re-render React à chaque tick
+  // €/s mis à jour 2×/s. Lecture via getState() pour stabilité du timer.
   const [income, setIncome] = useState(0);
   useEffect(() => {
-    setIncome(getIncome());
-    const id = setInterval(() => setIncome(getIncome()), 500);
+    const tick = () => setIncome(useGameStore.getState().getIncomePerSecond());
+    tick();
+    const id = setInterval(tick, 500);
     return () => clearInterval(id);
   }, []);
 
   const usedSlots = greenhouse.plants.length;
 
   return (
-    <header className="hud-top">
-      <div className="hud-brand">
-        <div className="hud-brand-title">Le Jardin d'Agnès</div>
-        <div className="hud-brand-sub">{config.icon} {config.name}</div>
+    <header className="hud-top hud-top--hero">
+      {/* Pile gauche : actions secondaires */}
+      <div className="hud-side hud-side-left">
+        <button
+          className="hud-pill hud-pill-action"
+          onClick={() => setViewMode('map')}
+          title="Vue d'ensemble"
+          aria-label="Ouvrir la vue d'ensemble"
+        >
+          🗺️ <span className="hud-pill-text">Vue</span>
+        </button>
+        <div className="hud-pill" title={config.name}>
+          {config.icon} <span className="hud-pill-text">{config.name}</span>
+        </div>
       </div>
 
-      <div className="hud-stats">
-        <Stat icon="💶" label="Euros" value={formatEuros(euros)} accent="green" />
-        <Stat icon="📈" label="€ / s" value={formatNumber(income, { decimals: 1 })} accent="gold" subtle />
-        <Stat icon="🌱" label="Graines rares" value={formatNumber(rareSeeds)} subtle />
+      {/* Centre : un GROS chiffre €/s qui pulse */}
+      <div className="hud-hero">
+        <div className="hud-hero-value">
+          + {formatNumber(income, { decimals: 1 })}
+          <span className="hud-hero-unit"> €/s</span>
+        </div>
+        <div className="hud-hero-sub">
+          <span className="hud-hero-stat">
+            <span aria-hidden="true">💶</span> {formatEuros(euros)}
+          </span>
+          <span className="hud-hero-stat">
+            <span aria-hidden="true">🌱</span> {formatNumber(rareSeeds)}
+          </span>
+        </div>
       </div>
 
-      <div className="hud-meta">
+      {/* Pile droite : météo + slots + settings */}
+      <div className="hud-side hud-side-right">
         <WeatherWidget />
-        <div className="hud-pill">Slots {usedSlots}/{greenhouse.slots}</div>
+        <div className="hud-pill" title="Slots remplis">
+          📦 {usedSlots}/{greenhouse.slots}
+        </div>
         <DebugMenu />
       </div>
     </header>
-  );
-}
-
-function Stat({ icon, label, value, accent, subtle }) {
-  return (
-    <div className={`hud-stat ${accent ? `hud-stat--${accent}` : ''} ${subtle ? 'hud-stat--subtle' : ''}`}>
-      <span className="hud-stat-icon">{icon}</span>
-      <div className="hud-stat-text">
-        <div className="hud-stat-label">{label}</div>
-        <div className="hud-stat-value">{value}</div>
-      </div>
-    </div>
   );
 }
 
