@@ -108,7 +108,18 @@ function tick() {
     useGameStore.setState({ activeBoost: null });
   }
 
-  // ── 9. Expéditions : réclamées manuellement par le joueur (pas ici).
+  // ── 9. Auto-arrosoir : 1 clic toutes les 5 s tant qu'il est possédé.
+  // On stocke `_lastAutoWaterAt` directement sur l'objet store (champ
+  // volatile, pas dans le state visible — ne sera pas re-render).
+  if (store.autoWaterer) {
+    const last = store._lastAutoWaterAt ?? 0;
+    if (now - last >= 5000) {
+      store.clickWater();
+      store._lastAutoWaterAt = now;
+    }
+  }
+
+  // ── 10. Expéditions : réclamées manuellement par le joueur (pas ici).
   store.setLastTick(now);
 }
 

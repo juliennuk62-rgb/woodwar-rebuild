@@ -138,6 +138,16 @@ function makeInitialState() {
     activeBoost: null,
     beeToast: null,
 
+    // Arrosoir manuel — chaque clic empile +25% pendant 5s, max ×2.
+    // Persisté entre sessions pour conserver l'historique total.
+    waterClicks: 0,                 // total lifetime de clics arrosoir
+    waterBoostEndsAt: 0,            // timestamp fin de boost (0 = pas de boost)
+    waterBoostStacks: 0,            // 1..4 (chaque stack = +25%)
+
+    // Auto-arrosoir : si owned=true, clique automatiquement toutes les 5s.
+    autoWaterer: false,
+    autoWaterCost: 50000,
+
     // Réglages persistés (Prompt 5)
     settings: {
       reducedMotion: false,
@@ -598,6 +608,39 @@ export const useGameStore = create((set, get) => ({
   // ─── UI panel ────────────────────────────────────────────────────
   setActivePanel: (panel) => set({ activePanel: panel }),
   setViewMode: (mode) => set({ viewMode: mode }),
+
+  // ─── Arrosoir (boost manuel cliquable) ──────────────────────────
+  // Chaque clic ajoute +25% (jusqu'à 4 stacks = ×2) et reset le timer
+  // à 5s. Le bonus est lu dans computePlantRevenue via getWaterBoost().
+  clickWater: () => {
+    const now = Date.now();
+    set((s) => {
+      const stillActive = now < s.waterBoostEndsAt;
+      const stacks = stillActive ? Math.min(4, s.waterBoostStacks + 1) : 1;
+      return {
+        waterClicks: s.waterClicks + 1,
+        waterBoostStacks: stacks,
+        waterBoostEndsAt: now + 5000,
+      };
+    });
+    audioManager.play('plant');
+  },
+
+  // Renvoie le multiplicateur arrosoir actuel (1 si pas de boost actif).
+  getWaterBoost: () => {
+    const s = get();
+    if (Date.now() >= s.waterBoostEndsAt) return 1;
+    return 1 + s.waterBoostStacks * 0.25;
+  },
+
+  buyAutoWaterer: () => {
+    const s = get();
+    if (s.autoWaterer) return false;
+    if (!get().spendEuros(s.autoWaterCost)) return false;
+    set({ autoWaterer: true });
+    audioManager.play('upgrade');
+    return true;
+  },
   togglePanel: (panel) => set((s) => ({
     activePanel: s.activePanel === panel ? null : panel,
   })),

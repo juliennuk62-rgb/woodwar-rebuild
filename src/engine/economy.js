@@ -189,6 +189,10 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
   // Boost temporaire "abeille dorée" : ×N pendant beeBoostDurationMs, sinon 1.
   const boost = state?.activeBoost;
   const beeBoost = (boost && boost.endsAt > Date.now()) ? (boost.multiplier ?? 1) : 1;
+  // Boost arrosoir manuel : +25 % par stack (max 4 stacks = ×2) pendant 5 s.
+  const now = Date.now();
+  const waterStacks = (state && now < state.waterBoostEndsAt) ? state.waterBoostStacks : 0;
+  const waterBoost = 1 + waterStacks * 0.25;
 
   return Math.floor(
     species.baseRevenue *
@@ -202,6 +206,7 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
     weatherBonus *
     researchBonus *
     achievementBonus *
+    waterBoost *
     permanentBonus *
     beeBoost
   );

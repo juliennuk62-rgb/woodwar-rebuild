@@ -60,6 +60,12 @@ export default function PanelLauncher() {
       icon: '📜',
       hint: false,
     },
+    {
+      id: 'stats',
+      label: 'Stats',
+      icon: '📊',
+      hint: false,
+    },
   ];
 
   return (
