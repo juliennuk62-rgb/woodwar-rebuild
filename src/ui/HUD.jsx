@@ -93,6 +93,14 @@ export default function HUD() {
         <div className="hud-pill" title="Slots remplis">
           📦 {usedSlots}/{greenhouse.slots}
         </div>
+        <a
+          href="#sandbox"
+          className="hud-pill hud-pill-action"
+          title="Page expérimentale — prototype tapis roulant"
+          aria-label="Ouvrir la sandbox du tapis roulant"
+        >
+          🧪 <span className="hud-pill-text">Sandbox</span>
+        </a>
         <DebugMenu />
       </div>
     </header>

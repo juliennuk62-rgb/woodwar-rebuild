@@ -127,16 +127,10 @@ export function loadSave() {
     // Prompt 11 — rush moments (milestones lifetime déjà célébrés)
     data.seenMilestones = data.seenMilestones ?? {};
 
-    // Tapis roulant : on persiste l'état "unlocked" + stats lifetime, mais
-    // jamais les cartes en cours (elles ont une durée de vie de qq secondes,
-    // les restaurer au reload n'a aucun sens).
-    data.conveyor = data.conveyor ?? {
-      unlocked: false, cards: [], lastSpawnAt: 0, nextSpawnAt: 0,
-      grabbed: 0, ignored: 0, totalSpent: 0, totalGained: 0,
-    };
-    data.conveyor.cards = [];
-    data.conveyor.lastSpawnAt = 0;
-    data.conveyor.nextSpawnAt = 0;
+    // Tapis roulant : si une vieille save contient un champ `conveyor`,
+    // on le supprime — la fonctionnalité vit maintenant dans le sandbox
+    // séparé (#sandbox), avec son propre store/localStorage.
+    delete data.conveyor;
 
     // Abeille dorée : nextBeeAt persisté ; si manquant (vieille save), on
     // programme un premier spawn dans 5 min. Si activeBoost expiré au load,

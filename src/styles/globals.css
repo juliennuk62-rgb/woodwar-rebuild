@@ -3912,3 +3912,273 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 .reduced-motion .conveyor-card.is-leaving {
   animation: none !important;
 }
+
+/* ───────────────────────────────────────────────────────────────
+   SANDBOX — page autonome pour prototyper le tapis roulant.
+   Totalement isolée du jeu principal (#sandbox dans l'URL).
+   ─────────────────────────────────────────────────────────── */
+.sandbox-loader {
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  background: #0a0e0b;
+  color: var(--green-pale);
+  font-family: 'Playfair Display', serif;
+}
+.sandbox-loader-title { font-size: 24px; }
+
+.sandbox-root {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(900px 600px at 20% 0%, rgba(126,200,122,.08), transparent 60%),
+    radial-gradient(700px 500px at 80% 100%, rgba(168,85,247,.08), transparent 60%),
+    linear-gradient(180deg, #0a0e0b 0%, #0d110e 100%);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* HUD du sandbox (top bar) */
+.sandbox-hud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(126,200,122,.12);
+  background: rgba(13,17,14,.5);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+.sandbox-back {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(126,200,122,.1);
+  border: 1px solid rgba(126,200,122,.25);
+  color: var(--green-pale);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  text-decoration: none;
+  transition: background .15s ease;
+}
+.sandbox-back:hover { background: rgba(126,200,122,.2); }
+.sandbox-hud-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+.sandbox-hud-cash {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 900;
+  background: linear-gradient(180deg, var(--green) 0%, var(--green2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 14px rgba(126,200,122,.3));
+}
+.sandbox-hud-sub {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Zone du tapis roulant (centre, prend tout l'espace dispo) */
+.sandbox-belt-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 24px;
+}
+.sandbox-belt {
+  position: relative;
+  width: min(900px, 100%);
+  height: 200px;
+  background: linear-gradient(180deg, rgba(13,17,14,.55) 0%, rgba(13,17,14,.85) 100%);
+  border: 1px solid rgba(126,200,122,.18);
+  border-radius: 18px;
+  box-shadow:
+    inset 0 16px 32px -16px rgba(0,0,0,.6),
+    0 16px 36px -12px rgba(0,0,0,.55);
+  overflow: hidden;
+  perspective: 1000px;
+}
+.sandbox-rail {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 18px;
+  background: rgba(0,0,0,.4);
+  border-top: 1px solid rgba(126,200,122,.15);
+}
+.sandbox-rail-stripes {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(126,200,122,.0)   0px,
+    rgba(126,200,122,.0)  22px,
+    rgba(126,200,122,.18) 22px,
+    rgba(126,200,122,.18) 26px
+  );
+  animation: sandbox-stripes-scroll 1s linear infinite;
+}
+@keyframes sandbox-stripes-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-48px); }
+}
+.sandbox-belt-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  max-width: 600px;
+}
+
+/* Cartes du sandbox — taille plus généreuse que dans le jeu principal */
+.sandbox-card {
+  position: absolute;
+  top: 16px;
+  width: 140px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 6px;
+  background: linear-gradient(180deg, rgba(20,28,22,.95) 0%, rgba(13,17,14,.95) 100%);
+  border: 2px solid var(--rarity-color, var(--green));
+  border-radius: 14px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  box-shadow:
+    0 0 18px var(--rarity-glow, rgba(126,200,122,.3)),
+    0 10px 20px -10px rgba(0,0,0,.55);
+  transition: filter .12s ease, box-shadow .15s ease;
+  will-change: right, transform, opacity;
+}
+.sandbox-card:hover:not(:disabled) {
+  filter: brightness(1.18);
+  box-shadow:
+    0 0 28px var(--rarity-glow, rgba(126,200,122,.55)),
+    0 12px 24px -10px rgba(0,0,0,.65);
+}
+.sandbox-card:active:not(:disabled) { filter: brightness(.92); }
+.sandbox-card.is-poor {
+  cursor: not-allowed;
+  filter: grayscale(.6) brightness(.65);
+}
+.sandbox-card.is-leaving { animation: sandbox-card-leave-pulse .8s ease-in-out infinite; }
+@keyframes sandbox-card-leave-pulse {
+  0%, 100% { box-shadow: 0 0 18px var(--rarity-glow), 0 10px 20px -10px rgba(0,0,0,.55); }
+  50%      { box-shadow: 0 0 36px var(--rarity-glow), 0 10px 20px -10px rgba(0,0,0,.55); }
+}
+
+.sandbox-card-rarity {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--rarity-color, var(--green));
+  text-shadow: 0 0 6px var(--rarity-glow, rgba(126,200,122,.4));
+}
+.sandbox-card-icon {
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.6));
+}
+.sandbox-card-benefit {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green);
+  white-space: nowrap;
+}
+.sandbox-card-cost {
+  font-size: 12px;
+  color: var(--muted);
+}
+.sandbox-card-roi {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: var(--rarity-color, var(--gold));
+  color: #0d110e;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  box-shadow: 0 0 10px var(--rarity-glow, rgba(212,168,75,.5));
+}
+.sandbox-card.rarity-legendary {
+  animation: sandbox-legendary-pulse 1.6s ease-in-out infinite;
+}
+@keyframes sandbox-legendary-pulse {
+  0%, 100% { box-shadow: 0 0 22px var(--rarity-glow), 0 0 44px rgba(251,191,36,.25), 0 10px 20px -10px rgba(0,0,0,.6); }
+  50%      { box-shadow: 0 0 38px var(--rarity-glow), 0 0 70px rgba(251,191,36,.5),  0 10px 20px -10px rgba(0,0,0,.6); }
+}
+
+/* Contrôles bas (upgrade + reset) */
+.sandbox-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  border-top: 1px solid rgba(126,200,122,.12);
+  background: rgba(13,17,14,.5);
+}
+.sandbox-upgrade-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, rgba(126,200,122,.18) 0%, rgba(126,200,122,.08) 100%);
+  border: 2px solid var(--green);
+  border-radius: 14px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  transition: filter .15s ease, transform .15s ease;
+  box-shadow: 0 0 16px rgba(126,200,122,.25);
+}
+.sandbox-upgrade-btn:hover:not(:disabled) {
+  filter: brightness(1.15);
+  transform: translateY(-2px);
+}
+.sandbox-upgrade-btn.is-poor {
+  filter: grayscale(.6) brightness(.6);
+  cursor: not-allowed;
+}
+.sandbox-upgrade-icon { font-size: 22px; }
+.sandbox-upgrade-label { font-size: 14px; font-weight: 700; }
+.sandbox-upgrade-cost { font-size: 12px; color: var(--gold); }
+.sandbox-reset-btn {
+  padding: 14px 18px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease;
+}
+.sandbox-reset-btn:hover { color: var(--rose); border-color: var(--rose); }
+
+@media (max-width: 720px) {
+  .sandbox-hud { padding: 12px; flex-wrap: wrap; }
+  .sandbox-hud-cash { font-size: 28px; }
+  .sandbox-hud-sub { flex-wrap: wrap; gap: 6px; font-size: 10px; }
+  .sandbox-belt { height: 170px; }
+  .sandbox-card { width: 110px; height: 124px; }
+  .sandbox-card-icon { font-size: 28px; }
+  .sandbox-card-benefit { font-size: 12px; }
+}

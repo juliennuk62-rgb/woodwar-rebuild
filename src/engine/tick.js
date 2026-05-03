@@ -119,17 +119,9 @@ function tick() {
     }
   }
 
-  // ── 10. Tapis roulant : spawn + expiration des cartes
-  // Le spawn ne démarre qu'une fois `unlocked` (vérifié dans l'action).
-  // On respecte l'intervalle pseudo-aléatoire stocké dans `nextSpawnAt`.
-  if (now >= (store.conveyor?.nextSpawnAt ?? 0)) {
-    store.spawnConveyorCard();
-  }
-  if ((store.conveyor?.cards?.length ?? 0) > 0) {
-    store.expireConveyorCards();
-  }
-
-  // ── 11. Expéditions : réclamées manuellement par le joueur (pas ici).
+  // ── 10. Expéditions : réclamées manuellement par le joueur (pas ici).
+  // (Le tapis roulant tourne sur sa propre boucle dans la page sandbox,
+  //  cf. src/sandbox/. Pas branché sur le jeu principal.)
   store.setLastTick(now);
 }
 
