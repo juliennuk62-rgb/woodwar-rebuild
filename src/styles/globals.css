@@ -411,10 +411,21 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   gap: 10px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 820px) {
+  /* Le HUD top wrap sur 2 lignes en dessous de 820px : on descend les éléments
+     flottants pour qu'ils ne se chevauchent pas. */
   .greenhouse-selector { top: 110px; }
-  .prestige-trigger { top: 156px; }
+  .prestige-trigger { top: 158px; }
   .prestige-cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  /* Mobile portrait : on libère encore plus de place et on cache les labels
+     du dock pour faire tenir 7 boutons (icônes seules + aria-labels). */
+  .greenhouse-selector { top: 124px; }
+  .prestige-trigger { top: 172px; padding: 6px 12px; font-size: 11px; }
+  .launcher-btn { min-width: 0; padding: 6px 4px; }
+  .launcher-label { display: none; }
+  .launcher-icon { font-size: 22px; }
 }
 
 /* ─── Sidebar gauche : liste des plantes ─────────────────────── */

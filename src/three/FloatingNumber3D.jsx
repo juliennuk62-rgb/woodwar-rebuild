@@ -1,21 +1,16 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useGameStore } from '../store/gameStore.js';
 import { GAME_CONFIG } from '../config/gameConfig.js';
 import { formatEuros } from '../utils/numberFormat.js';
 
 // Floating number ancré en 3D au slot — projette du HTML via <Html> de drei.
 // Animation : monte de 1.2 unité sur 1.4s puis disparaît (GDD §09).
-// Se nettoie tout seul du store à la fin du timer.
-export default function FloatingNumber3D({ id, amount, kind, createdAt }) {
+// Le cleanup du store est géré côté action `harvestPlant` (un setTimeout
+// y est posé pour ne PAS dépendre du montage du composant — sinon les
+// floating numbers d'une serre inactive fuiraient en mémoire).
+export default function FloatingNumber3D({ amount, kind, createdAt }) {
   const ref = useRef();
-  const remove = useGameStore((s) => s.removeFloatingNumber);
-
-  useEffect(() => {
-    const t = setTimeout(() => remove(id), GAME_CONFIG.floatingNumberLifetimeMs);
-    return () => clearTimeout(t);
-  }, [id, remove]);
 
   useFrame(() => {
     if (!ref.current) return;

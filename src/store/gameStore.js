@@ -11,6 +11,8 @@ import {
   computeBulkCost,
   computeMaxAffordable,
   hasAnyGardener,
+  getGrowTime,
+  getSpeciesData,
 } from '../engine/economy.js';
 import { loadSave, applyOfflineProgress } from '../engine/save.js';
 import { SEASONS, SEASON_DURATION_MS, WEATHER_DURATION_MS, pickWeatherForSeason } from '../mechanics/weather.js';
@@ -198,7 +200,8 @@ export const useGameStore = create((set, get) => ({
   },
 
   isSpeciesUnlocked: (speciesId) => {
-    const plant = PLANTS[speciesId];
+    const plant = getSpeciesData(speciesId, get());
+    if (!plant) return false;
     if (plant.unlockedFromStart) return true;
     const lifetime = get().currency.lifetimeEuros;
     return lifetime >= (plant.unlockCost ?? 0);
@@ -314,10 +317,13 @@ export const useGameStore = create((set, get) => ({
     const plant = gh?.plants?.find((p) => p.slotId === slotId);
     if (!plant) return 0;
 
-    const species = PLANTS[plant.speciesId] ?? s.hybrids[plant.speciesId];
+    const species = getSpeciesData(plant.speciesId, s);
     if (!species) return 0;
+    // On utilise le growTime effectif (lighting + recherche), pas le brut.
     const elapsed = (Date.now() - plant.plantedAt) / 1000;
-    if (elapsed < species.growTime) return 0;
+    if (elapsed < getGrowTime(plant.speciesId, gh, s)) return 0;
+
+    const floatId = `${ghId}-${slotId}-${Date.now()}`;
 
     const revenue = computePlantRevenue(plant, gh, s.market, { manual: !!opts.manual }, s);
 
@@ -366,7 +372,7 @@ export const useGameStore = create((set, get) => ({
       floatingNumbers: [
         ...cur.floatingNumbers,
         {
-          id: `${ghId}-${slotId}-${Date.now()}`,
+          id: floatId,
           slotId,
           greenhouseId: ghId,
           amount: revenue,
@@ -375,7 +381,11 @@ export const useGameStore = create((set, get) => ({
         },
       ],
     }));
-    // Le son ne joue que pour la récolte manuelle (sinon ça serait incessant)
+    // Cleanup côté store (le composant peut ne jamais monter pour une serre
+    // inactive — sinon on aurait une fuite mémoire).
+    setTimeout(() => {
+      get().removeFloatingNumber(floatId);
+    }, GAME_CONFIG.floatingNumberLifetimeMs);
     if (opts.manual) audioManager.play('harvest');
     return revenue;
   },

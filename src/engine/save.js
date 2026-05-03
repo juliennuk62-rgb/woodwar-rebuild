@@ -59,8 +59,12 @@ export function loadSave() {
       data = migrated;
     }
 
-    // Patch léger : champs marché/saison ajoutés en Prompt 4
+    // Patch léger : champs ajoutés au fil des Prompts.
+    // On préfère ce mécanisme à une migration explicite tant qu'on reste sur
+    // la même version majeure, parce qu'il est non-destructif et simple.
     const now = Date.now();
+
+    // Prompt 4 — marché/saisons
     data.market = data.market ?? {};
     if (!data.market.seasonEndsAt)    data.market.seasonEndsAt    = now + SEASON_DURATION_MS;
     if (!data.market.weatherEndsAt)   data.market.weatherEndsAt   = now + WEATHER_DURATION_MS;
@@ -69,6 +73,21 @@ export function loadSave() {
     if (!data.market.salesSinceTick)  data.market.salesSinceTick  = {};
     if (!data.market.weather)         data.market.weather         = 'sunny';
     if (!data.market.currentSeason)   data.market.currentSeason   = 'spring';
+
+    // Prompts 5, 7, 9 — onboarding, hybrides, recherche, quêtes
+    data.settings = data.settings ?? {
+      reducedMotion: false, sfxVolume: 0.7, musicVolume: 0.4, muted: false, lang: 'fr',
+    };
+    data.onboarding = data.onboarding ?? { step: 0, dismissed: false, lastSeenStep: 0 };
+    data.research = data.research ?? { unlocked: [], inProgress: null };
+    data.hybrids = data.hybrids ?? {};
+    if (data.hybridIndex == null) data.hybridIndex = 0;
+    data.lab = data.lab ?? { active: [] };
+    data.quests = data.quests ?? {};
+    if (!data.quests.claimed) data.quests.claimed = {};
+    if (!data.quests.daily)   data.quests.daily   = { lastRefresh: null, active: [] };
+    if (!data.quests.weekly)  data.quests.weekly  = { points: 0 };
+    if (!data.expeditions)    data.expeditions    = { active: [], completed: 0 };
 
     // Vérification checksum en arrière-plan (non-bloquante)
     const expected = localStorage.getItem(HASH_KEY);
@@ -85,14 +104,21 @@ export function loadSave() {
   }
 }
 
+// `saveGame` est `async` (à cause du checksum SHA-256). On consomme les
+// promesses ici pour éviter les warnings "unhandled promise rejection" et
+// pour ne jamais propager une erreur de sauvegarde.
+function fireSave() {
+  saveGame().catch((e) => console.warn('[Jardin d\'Agnès] saveGame threw :', e));
+}
+
 export function setupAutosave() {
-  const id = setInterval(saveGame, GAME_CONFIG.autosaveIntervalMs);
-  const onUnload = () => saveGame();
+  const id = setInterval(fireSave, GAME_CONFIG.autosaveIntervalMs);
+  const onUnload = () => fireSave();
   window.addEventListener('beforeunload', onUnload);
   return () => {
     clearInterval(id);
     window.removeEventListener('beforeunload', onUnload);
-    saveGame();
+    fireSave();
   };
 }
 
