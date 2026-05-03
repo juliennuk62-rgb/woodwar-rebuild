@@ -2780,5 +2780,182 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 }
 .reduced-motion .plants-row-v2--mature {
   transform: none;
+/* ─── V4 — Micro-animations modernes (cards, boutons, badges) ────────────
+   Tous les effets sont additifs : appliqués sur :hover / :active uniquement,
+   donc aucune régression au repos. Respecte prefers-reduced-motion + .reduced-motion
+   via la règle globale en haut du fichier (transition/animation .01ms !important). */
+
+/* Keyframes partagés ----------------------------------------------------- */
+@keyframes v4-gradient-shift {
+  0%   { background-position:   0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes v4-border-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes v4-badge-pulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 var(--v4-badge-glow, rgba(126,200,122,.45)); }
+  50%      { transform: scale(1.06); box-shadow: 0 0 14px 2px var(--v4-badge-glow, rgba(126,200,122,.55)); }
+}
+@keyframes v4-shimmer {
+  0%   { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(220%)  skewX(-18deg); }
+}
+@keyframes v4-fn3d-pop {
+  0%   { opacity: 0; transform: scale(0);    }
+  40%  { opacity: 1; transform: scale(1.1);  }
+  60%  { opacity: 1; transform: scale(1);    }
+  100% { opacity: 0; transform: scale(.95);  }
+}
+
+/* Lift commun à toutes les cards des panels ----------------------------- */
+.shop-card,
+.gardener-card,
+.upgrade-card,
+.quest-card,
+.destination-card,
+.gallery-card {
+  position: relative;
+  /* dégradé radial très léger en bas-droite pour donner du relief */
+  background-image:
+    radial-gradient(ellipse at bottom right, rgba(126,200,122,.07), transparent 60%);
+  transition:
+    transform 200ms cubic-bezier(.2,.8,.2,1),
+    box-shadow 200ms cubic-bezier(.2,.8,.2,1),
+    border-color 200ms cubic-bezier(.2,.8,.2,1);
+}
+.shop-card:hover,
+.gardener-card:hover,
+.upgrade-card:hover,
+.quest-card:hover,
+.destination-card:hover,
+.gallery-card:hover {
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 0 10px 24px -10px rgba(0,0,0,.55), 0 4px 12px -4px rgba(126,200,122,.18);
+  border-color: rgba(126,200,122,.35);
+}
+
+/* Faux border-gradient animé via pseudo-element (n'altère pas le layout) */
+.shop-card::before,
+.gardener-card::before,
+.upgrade-card::before,
+.quest-card::before,
+.destination-card::before,
+.gallery-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from 0deg,
+    var(--green) 0%,
+    var(--gold) 25%,
+    var(--green2) 50%,
+    var(--blue) 75%,
+    var(--green) 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+.shop-card:hover::before,
+.gardener-card:hover::before,
+.upgrade-card:hover::before,
+.quest-card:hover::before,
+.destination-card:hover::before,
+.gallery-card:hover::before {
+  opacity: .9;
+  animation: v4-border-spin 6s linear infinite;
+}
+
+/* Cards "poor" : un peu plus grisées + saturation réduite ---------------- */
+.shop-card.poor,
+.gardener-card.poor {
+  filter: saturate(.55) brightness(.92);
+  opacity: .72;
+}
+
+/* Boutons d'action : gradient qui glisse au hover, scale 0.96 au click --- */
+.btn-plant,
+.btn-hire,
+.btn-upgrade {
+  position: relative;
+  overflow: hidden;
+  transition:
+    background .15s ease,
+    transform 120ms cubic-bezier(.2,.8,.2,1),
+    box-shadow 200ms ease;
+}
+.btn-plant:not(:disabled):hover,
+.btn-hire:not(:disabled):hover,
+.btn-upgrade:not(:disabled):hover {
+  background: linear-gradient(120deg, var(--green), var(--green2), var(--green));
+  background-size: 200% 100%;
+  animation: v4-gradient-shift 3s linear infinite;
+  box-shadow: 0 6px 18px -6px rgba(126,200,122,.55);
+}
+.btn-plant:not(:disabled):active,
+.btn-hire:not(:disabled):active,
+.btn-upgrade:not(:disabled):active {
+  transform: scale(.96);
+}
+
+/* Badges : pulse marqué + glow coloré ------------------------------------ */
+.badge-active {
+  --v4-badge-glow: rgba(126,200,122,.5);
+  animation: v4-badge-pulse 2.2s ease-in-out infinite;
+}
+.badge-max {
+  --v4-badge-glow: rgba(212,168,75,.5);
+  animation: v4-badge-pulse 2.6s ease-in-out infinite;
+}
+.badge-hot {
+  /* override du pulse historique (plus marqué + glow doré) */
+  --v4-badge-glow: rgba(212,168,75,.55);
+  animation: v4-badge-pulse 1.6s ease-in-out infinite;
+}
+
+/* Reward pills : shimmer left-to-right au hover -------------------------- */
+.reward-pill {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.reward-pill::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 40%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,.18) 50%,
+    transparent 100%);
+  transform: translateX(-120%) skewX(-18deg);
+  pointer-events: none;
+  z-index: 1;
+}
+.reward-pill:hover::after {
+  animation: v4-shimmer 900ms ease-out;
+}
+
+/* Floating numbers .fn3d : entrance plus marquée + glow ------------------ */
+.fn3d {
+  /* override de l'ancienne animation par la nouvelle entrance */
+  animation: v4-fn3d-pop 1.4s cubic-bezier(.2,1.4,.4,1) forwards;
+  text-shadow:
+    0 0 4px rgba(13,17,14,.9),
+    0 0 10px rgba(126,200,122,.55);
+  box-shadow: 0 0 14px -2px rgba(126,200,122,.35);
+}
+.fn3d--manual {
+  text-shadow:
+    0 0 4px rgba(13,17,14,.9),
+    0 0 10px rgba(212,168,75,.55);
+  box-shadow: 0 0 14px -2px rgba(212,168,75,.35);
 }
 
