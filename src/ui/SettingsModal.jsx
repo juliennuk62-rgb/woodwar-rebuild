@@ -22,6 +22,19 @@ export default function SettingsModal() {
     document.body.classList.toggle('reduced-motion', !!settings.reducedMotion);
   }, [settings.reducedMotion]);
 
+  // V3 — applique le thème néon optionnel sur <body>. Au démontage,
+  // on retire la classe pour ne pas laisser un état résiduel.
+  useEffect(() => {
+    const isNeon = settings.theme === 'neon';
+    document.body.classList.toggle('theme-neon', isNeon);
+    return () => {
+      // Si le composant est démonté pendant que neon est actif, on
+      // ne touche à rien : la classe doit rester tant que le réglage
+      // est ON. Le cleanup ne sert qu'à éviter un état fantôme si
+      // jamais l'effet est rejoué — rien à faire ici.
+    };
+  }, [settings.theme]);
+
   if (!open) return null;
 
   const onExport = async () => {
@@ -100,6 +113,12 @@ export default function SettingsModal() {
               hint="Désactive les transitions et particules pour un rendu plus calme."
               checked={settings.reducedMotion}
               onChange={(v) => update({ reducedMotion: v })}
+            />
+            <Toggle
+              label="✨ Thème néon"
+              hint="Palette dopaminante avec dégradés vifs et glow ambiant."
+              checked={settings.theme === 'neon'}
+              onChange={(v) => update({ theme: v ? 'neon' : 'classic' })}
             />
             <div className="settings-row">
               <label>Langue</label>

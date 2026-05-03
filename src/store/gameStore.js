@@ -145,6 +145,7 @@ function makeInitialState() {
       musicVolume: 0.4,
       muted: false,
       lang: 'fr',
+      theme: 'classic',      // V3 — 'classic' | 'neon'
     },
 
     // Tutoriel guidé (Prompt 5). step va de 0 (pas commencé) à 6 (fini).

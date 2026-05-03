@@ -100,8 +100,10 @@ export function loadSave() {
 
     // Prompts 5, 7, 9 — onboarding, hybrides, recherche, quêtes
     data.settings = data.settings ?? {
-      reducedMotion: false, sfxVolume: 0.7, musicVolume: 0.4, muted: false, lang: 'fr',
+      reducedMotion: false, sfxVolume: 0.7, musicVolume: 0.4, muted: false, lang: 'fr', theme: 'classic',
     };
+    // V3 — migration légère : champ `theme` ajouté après coup.
+    data.settings.theme ??= 'classic';
     data.onboarding = data.onboarding ?? { step: 0, dismissed: false, lastSeenStep: 0 };
     data.tipsSeen ??= {};
     data.mtipsSeen ??= {};

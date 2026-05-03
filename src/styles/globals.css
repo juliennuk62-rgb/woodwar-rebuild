@@ -14,6 +14,17 @@
   --text:      #e8eee6;
   --muted:     #6a7d66;
   --soil:      #2a1e10;
+
+  /* ─── Palette néon optionnelle (V3) ──────────────────────────
+     Exposée en permanence comme variables auxiliaires : utilisable
+     ponctuellement même hors du thème néon. Le thème complet ne
+     s'active qu'avec la classe `.theme-neon` sur <body>. */
+  --neon-green:  #00ff88;
+  --neon-purple: #a855f7;
+  --neon-pink:   #f472b6;
+  --neon-cyan:   #22d3ee;
+  --neon-yellow: #fbbf24;
+  --neon-orange: #fb923c;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2347,5 +2358,55 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 .btn-upgrade-mini:disabled {
   opacity: .5;
   cursor: not-allowed;
+}
+
+/* ─── Thème néon (V3) ────────────────────────────────────────────
+   Activé via la classe `.theme-neon` sur <body>. Surcharge les
+   variables principales avec la palette néon + assombrit le fond
+   en violet profond, puis ajoute des glows ciblés sur les éléments
+   clés du HUD / actions / hooks de progression. Tout reste
+   strictement opt-in : sans la classe, l'apparence d'origine est
+   intacte au pixel près. */
+.theme-neon {
+  --green:    var(--neon-green);
+  --gold:     var(--neon-yellow);
+  --rose:     var(--neon-pink);
+  --bg:       #0a0118;
+  --surface:  #14082b;
+  --surface2: #1e0d3e;
+  --border:   #2d1b4e;
+}
+
+/* Glow ambiant sur les éléments-clés en mode néon. text-shadow pour
+   les libellés et box-shadow pour les boutons d'action. */
+.theme-neon .hud-stat--green .hud-stat-value {
+  text-shadow:
+    0 0 6px var(--neon-green),
+    0 0 14px rgba(0, 255, 136, .55);
+}
+
+.theme-neon .btn-plant {
+  box-shadow:
+    0 0 12px rgba(0, 255, 136, .55),
+    0 0 24px rgba(0, 255, 136, .25);
+}
+
+.theme-neon .prestige-trigger {
+  box-shadow:
+    0 0 14px rgba(251, 191, 36, .75),
+    0 0 28px rgba(251, 191, 36, .45),
+    0 0 42px rgba(251, 191, 36, .25);
+}
+
+.theme-neon .badge-hot {
+  text-shadow:
+    0 0 6px var(--neon-pink),
+    0 0 14px rgba(244, 114, 182, .55);
+}
+
+.theme-neon .gh-tab.active {
+  box-shadow:
+    0 0 10px rgba(0, 255, 136, .5),
+    0 0 22px rgba(168, 85, 247, .35);
 }
 
