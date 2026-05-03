@@ -103,7 +103,7 @@ export function buildPrestigeReset(greenhouseId, state) {
   const newGh = {
     ...gh,
     plants: [],
-    gardeners: [],
+    gardeners: {},  // F8 : objet { [id]: level }
     upgrades: { lighting: 0, irrigation: 0, climate: 0, soil: 0 },
     slots: config.initialSlots, // les bonus slots de recherche s'appliquent ailleurs
     prestige: {

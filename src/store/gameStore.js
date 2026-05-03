@@ -55,7 +55,7 @@ function makeInitialGreenhouseState(id) {
     unlocked: id === 'temperate',
     slots: cfg.initialSlots,
     plants: [],     // { slotId, speciesId, plantedAt }
-    gardeners: [],  // tableau d'IDs (string)
+    gardeners: {},  // F8 : objet { [id]: level } — niveaux 1..5
     upgrades: { lighting: 0, irrigation: 0, climate: 0, soil: 0 },
     prestige: { count: 0, tokens: 0, lifetimeEarned: 0 },
   };
@@ -423,23 +423,49 @@ export const useGameStore = create((set, get) => ({
   },
 
   // ─── Jardiniers ──────────────────────────────────────────────────
-  hireGardener: (gardenerId) => {
+  // Structure : `gardeners` est un objet `{ [id]: level }` (level 1..5).
+  // Compat : si une vieille save contient un tableau, save.js le migre
+  // en objet au load. On lit toujours via les helpers ci-dessous.
+  getGardenerLevel: (gardenerId) => {
+    const s = get();
+    const g = GARDENERS[gardenerId];
+    if (!g) return 0;
+    const gh = s.greenhouses[g.greenhouseId];
+    return gh?.gardeners?.[gardenerId] ?? 0;
+  },
+
+  // Coût pour passer du niveau N au niveau N+1 : g.cost × 2^N.
+  // Niveau 0 → 1 = g.cost, 1 → 2 = 2× g.cost, etc.
+  getGardenerUpgradeCost: (gardenerId) => {
+    const g = GARDENERS[gardenerId];
+    if (!g) return Infinity;
+    const level = get().getGardenerLevel(gardenerId);
+    if (level >= 5) return Infinity;
+    return Math.round(g.cost * Math.pow(2, level));
+  },
+
+  levelUpGardener: (gardenerId) => {
     const s = get();
     const g = GARDENERS[gardenerId];
     if (!g) return false;
     const ghId = g.greenhouseId;
     const gh = s.greenhouses[ghId];
     if (!gh) return false;
-    if (gh.gardeners.includes(gardenerId)) return false;
+    const current = gh.gardeners?.[gardenerId] ?? 0;
+    if (current >= 5) return false;
 
-    if (!get().spendEuros(g.cost)) return false;
+    const cost = get().getGardenerUpgradeCost(gardenerId);
+    if (!get().spendEuros(cost)) return false;
 
     set((cur) => ({
       greenhouses: {
         ...cur.greenhouses,
         [ghId]: {
           ...cur.greenhouses[ghId],
-          gardeners: [...cur.greenhouses[ghId].gardeners, gardenerId],
+          gardeners: {
+            ...(cur.greenhouses[ghId].gardeners ?? {}),
+            [gardenerId]: current + 1,
+          },
         },
       },
       stats: {
@@ -616,7 +642,10 @@ export const useGameStore = create((set, get) => ({
     if (!check.ok) return false;
     const dest = EXPEDITIONS[destinationId];
     if (!get().spendEuros(dest.cost)) return false;
-    const exp = buildExpedition(destinationId, Date.now());
+    // F12 : on passe le bonus de vitesse achievements (a_exp_5/20) à la
+    // construction de l'expédition pour qu'il réduise effectivement la durée.
+    const bonuses = getAchievementBonus(s.quests?.claimed ?? {});
+    const exp = buildExpedition(destinationId, Date.now(), bonuses);
     set((cur) => ({
       expeditions: {
         ...cur.expeditions,

@@ -79,7 +79,13 @@ export default function Onboarding() {
         advance(3);
       }
       // Étape 4 : 3 plantes posées au total
-      if (step <= 3 && s.species.daisy?.owned >= 3) {
+      // Compte le nombre total de plantations toutes espèces confondues
+      // (pas que les marguerites — le joueur peut diversifier tôt).
+      const totalOwned = Object.values(s.species ?? {}).reduce(
+        (sum, sp) => sum + (sp?.owned ?? 0),
+        0
+      );
+      if (step <= 3 && totalOwned >= 3) {
         advance(4);
       }
       // Étape 5 : un jardinier embauché

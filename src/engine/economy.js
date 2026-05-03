@@ -114,21 +114,39 @@ export function getPrestigeMultiplier(greenhouse, state = null) {
   return base * boost;
 }
 
-// Bonus jardiniers pour une espèce donnée — somme additive
+// Bonus jardiniers pour une espèce — additif, modulé par le niveau (1..5).
+// Compat : `gardeners` peut être soit un objet `{ [id]: level }` (nouveau,
+// F8) soit un tableau d'IDs (ancien) — on lit dans les deux cas.
 export function getGardenerBonus(greenhouse, speciesId) {
-  if (!greenhouse?.gardeners?.length) return 0;
+  const g = greenhouse?.gardeners;
+  if (!g) return 0;
   let bonus = 0;
-  for (const gid of greenhouse.gardeners) {
-    const g = GARDENERS[gid];
-    if (g?.speciesBonus?.[speciesId]) bonus += g.speciesBonus[speciesId];
+  if (Array.isArray(g)) {
+    // Format legacy — on traite chaque jardinier comme niveau 1.
+    for (const gid of g) {
+      const def = GARDENERS[gid];
+      if (def?.speciesBonus?.[speciesId]) bonus += def.speciesBonus[speciesId];
+    }
+  } else {
+    for (const gid of Object.keys(g)) {
+      const level = g[gid] ?? 0;
+      if (level <= 0) continue;
+      const def = GARDENERS[gid];
+      if (def?.speciesBonus?.[speciesId]) {
+        bonus += def.speciesBonus[speciesId] * (1 + 0.25 * (level - 1));
+      }
+    }
   }
   return bonus;
 }
 
 // Y a-t-il au moins un jardinier embauché dans cette serre ?
-// Sert à savoir si le slot est replanté automatiquement après vente.
+// Compat array (legacy) + objet (F8).
 export function hasAnyGardener(greenhouse) {
-  return (greenhouse?.gardeners?.length ?? 0) > 0;
+  const g = greenhouse?.gardeners;
+  if (!g) return false;
+  if (Array.isArray(g)) return g.length > 0;
+  return Object.values(g).some((lvl) => lvl > 0);
 }
 
 // ─── Revenu d'une vente ──────────────────────────────────────

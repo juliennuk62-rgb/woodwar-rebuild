@@ -10,14 +10,18 @@ export default function HUD() {
   const ghId = useGameStore((s) => s.activeGreenhouse);
   const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
   const config = GREENHOUSES[ghId];
-  const getIncome = useGameStore((s) => s.getIncomePerSecond);
+  // On lit la fonction directement depuis le store via getState() — sinon
+  // le sélecteur retournerait potentiellement une nouvelle référence à
+  // chaque tick, recréant l'interval et fuyant des timers.
+  const getIncome = () => useGameStore.getState().getIncomePerSecond();
 
   // €/s mis à jour 2× par seconde — pas la peine de re-render React à chaque tick
   const [income, setIncome] = useState(0);
   useEffect(() => {
+    setIncome(getIncome());
     const id = setInterval(() => setIncome(getIncome()), 500);
     return () => clearInterval(id);
-  }, [getIncome]);
+  }, []);
 
   const usedSlots = greenhouse.plants.length;
 

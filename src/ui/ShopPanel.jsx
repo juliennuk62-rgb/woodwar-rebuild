@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useGameStore } from '../store/gameStore.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import { PLANTS } from '../config/plants.js';
-import { getSpeciesData } from '../engine/economy.js';
+import { getSpeciesData, getEffectiveSlots } from '../engine/economy.js';
 import { formatEuros, formatDuration } from '../utils/numberFormat.js';
 
 // Panneau de plantation. S'ouvre via :
@@ -70,15 +70,18 @@ export default function ShopPanel() {
       if (ok) close();
     } else {
       // Trouve un slot libre
+      const state = useGameStore.getState();
+      const totalSlots = getEffectiveSlots(greenhouse, state);
       const used = new Set(greenhouse.plants.map((p) => p.slotId));
       let free = -1;
-      for (let i = 0; i < greenhouse.slots; i++) if (!used.has(i)) { free = i; break; }
+      for (let i = 0; i < totalSlots; i++) if (!used.has(i)) { free = i; break; }
       if (free !== -1) plant(free, id);
     }
   };
 
   const onPlantBulk = (id, qty) => {
-    if (qty === 'max') qty = Math.min(getMaxAffordable(id), freeSlotsLeft(greenhouse));
+    const state = useGameStore.getState();
+    if (qty === 'max') qty = Math.min(getMaxAffordable(id), freeSlotsLeft(greenhouse, state));
     if (qty <= 0) return;
     plantBulk(id, qty);
   };
@@ -114,7 +117,7 @@ export default function ShopPanel() {
               const canAfford = euros >= cost;
               const marketMult = market[id] ?? 1.0;
               const sellPrice = Math.floor(species.baseRevenue * marketMult);
-              const freeSlots = freeSlotsLeft(greenhouse);
+              const freeSlots = freeSlotsLeft(greenhouse, useGameStore.getState());
 
               return (
                 <div
@@ -181,6 +184,10 @@ export default function ShopPanel() {
   );
 }
 
-function freeSlotsLeft(greenhouse) {
-  return greenhouse.slots - greenhouse.plants.length;
+// Slots libres = slots effectifs (incluant le bonus recherche slots_*)
+// moins ceux déjà occupés. Ignorer le bonus serait un piège : le joueur ne
+// peut pas planter en Max alors qu'il a payé pour des slots supplémentaires.
+function freeSlotsLeft(greenhouse, state) {
+  const total = getEffectiveSlots(greenhouse, state);
+  return total - greenhouse.plants.length;
 }

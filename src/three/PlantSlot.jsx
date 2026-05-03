@@ -23,33 +23,48 @@ export default function PlantSlot({ slot }) {
   const marketPrice = useGameStore((s) =>
     plant ? s.market.prices[plant.speciesId] : undefined
   );
-  const slotFloats = useGameStore((s) =>
-    s.floatingNumbers.filter(
-      (f) => f.slotId === slot.id && (f.greenhouseId == null || f.greenhouseId === s.activeGreenhouse)
-    )
+  // Sélecteur stable : on ne lit que `floatingNumbers` (référence partagée)
+  // et on filtre en useMemo. Sans ça, `.filter()` côté sélecteur recrée un
+  // nouveau tableau à chaque tick → re-render permanent du composant.
+  const allFloatingNumbers = useGameStore((s) => s.floatingNumbers);
+  const slotFloats = useMemo(
+    () => allFloatingNumbers.filter(
+      (f) => f.slotId === slot.id && (f.greenhouseId == null || f.greenhouseId === ghId)
+    ),
+    [allFloatingNumbers, slot.id, ghId]
   );
 
   const [hover, setHover] = useState(false);
+  // Perf : la valeur exacte du ratio (60 fps) vit dans une ref. Le state
+  // React n'est mis à jour qu'aux changements visibles (palier de 5 %)
+  // pour ne pas re-render PlantMesh à chaque frame Three.js.
+  const growthRef = useRef(0);
   const [growth, setGrowth] = useState(0);
   const wasMatureRef = useRef(false);
   const [burstId, setBurstId] = useState(0);
 
-  // Si le composant est démonté pendant qu'on est en hover (switch de serre
-  // rapide par exemple), `onPointerOut` n'a pas le temps de se déclencher
-  // et le curseur reste coincé en 'pointer'. Ce cleanup couvre le cas.
+  // Cleanup du curseur au démontage (cas où onPointerOut n'a pas eu le temps
+  // de se déclencher avant un switch de serre).
   useEffect(() => () => { document.body.style.cursor = ''; }, []);
 
   useFrame(() => {
     if (!plant) {
-      if (growth !== 0) setGrowth(0);
+      if (growthRef.current !== 0) {
+        growthRef.current = 0;
+        setGrowth(0);
+      }
       wasMatureRef.current = false;
       return;
     }
     const state = useGameStore.getState();
     const { ratio } = getPlantStage(plant, undefined, greenhouse, state);
-    if (Math.abs(ratio - growth) > 0.005) setGrowth(ratio);
+    growthRef.current = ratio;
+    // setState seulement si le palier visible change (5 %). Évite le
+    // re-render à 60 fps qui plombait le CPU avec ~20 pots actifs.
+    if (Math.abs(ratio - growth) >= 0.05 || (ratio >= 1 && growth < 1) || (ratio < 0.05 && growth > 0)) {
+      setGrowth(ratio);
+    }
 
-    // Détection de floraison → spawn particules de pollen une fois
     const isMature = ratio >= 1;
     if (isMature && !wasMatureRef.current) {
       setBurstId((id) => id + 1);

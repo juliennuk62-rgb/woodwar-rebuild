@@ -131,6 +131,34 @@ export function loadSave() {
     if (data.nextBeeAt == null) data.nextBeeAt = now + 5 * 60 * 1000;
     if (data.activeBoost && data.activeBoost.endsAt < now) data.activeBoost = null;
 
+    // F8 : migration `gardeners` array → objet `{ [id]: level }`. Sécurité
+    // anti-crash : si pour une raison quelconque la clé manque (vieille
+    // save d'avant Prompt 3), on l'initialise à un objet vide.
+    if (data.greenhouses) {
+      for (const ghId of Object.keys(data.greenhouses)) {
+        const gh = data.greenhouses[ghId];
+        if (!gh) continue;
+        if (Array.isArray(gh.gardeners)) {
+          const obj = {};
+          for (const id of gh.gardeners) obj[id] = 1;
+          gh.gardeners = obj;
+        } else if (gh.gardeners == null) {
+          gh.gardeners = {};
+        }
+      }
+    }
+
+    // F13 : migration des hybrides. Si un hybride a `trait` (string) mais
+    // pas `traits[]`, on rétro-remplit pour que le code en aval puisse
+    // toujours itérer sur traits.
+    if (data.hybrids) {
+      for (const h of Object.values(data.hybrids)) {
+        if (!Array.isArray(h.traits)) {
+          h.traits = h.trait ? [h.trait] : [];
+        }
+      }
+    }
+
     // Champs volatiles : on les nettoie même s'ils sont présents (vieilles
     // saves committées avant l'audit qui les a ajoutés à VOLATILE).
     delete data.currentDiscovery;
