@@ -45,6 +45,13 @@ export default function ShopPanel() {
     return () => window.removeEventListener('jardin:open-shop', onOpen);
   }, []);
 
+  // Si l'utilisateur switche de serre alors qu'un slot précis était ouvert,
+  // on referme le mode "slot" — sinon on planterait dans la mauvaise serre.
+  useEffect(() => {
+    if (slotId !== null) setSlotId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ghId]);
+
   const open = slotId !== null || activePanel === 'shop';
   if (!open) return null;
 

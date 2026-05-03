@@ -92,6 +92,13 @@ export function loadSave() {
     if (!data.expeditions)    data.expeditions    = { active: [], completed: 0 };
     data.permanentBonuses = data.permanentBonuses ?? { revenueBonus: 0 };
 
+    // Champs volatiles : on les nettoie même s'ils sont présents (vieilles
+    // saves committées avant l'audit qui les a ajoutés à VOLATILE).
+    delete data.currentDiscovery;
+    delete data.upgradeFlash;
+    delete data.floatingNumbers;
+    delete data.offlineGains;
+
     // Vérification checksum en arrière-plan (non-bloquante)
     const expected = localStorage.getItem(HASH_KEY);
     if (expected) {
