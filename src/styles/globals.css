@@ -2477,3 +2477,308 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   }
 }
 
+/* ─── Sidebar gauche V2 — cartes data-viz néon-glassmorphism ─── */
+/* Préfixe `.plants-row-v2-` pour ne pas écraser la V1 (.plants-row-*).
+   La couleur d'accent est injectée via la variable inline --accent
+   (voir PlantsList.jsx → species.petalColor). */
+
+.plants-row-v2 {
+  --accent: var(--green);
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px 12px;
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--accent) 14%, rgba(19,26,20,.92)) 0%,
+      rgba(19,26,20,.92) 65%);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: 12px;
+  align-items: stretch;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.02) inset,
+    0 4px 14px -6px color-mix(in srgb, var(--accent) 40%, transparent),
+    0 0 18px -10px color-mix(in srgb, var(--accent) 60%, transparent);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.plants-row-v2::before {
+  /* Liseré néon en haut à gauche, façon HUD cyber. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 60% at 0% 0%,
+      color-mix(in srgb, var(--accent) 25%, transparent) 0%,
+      transparent 55%);
+  opacity: .55;
+  pointer-events: none;
+  z-index: 0;
+}
+.plants-row-v2:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04) inset,
+    0 6px 22px -6px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 0 26px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
+
+/* Mature : pulse doré + bordure or saturée. */
+.plants-row-v2--mature {
+  border-color: var(--gold);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--gold) 22%, rgba(19,26,20,.92)) 0%,
+      rgba(19,26,20,.92) 70%);
+  animation: plants-row-v2-pulse 1.6s ease-in-out infinite;
+}
+@keyframes plants-row-v2-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.04) inset,
+      0 4px 18px -6px rgba(212,168,75,.55),
+      0 0 24px -8px rgba(212,168,75,.7);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.06) inset,
+      0 8px 28px -6px rgba(212,168,75,.85),
+      0 0 36px -6px rgba(212,168,75,.95);
+  }
+}
+
+/* ── Icône + halo + donut SVG ─────────────────────────────── */
+.plants-row-v2-icon-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+.plants-row-v2-halo {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--accent) 70%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 25%, transparent) 45%,
+    transparent 75%);
+  filter: blur(2px);
+  z-index: 0;
+  animation: plants-row-v2-halo-breathe 3.2s ease-in-out infinite;
+}
+@keyframes plants-row-v2-halo-breathe {
+  0%, 100% { opacity: .65; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.06); }
+}
+.plants-row-v2-donut {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 60%, transparent));
+}
+.plants-row-v2-donut-track {
+  fill: none;
+  stroke: rgba(255,255,255,.08);
+  stroke-width: 3;
+}
+.plants-row-v2-donut-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray .3s ease-out;
+}
+.plants-row-v2--mature .plants-row-v2-donut-fill {
+  stroke: var(--gold);
+  filter: drop-shadow(0 0 4px var(--gold));
+}
+.plants-row-v2-icon {
+  position: relative;
+  z-index: 2;
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+.plants-row-v2-check {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #1a1208;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  z-index: 3;
+  box-shadow: 0 0 10px rgba(212,168,75,.9);
+}
+
+/* ── Bloc texte ───────────────────────────────────────────── */
+.plants-row-v2-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+}
+.plants-row-v2-name-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+.plants-row-v2-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f3f8f1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+.plants-row-v2-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: color-mix(in srgb, var(--accent) 80%, white);
+  flex-shrink: 0;
+  text-shadow: 0 0 6px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.plants-row-v2-pct.is-mature {
+  color: var(--gold);
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(212,168,75,.9);
+}
+.plants-row-v2-sci {
+  font-size: 10px;
+  font-style: italic;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 80%, white) 0%,
+    color-mix(in srgb, var(--accent) 30%, #c8e8c4) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: -2px;
+  opacity: .9;
+}
+
+/* ── Mini-stats ───────────────────────────────────────────── */
+.plants-row-v2-stats {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.plants-row-v2-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgba(0,0,0,.32);
+  border: 1px solid rgba(255,255,255,.06);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: #d8e8d4;
+  line-height: 1;
+}
+.plants-row-v2-stat-icon {
+  font-size: 10px;
+  opacity: .85;
+}
+.plants-row-v2-stat-val {
+  font-weight: 700;
+  color: #fff;
+}
+.plants-row-v2-stat-unit {
+  opacity: .65;
+  font-size: 9px;
+}
+.plants-row-v2-stat.is-hot {
+  background: linear-gradient(135deg, rgba(255,90,40,.28), rgba(255,160,40,.18));
+  border-color: rgba(255,140,40,.6);
+  color: #ffd9b8;
+  box-shadow: 0 0 10px -2px rgba(255,120,40,.7);
+}
+.plants-row-v2-stat.is-cold {
+  background: linear-gradient(135deg, rgba(80,160,255,.22), rgba(140,200,255,.12));
+  border-color: rgba(140,200,255,.5);
+  color: #d8ecff;
+}
+
+/* ── Barre de progression large (sous les stats) ──────────── */
+.plants-row-v2-bar {
+  height: 4px;
+  margin-top: 6px;
+  background: rgba(255,255,255,.06);
+  border-radius: 100px;
+  overflow: hidden;
+  position: relative;
+}
+.plants-row-v2-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 60%, #4a9e46) 0%,
+    var(--accent) 60%,
+    color-mix(in srgb, var(--accent) 80%, white) 100%);
+  border-radius: inherit;
+  box-shadow:
+    0 0 8px color-mix(in srgb, var(--accent) 80%, transparent),
+    0 0 2px var(--accent);
+  transition: width .3s ease-out;
+  position: relative;
+}
+.plants-row-v2-bar-fill::after {
+  /* Reflet animé qui glisse pour donner un effet "pulsant". */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,.45) 50%,
+    transparent 100%);
+  transform: translateX(-100%);
+  animation: plants-row-v2-bar-shimmer 2.2s linear infinite;
+}
+@keyframes plants-row-v2-bar-shimmer {
+  to { transform: translateX(100%); }
+}
+.plants-row-v2--mature .plants-row-v2-bar-fill {
+  background: linear-gradient(90deg, #f5c45a, var(--gold), #ffe8a8);
+  box-shadow:
+    0 0 12px rgba(212,168,75,.9),
+    0 0 4px rgba(212,168,75,1);
+}
+
+/* Reduced motion : on coupe les pulses + shimmer.
+   La règle globale `.reduced-motion *` (globals.css ligne 64) ramène déjà
+   les durations à 0.01ms, mais on neutralise explicitement le scale pour
+   éviter tout flicker visuel. */
+.reduced-motion .plants-row-v2--mature,
+.reduced-motion .plants-row-v2-halo,
+.reduced-motion .plants-row-v2-bar-fill::after {
+  animation: none !important;
+}
+.reduced-motion .plants-row-v2--mature {
+  transform: none;
+}
+
