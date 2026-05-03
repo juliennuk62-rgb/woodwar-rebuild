@@ -852,6 +852,20 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 .upgrade-effect strong { color: var(--green); }
 .next-effect { color: var(--gold); margin-left: 4px; }
 
+.upgrade-buy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.upgrade-ttnb {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
 .level-bar {
   display: flex;
   gap: 4px;
