@@ -41,7 +41,7 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 .side-panel button,
 .panel-launcher button,
 .onboarding-card button,
-.btn-plant, .btn-plant-mini, .btn-hire, .btn-upgrade,
+.btn-plant, .btn-plant-mini, .btn-hire, .btn-upgrade, .btn-upgrade-mini,
 .btn-secondary, .btn-danger {
   min-height: 44px;
 }
@@ -2287,3 +2287,35 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   font-size: 22px;
   color: var(--green-pale);
 }
+
+/* ─── Buy Max sur les upgrades de serre ─────────────────────── */
+.upgrade-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.upgrade-actions .btn-upgrade {
+  flex: 1 1 auto;
+}
+.btn-upgrade-mini {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 8px 10px;
+  background: var(--surface3);
+  color: var(--green-pale);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  flex: 1 1 auto;
+  transition: border-color .15s ease, color .15s ease;
+}
+.btn-upgrade-mini:not(:disabled):hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+.btn-upgrade-mini:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+

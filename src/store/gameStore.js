@@ -3,7 +3,7 @@ import { PLANTS } from '../config/plants.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import { GAME_CONFIG } from '../config/gameConfig.js';
 import { GARDENERS } from '../config/gardeners.js';
-import { UPGRADE_TYPES, upgradeCost } from '../config/upgrades.js';
+import { UPGRADE_TYPES, upgradeCost, bulkUpgradeCost } from '../config/upgrades.js';
 import {
   computePlantRevenue,
   computeIncomePerSecond,
@@ -447,7 +447,11 @@ export const useGameStore = create((set, get) => ({
     return upgradeCost(typeId, level);
   },
 
-  buyUpgrade: (typeId) => {
+  // count : nombre de niveaux à acheter d'un coup (par défaut 1).
+  // Si count === 'max', on prend tout ce qu'on peut s'offrir jusqu'au maxLevel.
+  // Sinon on plafonne par : niveaux restants, count demandé, et budget dispo.
+  // Le coût débité est exact (somme des upgradeCost successifs).
+  buyUpgrade: (typeId, count = 1) => {
     const s = get();
     const ghId = s.activeGreenhouse;
     const gh = s.greenhouses[ghId];
@@ -456,8 +460,26 @@ export const useGameStore = create((set, get) => ({
     const level = gh.upgrades[typeId] ?? 0;
     if (level >= upgrade.maxLevel) return false;
 
-    const cost = upgradeCost(typeId, level);
-    if (!get().spendEuros(cost)) return false;
+    // Détermine combien de niveaux on peut effectivement payer.
+    const budget = s.currency.euros;
+    let want;
+    if (count === 'max') {
+      want = upgrade.maxLevel - level;
+    } else {
+      want = Math.min(Math.max(1, count | 0), upgrade.maxLevel - level);
+    }
+
+    let bought = 0;
+    let totalCost = 0;
+    for (let i = 0; i < want; i++) {
+      const c = upgradeCost(typeId, level + i);
+      if (totalCost + c > budget) break;
+      totalCost += c;
+      bought++;
+    }
+    if (bought <= 0) return false;
+
+    if (!get().spendEuros(totalCost)) return false;
 
     set((cur) => ({
       greenhouses: {
@@ -466,7 +488,7 @@ export const useGameStore = create((set, get) => ({
           ...cur.greenhouses[ghId],
           upgrades: {
             ...cur.greenhouses[ghId].upgrades,
-            [typeId]: level + 1,
+            [typeId]: level + bought,
           },
         },
       },
@@ -474,6 +496,42 @@ export const useGameStore = create((set, get) => ({
     get().flashUpgrade(typeId);
     audioManager.play('upgrade');
     return true;
+  },
+
+  // Coût total + niveaux réellement obtenus pour un achat groupé. Utilisé
+  // par UpgradesPanel pour afficher le prix sur les boutons +5 / Max.
+  getBulkUpgradePreview: (typeId, count) => {
+    const s = get();
+    const ghId = s.activeGreenhouse;
+    const level = s.greenhouses[ghId]?.upgrades?.[typeId] ?? 0;
+    const upgrade = UPGRADE_TYPES[typeId];
+    if (!upgrade) return { totalCost: 0, levels: 0 };
+    const remaining = upgrade.maxLevel - level;
+    if (remaining <= 0) return { totalCost: 0, levels: 0 };
+
+    let want;
+    if (count === 'max') {
+      want = remaining;
+    } else {
+      want = Math.min(Math.max(1, count | 0), remaining);
+    }
+    const budget = s.currency.euros;
+    let totalCost = 0;
+    let levels = 0;
+    for (let i = 0; i < want; i++) {
+      const c = upgradeCost(typeId, level + i);
+      if (totalCost + c > budget) break;
+      totalCost += c;
+      levels++;
+    }
+    // Si on n'a pas assez pour rien : on renvoie tout de même le coût "voulu"
+    // (sans tronquer par budget) pour pouvoir afficher le prix sur le bouton
+    // désactivé (ex: "+5 · 12 800 €").
+    if (levels === 0) {
+      const preview = bulkUpgradeCost(typeId, level, want);
+      return { totalCost: preview.totalCost, levels: 0 };
+    }
+    return { totalCost, levels };
   },
 
   // ─── Income forecast (somme sur toutes serres débloquées) ────────

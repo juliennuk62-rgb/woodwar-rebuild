@@ -1,5 +1,5 @@
 import { useGameStore } from '../store/gameStore.js';
-import { UPGRADE_LIST, upgradeCost } from '../config/upgrades.js';
+import { UPGRADE_LIST, upgradeCost, bulkUpgradeCost } from '../config/upgrades.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import { formatEuros } from '../utils/numberFormat.js';
 
@@ -33,15 +33,41 @@ export default function UpgradesPanel() {
             {UPGRADE_LIST.map((u) => {
               const level = greenhouse.upgrades[u.id] ?? 0;
               const max = u.maxLevel;
-              const cost = upgradeCost(u.id, level);
-              const canAfford = euros >= cost && level < max;
+              const remaining = max - level;
               const isMax = level >= max;
+
+              // Coût du prochain niveau (bouton +1)
+              const cost1 = upgradeCost(u.id, level);
+              const canAfford1 = euros >= cost1 && !isMax;
+
+              // Coût pour +5 (ou moins si on est près du max). On affiche
+              // toujours le prix du paquet "voulu" (jusqu'à 5), même si on
+              // n'a pas tout le budget — le bouton est juste désactivé.
+              const want5 = Math.min(5, remaining);
+              const bulk5 = bulkUpgradeCost(u.id, level, want5);
+              const canAfford5 = !isMax && want5 > 0 && euros >= cost1; // au moins 1 niveau payable
+
+              // Coût "Max" : tout ce qui reste, plafonné par le budget.
+              const bulkMaxAll = bulkUpgradeCost(u.id, level, remaining);
+              // Combien de niveaux on peut réellement s'offrir sur les
+              // niveaux restants. Sert à afficher le coût exact sur le bouton.
+              let maxAffordableLevels = 0;
+              let maxAffordableCost = 0;
+              for (let i = 0; i < remaining; i++) {
+                const c = upgradeCost(u.id, level + i);
+                if (maxAffordableCost + c > euros) break;
+                maxAffordableCost += c;
+                maxAffordableLevels++;
+              }
+              const maxLabelCost =
+                maxAffordableLevels > 0 ? maxAffordableCost : bulkMaxAll.totalCost;
+              const canAffordMax = !isMax && maxAffordableLevels > 0;
 
               const flashing = flash?.typeId === u.id;
               return (
                 <div
                   key={u.id}
-                  className={`upgrade-card ${!canAfford && !isMax ? 'poor' : ''} ${isMax ? 'maxed' : ''} ${flashing ? 'flashing' : ''}`}
+                  className={`upgrade-card ${!canAfford1 && !isMax ? 'poor' : ''} ${isMax ? 'maxed' : ''} ${flashing ? 'flashing' : ''}`}
                 >
                   <div className="upgrade-icon">{u.icon}</div>
                   <div className="upgrade-body">
@@ -53,20 +79,42 @@ export default function UpgradesPanel() {
                           {!isMax && <span className="next-effect"> → {formatEffect(u, level + 1)}</span>}
                         </div>
                       </div>
-                      {isMax ? (
-                        <span className="badge badge-max">MAX</span>
-                      ) : (
-                        <button
-                          className="btn-upgrade"
-                          disabled={!canAfford}
-                          onClick={() => buy(u.id)}
-                        >
-                          {formatEuros(cost)}
-                        </button>
-                      )}
+                      {isMax && <span className="badge badge-max">MAX</span>}
                     </div>
                     <div className="upgrade-desc">{u.description}</div>
                     <LevelBar level={level} max={max} />
+                    {!isMax && (
+                      <div className="upgrade-actions">
+                        <button
+                          className="btn-upgrade"
+                          disabled={!canAfford1}
+                          onClick={() => buy(u.id, 1)}
+                          title={`Acheter 1 niveau · ${formatEuros(cost1)}`}
+                        >
+                          +1 · {formatEuros(cost1)}
+                        </button>
+                        <button
+                          className="btn-upgrade-mini"
+                          disabled={!canAfford5}
+                          onClick={() => buy(u.id, 5)}
+                          title={`Acheter jusqu'à ${want5} niveaux · ${formatEuros(bulk5.totalCost)}`}
+                        >
+                          +{want5} · {formatEuros(bulk5.totalCost)}
+                        </button>
+                        <button
+                          className="btn-upgrade-mini"
+                          disabled={!canAffordMax}
+                          onClick={() => buy(u.id, 'max')}
+                          title={
+                            canAffordMax
+                              ? `Acheter ${maxAffordableLevels} niveau(x) · ${formatEuros(maxAffordableCost)}`
+                              : `Coût pour tout débloquer : ${formatEuros(bulkMaxAll.totalCost)}`
+                          }
+                        >
+                          Max · {formatEuros(maxLabelCost)}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               );

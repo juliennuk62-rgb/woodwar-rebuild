@@ -60,3 +60,36 @@ export function upgradeCost(typeId, currentLevel) {
   if (!t || currentLevel >= t.maxLevel) return Infinity;
   return Math.round(t.baseCost * Math.pow(t.costGrowth, currentLevel));
 }
+
+// Coût total pour acheter `count` niveaux successifs à partir de currentLevel.
+// Plafonné par maxLevel : si on demande plus que ce qui reste, on s'arrête.
+// Retourne { totalCost, levels } où levels est le nombre de niveaux pris en
+// compte (peut être < count si on heurte le maxLevel).
+export function bulkUpgradeCost(typeId, currentLevel, count) {
+  const t = UPGRADE_TYPES[typeId];
+  if (!t) return { totalCost: 0, levels: 0 };
+  const remaining = Math.max(0, t.maxLevel - currentLevel);
+  const levels = Math.min(remaining, Math.max(0, count));
+  let totalCost = 0;
+  for (let i = 0; i < levels; i++) {
+    totalCost += upgradeCost(typeId, currentLevel + i);
+  }
+  return { totalCost, levels };
+}
+
+// Combien de niveaux on peut s'offrir (plafonné par maxLevel ET par budget).
+// Retourne { totalCost, levels }.
+export function maxAffordableUpgrade(typeId, currentLevel, budget) {
+  const t = UPGRADE_TYPES[typeId];
+  if (!t) return { totalCost: 0, levels: 0 };
+  const remaining = Math.max(0, t.maxLevel - currentLevel);
+  let totalCost = 0;
+  let levels = 0;
+  for (let i = 0; i < remaining; i++) {
+    const c = upgradeCost(typeId, currentLevel + i);
+    if (totalCost + c > budget) break;
+    totalCost += c;
+    levels++;
+  }
+  return { totalCost, levels };
+}
