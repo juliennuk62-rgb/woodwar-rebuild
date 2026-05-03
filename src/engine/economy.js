@@ -12,6 +12,7 @@ import {
 } from '../mechanics/weather.js';
 import { getResearchBonuses } from '../mechanics/research.js';
 import { TRAITS } from '../mechanics/hybridation.js';
+import { getAchievementBonus } from '../mechanics/quests.js';
 
 // Helper unifié : récupère les données d'une espèce (native PLANTS ou hybride).
 // `state` est optionnel : si non fourni, on ne regarde que PLANTS.
@@ -139,6 +140,7 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
   const weatherBonus = 1 + getWeatherEffect(weather).revenueBonus;
   const research = state?.research?.unlocked ?? [];
   const researchBonus = 1 + getResearchBonuses(research).revenueBonus;
+  const achievementBonus = 1 + getAchievementBonus(state?.quests?.claimed ?? {});
 
   return Math.floor(
     species.baseRevenue *
@@ -150,7 +152,8 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
     seasonGlobal *
     seasonSpecies *
     weatherBonus *
-    researchBonus
+    researchBonus *
+    achievementBonus
   );
 }
 

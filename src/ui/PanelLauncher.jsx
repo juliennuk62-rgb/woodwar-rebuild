@@ -54,6 +54,12 @@ export default function PanelLauncher() {
       icon: '🧬',
       hint: false,
     },
+    {
+      id: 'quests',
+      label: 'Quêtes',
+      icon: '📜',
+      hint: false,
+    },
   ];
 
   return (

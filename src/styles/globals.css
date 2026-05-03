@@ -1699,6 +1699,75 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   letter-spacing: .03em;
 }
 
+/* ─── Quests panel (Prompt 9) ─────────────────────────────── */
+.quest-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.quest-card:has(.quest-icon) { grid-template-columns: 50px 1fr; }
+.quest-card .quest-icon {
+  font-size: 28px;
+  text-align: center;
+  align-self: center;
+}
+.quest-card.ready {
+  border-color: rgba(212,168,75,.5);
+  background: rgba(212,168,75,.07);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+.quest-card.claimed { opacity: .65; }
+.quest-card.locked { opacity: .5; }
+.quest-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.quest-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  flex: 1;
+  min-width: 0;
+}
+.quest-locked-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: normal;
+}
+.quest-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.quest-progress {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 4px;
+}
+.reward-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 100px;
+  background: rgba(212,168,75,.12);
+  color: var(--gold);
+  border: 1px solid rgba(212,168,75,.3);
+  white-space: nowrap;
+}
+.reward-pill.subtle {
+  background: var(--surface3);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
 /* ─── Flash sur upgrade achetée ───────────────────────────── */
 .upgrade-card.flashing {
   animation: flash-buy .5s ease-out;

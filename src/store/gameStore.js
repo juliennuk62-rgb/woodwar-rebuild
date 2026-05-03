@@ -27,6 +27,24 @@ import {
   hybridizationDurationMs,
 } from '../mechanics/hybridation.js';
 import { getPrestigePreview, buildPrestigeReset } from '../engine/prestige.js';
+import {
+  STORY_QUESTS,
+  ACHIEVEMENTS,
+  dailyTitle,
+  dailyDescription,
+  dailyReward,
+} from '../config/quests.js';
+import {
+  questStatus,
+  storyList,
+  achievementsList,
+  dailyStatus,
+  generateDailies,
+  shouldRefreshDailies,
+  todayISO,
+  getAchievementBonus,
+} from '../mechanics/quests.js';
+import { Events as Analytics } from '../utils/analytics.js';
 
 function makeInitialGreenhouseState(id) {
   const cfg = GREENHOUSES[id];
@@ -87,7 +105,11 @@ function makeInitialState() {
     hybrids: {},                                    // { hyb_001: { ...speciesData, parent1, parent2, trait, createdAt } }
     hybridIndex: 0,                                 // incrémente pour générer les IDs
     lab: { active: [] },                            // { id, parent1, parent2, startedAt, endsAt, cost }
-    quests: { story: {}, daily: { lastRefresh: null, active: [] }, weekly: { points: 0 } },
+    quests: {
+      claimed: {},          // { questId: true } — story + achievements + dailies
+      daily: { lastRefresh: null, active: [] },
+      weekly: { points: 0 },
+    },
     stats: {
       totalPlantsGrown: 0,
       totalEarned: 0,
@@ -628,6 +650,100 @@ export const useGameStore = create((set, get) => ({
     }));
     return hybrid;
   },
+
+  // ─── Quêtes (Prompt 9) ───────────────────────────────────────────
+  getStoryList: () => storyList(get(), get().quests.claimed),
+  getAchievements: () => achievementsList(get(), get().quests.claimed),
+  getDailies: () => {
+    const s = get();
+    return (s.quests.daily.active ?? []).map((d) => ({
+      ...dailyStatus(d, s),
+      title: dailyTitle(d.kind, d.target),
+      description: dailyDescription(d.kind, d.target),
+      reward: dailyReward(d.kind),
+      isClaimed: !!s.quests.claimed[d.id],
+    }));
+  },
+
+  // Vérifie si on doit régénérer les dailies + le fait
+  refreshDailiesIfNeeded: () => {
+    const s = get();
+    if (!shouldRefreshDailies(s.quests)) return false;
+    const today = todayISO();
+    const dailies = generateDailies(s, today);
+    set((cur) => ({
+      quests: {
+        ...cur.quests,
+        daily: { lastRefresh: today, active: dailies },
+      },
+    }));
+    return true;
+  },
+
+  // Réclame la récompense d'une quête (story / achievement / daily)
+  claimQuest: (questId) => {
+    const s = get();
+    if (s.quests.claimed[questId]) return false;
+
+    // Trouve la quête (story, achievement ou daily)
+    let reward = null;
+    let isStory = false;
+    let isDaily = false;
+    let kind = null;
+
+    const story = STORY_QUESTS.find((q) => q.id === questId);
+    if (story) {
+      const status = questStatus(story, s, s.quests.claimed);
+      if (!status.isComplete) return false;
+      reward = story.reward;
+      isStory = true;
+      Analytics.questCompleted(questId);
+    } else {
+      const ach = ACHIEVEMENTS.find((a) => a.id === questId);
+      if (ach) {
+        const status = questStatus(ach, s, s.quests.claimed);
+        if (!status.isComplete) return false;
+        reward = ach.reward;
+        Analytics.achievementUnlocked(questId);
+      } else {
+        const daily = (s.quests.daily.active ?? []).find((d) => d.id === questId);
+        if (daily) {
+          const status = dailyStatus(daily, s);
+          if (!status.isComplete) return false;
+          reward = dailyReward(daily.kind);
+          isDaily = true;
+          kind = daily.kind;
+          Analytics.dailyQuestCompleted(daily.kind);
+        }
+      }
+    }
+    if (!reward) return false;
+
+    // Applique la récompense
+    set((cur) => {
+      const next = {
+        quests: { ...cur.quests, claimed: { ...cur.quests.claimed, [questId]: true } },
+      };
+      if (reward.euros) {
+        next.currency = {
+          ...cur.currency,
+          euros: cur.currency.euros + reward.euros,
+          lifetimeEuros: cur.currency.lifetimeEuros + reward.euros,
+        };
+      }
+      if (reward.rareSeeds) {
+        next.currency = {
+          ...(next.currency ?? cur.currency),
+          rareSeeds: cur.currency.rareSeeds + reward.rareSeeds,
+        };
+      }
+      return next;
+    });
+    return true;
+  },
+
+  // Bonus revenu cumulé depuis les achievements claimed (utilisé par economy)
+  getAchievementRevenueBonus: () => getAchievementBonus(get().quests.claimed),
 
   // ─── Save export / import ────────────────────────────────────────
   exportSave: () => {

@@ -7,6 +7,7 @@ import UpgradesPanel from './ui/UpgradesPanel.jsx';
 import MarketPanel from './ui/MarketPanel.jsx';
 import ExpeditionPanel from './ui/ExpeditionPanel.jsx';
 import LabPanel from './ui/LabPanel.jsx';
+import QuestsPanel from './ui/QuestsPanel.jsx';
 import SettingsModal from './ui/SettingsModal.jsx';
 import GreenhouseSelector from './ui/GreenhouseSelector.jsx';
 import PrestigeModal from './ui/PrestigeModal.jsx';
@@ -48,6 +49,7 @@ export default function App() {
       {activePanel === 'market' && <MarketPanel />}
       {activePanel === 'expeditions' && <ExpeditionPanel />}
       {activePanel === 'lab' && <LabPanel />}
+      {activePanel === 'quests' && <QuestsPanel />}
       <SettingsModal />
       <Onboarding />
       <DiscoveryModal />

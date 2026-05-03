@@ -91,7 +91,10 @@ function tick() {
     }
   }
 
-  // ── 7. Expéditions : réclamées manuellement par le joueur (pas ici).
+  // ── 7. Quêtes : reset journalier des dailies
+  store.refreshDailiesIfNeeded();
+
+  // ── 8. Expéditions : réclamées manuellement par le joueur (pas ici).
   store.setLastTick(now);
 }
 
