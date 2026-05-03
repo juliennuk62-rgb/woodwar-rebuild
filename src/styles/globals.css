@@ -3726,3 +3726,189 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   .stats-cell-value { font-size: 16px; }
   .stats-cell--big .stats-cell-value { font-size: 22px; }
 }
+
+/* ───────────────────────────────────────────────────────────────
+   CONVEYOR BELT — tapis roulant des cartes en bas d'écran
+   Cartes glissent de droite à gauche, le joueur clique pour saisir.
+   Inspiré des tycoons Fortnite (counter de droïdes / boutiques mobiles).
+   ─────────────────────────────────────────────────────────── */
+.conveyor-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: 110px;          /* au-dessus du PanelLauncher (bottom 14px + ~70px hauteur) */
+  transform: translateX(-50%);
+  width: min(880px, 92vw);
+  height: 130px;
+  z-index: 11;             /* sous PanelLauncher (12) et HUD (15) */
+  pointer-events: none;
+}
+
+/* Le rail proprement dit — bande sombre avec stries qui défilent.
+   Un poil de perspective pour donner l'illusion de profondeur. */
+.conveyor-belt {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13,17,14,.55) 0%, rgba(13,17,14,.85) 100%);
+  border: 1px solid rgba(126,200,122,.18);
+  border-radius: 14px;
+  box-shadow:
+    inset 0 12px 24px -12px rgba(0,0,0,.6),
+    0 12px 28px -10px rgba(0,0,0,.55);
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  perspective: 800px;
+  pointer-events: auto;
+}
+
+/* Texture défilante (illusion de mouvement même sans cartes) */
+.conveyor-rail {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 14px;
+  background: rgba(0,0,0,.35);
+  border-top: 1px solid rgba(126,200,122,.14);
+}
+.conveyor-rail-stripes {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(126,200,122,.0)   0px,
+    rgba(126,200,122,.0)  18px,
+    rgba(126,200,122,.18) 18px,
+    rgba(126,200,122,.18) 22px
+  );
+  animation: conveyor-stripes-scroll 1.2s linear infinite;
+}
+@keyframes conveyor-stripes-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-40px); }
+}
+
+/* Une carte sur le tapis. La position est gérée inline (right + transform).
+   `--rarity-color` et `--rarity-glow` injectées par React selon la rareté. */
+.conveyor-card {
+  position: absolute;
+  top: 8px;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px;
+  background: linear-gradient(180deg, rgba(20,28,22,.95) 0%, rgba(13,17,14,.95) 100%);
+  border: 2px solid var(--rarity-color, var(--green));
+  border-radius: 12px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  box-shadow:
+    0 0 16px var(--rarity-glow, rgba(126,200,122,.3)),
+    0 8px 16px -8px rgba(0,0,0,.5);
+  transition: filter .12s ease, box-shadow .15s ease;
+  will-change: right, transform, opacity;
+  /* faux-3D : très léger tilt pour donner du volume */
+  transform-style: preserve-3d;
+}
+.conveyor-card:hover:not(:disabled) {
+  filter: brightness(1.15);
+  box-shadow:
+    0 0 24px var(--rarity-glow, rgba(126,200,122,.5)),
+    0 10px 22px -8px rgba(0,0,0,.6);
+}
+.conveyor-card:active:not(:disabled) {
+  filter: brightness(.92);
+}
+.conveyor-card.is-poor {
+  cursor: not-allowed;
+  filter: grayscale(.6) brightness(.7);
+}
+.conveyor-card.is-leaving {
+  animation: conveyor-card-leave-pulse .8s ease-in-out infinite;
+}
+@keyframes conveyor-card-leave-pulse {
+  0%, 100% { box-shadow: 0 0 16px var(--rarity-glow, rgba(126,200,122,.3)), 0 8px 16px -8px rgba(0,0,0,.5); }
+  50%      { box-shadow: 0 0 28px var(--rarity-glow, rgba(126,200,122,.7)), 0 8px 16px -8px rgba(0,0,0,.5); }
+}
+
+.conveyor-card-rarity {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--rarity-color, var(--green));
+  text-shadow: 0 0 6px var(--rarity-glow, rgba(126,200,122,.4));
+}
+.conveyor-card-icon {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+.conveyor-card-benefit {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+  white-space: nowrap;
+}
+.conveyor-card-cost {
+  font-size: 11px;
+  color: var(--muted);
+}
+.conveyor-card-roi {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--rarity-color, var(--gold));
+  color: #0d110e;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 999px;
+  box-shadow: 0 0 8px var(--rarity-glow, rgba(212,168,75,.5));
+}
+
+/* Légendaire = encore plus de glow + bordure animée */
+.conveyor-card.rarity-legendary {
+  animation: conveyor-legendary-pulse 1.6s ease-in-out infinite;
+}
+@keyframes conveyor-legendary-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 18px var(--rarity-glow),
+      0 0 36px rgba(251,191,36,.25),
+      0 8px 16px -8px rgba(0,0,0,.55);
+  }
+  50% {
+    box-shadow:
+      0 0 32px var(--rarity-glow),
+      0 0 60px rgba(251,191,36,.45),
+      0 8px 16px -8px rgba(0,0,0,.55);
+  }
+}
+
+/* Mobile : on rétrécit et on garde au-dessus du dock (qui passe en bas pleine largeur) */
+@media (max-width: 720px) {
+  .conveyor-wrap {
+    bottom: 90px;
+    height: 110px;
+    width: 96vw;
+  }
+  .conveyor-card {
+    width: 86px;
+    height: 92px;
+    padding: 6px 3px;
+  }
+  .conveyor-card-icon { font-size: 22px; }
+  .conveyor-card-benefit { font-size: 11px; }
+  .conveyor-card-cost { font-size: 10px; }
+}
+
+/* Reduced motion : on coupe les animations décoratives */
+.reduced-motion .conveyor-rail-stripes,
+.reduced-motion .conveyor-card.rarity-legendary,
+.reduced-motion .conveyor-card.is-leaving {
+  animation: none !important;
+}

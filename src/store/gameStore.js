@@ -48,6 +48,7 @@ import {
 } from '../mechanics/quests.js';
 import { Events as Analytics } from '../utils/analytics.js';
 import { audioManager } from '../audio/audioManager.js';
+import { CONVEYOR, pickRarity, rollCard } from '../config/conveyor.js';
 
 function makeInitialGreenhouseState(id) {
   const cfg = GREENHOUSES[id];
@@ -147,6 +148,21 @@ function makeInitialState() {
     // Auto-arrosoir : si owned=true, clique automatiquement toutes les 5s.
     autoWaterer: false,
     autoWaterCost: 50000,
+
+    // ─── Tapis roulant (Conveyor) ─────────────────────────────────
+    // Cartes qui défilent en bas de l'écran. Le joueur peut en saisir
+    // pour ¢ instantané, boost temporaire ou graines rares. Cf. config/conveyor.js
+    conveyor: {
+      unlocked: false,
+      cards: [],            // [{id, rarity, type, cost, ...payload, spawnedAt, expiresAt}]
+      lastSpawnAt: 0,
+      nextSpawnAt: 0,
+      // Stats lifetime (persistées) pour le panel Stats
+      grabbed: 0,
+      ignored: 0,
+      totalSpent: 0,
+      totalGained: 0,
+    },
 
     // Réglages persistés (Prompt 5)
     settings: {
@@ -639,6 +655,113 @@ export const useGameStore = create((set, get) => ({
     if (!get().spendEuros(s.autoWaterCost)) return false;
     set({ autoWaterer: true });
     audioManager.play('upgrade');
+    return true;
+  },
+
+  // ─── Tapis roulant ─────────────────────────────────────────────
+  // Spawn d'une carte. Appelé par le tick au rythme défini par
+  // CONVEYOR.spawnIntervalMs, à condition que le joueur ait débloqué
+  // (lifetimeEuros >= unlockAt) et que le tapis ne soit pas plein.
+  spawnConveyorCard: () => {
+    const s = get();
+    if (!s.conveyor.unlocked) {
+      if ((s.currency.lifetimeEuros ?? 0) >= CONVEYOR.unlockAt) {
+        set((st) => ({ conveyor: { ...st.conveyor, unlocked: true } }));
+      } else {
+        return;
+      }
+    }
+    if (s.conveyor.cards.length >= CONVEYOR.maxOnBelt) return;
+
+    // Multiplicateur global pour ajuster la rareté
+    const claimed = s.quests?.claimed ?? {};
+    const aBonus = getAchievementBonus(claimed).revenueBonus ?? 0;
+    const rBonus = getResearchBonuses(s.research?.unlocked ?? []).revenueBonus ?? 0;
+    const pBonus = s.permanentBonuses?.revenueBonus ?? 0;
+    const now = Date.now();
+    const water = (now < s.waterBoostEndsAt) ? 1 + (s.waterBoostStacks ?? 0) * 0.25 : 1;
+    const bee = (s.activeBoost && s.activeBoost.endsAt > now) ? (s.activeBoost.multiplier ?? 1) : 1;
+    const globalMulti = (1 + aBonus) * (1 + rBonus) * (1 + pBonus) * water * bee;
+
+    const rarity = pickRarity(globalMulti);
+    const ips = get().getIncomePerSecond();
+    const card = rollCard(rarity, ips);
+    const id = `cv_${now}_${Math.floor(Math.random() * 9999)}`;
+    const newCard = {
+      id,
+      rarity,
+      ...card,
+      spawnedAt: now,
+      expiresAt: now + CONVEYOR.lifetimeMs,
+    };
+    set((st) => ({
+      conveyor: {
+        ...st.conveyor,
+        cards: [...st.conveyor.cards, newCard],
+        lastSpawnAt: now,
+        nextSpawnAt: now + CONVEYOR.spawnIntervalMs + Math.random() * CONVEYOR.spawnJitterMs,
+      },
+    }));
+  },
+
+  // Expire les cartes dont la durée de vie est écoulée. Compte les
+  // ignorées dans les stats (pour calculer un % de cartes saisies).
+  expireConveyorCards: () => {
+    const now = Date.now();
+    const s = get();
+    const expired = s.conveyor.cards.filter((c) => c.expiresAt <= now);
+    if (expired.length === 0) return;
+    set((st) => ({
+      conveyor: {
+        ...st.conveyor,
+        cards: st.conveyor.cards.filter((c) => c.expiresAt > now),
+        ignored: st.conveyor.ignored + expired.length,
+      },
+    }));
+  },
+
+  // Saisit une carte si le joueur peut payer. Applique l'effet selon le
+  // type, joue un son, et incrémente les stats. Renvoie true si succès.
+  grabConveyorCard: (cardId) => {
+    const s = get();
+    const card = s.conveyor.cards.find((c) => c.id === cardId);
+    if (!card) return false;
+    if (s.currency.euros < card.cost) return false;
+    if (!get().spendEuros(card.cost)) return false;
+
+    let gainedAmount = card.cost; // au moins on enregistre le coût comme "engagé"
+    if (card.type === 'cash') {
+      get().addEuros(card.gain);
+      gainedAmount = card.gain;
+      audioManager.play('harvest');
+    } else if (card.type === 'boost') {
+      // Empile/remplace le boost actif (on prend le meilleur des deux)
+      const now = Date.now();
+      const current = s.activeBoost;
+      const currentMult = (current && current.endsAt > now) ? current.multiplier : 1;
+      const useNew = card.multiplier >= currentMult;
+      set({
+        activeBoost: useNew
+          ? { multiplier: card.multiplier, endsAt: now + card.durationMs }
+          : current,
+      });
+      audioManager.play('upgrade');
+    } else if (card.type === 'seed') {
+      set((st) => ({
+        currency: { ...st.currency, rareSeeds: (st.currency.rareSeeds ?? 0) + card.quantity },
+      }));
+      audioManager.play('plant');
+    }
+
+    set((st) => ({
+      conveyor: {
+        ...st.conveyor,
+        cards: st.conveyor.cards.filter((c) => c.id !== cardId),
+        grabbed: st.conveyor.grabbed + 1,
+        totalSpent: st.conveyor.totalSpent + card.cost,
+        totalGained: st.conveyor.totalGained + (card.type === 'cash' ? gainedAmount : 0),
+      },
+    }));
     return true;
   },
   togglePanel: (panel) => set((s) => ({

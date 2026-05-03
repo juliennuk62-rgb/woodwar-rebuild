@@ -24,6 +24,7 @@ import ConfettiBurst from './ui/ConfettiBurst.jsx';
 import WorldMap from './ui/WorldMap.jsx';
 import WaterCan from './ui/WaterCan.jsx';
 import StatsPanel from './ui/StatsPanel.jsx';
+import ConveyorBelt from './ui/ConveyorBelt.jsx';
 import { useGameStore } from './store/gameStore.js';
 import { startGameLoop, stopGameLoop } from './engine/tick.js';
 import { setupAutosave } from './engine/save.js';
@@ -73,6 +74,7 @@ export default function App() {
       {!isMap && activePanel === 'quests' && <QuestsPanel />}
       {!isMap && activePanel === 'stats' && <StatsPanel />}
       {!isMap && <WaterCan />}
+      {!isMap && <ConveyorBelt />}
       <WorldMap />
       <SettingsModal />
       <Onboarding />
