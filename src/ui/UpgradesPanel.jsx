@@ -1,7 +1,18 @@
+import { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore.js';
 import { UPGRADE_LIST, upgradeCost, bulkUpgradeCost } from '../config/upgrades.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
-import { formatEuros } from '../utils/numberFormat.js';
+import { formatEuros, formatDuration } from '../utils/numberFormat.js';
+
+// F2 — TTNB ("Time To Next Buy") : combien de temps avant que le joueur
+// ait assez d'euros pour s'offrir cet achat, à revenu passif constant.
+function formatTtnb(cost, euros, incomePerSecond) {
+  if (euros >= cost) return '✓ disponible';
+  if (!incomePerSecond || incomePerSecond <= 0) return '—';
+  const seconds = (cost - euros) / incomePerSecond;
+  if (!isFinite(seconds) || seconds <= 0) return '✓ disponible';
+  return `≈ ${formatDuration(seconds)}`;
+}
 
 export default function UpgradesPanel() {
   const ghId = useGameStore((s) => s.activeGreenhouse);
@@ -11,6 +22,16 @@ export default function UpgradesPanel() {
   const buy = useGameStore((s) => s.buyUpgrade);
   const close = useGameStore((s) => s.setActivePanel);
   const flash = useGameStore((s) => s.upgradeFlash);
+  const getIncomePerSecond = useGameStore((s) => s.getIncomePerSecond);
+  const incomePerSecond = getIncomePerSecond();
+
+  // Re-render chaque seconde pour rafraîchir l'estimation TTNB
+  // même quand euros ne bouge pas d'assez pour déclencher un re-render.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => (t + 1) % 1_000_000), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <>
@@ -85,34 +106,49 @@ export default function UpgradesPanel() {
                     <LevelBar level={level} max={max} />
                     {!isMax && (
                       <div className="upgrade-actions">
-                        <button
-                          className="btn-upgrade"
-                          disabled={!canAfford1}
-                          onClick={() => buy(u.id, 1)}
-                          title={`Acheter 1 niveau · ${formatEuros(cost1)}`}
-                        >
-                          +1 · {formatEuros(cost1)}
-                        </button>
-                        <button
-                          className="btn-upgrade-mini"
-                          disabled={!canAfford5}
-                          onClick={() => buy(u.id, 5)}
-                          title={`Acheter jusqu'à ${want5} niveaux · ${formatEuros(bulk5.totalCost)}`}
-                        >
-                          +{want5} · {formatEuros(bulk5.totalCost)}
-                        </button>
-                        <button
-                          className="btn-upgrade-mini"
-                          disabled={!canAffordMax}
-                          onClick={() => buy(u.id, 'max')}
-                          title={
-                            canAffordMax
-                              ? `Acheter ${maxAffordableLevels} niveau(x) · ${formatEuros(maxAffordableCost)}`
-                              : `Coût pour tout débloquer : ${formatEuros(bulkMaxAll.totalCost)}`
-                          }
-                        >
-                          Max · {formatEuros(maxLabelCost)}
-                        </button>
+                        <div className="upgrade-buy">
+                          <button
+                            className="btn-upgrade"
+                            disabled={!canAfford1}
+                            onClick={() => buy(u.id, 1)}
+                            title={`Acheter 1 niveau · ${formatEuros(cost1)}`}
+                          >
+                            +1 · {formatEuros(cost1)}
+                          </button>
+                          <span className="upgrade-ttnb">
+                            {formatTtnb(cost1, euros, incomePerSecond)}
+                          </span>
+                        </div>
+                        <div className="upgrade-buy">
+                          <button
+                            className="btn-upgrade-mini"
+                            disabled={!canAfford5}
+                            onClick={() => buy(u.id, 5)}
+                            title={`Acheter jusqu'à ${want5} niveaux · ${formatEuros(bulk5.totalCost)}`}
+                          >
+                            +{want5} · {formatEuros(bulk5.totalCost)}
+                          </button>
+                          <span className="upgrade-ttnb">
+                            {formatTtnb(bulk5.totalCost, euros, incomePerSecond)}
+                          </span>
+                        </div>
+                        <div className="upgrade-buy">
+                          <button
+                            className="btn-upgrade-mini"
+                            disabled={!canAffordMax}
+                            onClick={() => buy(u.id, 'max')}
+                            title={
+                              canAffordMax
+                                ? `Acheter ${maxAffordableLevels} niveau(x) · ${formatEuros(maxAffordableCost)}`
+                                : `Coût pour tout débloquer : ${formatEuros(bulkMaxAll.totalCost)}`
+                            }
+                          >
+                            Max · {formatEuros(maxLabelCost)}
+                          </button>
+                          <span className="upgrade-ttnb">
+                            {formatTtnb(bulkMaxAll.totalCost, euros, incomePerSecond)}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
