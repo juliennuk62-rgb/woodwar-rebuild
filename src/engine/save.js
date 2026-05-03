@@ -10,8 +10,10 @@ import { migrateSave } from '../utils/migrate.js';
 // Si le hash ne matche pas → on suspecte une édition manuelle, on jette.
 const HASH_KEY = GAME_CONFIG.saveKey + ':hash';
 
-// Champs volatiles à exclure du save
-const VOLATILE = ['floatingNumbers', 'offlineGains', 'ready'];
+// Champs volatiles à exclure du save : ils sont propres à une session et
+// ne doivent pas être restaurés au reload (sinon une modale ouverte
+// réapparaîtrait, un flash visuel persisterait, etc.).
+const VOLATILE = ['floatingNumbers', 'offlineGains', 'upgradeFlash', 'currentDiscovery', 'ready'];
 
 export async function saveGame() {
   try {

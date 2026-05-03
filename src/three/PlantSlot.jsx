@@ -55,7 +55,11 @@ export default function PlantSlot({ slot }) {
   };
 
   const ready = plant && growth >= 1;
-  const accent = plant ? getSpeciesData(plant.speciesId, useGameStore.getState()).petalColor : '#7ec87a';
+  // On résout l'espèce une seule fois et on garde une couleur de repli
+  // si elle n'est pas trouvée (espèce supprimée d'une save importée d'une
+  // ancienne version par exemple).
+  const species = plant ? getSpeciesData(plant.speciesId, useGameStore.getState()) : null;
+  const accent = species?.petalColor ?? '#7ec87a';
 
   return (
     <group
@@ -65,7 +69,7 @@ export default function PlantSlot({ slot }) {
       onClick={onClick}
     >
       <Pot accentHover={hover || ready} ready={ready} accent={accent} />
-      {plant && <PlantMesh species={getSpeciesData(plant.speciesId, useGameStore.getState())} growth={growth} />}
+      {plant && species && <PlantMesh species={species} growth={growth} />}
       {plant && burstId > 0 && <PollenBurst key={burstId} color={accent} />}
       {slotFloats.map((f) => (
         <FloatingNumber3D

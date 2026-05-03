@@ -17,7 +17,7 @@ export default function PlantMesh({ species, growth }) {
   const grad = useMemo(() => getToonGradient(), []);
 
   useFrame((state) => {
-    if (!group.current) return;
+    if (!group.current || !species) return;
     const t = state.clock.elapsedTime;
     // Petit balancement organique
     group.current.rotation.z = Math.sin(t * 0.8 + species.height * 5) * 0.04 * growth;
@@ -25,6 +25,11 @@ export default function PlantMesh({ species, growth }) {
       flowerRef.current.rotation.y = t * 0.3;
     }
   });
+
+  // Garde-fou : un slot peut référencer une espèce inconnue (save importée
+  // d'une vieille version, hybride supprimé, etc.). On rend rien plutôt que
+  // de crasher la scène.
+  if (!species) return null;
 
   if (growth < 0.05) {
     return <Seed />;
