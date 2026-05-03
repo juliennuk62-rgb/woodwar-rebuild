@@ -13,7 +13,7 @@ const HASH_KEY = GAME_CONFIG.saveKey + ':hash';
 // Champs volatiles à exclure du save : ils sont propres à une session et
 // ne doivent pas être restaurés au reload (sinon une modale ouverte
 // réapparaîtrait, un flash visuel persisterait, etc.).
-const VOLATILE = ['floatingNumbers', 'offlineGains', 'upgradeFlash', 'currentDiscovery', 'ready'];
+const VOLATILE = ['floatingNumbers', 'offlineGains', 'upgradeFlash', 'currentDiscovery', 'saveError', 'ready'];
 
 export async function saveGame() {
   try {
@@ -26,7 +26,20 @@ export async function saveGame() {
     }
     data.lastSave = Date.now();
     const json = JSON.stringify(data);
-    localStorage.setItem(GAME_CONFIG.saveKey, json);
+    try {
+      localStorage.setItem(GAME_CONFIG.saveKey, json);
+    } catch (e) {
+      // Détection spécifique du quota dépassé (5 MB) — message identifié à
+      // l'utilisateur via le store pour qu'on affiche une bannière visible.
+      const isQuota =
+        e?.name === 'QuotaExceededError' ||
+        e?.code === 22 ||
+        e?.code === 1014 ||
+        /quota/i.test(e?.message ?? '');
+      useGameStore.getState().setSaveError(isQuota ? 'quota' : 'unknown');
+      console.warn('[Jardin d\'Agnès] Impossible de sauvegarder :', e);
+      return false;
+    }
 
     // Checksum SHA-256 (anti-tamper basique). Échec silencieux si SubtleCrypto
     // n'est pas dispo (vieux navigateurs) — la save reste valide sans hash.
@@ -35,9 +48,14 @@ export async function saveGame() {
       try { localStorage.setItem(HASH_KEY, hash); } catch (e) {}
     }
 
+    // La save a réussi : on efface une éventuelle alerte précédente.
+    if (useGameStore.getState().saveError) {
+      useGameStore.getState().setSaveError(null);
+    }
     useGameStore.getState().setLastSave(data.lastSave);
     return true;
   } catch (e) {
+    useGameStore.getState().setSaveError('unknown');
     console.warn('[Jardin d\'Agnès] Impossible de sauvegarder :', e);
     return false;
   }

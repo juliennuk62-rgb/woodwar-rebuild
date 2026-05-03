@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGameStore } from '../store/gameStore.js';
 import { getPlantStage, getSpeciesData } from '../engine/economy.js';
@@ -25,6 +25,11 @@ export default function PlantSlot({ slot }) {
   const [growth, setGrowth] = useState(0);
   const wasMatureRef = useRef(false);
   const [burstId, setBurstId] = useState(0);
+
+  // Si le composant est démonté pendant qu'on est en hover (switch de serre
+  // rapide par exemple), `onPointerOut` n'a pas le temps de se déclencher
+  // et le curseur reste coincé en 'pointer'. Ce cleanup couvre le cas.
+  useEffect(() => () => { document.body.style.cursor = ''; }, []);
 
   useFrame(() => {
     if (!plant) {

@@ -11,6 +11,7 @@ import QuestsPanel from './ui/QuestsPanel.jsx';
 import SettingsModal from './ui/SettingsModal.jsx';
 import GreenhouseSelector from './ui/GreenhouseSelector.jsx';
 import PrestigeModal from './ui/PrestigeModal.jsx';
+import SaveErrorBanner from './ui/SaveErrorBanner.jsx';
 import OfflineModal from './ui/OfflineModal.jsx';
 import DiscoveryModal from './ui/DiscoveryModal.jsx';
 import PanelLauncher from './ui/PanelLauncher.jsx';
@@ -65,6 +66,7 @@ export default function App() {
       <Onboarding />
       <DiscoveryModal />
       <OfflineModal />
+      <SaveErrorBanner />
     </>
   );
 }

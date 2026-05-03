@@ -19,12 +19,17 @@ export default function DiscoveryModal() {
   const dismiss = useGameStore((s) => s.dismissDiscovery);
   const greenhouses = useGameStore((s) => s.greenhouses);
   // On laisse passer la modale Offline en premier — sinon les 2 se chevauchent
-  // au retour d'un long offline.
+  // au retour d'un long offline. Et on ne couvre pas non plus le tutoriel.
   const offlineGains = useGameStore((s) => s.offlineGains);
+  const onboarding = useGameStore((s) => s.onboarding);
   const state = useGameStore.getState();
 
   if (!discovery) return null;
   if (offlineGains && (offlineGains.euros > 0 || offlineGains.plants > 0)) return null;
+  // Pendant le tutoriel : on ne montre pas la modale Discovery (z-index 50
+  // se mettrait par-dessus l'onboarding à z-index 41 sinon). La découverte
+  // attend la fin du tuto.
+  if (!onboarding?.dismissed && (onboarding?.step ?? 0) > 0 && (onboarding?.step ?? 0) < 6) return null;
   const species = getSpeciesData(discovery.speciesId, state);
   if (!species) return null;
   const isHybrid = !!species.isHybrid;

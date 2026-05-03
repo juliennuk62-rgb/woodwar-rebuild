@@ -1779,6 +1779,68 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   border-color: var(--border);
 }
 
+/* ─── Bannière d'erreur de sauvegarde ─────────────────────── */
+.save-error-banner {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(560px, 92vw);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(40, 14, 14, .96);
+  border: 1px solid var(--rose);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
+  z-index: 60;
+  animation: fade-in .2s ease;
+}
+.save-error-icon { font-size: 22px; line-height: 1; }
+.save-error-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.save-error-text strong {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  color: var(--rose);
+}
+.save-error-text span {
+  font-size: 12px;
+  color: var(--green-pale);
+  line-height: 1.4;
+}
+.save-error-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.save-error-close {
+  font-size: 22px;
+  color: var(--muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  min-height: 28px;
+}
+.save-error-close:hover { color: var(--rose); }
+@media (max-width: 600px) {
+  .save-error-banner {
+    flex-wrap: wrap;
+    top: 8px;
+  }
+  .save-error-text { width: 100%; order: 2; }
+  .save-error-actions { width: 100%; order: 3; justify-content: flex-end; }
+}
+
 /* ─── Flash sur upgrade achetée ───────────────────────────── */
 .upgrade-card.flashing {
   animation: flash-buy .5s ease-out;

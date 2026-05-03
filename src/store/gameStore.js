@@ -148,6 +148,7 @@ function makeInitialState() {
     activePanel: null,
     upgradeFlash: null,    // { typeId, ts } — pour animer la carte qui vient d'être achetée
     currentDiscovery: null, // { speciesId, expeditionId } — modale de découverte
+    saveError: null,       // 'quota' | 'unknown' — bannière visible si la sauvegarde échoue
     ready: false,
   };
 }
@@ -855,6 +856,7 @@ export const useGameStore = create((set, get) => ({
 
   setLastTick: (t) => set({ lastTick: t }),
   setLastSave: (t) => set({ lastSave: t }),
+  setSaveError: (kind) => set({ saveError: kind }),
 
   dismissOfflineGains: () => set({ offlineGains: null }),
 
