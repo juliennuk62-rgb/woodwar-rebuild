@@ -2957,5 +2957,96 @@ button:disabled { cursor: not-allowed; opacity: .4; }
     0 0 4px rgba(13,17,14,.9),
     0 0 10px rgba(212,168,75,.55);
   box-shadow: 0 0 14px -2px rgba(212,168,75,.35);
+/* ─── V5 — Confetti & Prestige flash ─────────────────────────────────────
+   Overlay HTML par-dessus le canvas R3F. pointer-events:none pour ne pas
+   intercepter les clics. z-index très élevé (au-dessus des modales). */
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+.confetti-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  /* ancré sur (left, top) = position du clic ou centre */
+}
+.confetti-particle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 1.5px;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  animation-name: confetti-fly;
+  animation-timing-function: cubic-bezier(.2, .65, .35, 1);
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+  opacity: 1;
+}
+@keyframes confetti-fly {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot0));
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    /* Trajectoire = vélocité initiale + chute gravitaire */
+    transform:
+      translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + var(--gravity)))
+      rotate(var(--rot1));
+    opacity: 0;
+  }
+}
+
+/* Flash plein écran doré sur prestige */
+.prestige-flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center,
+    rgba(255, 230, 140, .85) 0%,
+    rgba(212, 168, 75, .55) 35%,
+    rgba(212, 168, 75, 0) 75%);
+  animation: prestige-flash 600ms ease-out forwards;
+  mix-blend-mode: screen;
+}
+@keyframes prestige-flash {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.prestige-flash-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(.4);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: clamp(48px, 9vw, 140px);
+  letter-spacing: .04em;
+  background: linear-gradient(180deg, #fff5c2 0%, #f5b830 50%, #d4a84b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow:
+    0 0 30px rgba(255, 215, 106, .8),
+    0 0 60px rgba(212, 168, 75, .55);
+  animation: prestige-text 600ms cubic-bezier(.2, .8, .2, 1) forwards;
+  white-space: nowrap;
+}
+@keyframes prestige-text {
+  0%   { transform: translate(-50%, -50%) scale(.4); opacity: 0; }
+  35%  { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  70%  { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-layer { display: none; }
 }
 

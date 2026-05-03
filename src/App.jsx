@@ -20,6 +20,7 @@ import PlantsList from './ui/PlantsList.jsx';
 import Onboarding from './ui/Onboarding.jsx';
 import ContextualTips from './ui/ContextualTips.jsx';
 import MilestoneTips from './ui/MilestoneTips.jsx';
+import ConfettiBurst from './ui/ConfettiBurst.jsx';
 import { useGameStore } from './store/gameStore.js';
 import { startGameLoop, stopGameLoop } from './engine/tick.js';
 import { setupAutosave } from './engine/save.js';
@@ -73,6 +74,7 @@ export default function App() {
       <MilestoneOverlay />
       <OfflineModal />
       <SaveErrorBanner />
+      <ConfettiBurst />
     </>
   );
 }
