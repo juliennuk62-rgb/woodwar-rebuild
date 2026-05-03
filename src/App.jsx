@@ -19,6 +19,8 @@ import Onboarding from './ui/Onboarding.jsx';
 import { useGameStore } from './store/gameStore.js';
 import { startGameLoop, stopGameLoop } from './engine/tick.js';
 import { setupAutosave } from './engine/save.js';
+import { bootstrapAudioOnFirstInteraction, audioManager } from './audio/audioManager.js';
+import { Events as Analytics } from './utils/analytics.js';
 
 export default function App() {
   const ready = useGameStore((s) => s.ready);
@@ -27,9 +29,18 @@ export default function App() {
   useEffect(() => {
     startGameLoop();
     const stopAutosave = setupAutosave();
+    bootstrapAudioOnFirstInteraction();
+    // Propage les volumes initiaux après chargement du save
+    const settings = useGameStore.getState().settings;
+    if (settings) audioManager.setSettings(settings);
+    Analytics.sessionStart();
+    const sessionStart = Date.now();
+    const onUnload = () => Analytics.sessionEnd(Date.now() - sessionStart);
+    window.addEventListener('beforeunload', onUnload);
     return () => {
       stopGameLoop();
       stopAutosave();
+      window.removeEventListener('beforeunload', onUnload);
     };
   }, []);
 

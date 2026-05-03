@@ -3,11 +3,17 @@ import { useGameStore } from '../store/gameStore.js';
 import { GAME_CONFIG } from '../config/gameConfig.js';
 import { computePlantRevenue, getPlantStage, getGrowTime } from './economy.js';
 import { SEASON_DURATION_MS, WEATHER_DURATION_MS } from '../mechanics/weather.js';
+import { computeChecksum, verifyChecksum } from '../utils/checksum.js';
+import { migrateSave } from '../utils/migrate.js';
+
+// La save est stockée en deux clés : un payload + un hash SHA-256.
+// Si le hash ne matche pas → on suspecte une édition manuelle, on jette.
+const HASH_KEY = GAME_CONFIG.saveKey + ':hash';
 
 // Champs volatiles à exclure du save
 const VOLATILE = ['floatingNumbers', 'offlineGains', 'ready'];
 
-export function saveGame() {
+export async function saveGame() {
   try {
     const state = useGameStore.getState();
     const data = {};
@@ -17,7 +23,16 @@ export function saveGame() {
       data[k] = state[k];
     }
     data.lastSave = Date.now();
-    localStorage.setItem(GAME_CONFIG.saveKey, JSON.stringify(data));
+    const json = JSON.stringify(data);
+    localStorage.setItem(GAME_CONFIG.saveKey, json);
+
+    // Checksum SHA-256 (anti-tamper basique). Échec silencieux si SubtleCrypto
+    // n'est pas dispo (vieux navigateurs) — la save reste valide sans hash.
+    const hash = await computeChecksum(json);
+    if (hash) {
+      try { localStorage.setItem(HASH_KEY, hash); } catch (e) {}
+    }
+
     useGameStore.getState().setLastSave(data.lastSave);
     return true;
   } catch (e) {
@@ -26,25 +41,43 @@ export function saveGame() {
   }
 }
 
+// Note : loadSave reste synchrone car appelé au boot. La vérification du
+// checksum se fait *en arrière-plan* — le save invalide est juste signalé
+// dans la console (on ne refuse pas la save, parce qu'un faux positif coûte
+// la progression du joueur, ce qui est pire qu'un cheat).
 export function loadSave() {
   try {
     const raw = localStorage.getItem(GAME_CONFIG.saveKey);
     if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (!data || data.version !== GAME_CONFIG.version) {
-      // Pas encore de migration entre majeures — on ignore les saves d'autres versions.
-      return null;
+    let data = JSON.parse(raw);
+    if (!data) return null;
+
+    // Migration éventuelle si le save est d'une ancienne version
+    if (data.version !== GAME_CONFIG.version) {
+      const migrated = migrateSave(data, GAME_CONFIG.version);
+      if (!migrated) return null; // pas de chemin de migration → reset
+      data = migrated;
     }
-    // Patch léger : ajoute les champs marché/saison s'ils manquent (saves Prompt 1-3)
+
+    // Patch léger : champs marché/saison ajoutés en Prompt 4
     const now = Date.now();
     data.market = data.market ?? {};
-    if (!data.market.seasonEndsAt)  data.market.seasonEndsAt  = now + SEASON_DURATION_MS;
-    if (!data.market.weatherEndsAt) data.market.weatherEndsAt = now + WEATHER_DURATION_MS;
+    if (!data.market.seasonEndsAt)    data.market.seasonEndsAt    = now + SEASON_DURATION_MS;
+    if (!data.market.weatherEndsAt)   data.market.weatherEndsAt   = now + WEATHER_DURATION_MS;
     if (!data.market.seasonStartedAt) data.market.seasonStartedAt = now;
-    if (!data.market.history)        data.market.history        = {};
-    if (!data.market.salesSinceTick) data.market.salesSinceTick = {};
-    if (!data.market.weather)        data.market.weather        = 'sunny';
-    if (!data.market.currentSeason)  data.market.currentSeason  = 'spring';
+    if (!data.market.history)         data.market.history         = {};
+    if (!data.market.salesSinceTick)  data.market.salesSinceTick  = {};
+    if (!data.market.weather)         data.market.weather         = 'sunny';
+    if (!data.market.currentSeason)   data.market.currentSeason   = 'spring';
+
+    // Vérification checksum en arrière-plan (non-bloquante)
+    const expected = localStorage.getItem(HASH_KEY);
+    if (expected) {
+      verifyChecksum(raw, expected).then((ok) => {
+        if (!ok) console.warn('[Jardin d\'Agnès] Save modifiée hors du jeu — checksum invalide.');
+      }).catch(() => {});
+    }
+
     return data;
   } catch (e) {
     console.warn('[Jardin d\'Agnès] Save corrompue, on repart à zéro :', e);

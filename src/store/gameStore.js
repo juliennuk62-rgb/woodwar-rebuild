@@ -45,6 +45,7 @@ import {
   getAchievementBonus,
 } from '../mechanics/quests.js';
 import { Events as Analytics } from '../utils/analytics.js';
+import { audioManager } from '../audio/audioManager.js';
 
 function makeInitialGreenhouseState(id) {
   const cfg = GREENHOUSES[id];
@@ -234,6 +235,8 @@ export const useGameStore = create((set, get) => ({
         },
       },
     }));
+    audioManager.play('plant');
+    Analytics.firstPlant();
     return true;
   },
 
@@ -275,6 +278,8 @@ export const useGameStore = create((set, get) => ({
       },
       activeGreenhouse: id,
     }));
+    audioManager.play('upgrade');
+    Analytics.greenhouseUnlocked(id);
     return true;
   },
 
@@ -292,6 +297,8 @@ export const useGameStore = create((set, get) => ({
         firstPrestigeAt: cur.stats.firstPrestigeAt ?? Date.now(),
       },
     }));
+    audioManager.play('prestige');
+    Analytics.firstPrestige();
     return reset.tokensGained;
   },
 
@@ -368,6 +375,8 @@ export const useGameStore = create((set, get) => ({
         },
       ],
     }));
+    // Le son ne joue que pour la récolte manuelle (sinon ça serait incessant)
+    if (opts.manual) audioManager.play('harvest');
     return revenue;
   },
 
@@ -396,6 +405,8 @@ export const useGameStore = create((set, get) => ({
         firstGardenerAt: cur.stats.firstGardenerAt ?? Date.now(),
       },
     }));
+    audioManager.play('gardener');
+    Analytics.firstGardener();
     return true;
   },
 
@@ -431,6 +442,7 @@ export const useGameStore = create((set, get) => ({
       },
     }));
     get().flashUpgrade(typeId);
+    audioManager.play('upgrade');
     return true;
   },
 
@@ -453,9 +465,11 @@ export const useGameStore = create((set, get) => ({
   })),
 
   // ─── Settings ────────────────────────────────────────────────────
-  updateSettings: (patch) => set((s) => ({
-    settings: { ...s.settings, ...patch },
-  })),
+  updateSettings: (patch) => {
+    set((s) => ({ settings: { ...s.settings, ...patch } }));
+    // Propage immédiatement les volumes à l'audio manager
+    audioManager.setSettings(get().settings);
+  },
 
   // ─── Onboarding ──────────────────────────────────────────────────
   // Avance d'une étape uniquement si on est sur la précédente.
@@ -524,6 +538,8 @@ export const useGameStore = create((set, get) => ({
           : cur.currentDiscovery,
       };
     });
+    audioManager.play('expedition');
+    Analytics.firstExpedition();
     return reward;
   },
 
@@ -648,6 +664,8 @@ export const useGameStore = create((set, get) => ({
       stats: { ...cur.stats, totalHybridsCreated: (cur.stats.totalHybridsCreated ?? 0) + 1 },
       currentDiscovery: { speciesId: hybrid.id, source: 'hybrid' },
     }));
+    audioManager.play('quest');
+    Analytics.firstHybrid();
     return hybrid;
   },
 
@@ -739,6 +757,7 @@ export const useGameStore = create((set, get) => ({
       }
       return next;
     });
+    audioManager.play('quest');
     return true;
   },
 

@@ -70,17 +70,17 @@ export default function SettingsModal() {
 
         <div className="side-panel-body">
           {/* ── Audio ─────────────────────────────────────── */}
-          <Section title="Audio (bientôt actif)">
-            <Slider
-              label="Musique"
-              value={settings.musicVolume}
-              onChange={(v) => update({ musicVolume: v })}
-              disabled={settings.muted}
-            />
+          <Section title="Audio">
             <Slider
               label="Effets sonores"
               value={settings.sfxVolume}
               onChange={(v) => update({ sfxVolume: v })}
+              disabled={settings.muted}
+            />
+            <Slider
+              label="Musique"
+              value={settings.musicVolume}
+              onChange={(v) => update({ musicVolume: v })}
               disabled={settings.muted}
             />
             <Toggle
@@ -88,7 +88,9 @@ export default function SettingsModal() {
               checked={settings.muted}
               onChange={(v) => update({ muted: v })}
             />
-            <p className="settings-hint">L'audio s'activera au Prompt 10 (lancement).</p>
+            <p className="settings-hint">
+              SFX synthétisés en Web Audio. La musique d'ambiance arrivera dans une mise à jour future.
+            </p>
           </Section>
 
           {/* ── Confort ───────────────────────────────────── */}
