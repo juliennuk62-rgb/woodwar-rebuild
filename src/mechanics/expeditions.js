@@ -15,14 +15,30 @@ export function canStart(destinationId, state) {
   return { ok: true };
 }
 
+// Durée effective d'une expédition après application des bonus achievements.
+// `achievementBonuses` est l'objet retourné par getAchievementBonus()
+// (ou un nombre direct pour le bonus de vitesse, pour faciliter les tests).
+// Plancher à 20% de la durée de base pour éviter les expéditions instantanées.
+export function effectiveDurationMs(destination, achievementBonuses = {}) {
+  if (!destination) return 0;
+  const base = destination.durationMs;
+  const speedBonus = typeof achievementBonuses === 'number'
+    ? achievementBonuses
+    : (achievementBonuses?.expeditionSpeedBonus ?? 0);
+  const factor = Math.max(0.2, 1 - speedBonus);
+  return Math.round(base * factor);
+}
+
 // Génère une instance d'expédition (à pousser dans state.expeditions.active).
-export function buildExpedition(destinationId, now) {
+// `achievementBonuses` (optionnel) : pour appliquer le bonus de vitesse.
+export function buildExpedition(destinationId, now, achievementBonuses = {}) {
   const dest = EXPEDITIONS[destinationId];
+  const duration = effectiveDurationMs(dest, achievementBonuses);
   return {
     id: `${destinationId}-${now}`,
     destinationId,
     startedAt: now,
-    endsAt: now + dest.durationMs,
+    endsAt: now + duration,
   };
 }
 

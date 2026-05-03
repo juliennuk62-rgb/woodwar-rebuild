@@ -10,6 +10,7 @@ const THEMES = {
   tropical:  { wood: '#5e3a20', woodDark: '#42271a', metal: '#9bc4a8', metalDark: '#6f9a82', glass: '#a8d4c8' },
   arid:      { wood: '#a87a4a', woodDark: '#7a5530', metal: '#c8b88c', metalDark: '#9a8a64', glass: '#e8d8a8' },
   arctic:    { wood: '#a0b8c0', woodDark: '#7a8a90', metal: '#c8d4e0', metalDark: '#8aa0b0', glass: '#d8e8f0' },
+  complex:   { wood: '#2a3a4a', woodDark: '#1a2a3a', metal: '#7eaaca', metalDark: '#5a8aab', glass: '#c8d4e0' },
 };
 
 const FLOOR_WIDTH = 13;

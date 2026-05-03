@@ -16,7 +16,7 @@ import {
 } from '../engine/economy.js';
 import { loadSave, applyOfflineProgress } from '../engine/save.js';
 import { SEASONS, SEASON_DURATION_MS, WEATHER_DURATION_MS, pickWeatherForSeason } from '../mechanics/weather.js';
-import { canStart, buildExpedition, generateReward } from '../mechanics/expeditions.js';
+import { canStart, buildExpedition, generateReward, effectiveDurationMs } from '../mechanics/expeditions.js';
 import { EXPEDITIONS } from '../config/expeditions.js';
 import {
   TECHS,
@@ -141,6 +141,18 @@ function makeInitialState() {
       dismissed: false,
       lastSeenStep: 0,
     },
+
+    // Tips contextuels — affichés une seule fois à la première rencontre
+    // d'une feature avancée (saisons, pics de marché, etc.). Persisté.
+    tipsSeen: {},
+
+    // Milestone tips (lab, prestige) — séparés des `tipsSeen` pour éviter
+    // tout conflit avec l'autre système de tips. Persisté.
+    mtipsSeen: {},
+
+    // Rush moments — milestones lifetime déjà franchis. Persisté pour ne
+    // pas rejouer l'animation au reload. Clé = montant en € (string), val = true.
+    seenMilestones: {},
 
     // Volatile — pas sauvegardé
     floatingNumbers: [],
@@ -501,6 +513,21 @@ export const useGameStore = create((set, get) => ({
     onboarding: { ...s.onboarding, dismissed: true },
   })),
 
+  // ─── Tips contextuels ────────────────────────────────────────────
+  // Marque un tip comme vu pour qu'il ne réapparaisse plus jamais.
+  // Idempotent : appeler plusieurs fois avec le même id n'a aucun effet.
+  markTipSeen: (tipId) => set((s) => {
+    if (!tipId || s.tipsSeen?.[tipId]) return {};
+    return { tipsSeen: { ...(s.tipsSeen ?? {}), [tipId]: true } };
+  }),
+
+  // Variante pour les milestone tips (lab, prestige). Stockée séparément
+  // pour ne pas interférer avec les tips existants.
+  markMtipSeen: (tipId) => set((s) => {
+    if (!tipId || s.mtipsSeen?.[tipId]) return {};
+    return { mtipsSeen: { ...(s.mtipsSeen ?? {}), [tipId]: true } };
+  }),
+
   // ─── Expéditions (Prompt 6) ──────────────────────────────────────
   canStartExpedition: (destinationId) => canStart(destinationId, get()),
 
@@ -859,6 +886,13 @@ export const useGameStore = create((set, get) => ({
   setSaveError: (kind) => set({ saveError: kind }),
 
   dismissOfflineGains: () => set({ offlineGains: null }),
+
+  // ─── Rush moments (milestones lifetime) ──────────────────────────
+  // Marque un seuil comme déjà célébré pour ne pas rejouer la modale.
+  // La clé est stockée en string pour rester stable à la sérialisation JSON.
+  markMilestoneSeen: (amount) => set((s) => ({
+    seenMilestones: { ...(s.seenMilestones ?? {}), [String(amount)]: true },
+  })),
 
   // ─── Reset (debug) ───────────────────────────────────────────────
   hardReset: () => {

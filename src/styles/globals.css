@@ -294,6 +294,31 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   50%      { box-shadow: 0 0 18px 2px rgba(212,168,75,.4); }
 }
 
+/* Compteur "prochain prestige intéressant" — informationnel, discret.
+   Quand le bouton .prestige-trigger est visible, on se place juste en dessous ;
+   sinon on prend sa place. */
+.prestige-next {
+  position: fixed;
+  top: 116px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(13,17,14,.55);
+  border: 1px solid rgba(212,168,75,.25);
+  border-radius: 100px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .02em;
+  z-index: 7;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.prestige-next--has-button { top: 158px; }
+
 .prestige-backdrop {
   position: fixed;
   inset: 0;
@@ -1941,4 +1966,324 @@ button:disabled { cursor: not-allowed; opacity: .4; }
     animation: slide-up .25s ease;
   }
   @keyframes slide-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+}
+
+/* ─── Tooltip "récolte +25 %" sur fleur mature (drei <Html>) ──── */
+.pot-tooltip {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text);
+  background: rgba(13,17,14,.92);
+  border: 1px solid rgba(212,168,75,.55);
+  padding: 5px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,.45);
+}
+.pot-tooltip strong {
+  color: var(--gold);
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+/* ─── Badge "🔥 BON MOMENT" sur pots dont l'espèce est en pic marché ── */
+.hot-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gold);
+  background: rgba(13,17,14,.92);
+  border: 1px solid rgba(212,168,75,.7);
+  padding: 4px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: .04em;
+  box-shadow: 0 0 14px rgba(212,168,75,.35), 0 4px 14px rgba(0,0,0,.45);
+  animation: hot-badge-pulse 1.4s ease-in-out infinite;
+}
+@keyframes hot-badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(212,168,75,.3), 0 4px 14px rgba(0,0,0,.45);
+    border-color: rgba(212,168,75,.55);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 22px rgba(212,168,75,.7), 0 4px 14px rgba(0,0,0,.45);
+    border-color: rgba(212,168,75,.95);
+  }
+}
+
+/* ─── Contextual tips (saisons, marché) ──────────────────────────── */
+.contextual-tip {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(520px, 92vw);
+  padding: 12px 14px;
+  background: rgba(13, 17, 14, .96);
+  border: 1px solid var(--green);
+  border-radius: 12px;
+  color: var(--green-pale);
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .55);
+  z-index: 55;
+  cursor: pointer;
+  animation: contextual-tip-in .35s ease-out;
+}
+.contextual-tip--reduced {
+  animation: none;
+}
+.contextual-tip-text {
+  flex: 1;
+  min-width: 0;
+}
+.contextual-tip-close {
+  font-size: 22px;
+  line-height: 1;
+  color: var(--muted);
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.contextual-tip-close:hover {
+  color: var(--green);
+  background: var(--surface2);
+}
+@keyframes contextual-tip-in {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ─── Milestone tips (lab, prestige) — toast doré bas centré ───── */
+.milestone-tip {
+  position: fixed;
+  bottom: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(560px, 94vw);
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(212,168,75,.95) 0%, rgba(180,140,55,.95) 100%);
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  color: #1a1208;
+  font-size: 14px;
+  line-height: 1.45;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .55), 0 0 0 1px rgba(212,168,75,.25);
+  z-index: 56;
+  animation: milestone-tip-in .4s ease-out;
+}
+.milestone-tip-text {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+  margin: 0;
+}
+.milestone-tip-cta {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 9px 16px;
+  background: #1a1208;
+  color: var(--gold);
+  border-radius: 9px;
+  flex-shrink: 0;
+  transition: background .15s ease;
+}
+.milestone-tip-cta:hover {
+  background: #2a1e10;
+}
+@keyframes milestone-tip-in {
+  from { opacity: 0; transform: translate(-50%, 16px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+@media (max-width: 720px) {
+  .milestone-tip {
+    bottom: 110px;
+    padding: 12px 14px;
+    font-size: 13px;
+    gap: 10px;
+  }
+  .milestone-tip-cta {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}
+
+/* ─── Rush moments (Prompt 11) ──────────────────────────────────── */
+/* Overlay full-screen non-bloquant. pointer-events: none — le joueur
+   peut continuer à interagir avec la scène pendant l'animation. */
+.milestone-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 55;
+  pointer-events: none;
+  overflow: hidden;
+  background: radial-gradient(circle at center, rgba(212,168,75,.18), rgba(13,17,14,0) 60%);
+  animation: milestone-bg 2.4s ease forwards;
+}
+@keyframes milestone-bg {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.milestone-card {
+  position: relative;
+  text-align: center;
+  padding: 24px 36px;
+  animation: milestone-pop 2.4s cubic-bezier(.22,1.4,.36,1) forwards;
+  text-shadow: 0 4px 20px rgba(0,0,0,.6);
+}
+@keyframes milestone-pop {
+  0%   { opacity: 0; transform: scale(.6); }
+  18%  { opacity: 1; transform: scale(1.05); }
+  28%  { transform: scale(1); }
+  78%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.08); }
+}
+.milestone-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.milestone-amount {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(48px, 11vw, 120px);
+  line-height: 1;
+  background: linear-gradient(180deg, #f6d68a 0%, var(--gold) 60%, #a07a2f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 6px 24px rgba(212,168,75,.45));
+}
+.milestone-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--green-pale);
+  margin-top: 14px;
+  opacity: .85;
+}
+
+/* Particules dorées pures CSS — 6 trajectoires différentes (p0..p5)
+   réparties autour du centre. On en pose 24 pour densifier. */
+.milestone-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.milestone-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe9a8 0%, var(--gold) 60%, transparent 100%);
+  box-shadow: 0 0 12px rgba(212,168,75,.7);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}
+/* 6 directions x 4 couches → 24 particules avec délais variés */
+.milestone-particle.p0 { animation: milestone-fly-0 1.8s ease-out forwards; }
+.milestone-particle.p1 { animation: milestone-fly-1 2.0s ease-out forwards; }
+.milestone-particle.p2 { animation: milestone-fly-2 1.7s ease-out forwards; }
+.milestone-particle.p3 { animation: milestone-fly-3 2.1s ease-out forwards; }
+.milestone-particle.p4 { animation: milestone-fly-4 1.9s ease-out forwards; }
+.milestone-particle.p5 { animation: milestone-fly-5 2.2s ease-out forwards; }
+
+/* Étalement temporel : les 24 particules partent par vagues successives. */
+.milestone-particle:nth-child(6n+1)  { animation-delay: 0s;    }
+.milestone-particle:nth-child(6n+2)  { animation-delay: .08s;  }
+.milestone-particle:nth-child(6n+3)  { animation-delay: .16s;  }
+.milestone-particle:nth-child(6n+4)  { animation-delay: .04s;  }
+.milestone-particle:nth-child(6n+5)  { animation-delay: .12s;  }
+.milestone-particle:nth-child(6n)    { animation-delay: .20s;  }
+
+@keyframes milestone-fly-0 {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + 320px), calc(-50% - 180px)) scale(.3); }
+}
+@keyframes milestone-fly-1 {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% - 340px), calc(-50% - 200px)) scale(.3); }
+}
+@keyframes milestone-fly-2 {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + 380px), calc(-50% + 220px)) scale(.3); }
+}
+@keyframes milestone-fly-3 {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% - 360px), calc(-50% + 240px)) scale(.3); }
+}
+@keyframes milestone-fly-4 {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + 60px), calc(-50% - 280px)) scale(.3); }
+}
+@keyframes milestone-fly-5 {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% - 60px), calc(-50% + 280px)) scale(.3); }
+}
+
+/* Toast réduit pour `settings.reducedMotion`. Pas d'animation lourde,
+   juste un fade-in/out doux et une apparition statique. */
+.milestone-toast {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 22px;
+  background: rgba(19,26,20,.96);
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  z-index: 55;
+  pointer-events: none;
+  box-shadow: 0 12px 32px rgba(0,0,0,.55);
+  animation: fade-in .2s ease;
+}
+.milestone-toast-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.milestone-toast strong {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--green-pale);
 }

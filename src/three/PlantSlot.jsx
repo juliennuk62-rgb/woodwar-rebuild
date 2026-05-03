@@ -1,7 +1,9 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import { useGameStore } from '../store/gameStore.js';
 import { getPlantStage, getSpeciesData } from '../engine/economy.js';
+import { isHotPrice } from '../mechanics/market.js';
 import { getToonGradient } from './toon.js';
 import { clickWasDrag } from './IsometricCamera.jsx';
 import PlantMesh from './PlantMesh.jsx';
@@ -15,6 +17,12 @@ export default function PlantSlot({ slot }) {
   const greenhouse = useGameStore((s) => s.greenhouses[ghId]);
   const plant = greenhouse.plants.find((p) => p.slotId === slot.id);
   const harvest = useGameStore((s) => s.harvestPlant);
+  const reducedMotion = useGameStore((s) => s.settings.reducedMotion);
+  // Prix actuel de l'espèce sur le marché — undefined pour les hybrides ou
+  // espèces inconnues (pas de prix coté), ce qui désactive naturellement le badge.
+  const marketPrice = useGameStore((s) =>
+    plant ? s.market.prices[plant.speciesId] : undefined
+  );
   const slotFloats = useGameStore((s) =>
     s.floatingNumbers.filter(
       (f) => f.slotId === slot.id && (f.greenhouseId == null || f.greenhouseId === s.activeGreenhouse)
@@ -66,6 +74,11 @@ export default function PlantSlot({ slot }) {
   const species = plant ? getSpeciesData(plant.speciesId, useGameStore.getState()) : null;
   const accent = species?.petalColor ?? '#7ec87a';
 
+  // Badge "BON MOMENT" : la plante est (presque) mature ET son espèce est en pic
+  // de marché. `marketPrice` est undefined pour les hybrides → la condition est
+  // naturellement falsy et le badge n'apparaît pas.
+  const showHotBadge = plant && growth >= 0.85 && isHotPrice(marketPrice);
+
   return (
     <group
       position={slot.position}
@@ -73,9 +86,19 @@ export default function PlantSlot({ slot }) {
       onPointerOut={() => { setHover(false); document.body.style.cursor = ''; }}
       onClick={onClick}
     >
-      <Pot accentHover={hover || ready} ready={ready} accent={accent} />
+      <Pot accentHover={hover || ready} ready={ready} accent={accent} reducedMotion={reducedMotion} />
       {plant && species && <PlantMesh species={species} growth={growth} />}
       {plant && burstId > 0 && <PollenBurst key={burstId} color={accent} />}
+      {ready && hover && (
+        <Html position={[0, 1.4, 0]} center distanceFactor={8} zIndexRange={[5, 0]} pointerEvents="none">
+          <div className="pot-tooltip">Récolter manuellement <strong>+25 %</strong></div>
+        </Html>
+      )}
+      {showHotBadge && (
+        <Html position={[0, 1.7, 0]} center distanceFactor={8} zIndexRange={[5, 0]} pointerEvents="none">
+          <div className="hot-badge">🔥 ×{marketPrice.toFixed(1)}</div>
+        </Html>
+      )}
       {slotFloats.map((f) => (
         <FloatingNumber3D
           key={f.id}
@@ -88,12 +111,35 @@ export default function PlantSlot({ slot }) {
   );
 }
 
-function Pot({ accentHover, ready, accent }) {
+function Pot({ accentHover, ready, accent, reducedMotion }) {
   const grad = useMemo(() => getToonGradient(), []);
-  const ringColor = ready ? accent : (accentHover ? '#d4a84b' : '#3a3326');
+  // Quand la plante est mature, on force un anneau doré bien visible (signal
+  // fort de "récolte manuelle dispo +25 %"). Sinon on garde le comportement
+  // d'origine (accent doré au hover, sombre par défaut).
+  const ringColor = ready ? '#d4a84b' : (accentHover ? '#d4a84b' : '#3a3326');
+  const baseRingOpacity = ready ? 0.85 : (accentHover ? 0.6 : 0.18);
+
+  const ringRef = useRef();
+  const potRef = useRef();
+
+  useFrame(({ clock }) => {
+    // Si pas mature ou si l'utilisateur a coupé les anim, on remet à l'état neutre.
+    if (!ready || reducedMotion) {
+      if (ringRef.current?.material) ringRef.current.material.opacity = baseRingOpacity;
+      if (potRef.current) potRef.current.scale.setScalar(1);
+      return;
+    }
+    const pulse = Math.sin(clock.getElapsedTime() * 3) * 0.3;
+    if (ringRef.current?.material) {
+      ringRef.current.material.opacity = Math.max(0, Math.min(1, baseRingOpacity + pulse * 0.15));
+    }
+    if (potRef.current) {
+      potRef.current.scale.setScalar(1 + pulse * 0.04);
+    }
+  });
 
   return (
-    <group>
+    <group ref={potRef}>
       {/* Pot en terre cuite */}
       <mesh position={[0, 0.15, 0]}>
         <cylinderGeometry args={[0.45, 0.4, 0.3, 14]} />
@@ -110,12 +156,12 @@ function Pot({ accentHover, ready, accent }) {
         <meshToonMaterial color="#3a2410" gradientMap={grad} />
       </mesh>
       {/* Halo de sélection — anneau au sol */}
-      <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh ref={ringRef} position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.55, 0.7, 28]} />
         <meshBasicMaterial
           color={ringColor}
           transparent
-          opacity={ready ? 0.85 : (accentHover ? 0.6 : 0.18)}
+          opacity={baseRingOpacity}
         />
       </mesh>
     </group>

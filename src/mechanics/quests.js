@@ -85,12 +85,23 @@ export function shouldRefreshDailies(quests, today = todayISO()) {
   return quests?.daily?.lastRefresh !== today;
 }
 
-// Bonus revenu cumulé depuis tous les achievements claimed
+// Cumul des bonus apportés par les achievements claimed.
+// Retourne un objet : on additionne chaque type de bonus séparément
+// (revenu, chance de trait hybride, multi prestige, vitesse expédition).
 export function getAchievementBonus(claimed = {}) {
-  let bonus = 0;
+  const bonus = {
+    revenueBonus: 0,
+    traitChanceBonus: 0,
+    prestigeMultiplierBonus: 0,
+    expeditionSpeedBonus: 0,
+  };
   for (const a of ACHIEVEMENTS) {
     if (!claimed[a.id]) continue;
-    if (a.reward?.revenueBonus) bonus += a.reward.revenueBonus;
+    const r = a.reward ?? {};
+    if (r.revenueBonus)            bonus.revenueBonus            += r.revenueBonus;
+    if (r.traitChanceBonus)        bonus.traitChanceBonus        += r.traitChanceBonus;
+    if (r.prestigeMultiplierBonus) bonus.prestigeMultiplierBonus += r.prestigeMultiplierBonus;
+    if (r.expeditionSpeedBonus)    bonus.expeditionSpeedBonus    += r.expeditionSpeedBonus;
   }
   return bonus;
 }

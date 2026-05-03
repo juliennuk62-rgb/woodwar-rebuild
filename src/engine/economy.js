@@ -96,9 +96,14 @@ export function getUpgradeMultiplier(greenhouse) {
   return climate * soil;
 }
 
-export function getPrestigeMultiplier(greenhouse) {
+// `state` (optionnel) permet d'appliquer le boost achievements
+// (a_prestige_*) au multiplicateur prestige effectif.
+export function getPrestigeMultiplier(greenhouse, state = null) {
   const tokens = greenhouse?.prestige?.tokens ?? 0;
-  return 1 + tokens * 0.02; // +2% par token (GDD §06)
+  const base = 1 + tokens * 0.02; // +2% par token (GDD §06)
+  if (!state) return base;
+  const boost = 1 + (getAchievementBonus(state?.quests?.claimed ?? {}).prestigeMultiplierBonus ?? 0);
+  return base * boost;
 }
 
 // Bonus jardiniers pour une espèce donnée — somme additive
@@ -138,7 +143,7 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
   }
 
   const upgrade = getUpgradeMultiplier(greenhouse);
-  const prestige = getPrestigeMultiplier(greenhouse);
+  const prestige = getPrestigeMultiplier(greenhouse, state);
   const gardener = 1 + getGardenerBonus(greenhouse, plant.speciesId);
   const manual = opts.manual ? 1 + getManualBonus(greenhouse) : 1;
   const seasonGlobal = getSeasonRevenueMultiplier(season);
@@ -146,7 +151,7 @@ export function computePlantRevenue(plant, greenhouse, marketState, opts = {}, s
   const weatherBonus = 1 + getWeatherEffect(weather).revenueBonus;
   const research = state?.research?.unlocked ?? [];
   const researchBonus = 1 + getResearchBonuses(research).revenueBonus;
-  const achievementBonus = 1 + getAchievementBonus(state?.quests?.claimed ?? {});
+  const achievementBonus = 1 + (getAchievementBonus(state?.quests?.claimed ?? {}).revenueBonus ?? 0);
   const permanentBonus = 1 + (state?.permanentBonuses?.revenueBonus ?? 0);
 
   return Math.floor(

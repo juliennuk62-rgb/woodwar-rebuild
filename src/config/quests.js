@@ -98,6 +98,11 @@ export const STORY_QUESTS = [
 ];
 
 // ─── ACHIEVEMENTS (12 milestones perpétuels) ──────────────────────
+// Les rewards sont diversifiés (GDD §13 prompt 9) :
+//   - plantes        → revenueBonus (+ % revenu global)
+//   - hybrides       → traitChanceBonus (+ % chance de trait unique)
+//   - prestiges      → prestigeMultiplierBonus (+ % du multiplicateur prestige)
+//   - expéditions    → expeditionSpeedBonus (− % durée des expéditions)
 export const ACHIEVEMENTS = [
   { id: 'a_grow_10',   title: '10 plantes cultivées',   icon: '🌱', target: 10,    progress: (s) => s.stats.totalPlantsGrown,    reward: { revenueBonus: 0.05 } },
   { id: 'a_grow_50',   title: '50 plantes cultivées',   icon: '🌿', target: 50,    progress: (s) => s.stats.totalPlantsGrown,    reward: { revenueBonus: 0.10 } },
@@ -105,15 +110,15 @@ export const ACHIEVEMENTS = [
   { id: 'a_grow_500',  title: '500 plantes cultivées',  icon: '🌹', target: 500,   progress: (s) => s.stats.totalPlantsGrown,    reward: { revenueBonus: 0.25 } },
   { id: 'a_grow_2000', title: '2 000 plantes cultivées', icon: '🏆', target: 2000, progress: (s) => s.stats.totalPlantsGrown,    reward: { revenueBonus: 0.50 } },
 
-  { id: 'a_hyb_1',  title: '1 hybride créé',    icon: '🧬', target: 1,  progress: (s) => s.stats.totalHybridsCreated ?? 0,  reward: { revenueBonus: 0.05 } },
-  { id: 'a_hyb_5',  title: '5 hybrides créés',  icon: '✨', target: 5,  progress: (s) => s.stats.totalHybridsCreated ?? 0,  reward: { revenueBonus: 0.10 } },
-  { id: 'a_hyb_20', title: '20 hybrides créés', icon: '⚗️', target: 20, progress: (s) => s.stats.totalHybridsCreated ?? 0,  reward: { revenueBonus: 0.20 } },
+  { id: 'a_hyb_1',  title: '1 hybride créé',    icon: '🧬', target: 1,  progress: (s) => s.stats.totalHybridsCreated ?? 0,  reward: { traitChanceBonus: 0.05 } },
+  { id: 'a_hyb_5',  title: '5 hybrides créés',  icon: '✨', target: 5,  progress: (s) => s.stats.totalHybridsCreated ?? 0,  reward: { traitChanceBonus: 0.10 } },
+  { id: 'a_hyb_20', title: '20 hybrides créés', icon: '⚗️', target: 20, progress: (s) => s.stats.totalHybridsCreated ?? 0,  reward: { traitChanceBonus: 0.20 } },
 
-  { id: 'a_prestige_1', title: '1er prestige',  icon: '🌟', target: 1, progress: countPrestiges, reward: { revenueBonus: 0.10 } },
-  { id: 'a_prestige_3', title: '3 prestiges',   icon: '💫', target: 3, progress: countPrestiges, reward: { revenueBonus: 0.20 } },
+  { id: 'a_prestige_1', title: '1er prestige',  icon: '🌟', target: 1, progress: countPrestiges, reward: { prestigeMultiplierBonus: 0.05 } },
+  { id: 'a_prestige_3', title: '3 prestiges',   icon: '💫', target: 3, progress: countPrestiges, reward: { prestigeMultiplierBonus: 0.15 } },
 
-  { id: 'a_exp_5',  title: '5 expéditions',  icon: '🗺️', target: 5,  progress: (s) => s.expeditions.completed ?? 0, reward: { revenueBonus: 0.05 } },
-  { id: 'a_exp_20', title: '20 expéditions', icon: '🧭', target: 20, progress: (s) => s.expeditions.completed ?? 0, reward: { revenueBonus: 0.10 } },
+  { id: 'a_exp_5',  title: '5 expéditions',  icon: '🗺️', target: 5,  progress: (s) => s.expeditions.completed ?? 0, reward: { expeditionSpeedBonus: 0.05 } },
+  { id: 'a_exp_20', title: '20 expéditions', icon: '🧭', target: 20, progress: (s) => s.expeditions.completed ?? 0, reward: { expeditionSpeedBonus: 0.15 } },
 ];
 
 // ─── DAILY (générateurs de quêtes journalières) ───────────────────

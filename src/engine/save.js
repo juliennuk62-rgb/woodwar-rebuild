@@ -99,6 +99,8 @@ export function loadSave() {
       reducedMotion: false, sfxVolume: 0.7, musicVolume: 0.4, muted: false, lang: 'fr',
     };
     data.onboarding = data.onboarding ?? { step: 0, dismissed: false, lastSeenStep: 0 };
+    data.tipsSeen ??= {};
+    data.mtipsSeen ??= {};
     data.research = data.research ?? { unlocked: [], inProgress: null };
     data.hybrids = data.hybrids ?? {};
     if (data.hybridIndex == null) data.hybridIndex = 0;
@@ -109,6 +111,8 @@ export function loadSave() {
     if (!data.quests.weekly)  data.quests.weekly  = { points: 0 };
     if (!data.expeditions)    data.expeditions    = { active: [], completed: 0 };
     data.permanentBonuses = data.permanentBonuses ?? { revenueBonus: 0 };
+    // Prompt 11 — rush moments (milestones lifetime déjà célébrés)
+    data.seenMilestones = data.seenMilestones ?? {};
 
     // Champs volatiles : on les nettoie même s'ils sont présents (vieilles
     // saves committées avant l'audit qui les a ajoutés à VOLATILE).

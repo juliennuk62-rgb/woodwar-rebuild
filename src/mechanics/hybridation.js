@@ -66,7 +66,8 @@ export function hybridizationDurationMs(parent1, parent2, researchUnlocked = [])
 }
 
 // Génère un hybride à partir de deux parents — appelé à la fin du timer de lab.
-export function buildHybrid({ parent1Id, parent2Id, hybridIndex, researchUnlocked = [] }) {
+// `traitChanceBonus` (optionnel) : bonus additif issu des achievements (a_hyb_*).
+export function buildHybrid({ parent1Id, parent2Id, hybridIndex, researchUnlocked = [], traitChanceBonus = 0 }) {
   const p1 = PLANTS[parent1Id];
   const p2 = PLANTS[parent2Id];
   if (!p1 || !p2) return null;
@@ -75,8 +76,9 @@ export function buildHybrid({ parent1Id, parent2Id, hybridIndex, researchUnlocke
   const traitChance = sameBiome
     ? TRAIT_CHANCE_SAME_BIOME
     : TRAIT_CHANCE_CROSS_BIOME;
-  // Tech lab_2 : +15% chance trait rare
-  const finalTraitChance = traitChance + (researchUnlocked.includes('lab_2') ? 0.15 : 0);
+  // Tech lab_2 : +15% chance trait rare ; achievements : +N% supplémentaires.
+  const labBonus = researchUnlocked.includes('lab_2') ? 0.15 : 0;
+  const finalTraitChance = Math.min(1, traitChance + labBonus + (traitChanceBonus ?? 0));
 
   // Stats héritées avec variance aléatoire
   const growVariance = 0.7 + Math.random() * 0.6;          // 0.7 - 1.3

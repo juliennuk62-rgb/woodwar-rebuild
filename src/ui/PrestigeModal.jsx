@@ -1,7 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore.js';
 import { GREENHOUSES } from '../config/greenhouses.js';
 import { formatEuros, formatNumber } from '../utils/numberFormat.js';
+import { getNextMilestone } from '../engine/prestige.js';
+
+// Formatte un nombre de secondes en "8s", "2 min", "1 h 12 min" lisible.
+function formatDuration(seconds) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return '—';
+  if (seconds < 60) return `${Math.max(1, Math.round(seconds))}s`;
+  const minutes = seconds / 60;
+  if (minutes < 60) return `${Math.round(minutes)} min`;
+  const hours = Math.floor(minutes / 60);
+  const remMin = Math.round(minutes - hours * 60);
+  return remMin > 0 ? `${hours} h ${remMin} min` : `${hours} h`;
+}
 
 // Bouton + modale de prestige pour la serre active.
 // Visible dans le HUD quand le joueur peut faire au moins un prestige
@@ -13,8 +25,28 @@ export default function PrestigeModal() {
   const apply = useGameStore((s) => s.applyPrestige);
   const config = GREENHOUSES[ghId];
 
+  // Force un re-render 1×/s pour rafraîchir le compteur "prestige dans ≈ Xs"
+  // (l'incomePerSecond bouge au gré des récoltes, météo, etc.).
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => (t + 1) % 1000000), 1000);
+    return () => clearInterval(id);
+  }, []);
+
   const p = preview(ghId);
   if (!p) return null;
+
+  // Prochain palier intéressant : si on ne peut pas prestige, on vise le
+  // 1er token ; sinon, on vise un x1.5 du multiplicateur courant.
+  const milestone = getNextMilestone(
+    ghId,
+    useGameStore.getState(),
+    p.canPrestige ? 1.5 : null,
+  );
+  const showMilestone = milestone && milestone.tokensNeeded > 0;
+  const milestoneLabel = p.canPrestige
+    ? `Prestige ×1,5 dans ≈ ${formatDuration(milestone?.secondsNeeded)}`
+    : `+1 token dans ≈ ${formatDuration(milestone?.secondsNeeded)}`;
 
   return (
     <>
@@ -27,6 +59,16 @@ export default function PrestigeModal() {
           <span>{config.prestigeToken.icon}</span>
           <span>Prestige · +{p.tokensGained}</span>
         </button>
+      )}
+
+      {showMilestone && (
+        <div
+          className={`prestige-next ${p.canPrestige ? 'prestige-next--has-button' : ''}`}
+          aria-live="polite"
+        >
+          <span aria-hidden="true">🌟</span>
+          <span>{milestoneLabel}</span>
+        </div>
       )}
 
       {open && (

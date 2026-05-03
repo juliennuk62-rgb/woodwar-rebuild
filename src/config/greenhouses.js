@@ -53,6 +53,24 @@ export const GREENHOUSES = {
     floorColor: '#3a4a52',
     accentColor: '#88c4d8',
   },
+  complex: {
+    id: 'complex',
+    name: 'Complexe Botanique',
+    icon: '🔬',
+    biome: 'Complexe (toutes espèces + hybrides)',
+    unlockCost: 50000000,
+    initialSlots: 24,
+    slotsTiers: [24, 36, 48],
+    prestigeToken: { id: 'legendarySeed', name: 'Graine légendaire', icon: '🌟' },
+    species: [
+      'daisy', 'tulip', 'rose', 'lavender', 'peony',
+      'orchid', 'hibiscus', 'ylang', 'lotus',
+      'desert_rose', 'saffron', 'cactus',
+      'edelweiss', 'glow_moss', 'aurora_lily',
+    ],
+    floorColor: '#1a2e3a',
+    accentColor: '#e07ad4',
+  },
 };
 
 export const GREENHOUSE_LIST = Object.values(GREENHOUSES);

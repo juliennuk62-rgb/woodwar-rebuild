@@ -29,15 +29,17 @@ export default function ShopPanel() {
   // On plante les hybrides du joueur en plus des espèces natives configurées
   // pour la serre. Règle simple : un hybride dont le biome correspond à la
   // serre y est plantable. Les hybrides "cross-biome" (biome === 'hybrid')
-  // sont plantables dans la Tempérée par défaut tant que la Complexe Botanique
-  // n'existe pas (ce sera un Prompt futur).
+  // sont prioritairement plantables dans le Complexe Botanique s'il est
+  // débloqué — sinon ils retombent dans la Tempérée.
+  const complexUnlocked = useGameStore((s) => !!s.greenhouses.complex?.unlocked);
   const speciesIds = useMemo(() => {
     const native = config.species.slice();
+    const hybridHome = complexUnlocked ? 'complex' : 'temperate';
     const hybridIds = Object.values(hybrids)
-      .filter((h) => h.biome === ghId || (h.biome === 'hybrid' && ghId === 'temperate'))
+      .filter((h) => h.biome === ghId || (h.biome === 'hybrid' && ghId === hybridHome))
       .map((h) => h.id);
     return [...native, ...hybridIds];
-  }, [config.species, hybrids, ghId]);
+  }, [config.species, hybrids, ghId, complexUnlocked]);
 
   useEffect(() => {
     const onOpen = (e) => setSlotId(e.detail.slotId);

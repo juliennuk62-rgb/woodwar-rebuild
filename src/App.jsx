@@ -14,9 +14,12 @@ import PrestigeModal from './ui/PrestigeModal.jsx';
 import SaveErrorBanner from './ui/SaveErrorBanner.jsx';
 import OfflineModal from './ui/OfflineModal.jsx';
 import DiscoveryModal from './ui/DiscoveryModal.jsx';
+import MilestoneOverlay from './ui/MilestoneOverlay.jsx';
 import PanelLauncher from './ui/PanelLauncher.jsx';
 import PlantsList from './ui/PlantsList.jsx';
 import Onboarding from './ui/Onboarding.jsx';
+import ContextualTips from './ui/ContextualTips.jsx';
+import MilestoneTips from './ui/MilestoneTips.jsx';
 import { useGameStore } from './store/gameStore.js';
 import { startGameLoop, stopGameLoop } from './engine/tick.js';
 import { setupAutosave } from './engine/save.js';
@@ -64,7 +67,10 @@ export default function App() {
       {activePanel === 'quests' && <QuestsPanel />}
       <SettingsModal />
       <Onboarding />
+      <ContextualTips />
+      <MilestoneTips />
       <DiscoveryModal />
+      <MilestoneOverlay />
       <OfflineModal />
       <SaveErrorBanner />
     </>
