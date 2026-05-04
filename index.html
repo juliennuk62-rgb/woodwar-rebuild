@@ -724,21 +724,10 @@
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Marqueurs de ressource (3 petits ronds)
+    // Marqueurs de ressource — sprite distinct par type pour qu'on
+    // identifie le minerai d'un coup d'œil sans regarder la couleur de fond.
     if (tile.type === 'resource' && !tile.building) {
-      ctx.fillStyle = RESOURCES[tile.resource].color;
-      // Plus visibles à zoom bas — sinon les gisements deviennent invisibles
-      const dotR = Math.max(3, 4.5 * z);
-      const positions = [
-        { dx: -w * 0.18, dy: 0 },
-        { dx:  w * 0.18, dy: -h * 0.12 },
-        { dx:  0,        dy:  h * 0.18 },
-      ];
-      for (const p of positions) {
-        ctx.beginPath();
-        ctx.arc(x + p.dx, y + p.dy, dotR, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      drawResourceMarkers(tile.resource, x, y, w, h, z);
     }
 
     // Bâtiment posé sur cette tuile
@@ -748,6 +737,122 @@
   }
 
   // Dessine un bâtiment en faux-3D : un cube vu de dessus en iso.
+  // Dessine les marqueurs de minerai sur une tuile ressource. Chaque
+  // type a son sprite distinct — feedback visuel beaucoup plus fort que
+  // les 3 ronds génériques de la V1, où seule la couleur changeait.
+  function drawResourceMarkers(resource, x, y, w, h, z) {
+    const color = RESOURCES[resource].color;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+
+    if (resource === 'fer') {
+      // 3 mini-cubes empilés (look "minerai brut concassé")
+      const blocks = [
+        { dx: -w * 0.18, dy: -h * 0.04, s: 6 },
+        { dx:  w * 0.16, dy: -h * 0.02, s: 5 },
+        { dx: -w * 0.02, dy:  h * 0.20, s: 7 },
+      ];
+      for (const b of blocks) {
+        drawIsoMiniCube(x + b.dx, y + b.dy, Math.max(3.5, b.s * z), color);
+      }
+
+    } else if (resource === 'cuivre') {
+      // 4 pépites arrondies brillantes avec highlight
+      const nuggets = [
+        { dx: -w * 0.18, dy: -h * 0.04, r: 3.6 },
+        { dx:  w * 0.16, dy: -h * 0.10, r: 3.2 },
+        { dx:  w * 0.08, dy:  h * 0.16, r: 4.0 },
+        { dx: -w * 0.10, dy:  h * 0.20, r: 3.0 },
+      ];
+      for (const n of nuggets) {
+        const rr = Math.max(2, n.r * z);
+        // Ombre
+        ctx.fillStyle = shade(color, 0.55);
+        ctx.beginPath();
+        ctx.ellipse(x + n.dx, y + n.dy + 1 * z, rr * 1.05, rr * 0.55, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Corps
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.ellipse(x + n.dx, y + n.dy, rr, rr * 0.55, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // Highlight (reflet)
+        ctx.fillStyle = shade(color, 1.5);
+        ctx.beginPath();
+        ctx.ellipse(x + n.dx - rr * 0.3, y + n.dy - rr * 0.2, rr * 0.35, rr * 0.18, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+    } else if (resource === 'charbon') {
+      // 3 éclats polygonaux noirs, plus une facette claire pour le relief
+      const chunks = [
+        { dx: -w * 0.18, dy: -h * 0.04, s: 5 },
+        { dx:  w * 0.16, dy:  h * 0.04, s: 6 },
+        { dx: -w * 0.02, dy:  h * 0.20, s: 5 },
+      ];
+      for (const c of chunks) {
+        const cx = x + c.dx, cy = y + c.dy;
+        const r = Math.max(3, c.s * z);
+        // Corps (charbon noir)
+        ctx.fillStyle = '#1a1a1a';
+        ctx.beginPath();
+        ctx.moveTo(cx - r * 0.85, cy + r * 0.35);
+        ctx.lineTo(cx - r * 0.55, cy - r * 0.55);
+        ctx.lineTo(cx + r * 0.45, cy - r * 0.65);
+        ctx.lineTo(cx + r * 0.95, cy - r * 0.10);
+        ctx.lineTo(cx + r * 0.50, cy + r * 0.55);
+        ctx.lineTo(cx - r * 0.30, cy + r * 0.65);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        // Facette supérieure (reflet bleuté pour le brillant du charbon)
+        ctx.fillStyle = '#4a4d55';
+        ctx.beginPath();
+        ctx.moveTo(cx - r * 0.55, cy - r * 0.55);
+        ctx.lineTo(cx + r * 0.45, cy - r * 0.65);
+        ctx.lineTo(cx + r * 0.20, cy - r * 0.15);
+        ctx.lineTo(cx - r * 0.35, cy - r * 0.20);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+  }
+
+  // Petit cube iso utilitaire pour les blocs de fer.
+  function drawIsoMiniCube(x, y, s, color) {
+    // Top (clair)
+    ctx.fillStyle = shade(color, 1.2);
+    ctx.beginPath();
+    ctx.moveTo(x,         y - s * 0.6);
+    ctx.lineTo(x + s,     y - s * 0.3);
+    ctx.lineTo(x,         y);
+    ctx.lineTo(x - s,     y - s * 0.3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // Face droite
+    ctx.fillStyle = shade(color, 0.85);
+    ctx.beginPath();
+    ctx.moveTo(x,         y);
+    ctx.lineTo(x + s,     y - s * 0.3);
+    ctx.lineTo(x + s,     y + s * 0.4);
+    ctx.lineTo(x,         y + s * 0.7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // Face gauche
+    ctx.fillStyle = shade(color, 0.6);
+    ctx.beginPath();
+    ctx.moveTo(x,         y);
+    ctx.lineTo(x - s,     y - s * 0.3);
+    ctx.lineTo(x - s,     y + s * 0.4);
+    ctx.lineTo(x,         y + s * 0.7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+
   function drawBuilding(building, cx, cy, ghost) {
     const def = BUILDINGS[building.type];
     const z = state.camera.zoom;
