@@ -744,10 +744,21 @@
   // `basic: true` → ressource brute extractible sur la map ; sinon =
   // ressource crafted (apparaît dans les recettes). Les crafted ne sont
   // affichées dans le HUD qu'une fois la techno correspondante débloquée.
+  // ─── Définitions des ressources ─────────────────────────────────
+  // `basic: true` → ressource brute extractible sur la map ; sinon =
+  // ressource crafted (apparaît dans les recettes).
+  // `spawnWeight` (basic only) : poids relatif dans le tirage aléatoire à
+  //   la génération de carte. Plus c'est haut, plus c'est commun.
+  // `prodRate` (basic only) : unités/seconde extraites par un extracteur.
+  //   Volontairement décroissant avec la valeur — sinon l'extracteur de
+  //   cuivre (2 €) serait toujours strictement meilleur que celui de fer
+  //   (1 €) pour le même coût. Maintenant : fer rapide+commun, cuivre
+  //   lent+rare. €/s par extracteur reste comparable, mais le gameplay
+  //   devient stratégique (chercher les rares gisements de cuivre).
   const RESOURCES = {
-    fer:       { name: 'Fer',       short: 'FE', color: '#a86a3c', price: 1.0,    basic: true },
-    cuivre:    { name: 'Cuivre',    short: 'CU', color: '#d97e2a', price: 2.0,    basic: true },
-    charbon:   { name: 'Charbon',   short: 'CH', color: '#3d3d3d', price: 1.5,    basic: true },
+    fer:       { name: 'Fer',       short: 'FE', color: '#a86a3c', price: 1.0,    basic: true,  spawnWeight: 50, prodRate: 1.0 },
+    cuivre:    { name: 'Cuivre',    short: 'CU', color: '#d97e2a', price: 2.0,    basic: true,  spawnWeight: 20, prodRate: 0.6 },
+    charbon:   { name: 'Charbon',   short: 'CH', color: '#3d3d3d', price: 1.5,    basic: true,  spawnWeight: 30, prodRate: 0.8 },
     lingot:    { name: 'Lingot',    short: 'LI', color: '#b6c0d4', price: 8.0   },
     piece:     { name: 'Pièce',     short: 'PI', color: '#9aaab8', price: 50.0  },
     composant: { name: 'Composant', short: 'CP', color: '#6db8a8', price: 250.0 },
@@ -766,7 +777,7 @@
     extracteur: {
       name: 'Extracteur', icon: '⛏️', cost: 50, color: '#a06848',
       requiresResource: true, energyUsage: 1, productionPerTick: 1,
-      info: 'Sur ressource · +1/s · 1⚡',
+      info: 'Sur minerai · vitesse selon ressource · 1⚡',
     },
     entrepot: {
       name: 'Entrepôt',   icon: '📦', cost: 100, color: '#8b6f47',
@@ -923,15 +934,28 @@
   // ─── Génération de la grille ─────────────────────────────────────
   // Place des ressources aléatoirement (~18% des tuiles), réparties
   // entre les 3 types possibles. Le reste reste en "ground".
+  // Tirage pondéré d'une ressource basic selon spawnWeight. Fer rare ?
+  // Non — fer abondant. Cuivre rare = il faut chercher les filons,
+  // ce qui justifie sa meilleure valeur.
+  function pickWeightedResource() {
+    const weighted = Object.entries(RESOURCES).filter(([k, def]) => def.basic && def.spawnWeight > 0);
+    const total = weighted.reduce((s, [k, def]) => s + def.spawnWeight, 0);
+    let r = Math.random() * total;
+    for (const [key, def] of weighted) {
+      r -= def.spawnWeight;
+      if (r <= 0) return key;
+    }
+    return weighted[0][0];
+  }
+
   function generateGrid() {
     state.tiles = [];
-    const types = Object.keys(RESOURCES);
     for (let r = 0; r < GRID_SIZE; r++) {
       const row = [];
       for (let c = 0; c < GRID_SIZE; c++) {
         let resource = null;
         if (Math.random() < RESOURCE_DENSITY) {
-          resource = types[Math.floor(Math.random() * types.length)];
+          resource = pickWeightedResource();
         }
         row.push({
           type: resource ? 'resource' : 'ground',
@@ -1785,8 +1809,11 @@
         if (b.type === 'extracteur') {
           const r = state.tiles[b.row][b.col].resource;
           // Stock plein → l'extracteur tourne pour rien, on ne compte pas.
+          // Le taux est modulé par la difficulté du minerai (prodRate) :
+          // fer rapide (1.0), charbon medium (0.8), cuivre lent (0.6).
           if (r && state.stocks[r] < cap) {
-            rates[r] += def.productionPerTick * boosts.extractorMult;
+            const tileRate = RESOURCES[r].prodRate ?? 1;
+            rates[r] += def.productionPerTick * tileRate * boosts.extractorMult;
           }
         } else if (def.recipe) {
           // Recettes : taux théorique en supposant le cycle alimenté.
@@ -1828,12 +1855,19 @@
         const def = BUILDINGS[b.type];
 
         if (b.type === 'extracteur') {
-          // Extracteur : produit la ressource de la tuile, capé.
-          // extractorMult de la recherche Mk2 amplifie la prod.
+          // Extracteur : produit la ressource de la tuile, modulé par la
+          // difficulté du minerai (prodRate). Fer 1.0/s, charbon 0.8/s,
+          // cuivre 0.6/s — le cuivre se monnaie sa rareté + sa lenteur.
           const r = state.tiles[b.row][b.col].resource;
           if (r && state.stocks[r] < cap) {
-            state.stocks[r] = Math.min(cap, state.stocks[r] + def.productionPerTick * boosts.extractorMult);
-            spawnFloater(b.col, b.row, '+' + RESOURCES[r].price + '€', '#b6e8a3');
+            const tileRate = RESOURCES[r].prodRate ?? 1;
+            const produced = def.productionPerTick * tileRate * boosts.extractorMult;
+            state.stocks[r] = Math.min(cap, state.stocks[r] + produced);
+            // Le floater spawn avec proba = prodRate (fer 100%, cuivre 60%)
+            // → on voit visuellement que le cuivre extrait moins souvent.
+            if (Math.random() < tileRate) {
+              spawnFloater(b.col, b.row, '+' + RESOURCES[r].price + '€', '#b6e8a3');
+            }
           }
         } else if (def.recipe) {
           runRecipeTick(b, def.recipe);
