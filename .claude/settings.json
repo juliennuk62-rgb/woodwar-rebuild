@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/auto-review.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rm -f /tmp/claude-iron-co-auto-review-count 2>/dev/null; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
