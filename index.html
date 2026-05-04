@@ -95,8 +95,14 @@
       flex-shrink: 0;
       box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.3);
     }
-    .stock-name { font-weight: 600; flex: 1; }
-    .stock-qty { font-family: 'Consolas', 'Monaco', monospace; }
+    .stock-name { font-weight: 600; flex: 1; font-size: 12px; }
+    .stock-qty {
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;          /* plus dominant — c'est le chiffre que l'œil cherche */
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.01em;
+    }
     /* Badge "+1.0/s" ou "-0.5/s" affiché dans la ligne de stock — donne
        un feedback live de la production/consommation, même quand le
        stock courant reste à 0 (vente immédiate). */
@@ -198,14 +204,42 @@
     }
     .palette-btn-icon { font-size: 22px; line-height: 1; }
     .palette-btn-name { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-    .palette-btn-cost { font-size: 11px; color: #ffd166; font-family: 'Consolas', monospace; }
+    .palette-btn-cost { font-size: 11px; color: var(--primary); font-family: 'Consolas', monospace; }
+    /* Info production/consommation always-on — renseigne le joueur sur
+       ce que le bâtiment fait sans devoir consulter une doc externe. */
+    .palette-btn-info {
+      font-size: 9px;
+      color: var(--text-faint);
+      font-family: 'Consolas', monospace;
+      letter-spacing: 0.02em;
+      max-width: 100px;
+      text-align: center;
+      line-height: 1.25;
+      margin-top: 2px;
+    }
     /* Démolir : style rouge pour bien le distinguer des bâtiments à poser */
-    .palette-btn-demolish .palette-btn-cost { color: #b6e8a3; }
+    .palette-btn-demolish .palette-btn-cost { color: var(--success); }
     .palette-btn-demolish.active {
       background: rgba(255, 107, 107, 0.18);
-      border-color: #ff6b6b;
+      border-color: var(--danger);
     }
-    .palette-btn-demolish.active .palette-btn-name { color: #ff9d9d; }
+    .palette-btn-demolish.active .palette-btn-name { color: var(--danger-soft); }
+
+    /* Pulse subtil sur le bâtiment sélectionné — clarifie le mode actif */
+    @keyframes palette-active-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(143, 191, 125, 0.0); }
+      50%      { box-shadow: 0 0 0 3px rgba(143, 191, 125, 0.35); }
+    }
+    .palette-btn.active:not(.palette-btn-demolish) {
+      animation: palette-active-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes palette-active-pulse-red {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.0); }
+      50%      { box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.4); }
+    }
+    .palette-btn-demolish.active {
+      animation: palette-active-pulse-red 1.4s ease-in-out infinite;
+    }
 
     /* Bouton recherches (bas droite). pointer-events: auto explicite car
        l'élément a la classe `.hud` (pointer-events: none) mais n'est pas
@@ -245,8 +279,10 @@
     }
 
     /* Indication visuelle sur les stocks proches du cap */
-    .stock-row.is-near .stock-qty { color: #ffd166; }
-    .stock-row.is-full .stock-qty { color: #ff6b6b; font-weight: 700; }
+    /* Le qty est doré par défaut → "is-near" doit ressortir avec une teinte
+       orangée plus chaude, et "is-full" en rouge franc. */
+    .stock-row.is-near .stock-qty { color: #ffa94d; }
+    .stock-row.is-full .stock-qty { color: var(--danger); }
     .stock-row.is-full {
       border-color: rgba(255, 107, 107, 0.4);
       box-shadow: 0 0 12px rgba(255, 107, 107, 0.15);
@@ -476,11 +512,17 @@
       from { opacity: 0; transform: scale(0.96); }
       to   { opacity: 1; transform: scale(1); }
     }
-    .research-modal:not([hidden]) .research-panel {
+    @keyframes modal-fade-out {
+      from { opacity: 1; transform: scale(1); }
+      to   { opacity: 0; transform: scale(0.96); }
+    }
+    .research-modal:not([hidden]):not(.closing) .research-panel,
+    .research-modal:not([hidden]):not(.closing) .research-backdrop {
       animation: modal-fade-in 0.22s ease-out;
     }
-    .research-modal:not([hidden]) .research-backdrop {
-      animation: modal-fade-in 0.22s ease-out;
+    .research-modal.closing .research-panel,
+    .research-modal.closing .research-backdrop {
+      animation: modal-fade-out 0.18s ease-in;
     }
 
     /* ─── Affordance de scroll horizontal sur la palette ───────────
@@ -616,24 +658,29 @@
     extracteur: {
       name: 'Extracteur', icon: '⛏️', cost: 50, color: '#a06848',
       requiresResource: true, energyUsage: 1, productionPerTick: 1,
+      info: 'Sur ressource · +1/s · 1⚡',
     },
     entrepot: {
       name: 'Entrepôt',   icon: '📦', cost: 100, color: '#8b6f47',
       storage: 100,
+      info: '+100 capacité',
     },
     generateur: {
       name: 'Générateur', icon: '⚡', cost: 75, color: '#ffd166',
       energyProduction: 10,
+      info: '+10⚡',
     },
     fonderie: {
       name: 'Fonderie',   icon: '🏭', cost: 200, color: '#ef6c4a',
       energyUsage: 2, locked: true,
       recipe: { input: { fer: 1, charbon: 1 }, output: 'lingot', qty: 1, cycleMs: 2000 },
+      info: 'Fer+Charbon → Lingot · 2s · 2⚡',
     },
     assembleur: {
-      name: 'Assembleur', icon: '⚙️', cost: 400, color: '#9b6dff',
+      name: 'Assembleur', icon: '⚙️', cost: 400, color: '#7e6dff',
       energyUsage: 3, locked: true,
       recipe: { input: { lingot: 2, cuivre: 1 }, output: 'piece', qty: 1, cycleMs: 3000 },
+      info: '2 Lingot+Cuivre → Pièce · 3s · 3⚡',
     },
   };
 
@@ -1581,6 +1628,7 @@
             <span class="palette-btn-icon">${def.icon}</span>
             <span class="palette-btn-name">${def.name}</span>
             <span class="palette-btn-cost">${def.cost} €</span>
+            ${def.info ? `<span class="palette-btn-info">${def.info}</span>` : ''}
           </button>`;
       }
       // Bouton "Démolir" — toujours présent, gratuit, refund 50% du coût.
@@ -1592,7 +1640,8 @@
         >
           <span class="palette-btn-icon">🗑️</span>
           <span class="palette-btn-name">Démolir</span>
-          <span class="palette-btn-cost">+ 50%</span>
+          <span class="palette-btn-cost">refund 50%</span>
+          <span class="palette-btn-info">Tap un bâtiment</span>
         </button>`;
       palette.innerHTML = pHtml;
       lastHudHash = wantHash;
@@ -1815,10 +1864,20 @@
 
   function openResearchModal() {
     renderResearchModal();
+    researchModal.classList.remove('closing');
     researchModal.hidden = false;
   }
+  // Fermeture animée : on ajoute la classe .closing → l'animation
+  // CSS modal-fade-out joue, puis on hide réellement après sa durée.
+  let closingTimer = null;
   function closeResearchModal() {
-    researchModal.hidden = true;
+    if (researchModal.hidden) return;
+    researchModal.classList.add('closing');
+    clearTimeout(closingTimer);
+    closingTimer = setTimeout(() => {
+      researchModal.hidden = true;
+      researchModal.classList.remove('closing');
+    }, 180);
   }
 
   // Construit la liste des cartes de recherche. Chaque carte a 3 états :
