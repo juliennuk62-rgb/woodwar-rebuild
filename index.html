@@ -478,7 +478,6 @@
     credits: 200,
     stocks: { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0 },
     storageCap: 50,           // capacité de stockage par ressource
-    revenuePerSec: 0,         // taux affiché dans le HUD
     energyBase: 5,            // énergie "gratuite" de base
     // Recherches achetées (instantanées). Liste d'IDs de RESEARCH.
     research: { unlocked: [] },
@@ -881,7 +880,6 @@
       revenue += sellQty * RESOURCES[r].price;
     }
     state.credits += revenue;
-    state.revenuePerSec = revenue;
 
     updateHUD();
   }
@@ -970,9 +968,9 @@
     }
     stocksEl.innerHTML = html;
 
-    // Crédits + €/s + énergie (haut droite). On préfère expectedRevenue
-    // (live, dérivé de la prod) à state.revenuePerSec (mis à jour seulement
-    // au tick) pour que la valeur change DÈS qu'un bâtiment est posé.
+    // Crédits + €/s + énergie (haut droite). expectedRevenue est calculé
+    // live à partir des taux de production → réagit instantanément aux
+    // placements, pas besoin d'attendre le prochain tick.
     document.getElementById('credits-value').textContent = formatCredits(state.credits) + ' €';
     document.getElementById('credits-rate').textContent =
       '+ ' + stats.expectedRevenue.toFixed(1) + ' €/s';
