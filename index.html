@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Iron & Co — Tycoon isométrique</title>
+  <!-- Three.js depuis CDN. Utilisé uniquement par le skin "3D Beta" ;
+       les skins Classique et Néo n'en ont pas besoin et continuent à
+       fonctionner même si le CDN est down. -->
+  <script src="https://unpkg.com/three@0.166.1/build/three.min.js" defer></script>
   <style>
     /* ─── Reset minimal + thème ──────────────────────────────────── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -870,7 +874,13 @@
   <nav class="theme-tabs" id="theme-tabs" aria-label="Skin de l'interface">
     <button class="theme-tab" data-theme="classic" aria-pressed="true">▮ Classique</button>
     <button class="theme-tab" data-theme="neo" aria-pressed="false">▰ Néo</button>
+    <button class="theme-tab" data-theme="3d" aria-pressed="false">▼ 3D Beta</button>
   </nav>
+
+  <!-- Canvas WebGL pour le skin 3D. Caché par défaut (montré seulement
+       quand state.theme === '3d'). Initialisé à la demande pour ne pas
+       payer le coût Three.js si le user reste en 2D. -->
+  <canvas id="game3d" hidden></canvas>
 
   <!-- HUD : tout en HTML overlay pour rester simple à mettre à jour -->
   <div class="hud stocks" id="stocks"></div>
@@ -2779,21 +2789,373 @@
 
   // ─── Boucle principale ──────────────────────────────────────────
   function loop() {
-    render();
+    if (state.theme === '3d' && three.inited) {
+      render3D();
+    } else {
+      render();
+    }
     // Mini-map redraw throttled à ~5 Hz (suffit pour suivre la caméra)
     if ((loop._mmTick = (loop._mmTick || 0) + 1) % 12 === 0) drawMinimap();
     requestAnimationFrame(loop);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SKIN 3D BETA — Three.js scène isométrique. État de jeu inchangé.
+  // ═══════════════════════════════════════════════════════════════
+  const three = {
+    inited: false,
+    renderer: null,
+    scene: null,
+    camera: null,
+    raycaster: null,
+    pointer: null, // Vector2 NDC
+    tileGroup: null,
+    buildingGroup: null,
+    hoverHelper: null,
+    // Drag state propre au 3D (le 2D a son propre state.dragging)
+    dragging3d: false,
+    dragStart3d: null,
+    dragMoved3d: false,
+    cameraOffset: null, // pivot world position — on pan en bougeant ça
+    cameraZoom: 1,
+  };
+  const TILE_3D = 1;       // taille d'une tuile en unités world
+  const GRID_HALF = (GRID_SIZE - 1) / 2;
+
+  function init3D() {
+    if (three.inited) {
+      // Resize au cas où la fenêtre a changé pendant qu'on était en 2D
+      resize3D();
+      return;
+    }
+    three.inited = true;
+    const c = document.getElementById('game3d');
+    three.renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true });
+    three.renderer.setPixelRatio(window.devicePixelRatio || 1);
+    three.renderer.shadowMap.enabled = true;
+    three.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    three.scene = new THREE.Scene();
+    three.scene.background = new THREE.Color(0x1a1f1a);
+    three.scene.fog = new THREE.Fog(0x1a1f1a, 25, 60);
+
+    // Caméra orthographique avec angle iso classique (rotation Y -45° puis X 30°)
+    three.camera = new THREE.OrthographicCamera(-12, 12, 8, -8, 0.1, 200);
+    three.cameraOffset = new THREE.Vector3(0, 0, 0); // pivot
+    three.cameraZoom = 1;
+    updateCamera3D();
+
+    // Lumière directionnelle (soleil) avec ombres
+    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+    sun.position.set(20, 30, 15);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -20; sun.shadow.camera.right = 20;
+    sun.shadow.camera.top = 20; sun.shadow.camera.bottom = -20;
+    sun.shadow.bias = -0.0005;
+    three.scene.add(sun);
+    three.scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+    // Hémisphère pour adoucir les ombres
+    three.scene.add(new THREE.HemisphereLight(0xb6e8a3, 0x1a1f1a, 0.3));
+
+    // Sol global (plan vert) pour recevoir les ombres
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x2a3a2a });
+    const groundGeo = new THREE.PlaneGeometry(80, 80);
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.01;
+    ground.receiveShadow = true;
+    three.scene.add(ground);
+
+    three.tileGroup = new THREE.Group();
+    three.buildingGroup = new THREE.Group();
+    three.scene.add(three.tileGroup);
+    three.scene.add(three.buildingGroup);
+    rebuildTiles3D();
+
+    // Hover helper (cube fil de fer pour matérialiser la tuile pointée)
+    const hoverGeo = new THREE.BoxGeometry(TILE_3D * 1.02, 0.05, TILE_3D * 1.02);
+    const hoverMat = new THREE.MeshBasicMaterial({ color: 0xffd166, transparent: true, opacity: 0.4 });
+    three.hoverHelper = new THREE.Mesh(hoverGeo, hoverMat);
+    three.hoverHelper.visible = false;
+    three.scene.add(three.hoverHelper);
+
+    three.raycaster = new THREE.Raycaster();
+    three.pointer = new THREE.Vector2();
+    setup3DInputs();
+    resize3D();
+    window.addEventListener('resize', resize3D);
+  }
+
+  function resize3D() {
+    if (!three.renderer) return;
+    const w = window.innerWidth, h = window.innerHeight;
+    three.renderer.setSize(w, h, false);
+    const aspect = w / h;
+    const viewSize = 12 / three.cameraZoom;
+    three.camera.left = -viewSize * aspect;
+    three.camera.right = viewSize * aspect;
+    three.camera.top = viewSize;
+    three.camera.bottom = -viewSize;
+    three.camera.updateProjectionMatrix();
+  }
+
+  function updateCamera3D() {
+    // Position de la caméra : iso classique avec offset de pan
+    const isoDist = 30;
+    three.camera.position.set(
+      three.cameraOffset.x + isoDist,
+      three.cameraOffset.y + isoDist,
+      three.cameraOffset.z + isoDist
+    );
+    three.camera.lookAt(three.cameraOffset);
+  }
+
+  function tilePosition3D(col, row) {
+    // Centre la grille à l'origine — col/row 0..GRID-1 → world -GRID_HALF..+GRID_HALF
+    return { x: (col - GRID_HALF) * TILE_3D, z: (row - GRID_HALF) * TILE_3D };
+  }
+
+  function rebuildTiles3D() {
+    // Reset complet (à l'init ou après un prestige qui régénère la grille)
+    while (three.tileGroup.children.length) three.tileGroup.remove(three.tileGroup.children[0]);
+    while (three.buildingGroup.children.length) three.buildingGroup.remove(three.buildingGroup.children[0]);
+
+    const tileGeo = new THREE.BoxGeometry(TILE_3D * 0.96, 0.2, TILE_3D * 0.96);
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        const tile = state.tiles[r][c];
+        const pos = tilePosition3D(c, r);
+        let color = 0x3a5a3a;
+        if (tile.type === 'resource') color = parseInt(RESOURCES[tile.resource].color.slice(1), 16);
+        const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.9 });
+        const mesh = new THREE.Mesh(tileGeo, mat);
+        mesh.position.set(pos.x, 0.1, pos.z);
+        mesh.receiveShadow = true;
+        mesh.userData = { col: c, row: r };
+        three.tileGroup.add(mesh);
+        if (tile.building) addBuildingMesh3D(tile.building);
+      }
+    }
+  }
+
+  function addBuildingMesh3D(b) {
+    const def = BUILDINGS[b.type];
+    const pos = tilePosition3D(b.col, b.row);
+    const color = parseInt(def.color.slice(1), 16);
+    const h = b.type === 'usine' ? 1.2 : (b.type === 'fonderie' || b.type === 'atelier' ? 1.0 : 0.7);
+    const w = TILE_3D * 0.7;
+    const geo = new THREE.BoxGeometry(w, h, w);
+    const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.7, metalness: 0.2 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(pos.x, 0.2 + h / 2, pos.z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.userData = { col: b.col, row: b.row, buildingRef: b };
+    // Animation pop : petit scale au spawn
+    if (b.placedAt) {
+      const age = performance.now() - b.placedAt;
+      if (age < 280) {
+        const t = age / 280;
+        const ease = 1 + 2.7 * Math.pow(t - 1, 3) + 1.7 * Math.pow(t - 1, 2);
+        const s = 0.4 + 0.6 * ease;
+        mesh.scale.set(s, s, s);
+      }
+    }
+    three.buildingGroup.add(mesh);
+
+    // Détails par type — petit cylindre pour cheminée, etc.
+    if (b.type === 'fonderie' || b.type === 'usine') {
+      const chimGeo = new THREE.CylinderGeometry(0.08, 0.1, b.type === 'usine' ? 0.6 : 0.4, 8);
+      const chimMat = new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 0.8 });
+      const chim = new THREE.Mesh(chimGeo, chimMat);
+      chim.position.set(pos.x + 0.15, 0.2 + h + (b.type === 'usine' ? 0.3 : 0.2), pos.z + 0.15);
+      chim.castShadow = true;
+      three.buildingGroup.add(chim);
+    } else if (b.type === 'extracteur') {
+      // Petit derrick triangulaire
+      const tipGeo = new THREE.ConeGeometry(0.12, 0.3, 4);
+      const tipMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.4, metalness: 0.6, emissive: 0xfbbf24, emissiveIntensity: 0.3 });
+      const tip = new THREE.Mesh(tipGeo, tipMat);
+      tip.position.set(pos.x, 0.2 + h + 0.2, pos.z);
+      tip.castShadow = true;
+      three.buildingGroup.add(tip);
+    } else if (b.type === 'generateur') {
+      // Antenne avec sphère lumineuse
+      const sphGeo = new THREE.SphereGeometry(0.08, 8, 8);
+      const sphMat = new THREE.MeshStandardMaterial({ color: 0xffd166, emissive: 0xffd166, emissiveIntensity: 0.7 });
+      const sph = new THREE.Mesh(sphGeo, sphMat);
+      sph.position.set(pos.x, 0.2 + h + 0.2, pos.z);
+      three.buildingGroup.add(sph);
+    }
+  }
+
+  function syncBuildings3D() {
+    // Reconstruction simple : on vide et on rebuild les bâtiments à partir
+    // du state. Pas optimal mais simple, et on a max ~50 bâtiments.
+    while (three.buildingGroup.children.length) {
+      three.buildingGroup.remove(three.buildingGroup.children[0]);
+    }
+    for (const b of state.buildings) addBuildingMesh3D(b);
+  }
+
+  function setup3DInputs() {
+    const c = document.getElementById('game3d');
+    let last3DSync = 0;
+
+    function updatePointer(e) {
+      const rect = c.getBoundingClientRect();
+      three.pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      three.pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    }
+    function pickTile() {
+      three.raycaster.setFromCamera(three.pointer, three.camera);
+      const hits = three.raycaster.intersectObjects(three.tileGroup.children);
+      if (hits.length === 0) return null;
+      return hits[0].object.userData; // { col, row }
+    }
+
+    c.addEventListener('mousedown', (e) => {
+      three.dragging3d = true;
+      three.dragMoved3d = false;
+      three.dragStart3d = { x: e.clientX, y: e.clientY,
+        camX: three.cameraOffset.x, camZ: three.cameraOffset.z };
+    });
+    c.addEventListener('mousemove', (e) => {
+      updatePointer(e);
+      if (three.dragging3d) {
+        const dx = e.clientX - three.dragStart3d.x;
+        const dy = e.clientY - three.dragStart3d.y;
+        if (Math.abs(dx) + Math.abs(dy) > 6) three.dragMoved3d = true;
+        // Pan en world space — la projection iso fait que dy correspond à la
+        // diagonale (col+row) et dx à l'antidiagonale (col-row). Approx : on
+        // bouge la caméra dans le plan XZ proportionnellement.
+        const k = 0.025 / three.cameraZoom;
+        three.cameraOffset.x = three.dragStart3d.camX - dx * k - dy * k;
+        three.cameraOffset.z = three.dragStart3d.camZ + dx * k - dy * k;
+        updateCamera3D();
+      }
+      // Hover helper sur la tuile pointée
+      const t = pickTile();
+      if (t && state.selectedBuilding) {
+        const pos = tilePosition3D(t.col, t.row);
+        three.hoverHelper.position.set(pos.x, 0.21, pos.z);
+        three.hoverHelper.visible = true;
+        // Couleur selon validité
+        const ok = state.selectedBuilding === '__demolish__'
+          ? !!state.tiles[t.row][t.col].building
+          : canPlaceBuilding(state.selectedBuilding, t.col, t.row).ok;
+        three.hoverHelper.material.color.set(ok ? 0x8fbf7d : 0xff6b6b);
+      } else {
+        three.hoverHelper.visible = false;
+      }
+    });
+    c.addEventListener('mouseup', () => {
+      if (!three.dragging3d) return;
+      three.dragging3d = false;
+      if (!three.dragMoved3d) {
+        const t = pickTile();
+        if (t) {
+          if (state.selectedBuilding === '__demolish__') {
+            demolishAt(t.col, t.row); syncBuildings3D();
+          } else if (state.selectedBuilding) {
+            if (placeBuilding(state.selectedBuilding, t.col, t.row)) syncBuildings3D();
+          }
+        }
+      }
+    });
+    c.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = -Math.sign(e.deltaY) * 0.1;
+      three.cameraZoom = Math.max(0.5, Math.min(2.5, three.cameraZoom + delta));
+      resize3D();
+    }, { passive: false });
+
+    // Tactile basique : 1 doigt = drag/tap, comme la souris
+    c.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        e.preventDefault();
+        const t = e.touches[0];
+        const fake = { clientX: t.clientX, clientY: t.clientY };
+        three.dragging3d = true;
+        three.dragMoved3d = false;
+        three.dragStart3d = { x: t.clientX, y: t.clientY,
+          camX: three.cameraOffset.x, camZ: three.cameraOffset.z };
+        updatePointer(fake);
+      }
+    }, { passive: false });
+    c.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1 && three.dragging3d) {
+        e.preventDefault();
+        const t = e.touches[0];
+        const dx = t.clientX - three.dragStart3d.x;
+        const dy = t.clientY - three.dragStart3d.y;
+        if (Math.abs(dx) + Math.abs(dy) > 6) three.dragMoved3d = true;
+        const k = 0.025 / three.cameraZoom;
+        three.cameraOffset.x = three.dragStart3d.camX - dx * k - dy * k;
+        three.cameraOffset.z = three.dragStart3d.camZ + dx * k - dy * k;
+        updateCamera3D();
+      }
+    }, { passive: false });
+    c.addEventListener('touchend', (e) => {
+      if (!three.dragging3d) return;
+      three.dragging3d = false;
+      if (!three.dragMoved3d) {
+        const tt = pickTile();
+        if (tt) {
+          if (state.selectedBuilding === '__demolish__') {
+            demolishAt(tt.col, tt.row); syncBuildings3D();
+          } else if (state.selectedBuilding) {
+            if (placeBuilding(state.selectedBuilding, tt.col, tt.row)) syncBuildings3D();
+          }
+        }
+      }
+    });
+  }
+
+  function render3D() {
+    if (!three.renderer) return;
+    // Animation pop des bâtiments récemment posés : on update les scales
+    for (const m of three.buildingGroup.children) {
+      const b = m.userData.buildingRef;
+      if (!b || !b.placedAt) continue;
+      const age = performance.now() - b.placedAt;
+      if (age < 280) {
+        const t = age / 280;
+        const ease = 1 + 2.7 * Math.pow(t - 1, 3) + 1.7 * Math.pow(t - 1, 2);
+        const s = 0.4 + 0.6 * ease;
+        m.scale.set(s, s, s);
+      } else if (m.scale.x !== 1) {
+        m.scale.set(1, 1, 1);
+      }
+    }
+    three.renderer.render(three.scene, three.camera);
   }
 
   // ─── Skin & speed controls ──────────────────────────────────────
   let tickIntervalId = null;
   function applyTheme(theme) {
     state.theme = theme;
-    document.body.classList.remove('theme-classic', 'theme-neo');
+    document.body.classList.remove('theme-classic', 'theme-neo', 'theme-3d');
     document.body.classList.add('theme-' + theme);
     document.querySelectorAll('.theme-tab').forEach((t) => {
       t.setAttribute('aria-pressed', t.dataset.theme === theme ? 'true' : 'false');
     });
+    // Bascule entre canvas 2D et canvas 3D selon le skin
+    const c2d = document.getElementById('game');
+    const c3d = document.getElementById('game3d');
+    if (theme === '3d') {
+      if (typeof THREE === 'undefined') {
+        showToast('Three.js pas encore chargé — réessaie dans une seconde');
+        applyTheme('classic');
+        return;
+      }
+      c2d.hidden = true;
+      c3d.hidden = false;
+      init3D();
+    } else {
+      c2d.hidden = false;
+      c3d.hidden = true;
+    }
   }
   function setupThemeTabs() {
     document.querySelectorAll('.theme-tab').forEach((btn) => {
