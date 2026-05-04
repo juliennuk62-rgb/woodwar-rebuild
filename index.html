@@ -293,6 +293,48 @@
     }
     .research-btn:hover { background: rgba(192, 132, 252, 0.1); }
 
+    /* Bouton Prestige — au-dessus du bouton Recherches. Or pulsé pour
+       attirer l'œil quand l'opportunité de prestige est dispo. */
+    .prestige-btn {
+      bottom: calc(72px + env(safe-area-inset-bottom));
+      right: calc(16px + env(safe-area-inset-right));
+      pointer-events: auto;
+      background: linear-gradient(180deg, rgba(255, 209, 102, 0.18) 0%, rgba(255, 209, 102, 0.06) 100%);
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: var(--primary);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      min-height: 44px;
+      display: flex; align-items: center; gap: 8px;
+      animation: prestige-btn-pulse 1.6s ease-in-out infinite;
+      box-shadow: 0 8px 24px -8px rgba(255, 209, 102, 0.4);
+    }
+    .prestige-btn:hover { filter: brightness(1.15); }
+    .prestige-btn[hidden] { display: none; }
+    @keyframes prestige-btn-pulse {
+      0%, 100% { box-shadow: 0 8px 20px -8px rgba(255, 209, 102, 0.35); }
+      50%      { box-shadow: 0 8px 32px -4px rgba(255, 209, 102, 0.7); }
+    }
+    /* Indicateur permanent du multiplicateur de prestige dans le HUD crédits. */
+    .credits-prestige {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 209, 102, 0.15);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      font-family: 'Consolas', monospace;
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .credits-prestige[hidden] { display: none; }
+    .credits-prestige-mult { color: var(--success); }
+
     /* Aide en bas (raccourcis clavier/souris) — masquée sur mobile pour
        laisser de la place. Le user mobile la découvrira via les gestes. */
     .help-text {
@@ -619,6 +661,12 @@
       <span id="credits-energy-text">⚡ 0 / 5</span>
       <span class="energy-bar"><span class="energy-bar-fill" id="credits-energy-bar"></span></span>
     </div>
+    <!-- Affiché seulement si prestige.tokens > 0. Indicateur permanent
+         du bonus actuel — rappelle au joueur la valeur de ses runs précédents. -->
+    <div class="credits-prestige" id="credits-prestige" hidden>
+      <span>💎 <span id="credits-prestige-count">0</span></span>
+      <span class="credits-prestige-mult" id="credits-prestige-mult">×1.00</span>
+    </div>
   </div>
 
   <div class="hud help-text">
@@ -628,6 +676,9 @@
   <div class="hud palette" id="palette"></div>
 
   <button class="hud research-btn" id="research-btn" title="Ouvrir le panneau Recherches">🔬 Recherches</button>
+  <!-- Bouton Prestige — caché tant qu'on n'a pas atteint le seuil. Apparaît
+       en pulsant pour signaler l'opportunité de méta-progression. -->
+  <button class="hud prestige-btn" id="prestige-btn" hidden title="Effectuer un prestige : reset contre bonus permanent">💎 Prestige</button>
 
   <!-- Avertissement plein-écran quand l'énergie est insuffisante.
        Sans ça, le joueur peut spammer des extracteurs sans s'en rendre compte
@@ -763,6 +814,15 @@
     energyBase: 5,            // énergie "gratuite" de base
     // Recherches achetées (instantanées). Liste d'IDs de RESEARCH.
     research: { unlocked: [] },
+    // ─── Prestige (méta-progression) ────────────────────────────
+    // tokens : "Lingots Précieux" — gagnés en prestige, donnent un
+    //   bonus permanent de revenu cumulatif. Persistent à travers
+    //   tous les resets (c'est le sel du jeu).
+    // lifetimeEarned : total cumulé de revenus depuis la première
+    //   partie ou la dernière sauvegarde fraîche — sert au calcul
+    //   des tokens à la prochaine prestige.
+    // totalPrestiges : juste pour stats (combien de fois on a reset).
+    prestige: { tokens: 0, lifetimeEarned: 0, totalPrestiges: 0 },
     // Caméra
     camera: { x: 0, y: 0, zoom: 1 },
     // Souris
@@ -1549,6 +1609,29 @@
   // placements/destructions de bâtiments. Les taux affichés reflètent
   // la production RÉELLE, pas théorique : un extracteur sans énergie
   // ou sur un stock plein contribue 0.
+
+  // ─── Prestige helpers ───────────────────────────────────────────
+  const PRESTIGE_THRESHOLD = 50000;          // € lifetime requis pour 1er prestige
+  const PRESTIGE_BONUS_PER_TOKEN = 0.05;     // +5% revenu par jeton
+  // Calcule le total de jetons accordés pour `lifetimeEarned` cumulé.
+  // Formule sqrt → croissance sub-linéaire qui force à viser de plus
+  // en plus haut pour gagner plus (10k pour 1 token, 1M pour 31).
+  function prestigeTokensFor(lifetime) {
+    if (lifetime < PRESTIGE_THRESHOLD) return 0;
+    return Math.floor(Math.sqrt(lifetime / 1000));
+  }
+  // Jetons à GAGNER au prochain prestige (delta avec ce qu'on a déjà).
+  function prestigeTokensGain() {
+    return Math.max(0, prestigeTokensFor(state.prestige.lifetimeEarned) - state.prestige.tokens);
+  }
+  // Multiplicateur de revenu actuel (1 + 5% par token déjà détenu).
+  function getPrestigeMultiplier() {
+    return 1 + (state.prestige.tokens || 0) * PRESTIGE_BONUS_PER_TOKEN;
+  }
+  function canPrestige() {
+    return prestigeTokensGain() > 0;
+  }
+
   function computeStats() {
     // Passe 1 : énergie globale (indépendante de la production)
     let energyTotal = state.energyBase;
@@ -1588,12 +1671,14 @@
       }
     }
 
-    // Revenu attendu : produit × prix, capé par la vente auto.
+    // Revenu attendu : produit × prix × multiplicateur prestige, capé
+    // par la vente auto.
     let expectedRevenue = 0;
     for (const [r, rate] of Object.entries(rates)) {
       const sellable = Math.max(0, Math.min(rate, SELL_RATE_PER_TICK));
       expectedRevenue += sellable * RESOURCES[r].price;
     }
+    expectedRevenue *= getPrestigeMultiplier();
 
     return { energyTotal, energyUsed, hasEnergy, rates, expectedRevenue };
   }
@@ -1625,7 +1710,8 @@
     }
 
     // 2. Vente automatique : on écoule jusqu'à SELL_RATE_PER_TICK unités
-    //    de chaque ressource par tick.
+    //    de chaque ressource par tick. Le multiplicateur prestige (+5%
+    //    par token) s'applique au revenu final.
     let revenue = 0;
     for (const r of Object.keys(state.stocks)) {
       const sellQty = Math.min(state.stocks[r], SELL_RATE_PER_TICK);
@@ -1633,7 +1719,10 @@
       state.stocks[r] -= sellQty;
       revenue += sellQty * RESOURCES[r].price;
     }
+    revenue *= getPrestigeMultiplier();
     state.credits += revenue;
+    // Cumul lifetime pour calculer les tokens du prochain prestige.
+    state.prestige.lifetimeEarned += revenue;
 
     updateHUD();
     // Sauvegarde auto à chaque tick (1 Hz). LocalStorage est synchrone
@@ -1806,6 +1895,25 @@
       && state.credits >= r.cost
     );
     researchBtn.classList.toggle('has-affordable', hasAffordable);
+
+    // ── Prestige : indicateur permanent + bouton conditionnel ──
+    const prestigeEl = document.getElementById('credits-prestige');
+    const tokens = state.prestige.tokens || 0;
+    if (tokens > 0) {
+      prestigeEl.hidden = false;
+      document.getElementById('credits-prestige-count').textContent = tokens;
+      document.getElementById('credits-prestige-mult').textContent =
+        '×' + getPrestigeMultiplier().toFixed(2);
+    } else {
+      prestigeEl.hidden = true;
+    }
+    // Le bouton n'apparaît que quand on a au moins 1 token à gagner.
+    const prestigeBtn = document.getElementById('prestige-btn');
+    const gain = prestigeTokensGain();
+    prestigeBtn.hidden = gain <= 0;
+    if (gain > 0) {
+      prestigeBtn.textContent = `💎 Prestige +${gain}`;
+    }
   }
 
   function formatCredits(n) {
@@ -2091,6 +2199,7 @@
   }
 
   document.getElementById('research-btn').addEventListener('click', openResearchModal);
+  document.getElementById('prestige-btn').addEventListener('click', doPrestige);
   document.getElementById('research-close').addEventListener('click', closeResearchModal);
   document.getElementById('reset-btn').addEventListener('click', resetGame);
   // Clic sur le backdrop (mais pas sur le panel) ferme le modal
@@ -2116,6 +2225,11 @@
         stocks: state.stocks,
         storageCap: state.storageCap,
         research: { unlocked: [...(state.research.unlocked || [])] },
+        prestige: {
+          tokens: state.prestige.tokens || 0,
+          lifetimeEarned: state.prestige.lifetimeEarned || 0,
+          totalPrestiges: state.prestige.totalPrestiges || 0,
+        },
         camera: { x: state.camera.x, y: state.camera.y, zoom: state.camera.zoom },
         // On sérialise les tuiles avec leur bâtiment éventuel — `state.buildings`
         // sera reconstruit au load à partir de ces références (single source of truth).
@@ -2165,6 +2279,12 @@
       state.research = {
         unlocked: Array.isArray(data.research?.unlocked) ? data.research.unlocked : [],
       };
+      // Prestige — defaults conservateurs si la clé manque (saves antérieures)
+      state.prestige = {
+        tokens: Number(data.prestige?.tokens) || 0,
+        lifetimeEarned: Number(data.prestige?.lifetimeEarned) || 0,
+        totalPrestiges: Number(data.prestige?.totalPrestiges) || 0,
+      };
       state.camera = data.camera || { x: 0, y: 0, zoom: 1 };
       state.tiles = data.tiles;
       // Reconstruction de state.buildings depuis tiles.
@@ -2192,6 +2312,40 @@
     if (!confirm('Effacer la sauvegarde et recommencer une nouvelle partie ?')) return;
     try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
     location.reload();
+  }
+
+  // ─── Prestige : reset partiel mais GARDE les jetons ─────────────
+  // À l'inverse de resetGame() qui remet à zéro absolu, doPrestige()
+  // accorde N nouveaux jetons (basés sur lifetimeEarned), wipe l'état
+  // de jeu (crédits, bâtiments, stocks, recherches), et regénère une
+  // grille fraîche. Les jetons amplifient les revenus de la prochaine
+  // partie → boucle d'auto-progression infinie.
+  function doPrestige() {
+    const gain = prestigeTokensGain();
+    if (gain <= 0) return false;
+    if (!confirm(`Effectuer le prestige ?\n\nTu vas gagner ${gain} Lingots Précieux 💎\n(bonus permanent : +${(gain * PRESTIGE_BONUS_PER_TOKEN * 100).toFixed(0)} % revenu)\n\nCrédits, bâtiments, stocks et recherches seront RESET. Les jetons sont conservés.`)) return false;
+
+    const newTokens = state.prestige.tokens + gain;
+    const newTotal = (state.prestige.totalPrestiges || 0) + 1;
+    // Reset de l'état de jeu — on garde uniquement le bloc prestige.
+    state.credits = 200;
+    state.stocks = { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0 };
+    state.storageCap = 50;
+    state.research = { unlocked: [] };
+    state.buildings = [];
+    state.floaters = [];
+    state.demolishGhosts = [];
+    state.selectedBuilding = null;
+    state.prestige = { tokens: newTokens, lifetimeEarned: 0, totalPrestiges: newTotal };
+    // Régénère une carte neuve (placement aléatoire des ressources)
+    generateGrid();
+    centerCamera();
+    canvas.classList.remove('placing', 'demolishing');
+    closeResearchModal();
+    saveGame();
+    updateHUD();
+    showToast(`💎 Prestige #${newTotal} — +${gain} Lingots Précieux (bonus ×${(1 + newTokens * PRESTIGE_BONUS_PER_TOKEN).toFixed(2)})`);
+    return true;
   }
 
   // ─── Boucle principale ──────────────────────────────────────────
