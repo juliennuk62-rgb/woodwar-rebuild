@@ -702,20 +702,26 @@
     ctx.textBaseline = 'middle';
     ctx.fillText(def.icon, cx, cy - h - d / 4);
 
-    // Barre de progression au-dessus des bâtiments à recette en cours.
-    // Donne un feedback visuel du cycle (sinon une fonderie qui tourne
-    // semble inerte). Pas affichée pour le ghost preview.
-    if (!ghost && def.recipe && building.progress > 0) {
-      const ratio = Math.min(1, building.progress / def.recipe.cycleMs);
+    // Barre de progression au-dessus des bâtiments à recette.
+    // Toujours affichée (sauf ghost preview) :
+    //   · vide  → idle (manque d'input ou stock output saturé)
+    //   · plein → cycle en cours qui avance
+    // Sans ce feedback, une fonderie idle est indiscernable d'une qui tourne.
+    if (!ghost && def.recipe) {
+      const progress = building.progress || 0;
+      const ratio = Math.min(1, progress / def.recipe.cycleMs);
       const barW = w * 0.85;
       const barH = Math.max(3, 4 * z);
       const barX = cx - barW / 2;
       const barY = cy - h - d - barH - 2 * z;
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+      // Fond — orangé subtil quand idle pour signaler l'attente d'input
+      ctx.fillStyle = progress === 0 ? 'rgba(80, 50, 30, 0.7)' : 'rgba(0, 0, 0, 0.55)';
       ctx.fillRect(barX, barY, barW, barH);
-      ctx.fillStyle = '#8fbf7d';
-      ctx.fillRect(barX, barY, barW * ratio, barH);
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+      if (ratio > 0) {
+        ctx.fillStyle = ratio >= 1 ? '#ffd166' : '#8fbf7d'; // jaune si bloqué à 100%
+        ctx.fillRect(barX, barY, barW * ratio, barH);
+      }
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
       ctx.lineWidth = 1;
       ctx.strokeRect(barX, barY, barW, barH);
     }
