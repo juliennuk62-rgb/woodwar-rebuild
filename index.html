@@ -626,6 +626,212 @@
     /* ─── Compaction écrans étroits (iPhone SE 375 px) ─────────────
        Sans ça, .credits (200 px) + .stocks (180 px) > viewport et se
        chevauchent sur petit écran. */
+    /* ═══════════════════════════════════════════════════════════════
+       TAB BAR + NOUVELLES FEATURES (speed, minimap, tooltip)
+       ═══════════════════════════════════════════════════════════════ */
+    .theme-tabs {
+      position: absolute;
+      top: calc(8px + env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 2px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 4px;
+      z-index: 30;
+      pointer-events: auto;
+    }
+    .theme-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      letter-spacing: 0.04em;
+    }
+    .theme-tab:hover { color: var(--text); }
+    .theme-tab[aria-pressed="true"] {
+      background: var(--primary);
+      color: #1a1f1a;
+    }
+
+    /* Speed controls — pause / 1× / 2× / 4× */
+    .speed-ctrl {
+      top: calc(8px + env(safe-area-inset-top));
+      left: calc(16px + env(safe-area-inset-left));
+      display: flex;
+      gap: 2px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 4px;
+      pointer-events: auto;
+    }
+    .speed-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      min-width: 32px;
+      transition: background 0.12s, color 0.12s;
+    }
+    .speed-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+    .speed-btn.active {
+      background: var(--success);
+      color: #1a1f1a;
+    }
+    .speed-btn[data-speed="0"].active { background: var(--danger-soft); }
+    .speed-btn[data-speed="2"].active { background: var(--primary); }
+    .speed-btn[data-speed="4"].active { background: var(--danger); color: #fff; }
+
+    /* Mini-map */
+    .minimap {
+      bottom: calc(110px + env(safe-area-inset-bottom));
+      left: calc(16px + env(safe-area-inset-left));
+      background: rgba(15, 22, 17, 0.92);
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 4px 12px -4px rgba(0,0,0,0.5);
+    }
+
+    /* Tooltip bâtiment au hover */
+    .building-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(15, 22, 17, 0.96);
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      max-width: 220px;
+      box-shadow: 0 8px 24px -8px rgba(0,0,0,0.6);
+      z-index: 25;
+      transform: translate(-50%, -100%);
+      transition: opacity 0.12s;
+    }
+    .building-tooltip[hidden] { display: none; }
+    .building-tooltip-title {
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .building-tooltip-row {
+      display: flex; justify-content: space-between;
+      gap: 12px;
+      font-family: 'Consolas', monospace;
+      color: var(--text-muted);
+    }
+    .building-tooltip-row.is-pos { color: var(--success); }
+    .building-tooltip-row.is-neg { color: var(--danger-soft); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SKIN "NÉO" — refonte complète de l'UI avec palette cyberpunk,
+       angles géométriques, scanlines, fonts monospace.
+       Gameplay strictement identique au skin classique.
+       ═══════════════════════════════════════════════════════════════ */
+    body.theme-neo {
+      --primary: #00ffaa;
+      --success: #22ffcc;
+      --success-bold: #00cc88;
+      --danger: #ff2266;
+      --danger-soft: #ff5588;
+      --research: #ff44ff;
+      --research-light: #ffaaff;
+      --bg-panel: rgba(5, 8, 19, 0.94);
+      --bg-panel-soft: rgba(5, 8, 19, 0.85);
+      --border-soft: rgba(0, 255, 170, 0.25);
+      --text: #ddffee;
+      --text-muted: #88ccaa;
+      --text-faint: rgba(0, 255, 170, 0.55);
+      background: #050813;
+      font-family: 'Consolas', 'Monaco', monospace;
+    }
+    /* Effet scanlines superposé — inspiré CRT / cyberpunk */
+    body.theme-neo::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          transparent 0,
+          transparent 3px,
+          rgba(0, 255, 170, 0.03) 3px,
+          rgba(0, 255, 170, 0.03) 4px
+        );
+      z-index: 100;
+      mix-blend-mode: overlay;
+    }
+    /* Grille de fond subtile */
+    body.theme-neo {
+      background-image:
+        linear-gradient(rgba(0, 255, 170, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 170, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    /* Panneaux : clip-path angulaire (coins coupés) + glow */
+    body.theme-neo .credits,
+    body.theme-neo .stock-row,
+    body.theme-neo .palette,
+    body.theme-neo .speed-ctrl,
+    body.theme-neo .research-btn,
+    body.theme-neo .prestige-btn,
+    body.theme-neo .theme-tabs,
+    body.theme-neo .minimap,
+    body.theme-neo .building-tooltip,
+    body.theme-neo .energy-warning {
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+      border-radius: 0 !important;
+      box-shadow:
+        0 0 12px rgba(0, 255, 170, 0.15),
+        inset 0 0 16px rgba(0, 255, 170, 0.05);
+    }
+    body.theme-neo .credits-value {
+      background: linear-gradient(180deg, #00ffaa 0%, #00cc88 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 8px rgba(0, 255, 170, 0.5));
+      font-family: 'Consolas', monospace;
+      letter-spacing: 0.04em;
+    }
+    body.theme-neo .credits-rate { text-shadow: 0 0 6px rgba(34, 255, 204, 0.6); }
+    body.theme-neo .stock-icon {
+      box-shadow: 0 0 6px currentColor;
+      border: 1px solid rgba(0, 255, 170, 0.4);
+    }
+    body.theme-neo .palette-btn.active {
+      box-shadow: 0 0 12px var(--primary), inset 0 0 12px rgba(0, 255, 170, 0.2);
+    }
+    body.theme-neo .palette-btn-icon { filter: hue-rotate(120deg) saturate(1.4); }
+    /* Bouton tab actif en néo */
+    body.theme-neo .theme-tab[aria-pressed="true"] {
+      background: var(--primary);
+      color: #050813;
+      text-shadow: none;
+      box-shadow: 0 0 12px var(--primary);
+    }
+    /* Scanlines réduites pour reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      body.theme-neo::before { display: none; }
+    }
+
     @media (max-width: 400px) {
       .credits {
         min-width: 150px;
@@ -658,6 +864,14 @@
 <body>
   <canvas id="game"></canvas>
 
+  <!-- Tab bar global : switch entre deux skins UI complètement différents
+       (Classique / Néo). Le state du jeu est partagé : seule la couche
+       de rendu HTML/CSS change. -->
+  <nav class="theme-tabs" id="theme-tabs" aria-label="Skin de l'interface">
+    <button class="theme-tab" data-theme="classic" aria-pressed="true">▮ Classique</button>
+    <button class="theme-tab" data-theme="neo" aria-pressed="false">▰ Néo</button>
+  </nav>
+
   <!-- HUD : tout en HTML overlay pour rester simple à mettre à jour -->
   <div class="hud stocks" id="stocks"></div>
 
@@ -683,6 +897,24 @@
   <div class="hud palette" id="palette"></div>
 
   <button class="hud research-btn" id="research-btn" title="Ouvrir le panneau Recherches">🔬 Recherches</button>
+
+  <!-- Contrôles de vitesse — pause / 1× / 2× / 4×. Le tick interval
+       du setInterval se reconfigure à chaque clic. La vitesse est
+       persistée dans la save. -->
+  <div class="hud speed-ctrl" id="speed-ctrl" aria-label="Vitesse de jeu">
+    <button class="speed-btn" data-speed="0" title="Pause">⏸</button>
+    <button class="speed-btn active" data-speed="1" title="Vitesse normale">1×</button>
+    <button class="speed-btn" data-speed="2" title="Vitesse ×2">2×</button>
+    <button class="speed-btn" data-speed="4" title="Vitesse ×4">4×</button>
+  </div>
+
+  <!-- Mini-map en bas-gauche (au-dessus des stocks). Sur tactile, un
+       tap dessus recentre la caméra sur la zone correspondante. -->
+  <canvas class="hud minimap" id="minimap" width="160" height="100" aria-label="Mini-carte"></canvas>
+
+  <!-- Tooltip flottant qui apparaît au hover/tap d'un bâtiment.
+       Position calculée en JS pour suivre le curseur. -->
+  <div class="hud building-tooltip" id="building-tooltip" hidden></div>
   <!-- Bouton Prestige — caché tant qu'on n'a pas atteint le seuil. Apparaît
        en pulsant pour signaler l'opportunité de méta-progression. -->
   <button class="hud prestige-btn" id="prestige-btn" hidden title="Effectuer un prestige : reset contre bonus permanent">💎 Prestige</button>
@@ -906,6 +1138,9 @@
     dragMoved: false,         // pour distinguer un clic d'un drag
     // Mode construction
     selectedBuilding: null,   // ex: 'extracteur' ou null
+    // Préférences UI (persistées) : skin actif et vitesse de jeu
+    theme: 'classic',         // 'classic' | 'neo'
+    speedMul: 1,              // 0 = pause, 1 = normal, 2 = ×2, 4 = ×4
     // Nombres flottants spawn par les bâtiments productifs : feedback
     // visuel "tycoon" classique (Cookie Clicker / AdVenture Capitalist).
     // Volatile — pas sauvegardé.
@@ -2414,6 +2649,8 @@
           totalPrestiges: state.prestige.totalPrestiges || 0,
         },
         camera: { x: state.camera.x, y: state.camera.y, zoom: state.camera.zoom },
+        theme: state.theme || 'classic',
+        speedMul: state.speedMul == null ? 1 : state.speedMul,
         // On sérialise les tuiles avec leur bâtiment éventuel — `state.buildings`
         // sera reconstruit au load à partir de ces références (single source of truth).
         tiles: state.tiles.map((row) => row.map((t) => ({
@@ -2476,6 +2713,8 @@
         totalPrestiges: Number(data.prestige?.totalPrestiges) || 0,
       };
       state.camera = data.camera || { x: 0, y: 0, zoom: 1 };
+      state.theme = (data.theme === 'neo' || data.theme === 'classic') ? data.theme : 'classic';
+      state.speedMul = [0, 1, 2, 4].includes(data.speedMul) ? data.speedMul : 1;
       state.tiles = data.tiles;
       // Reconstruction de state.buildings depuis tiles.
       state.buildings = [];
@@ -2541,7 +2780,157 @@
   // ─── Boucle principale ──────────────────────────────────────────
   function loop() {
     render();
+    // Mini-map redraw throttled à ~5 Hz (suffit pour suivre la caméra)
+    if ((loop._mmTick = (loop._mmTick || 0) + 1) % 12 === 0) drawMinimap();
     requestAnimationFrame(loop);
+  }
+
+  // ─── Skin & speed controls ──────────────────────────────────────
+  let tickIntervalId = null;
+  function applyTheme(theme) {
+    state.theme = theme;
+    document.body.classList.remove('theme-classic', 'theme-neo');
+    document.body.classList.add('theme-' + theme);
+    document.querySelectorAll('.theme-tab').forEach((t) => {
+      t.setAttribute('aria-pressed', t.dataset.theme === theme ? 'true' : 'false');
+    });
+  }
+  function setupThemeTabs() {
+    document.querySelectorAll('.theme-tab').forEach((btn) => {
+      btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+    });
+  }
+
+  function applySpeed(mul) {
+    state.speedMul = mul;
+    document.querySelectorAll('.speed-btn').forEach((b) => {
+      b.classList.toggle('active', Number(b.dataset.speed) === mul);
+    });
+    if (tickIntervalId) clearInterval(tickIntervalId);
+    if (mul > 0) {
+      // Tick plus rapide = TICK_MS / mul (1×=1000ms, 2×=500ms, 4×=250ms)
+      tickIntervalId = setInterval(tick, TICK_MS / mul);
+    }
+  }
+  function setupSpeedCtrl() {
+    document.querySelectorAll('.speed-btn').forEach((b) => {
+      b.addEventListener('click', () => applySpeed(Number(b.dataset.speed)));
+    });
+  }
+
+  // ─── Mini-map ───────────────────────────────────────────────────
+  // Petite vue d'ensemble : tuiles ressource colorées, bâtiments en
+  // points blancs, viewport actuel surligné. Tap = recentre la caméra.
+  function setupMinimap() {
+    const mm = document.getElementById('minimap');
+    mm.addEventListener('click', (e) => {
+      // Convertit la position du clic en (col, row) au centre de la carte
+      const rect = mm.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width;   // 0..1
+      const py = (e.clientY - rect.top) / rect.height;
+      // La mini-map affiche le losange iso : on map (px, py) → centre de tuile
+      // pour recentrer la caméra dessus.
+      const col = Math.round(px * (GRID_SIZE - 1));
+      const row = Math.round(py * (GRID_SIZE - 1));
+      // worldToScreen sans la caméra = position relative
+      const z = state.camera.zoom;
+      const targetX = (col - row) * (TILE_W / 2) * z;
+      const targetY = (col + row) * (TILE_H / 2) * z;
+      state.camera.x = window.innerWidth / 2 - targetX;
+      state.camera.y = window.innerHeight / 2 - targetY;
+    });
+  }
+  function drawMinimap() {
+    const mm = document.getElementById('minimap');
+    if (!mm || mm.offsetParent === null) return;
+    const ctx = mm.getContext('2d');
+    const W = mm.width, H = mm.height;
+    ctx.fillStyle = '#0d110e';
+    ctx.fillRect(0, 0, W, H);
+    const cellW = W / GRID_SIZE;
+    const cellH = H / GRID_SIZE;
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        const t = state.tiles[r][c];
+        if (t.type === 'resource') {
+          ctx.fillStyle = RESOURCES[t.resource].color;
+          ctx.fillRect(c * cellW, r * cellH, cellW, cellH);
+        }
+        if (t.building) {
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(c * cellW + cellW * 0.3, r * cellH + cellH * 0.3, cellW * 0.4, cellH * 0.4);
+        }
+      }
+    }
+    // Indicateur de viewport : où est la caméra
+    // worldToScreen(c=0, r=0) = (cam.x, cam.y). On retrouve les bornes.
+    const z = state.camera.zoom;
+    // Point écran (0,0) → tuile (col, row)
+    const tileCorners = [
+      screenToTile(0, 0),
+      screenToTile(window.innerWidth, 0),
+      screenToTile(window.innerWidth, window.innerHeight),
+      screenToTile(0, window.innerHeight),
+    ];
+    ctx.strokeStyle = 'rgba(255, 209, 102, 0.7)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    let first = true;
+    for (const tc of tileCorners) {
+      if (!tc) continue;
+      const px = Math.max(0, Math.min(GRID_SIZE - 1, tc.col)) * cellW + cellW / 2;
+      const py = Math.max(0, Math.min(GRID_SIZE - 1, tc.row)) * cellH + cellH / 2;
+      if (first) { ctx.moveTo(px, py); first = false; }
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  // ─── Tooltip bâtiment au hover ─────────────────────────────────
+  function setupBuildingTooltip() {
+    const tip = document.getElementById('building-tooltip');
+    canvas.addEventListener('mousemove', (e) => {
+      // Pas de tooltip si on drag ou si on a un bâtiment sélectionné
+      if (state.dragging || state.selectedBuilding) {
+        tip.hidden = true;
+        return;
+      }
+      const t = screenToTile(e.clientX, e.clientY);
+      if (!t || !state.tiles[t.row][t.col].building) {
+        tip.hidden = true;
+        return;
+      }
+      const b = state.tiles[t.row][t.col].building;
+      const def = BUILDINGS[b.type];
+      let html = `<div class="building-tooltip-title">${def.icon} ${def.name}</div>`;
+      if (def.energyUsage) html += `<div class="building-tooltip-row is-neg">Énergie<span>−${def.energyUsage}⚡</span></div>`;
+      if (def.energyProduction) html += `<div class="building-tooltip-row is-pos">Énergie<span>+${def.energyProduction}⚡</span></div>`;
+      if (def.storage) html += `<div class="building-tooltip-row is-pos">Capacité<span>+${def.storage}</span></div>`;
+      if (b.type === 'extracteur') {
+        const r = state.tiles[t.row][t.col].resource;
+        if (r) {
+          const rate = (RESOURCES[r].prodRate || 1) * getResearchBoosts().extractorMult;
+          html += `<div class="building-tooltip-row is-pos">${RESOURCES[r].name}<span>+${rate.toFixed(2)}/s</span></div>`;
+          html += `<div class="building-tooltip-row">Valeur<span>${(rate * RESOURCES[r].price).toFixed(2)} €/s</span></div>`;
+        }
+      }
+      if (def.recipe) {
+        const sec = (def.recipe.cycleMs * getResearchBoosts().cycleMult) / 1000;
+        for (const [r, n] of Object.entries(def.recipe.input)) {
+          html += `<div class="building-tooltip-row is-neg">${RESOURCES[r].name}<span>−${(n / sec).toFixed(2)}/s</span></div>`;
+        }
+        const outName = RESOURCES[def.recipe.output].name;
+        const outPrice = RESOURCES[def.recipe.output].price;
+        html += `<div class="building-tooltip-row is-pos">${outName}<span>+${(def.recipe.qty / sec).toFixed(2)}/s</span></div>`;
+        html += `<div class="building-tooltip-row">Valeur<span>${(def.recipe.qty * outPrice / sec).toFixed(2)} €/s</span></div>`;
+      }
+      tip.innerHTML = html;
+      tip.hidden = false;
+      tip.style.left = e.clientX + 'px';
+      tip.style.top = (e.clientY - 12) + 'px';
+    });
+    canvas.addEventListener('mouseleave', () => { tip.hidden = true; });
   }
 
   // ─── Démarrage ──────────────────────────────────────────────────
@@ -2551,9 +2940,16 @@
     generateGrid();
     centerCamera();
   }
+  applyTheme(state.theme || 'classic');
+  applySpeed(state.speedMul == null ? 1 : state.speedMul);
+  setupThemeTabs();
+  setupSpeedCtrl();
+  setupMinimap();
+  setupBuildingTooltip();
   updateHUD();
   loop();
-  setInterval(tick, TICK_MS);
+  // Le tick interval est variable selon speedMul (0 = pause = pas d'interval).
+  // applySpeed() s'occupe de re-créer l'interval avec la bonne cadence.
   // Toast de bienvenue / confirmation de chargement (non bloquant)
   setTimeout(() => showToast(loaded ? '✓ Partie chargée' : 'Bienvenue ! Pose ton premier extracteur ⛏️'), 200);
 
