@@ -7,11 +7,42 @@
   <style>
     /* ─── Reset minimal + thème ──────────────────────────────────── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* CSS vars — centralise les couleurs et tokens d'espacement pour
+       éviter les dérives chromatiques et faciliter le tuning. */
+    :root {
+      /* Couleurs sémantiques */
+      --primary: #ffd166;          /* or — argent, coûts, accent positif */
+      --success: #b6e8a3;          /* vert pâle — production, refund */
+      --success-bold: #8fbf7d;     /* vert plus saturé — bordures, valides */
+      --danger: #ff6b6b;           /* rouge — invalide, plein, dépense */
+      --danger-soft: #ff9d9d;      /* rouge tendre — états désactivés, refunds */
+      --research: #c084fc;         /* violet — recherches */
+      --research-light: #e9d5ff;
+      /* Surfaces */
+      --bg-panel: rgba(15, 22, 17, 0.92);
+      --bg-panel-soft: rgba(15, 22, 17, 0.85);
+      --border-soft: rgba(255, 255, 255, 0.08);
+      /* Texte */
+      --text: #e8e8e8;
+      --text-muted: #d0d0d0;       /* relevé de #aaa pour passer WCAG AA */
+      --text-faint: rgba(255, 255, 255, 0.7); /* relevé de 0.45 → 0.7 */
+    }
+    /* Respect prefers-reduced-motion : neutralise les animations pour
+       l'accessibilité (vestibular disorders, préférence système). */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
     html, body {
       width: 100%; height: 100%;
       overflow: hidden;
       background: #1a1f1a;
-      color: #e8e8e8;
+      color: var(--text);
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
@@ -98,26 +129,29 @@
       min-width: 200px;
     }
     .credits-value {
-      font-size: 28px;
+      /* Augmenté de 28→32px : c'est LA stat qui doit dominer le HUD
+         (hiérarchie tycoon classique — le solde au-dessus de tout). */
+      font-size: 32px;
       font-weight: 800;
-      color: #ffd166;
+      color: var(--primary);
       letter-spacing: -0.02em;
       line-height: 1;
+      text-shadow: 0 2px 12px rgba(255, 209, 102, 0.18);
     }
     .credits-rate {
       margin-top: 4px;
       font-size: 13px;
-      color: #b6e8a3;     /* meilleur contraste sur fond sombre flouté */
+      color: var(--success);
       font-weight: 600;
       font-family: 'Consolas', monospace;
     }
     .credits-energy {
       margin-top: 6px;
-      font-size: 11px;
-      color: #aaa;
+      font-size: 12px;             /* +1px pour passer la barre 12px lisibilité */
+      color: var(--text-muted);    /* #d0d0d0 — passe WCAG AA (vs #aaa avant) */
       font-family: 'Consolas', monospace;
     }
-    .credits-energy.low { color: #ff6b6b; }
+    .credits-energy.low { color: var(--danger); font-weight: 700; }
 
     /* Palette de bâtiments (bas centre) — scrollable horizontalement
        sur mobile pour ne jamais déborder du viewport. */
@@ -200,8 +234,8 @@
       bottom: calc(110px + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.45);
+      font-size: 12px;                 /* 11→12 lisibilité */
+      color: var(--text-faint);        /* alpha 0.45→0.7 — passe WCAG AA */
       text-align: center;
       pointer-events: none;
       white-space: nowrap;
@@ -323,8 +357,8 @@
     }
     .research-card-desc {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.65);
-      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.85);   /* 0.65→0.85 contraste suffisant */
+      line-height: 1.5;                    /* 1.4→1.5 plus aéré */
     }
     .research-card-action {
       display: flex; align-items: center; justify-content: space-between;
@@ -359,8 +393,8 @@
       letter-spacing: 0.06em;
     }
     .research-locked-msg {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.45);
+      font-size: 12px;                  /* 11→12 lisibilité */
+      color: var(--text-faint);         /* 0.45→0.7 WCAG AA */
       font-style: italic;
     }
 
@@ -406,6 +440,81 @@
       pointer-events: none;
     }
     .toast.show { opacity: 1; }
+
+    /* ─── Active states (clic enfoncé) ─────────────────────────────
+       Les agents UI ont remonté l'absence totale de feedback :active —
+       un clic sur un bouton n'avait aucune réponse visuelle, ni desktop
+       ni tactile. Maintenant tous les boutons réagissent au press. */
+    .palette-btn:active:not(:disabled) {
+      transform: scale(0.96);
+      transition: transform 0.05s ease;
+    }
+    .research-btn:active,
+    .research-buy:active:not(:disabled),
+    .research-close:active,
+    .research-reset:active {
+      filter: brightness(0.85);
+      transition: filter 0.05s ease;
+    }
+
+    /* ─── Focus-visible (accessibilité clavier) ────────────────────
+       Important pour navigation tab/Enter et lecteurs d'écran. */
+    button:focus-visible,
+    a:focus-visible {
+      outline: 2px solid var(--research);
+      outline-offset: 2px;
+      border-radius: inherit;
+    }
+
+    /* ─── Animation d'apparition du modal Recherches ───────────────
+       Avant : hidden → visible binaire, choc visuel. Maintenant : fade
+       + scale subtil, plus "polished". L'attribut [hidden] reste la
+       source de vérité ; la classe .closing déclenche la sortie. */
+    @keyframes modal-fade-in {
+      from { opacity: 0; transform: scale(0.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .research-modal:not([hidden]) .research-panel {
+      animation: modal-fade-in 0.22s ease-out;
+    }
+    .research-modal:not([hidden]) .research-backdrop {
+      animation: modal-fade-in 0.22s ease-out;
+    }
+
+    /* ─── Affordance de scroll horizontal sur la palette ───────────
+       Sur mobile la palette déborde mais le scroll-x est invisible.
+       Un dégradé sur les bords suggère "il y en a plus à scroller". */
+    .palette {
+      mask-image: linear-gradient(90deg,
+        transparent 0,
+        #000 20px,
+        #000 calc(100% - 20px),
+        transparent 100%
+      );
+      -webkit-mask-image: linear-gradient(90deg,
+        transparent 0,
+        #000 20px,
+        #000 calc(100% - 20px),
+        transparent 100%
+      );
+    }
+
+    /* ─── Compaction écrans étroits (iPhone SE 375 px) ─────────────
+       Sans ça, .credits (200 px) + .stocks (180 px) > viewport et se
+       chevauchent sur petit écran. */
+    @media (max-width: 400px) {
+      .credits {
+        min-width: 150px;
+        padding: 10px 14px;
+      }
+      .credits-value { font-size: 26px; }
+      .stock-row {
+        min-width: 150px;
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+      .palette-btn { min-width: 76px; padding: 8px 10px; }
+    }
   </style>
 </head>
 <body>
