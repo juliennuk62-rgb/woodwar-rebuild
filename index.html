@@ -2279,10 +2279,17 @@
       state.research = {
         unlocked: Array.isArray(data.research?.unlocked) ? data.research.unlocked : [],
       };
-      // Prestige — defaults conservateurs si la clé manque (saves antérieures)
+      // Prestige — defaults conservateurs si la clé manque. Migration douce
+      // pour les saves antérieures à la feature : on bootstrap lifetimeEarned
+      // avec les crédits actuels (proxy conservateur — credits sous-estime
+      // le lifetime réel puisque tu en as dépensé une partie en bâtiments,
+      // mais c'est le mieux qu'on puisse faire sans tracking historique).
+      const hasPrestigeData = data.prestige && typeof data.prestige === 'object';
       state.prestige = {
         tokens: Number(data.prestige?.tokens) || 0,
-        lifetimeEarned: Number(data.prestige?.lifetimeEarned) || 0,
+        lifetimeEarned: hasPrestigeData
+          ? Number(data.prestige.lifetimeEarned) || 0
+          : Number(data.credits) || 0,
         totalPrestiges: Number(data.prestige?.totalPrestiges) || 0,
       };
       state.camera = data.camera || { x: 0, y: 0, zoom: 1 };
