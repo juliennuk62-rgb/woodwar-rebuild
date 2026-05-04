@@ -776,7 +776,10 @@
       const barW = w * 0.85;
       const barH = Math.max(3, 4 * z);
       const barX = cx - barW / 2;
-      const barY = cy - h - d - barH - 2 * z;
+      // Décalage suffisant pour passer au-dessus des silhouettes sur le toit
+      // (cheminée de la fonderie = 18*z de haut). Sinon la barre coupait
+      // visuellement la cheminée en deux.
+      const barY = cy - h - d - barH - 22 * z;
       // Fond — orangé subtil quand idle pour signaler l'attente d'input
       ctx.fillStyle = progress === 0 ? 'rgba(80, 50, 30, 0.7)' : 'rgba(0, 0, 0, 0.55)';
       ctx.fillRect(barX, barY, barW, barH);
