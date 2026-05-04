@@ -397,7 +397,7 @@
   </div>
 
   <div class="hud help-text">
-    Glisser : déplacer la caméra • Molette / pincer : zoom • Touches 1·2·3 : choisir un bâtiment • Échap : annuler
+    Glisser : déplacer la caméra • Molette / pincer : zoom • Touches 1-5 : bâtiment • D : démolir • Échap : annuler
   </div>
 
   <div class="hud palette" id="palette"></div>
@@ -1119,13 +1119,7 @@
       palette.innerHTML = pHtml;
       lastHudHash = wantHash;
       palette.querySelectorAll('.palette-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const k = btn.dataset.building;
-          state.selectedBuilding = state.selectedBuilding === k ? null : k;
-          canvas.classList.toggle('placing', !!state.selectedBuilding);
-          canvas.classList.toggle('demolishing', state.selectedBuilding === '__demolish__');
-          updateHUD();
-        });
+        btn.addEventListener('click', () => toggleSelection(btn.dataset.building));
       });
     }
 
@@ -1295,6 +1289,22 @@
   function currentBuildingKeys() {
     return Object.keys(BUILDINGS).filter(isBuildingAvailable);
   }
+
+  // Met à jour la sélection courante de manière cohérente — synchronise
+  // les classes CSS du canvas (curseur) avec le state. Évite d'oublier
+  // une classe quand on change de mode (placement → démolition → null).
+  function setSelection(value) {
+    state.selectedBuilding = value || null;
+    canvas.classList.toggle('placing',
+      !!state.selectedBuilding && state.selectedBuilding !== '__demolish__');
+    canvas.classList.toggle('demolishing',
+      state.selectedBuilding === '__demolish__');
+    updateHUD();
+  }
+  // Toggle : si déjà sélectionné on revient au mode neutre.
+  function toggleSelection(value) {
+    setSelection(state.selectedBuilding === value ? null : value);
+  }
   document.addEventListener('keydown', (e) => {
     const step = 30;
     if (e.key === 'ArrowUp')    { state.camera.y += step; e.preventDefault(); }
@@ -1302,24 +1312,18 @@
     if (e.key === 'ArrowLeft')  { state.camera.x += step; e.preventDefault(); }
     if (e.key === 'ArrowRight') { state.camera.x -= step; e.preventDefault(); }
     if (e.key === 'Escape') {
-      // Si le modal Recherches est ouvert, on le ferme en priorité.
-      if (!researchModal.hidden) {
-        closeResearchModal();
-      } else {
-        state.selectedBuilding = null;
-        canvas.classList.remove('placing');
-        updateHUD();
-      }
+      // Modal Recherches en priorité, sinon clear toute sélection.
+      if (!researchModal.hidden) closeResearchModal();
+      else                       setSelection(null);
+    }
+    // 'D' = mode Démolir (toggle)
+    if (e.key === 'd' || e.key === 'D') {
+      toggleSelection('__demolish__');
     }
     // Raccourcis 1..N pour la palette (toggle), dérivés des bâtiments dispos
     const idx = parseInt(e.key, 10) - 1;
     const keys = currentBuildingKeys();
-    if (idx >= 0 && idx < keys.length) {
-      const k = keys[idx];
-      state.selectedBuilding = state.selectedBuilding === k ? null : k;
-      canvas.classList.toggle('placing', !!state.selectedBuilding);
-      updateHUD();
-    }
+    if (idx >= 0 && idx < keys.length) toggleSelection(keys[idx]);
   });
 
   // ─── Panneau Recherches ─────────────────────────────────────────
