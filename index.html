@@ -745,11 +745,13 @@
   // ressource crafted (apparaît dans les recettes). Les crafted ne sont
   // affichées dans le HUD qu'une fois la techno correspondante débloquée.
   const RESOURCES = {
-    fer:     { name: 'Fer',     short: 'FE', color: '#a86a3c', price: 1.0,  basic: true },
-    cuivre:  { name: 'Cuivre',  short: 'CU', color: '#d97e2a', price: 2.0,  basic: true },
-    charbon: { name: 'Charbon', short: 'CH', color: '#3d3d3d', price: 1.5,  basic: true },
-    lingot:  { name: 'Lingot',  short: 'LI', color: '#b6c0d4', price: 8.0  },
-    piece:   { name: 'Pièce',   short: 'PI', color: '#9aaab8', price: 50.0 },
+    fer:       { name: 'Fer',       short: 'FE', color: '#a86a3c', price: 1.0,    basic: true },
+    cuivre:    { name: 'Cuivre',    short: 'CU', color: '#d97e2a', price: 2.0,    basic: true },
+    charbon:   { name: 'Charbon',   short: 'CH', color: '#3d3d3d', price: 1.5,    basic: true },
+    lingot:    { name: 'Lingot',    short: 'LI', color: '#b6c0d4', price: 8.0   },
+    piece:     { name: 'Pièce',     short: 'PI', color: '#9aaab8', price: 50.0  },
+    composant: { name: 'Composant', short: 'CP', color: '#6db8a8', price: 250.0 },
+    module:    { name: 'Module',    short: 'MO', color: '#d4a86a', price: 2000.0 },
   };
 
   // ─── Définitions des bâtiments ──────────────────────────────────
@@ -790,12 +792,27 @@
       recipe: { input: { lingot: 2, cuivre: 1 }, output: 'piece', qty: 1, cycleMs: 3000 },
       info: '2 Lingot+Cuivre → Pièce · 3s · 3⚡',
     },
+    atelier: {
+      // Tier 3 — assemble les pièces et lingots en composants à 250 €
+      name: 'Atelier', icon: '🔧', cost: 1200, color: '#6db8a8',
+      energyUsage: 5, locked: true,
+      recipe: { input: { piece: 1, lingot: 2 }, output: 'composant', qty: 1, cycleMs: 5000 },
+      info: 'Pièce+2 Lingot → Composant · 5s · 5⚡',
+    },
+    usine: {
+      // Tier 4 — fin de chaîne, modules à 2 000 € pièce. Énorme ROI.
+      name: 'Usine', icon: '🏗️', cost: 4000, color: '#d4a86a',
+      energyUsage: 8, locked: true,
+      recipe: { input: { composant: 2, cuivre: 3 }, output: 'module', qty: 1, cycleMs: 8000 },
+      info: '2 Composant+3 Cuivre → Module · 8s · 8⚡',
+    },
   };
 
   // ─── Recherches ─────────────────────────────────────────────────
   // Achat instantané (pas de timer pour V1). Chaque techno débloque un ou
   // plusieurs bâtiments + révèle de nouvelles ressources dans le HUD.
   const RESEARCH = {
+    // ── Tiers de matériaux (déblocages de bâtiments) ──
     metallurgie: {
       name: 'Métallurgie', icon: '🔥', cost: 500,
       desc: 'Débloque la Fonderie : transforme Fer + Charbon en Lingot (×8 €).',
@@ -805,6 +822,43 @@
       name: 'Mécanique de précision', icon: '🛠️', cost: 1500,
       desc: 'Débloque l\'Assembleur : combine 2 Lingots + 1 Cuivre en Pièce (50 €).',
       requires: ['metallurgie'], unlocks: ['assembleur'], reveals: ['piece'],
+    },
+    composants_avances: {
+      name: 'Composants avancés', icon: '🔧', cost: 8000,
+      desc: 'Débloque l\'Atelier : Pièce + 2 Lingots → Composant (250 €), cycle 5s.',
+      requires: ['mecanique'], unlocks: ['atelier'], reveals: ['composant'],
+    },
+    modules_industriels: {
+      name: 'Modules industriels', icon: '🏗️', cost: 30000,
+      desc: 'Débloque l\'Usine : 2 Composants + 3 Cuivre → Module (2 000 €), cycle 8s.',
+      requires: ['composants_avances'], unlocks: ['usine'], reveals: ['module'],
+    },
+
+    // ── Recherches de scaling (modifient les paramètres de jeu) ──
+    extracteur_mk2: {
+      name: 'Extracteur Mk2', icon: '⛏️', cost: 5000,
+      desc: 'Tous les extracteurs produisent +50% de ressource par seconde.',
+      requires: ['metallurgie'],
+    },
+    vente_acceleree: {
+      name: 'Vente accélérée', icon: '📈', cost: 12000,
+      desc: 'Le taux de vente automatique passe de 2 à 4 unités/s par ressource.',
+      requires: ['metallurgie'],
+    },
+    cycles_rapides: {
+      name: 'Cycles rapides', icon: '⏱️', cost: 25000,
+      desc: 'Toutes les recettes (Fonderie, Assembleur, Atelier, Usine) tournent 30% plus vite.',
+      requires: ['mecanique'],
+    },
+    energie_etendue: {
+      name: 'Énergie étendue', icon: '🔋', cost: 3000,
+      desc: '+5 énergie de base permanente (passe de 5 à 10 énergie gratuite).',
+      requires: [],
+    },
+    stockage_massif: {
+      name: 'Stockage massif', icon: '📦', cost: 10000,
+      desc: 'Capacité de stockage doublée pour toutes les ressources (entrepôts inclus).',
+      requires: ['metallurgie'],
     },
   };
 
@@ -816,7 +870,7 @@
     buildings: [],
     // Économie
     credits: 200,
-    stocks: { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0 },
+    stocks: { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0, composant: 0, module: 0 },
     storageCap: 50,           // capacité de stockage par ressource
     energyBase: 5,            // énergie "gratuite" de base
     // Recherches achetées (instantanées). Liste d'IDs de RESEARCH.
@@ -1280,7 +1334,9 @@
     // Sans ce feedback, une fonderie idle est indiscernable d'une qui tourne.
     if (!ghost && def.recipe) {
       const progress = building.progress || 0;
-      const ratio = Math.min(1, progress / def.recipe.cycleMs);
+      // Cycle effectif = cycle de base × boost recherche (cycles_rapides)
+      const effCycle = def.recipe.cycleMs * getResearchBoosts().cycleMult;
+      const ratio = Math.min(1, progress / effCycle);
       const barW = w * 0.85;
       const barH = Math.max(3, 4 * z);
       const barX = cx - barW / 2;
@@ -1639,9 +1695,34 @@
     return prestigeTokensGain() > 0;
   }
 
+  // ─── Boosts de scaling débloqués via la recherche ────────────────
+  // Chaque techno de scaling modifie un paramètre global du jeu.
+  // Centralisé ici → un seul endroit à mettre à jour quand on ajoute
+  // une nouvelle recherche. Lu par tick/computeStats/storage cap.
+  function getResearchBoosts() {
+    const u = state.research.unlocked || [];
+    return {
+      extractorMult: u.includes('extracteur_mk2') ? 1.5 : 1,
+      sellRateBonus: u.includes('vente_acceleree') ? 2 : 0,    // ajouté à SELL_RATE_PER_TICK
+      cycleMult:     u.includes('cycles_rapides')  ? 0.7 : 1,  // appliqué à recipe.cycleMs
+      energyBonus:   u.includes('energie_etendue') ? 5   : 0,
+      storageMult:   u.includes('stockage_massif') ? 2   : 1,
+    };
+  }
+  function getEffectiveSellRate() {
+    return SELL_RATE_PER_TICK + getResearchBoosts().sellRateBonus;
+  }
+  function getEffectiveStorageCap() {
+    return Math.round(state.storageCap * getResearchBoosts().storageMult);
+  }
+  function getEffectiveEnergyBase() {
+    return state.energyBase + getResearchBoosts().energyBonus;
+  }
+
   function computeStats() {
+    const boosts = getResearchBoosts();
     // Passe 1 : énergie globale (indépendante de la production)
-    let energyTotal = state.energyBase;
+    let energyTotal = state.energyBase + boosts.energyBonus;
     let energyUsed = 0;
     for (const b of state.buildings) {
       const def = BUILDINGS[b.type];
@@ -1655,21 +1736,22 @@
     const rates = {};
     for (const k of Object.keys(RESOURCES)) rates[k] = 0;
 
+    const cap = getEffectiveStorageCap();
+    const sellRate = SELL_RATE_PER_TICK + boosts.sellRateBonus;
     if (hasEnergy) {
       for (const b of state.buildings) {
         const def = BUILDINGS[b.type];
         if (b.type === 'extracteur') {
           const r = state.tiles[b.row][b.col].resource;
           // Stock plein → l'extracteur tourne pour rien, on ne compte pas.
-          if (r && state.stocks[r] < state.storageCap) {
-            rates[r] += def.productionPerTick;
+          if (r && state.stocks[r] < cap) {
+            rates[r] += def.productionPerTick * boosts.extractorMult;
           }
         } else if (def.recipe) {
-          // Recettes : on garde le calcul théorique (cycle moyen) car
-          // la simulation par bâtiment est trop coûteuse à reproduire ici.
-          // Acceptable parce que le joueur voit la barre de progression
-          // sur chaque bâtiment pour distinguer actif/idle.
-          const sec = def.recipe.cycleMs / 1000;
+          // Recettes : taux théorique en supposant le cycle alimenté.
+          // Le sec est divisé par cycleMult (recherche cycles_rapides
+          // raccourcit le cycle → produit plus vite).
+          const sec = (def.recipe.cycleMs * boosts.cycleMult) / 1000;
           rates[def.recipe.output] += def.recipe.qty / sec;
           for (const [r, n] of Object.entries(def.recipe.input)) {
             rates[r] -= n / sec;
@@ -1679,10 +1761,10 @@
     }
 
     // Revenu attendu : produit × prix × multiplicateur prestige, capé
-    // par la vente auto.
+    // par la vente auto (boostée par recherche éventuelle).
     let expectedRevenue = 0;
     for (const [r, rate] of Object.entries(rates)) {
-      const sellable = Math.max(0, Math.min(rate, SELL_RATE_PER_TICK));
+      const sellable = Math.max(0, Math.min(rate, sellRate));
       expectedRevenue += sellable * RESOURCES[r].price;
     }
     expectedRevenue *= getPrestigeMultiplier();
@@ -1699,15 +1781,17 @@
     // 1. Production. Si pas assez d'énergie → toutes les machines à
     //    consommation sont bloquées (all-or-nothing, simple à comprendre).
     if (stats.hasEnergy) {
+      const boosts = getResearchBoosts();
+      const cap = getEffectiveStorageCap();
       for (const b of state.buildings) {
         const def = BUILDINGS[b.type];
 
         if (b.type === 'extracteur') {
           // Extracteur : produit la ressource de la tuile, capé.
+          // extractorMult de la recherche Mk2 amplifie la prod.
           const r = state.tiles[b.row][b.col].resource;
-          if (r && state.stocks[r] < state.storageCap) {
-            state.stocks[r] = Math.min(state.storageCap, state.stocks[r] + def.productionPerTick);
-            // Floater "+€X" qui matérialise visuellement la production
+          if (r && state.stocks[r] < cap) {
+            state.stocks[r] = Math.min(cap, state.stocks[r] + def.productionPerTick * boosts.extractorMult);
             spawnFloater(b.col, b.row, '+' + RESOURCES[r].price + '€', '#b6e8a3');
           }
         } else if (def.recipe) {
@@ -1716,12 +1800,12 @@
       }
     }
 
-    // 2. Vente automatique : on écoule jusqu'à SELL_RATE_PER_TICK unités
-    //    de chaque ressource par tick. Le multiplicateur prestige (+5%
-    //    par token) s'applique au revenu final.
+    // 2. Vente automatique : on écoule jusqu'à SELL_RATE_PER_TICK (+ boost
+    //    "vente_acceleree") unités de chaque ressource par tick.
+    const sellRate = SELL_RATE_PER_TICK + getResearchBoosts().sellRateBonus;
     let revenue = 0;
     for (const r of Object.keys(state.stocks)) {
-      const sellQty = Math.min(state.stocks[r], SELL_RATE_PER_TICK);
+      const sellQty = Math.min(state.stocks[r], sellRate);
       if (sellQty <= 0) continue;
       state.stocks[r] -= sellQty;
       revenue += sellQty * RESOURCES[r].price;
@@ -1746,16 +1830,16 @@
   // l'output si le stock est plein.
   function runRecipeTick(b, recipe) {
     if (!b.progress) b.progress = 0;
+    // Boosts dynamiques : cycles plus rapides via recherche, cap plus
+    // grand via "stockage_massif".
+    const boosts = getResearchBoosts();
+    const effectiveCycleMs = recipe.cycleMs * boosts.cycleMult;
+    const cap = getEffectiveStorageCap();
 
     // Cycle terminé en attente d'écoulement → on tente de livrer l'output
-    if (b.progress >= recipe.cycleMs) {
-      if (state.stocks[recipe.output] >= state.storageCap) return; // bloqué
-      state.stocks[recipe.output] = Math.min(
-        state.storageCap,
-        state.stocks[recipe.output] + recipe.qty
-      );
-      // Floater doré pour les cycles de recette — plus gros gain, couleur
-      // qui se distingue des extracteurs (vert).
+    if (b.progress >= effectiveCycleMs) {
+      if (state.stocks[recipe.output] >= cap) return; // bloqué
+      state.stocks[recipe.output] = Math.min(cap, state.stocks[recipe.output] + recipe.qty);
       spawnFloater(b.col, b.row, '+' + (RESOURCES[recipe.output].price * recipe.qty) + '€', '#ffd166');
       b.progress = 0;
     }
@@ -1801,11 +1885,12 @@
     // avec un badge "+N/s" (production) ou "-N/s" (consommation) pour
     // que le joueur voie le flux même quand le stock reste à 0.
     const stocksEl = document.getElementById('stocks');
+    const effCap = getEffectiveStorageCap();
     let html = '';
     for (const [key, def] of Object.entries(RESOURCES)) {
       if (!isResourceDiscovered(key)) continue;
       const qty = Math.floor(state.stocks[key]);
-      const ratio = qty / state.storageCap;
+      const ratio = qty / effCap;
       const fullClass = ratio >= 1 ? ' is-full' : (ratio >= 0.85 ? ' is-near' : '');
       const rate = stats.rates[key] || 0;
       let rateBadge = '';
@@ -1819,7 +1904,7 @@
           <span class="stock-icon" style="background:${def.color}"></span>
           <span class="stock-name">${def.short} · ${def.name}</span>
           ${rateBadge}
-          <span class="stock-qty">${qty} / ${state.storageCap}</span>
+          <span class="stock-qty">${qty} / ${effCap}</span>
         </div>`;
     }
     stocksEl.innerHTML = html;
@@ -2279,7 +2364,7 @@
       state.credits = data.credits ?? 200;
       // Merge avec tous les keys de RESOURCES pour gérer l'ajout de
       // nouvelles ressources entre 2 versions (lingot/piece initialisés à 0).
-      state.stocks = { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0, ...(data.stocks || {}) };
+      state.stocks = { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0, composant: 0, module: 0, ...(data.stocks || {}) };
       state.storageCap = data.storageCap ?? 50;
       // Validation stricte de research.unlocked — si le champ est absent
       // ou pas un array, on tombe sur [] pour éviter les .includes() crash.
@@ -2343,7 +2428,7 @@
     const newTotal = (state.prestige.totalPrestiges || 0) + 1;
     // Reset de l'état de jeu — on garde uniquement le bloc prestige.
     state.credits = 200;
-    state.stocks = { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0 };
+    state.stocks = { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0, composant: 0, module: 0 };
     state.storageCap = 50;
     state.research = { unlocked: [] };
     state.buildings = [];
