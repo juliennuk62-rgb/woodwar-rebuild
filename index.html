@@ -341,10 +341,11 @@
       font-style: italic;
     }
 
-    /* Bannière énergie insuffisante — bien visible, bloque visuellement
-       le centre supérieur de l'écran tant que le problème n'est pas résolu. */
+    /* Bannière énergie insuffisante — positionnée SOUS le panneau crédits
+       (qui fait ~86 px de haut + 16 px d'offset) pour ne pas le masquer
+       au moment où le joueur en a le plus besoin pour décider quoi démolir. */
     .energy-warning {
-      top: calc(16px + env(safe-area-inset-top));
+      top: calc(112px + env(safe-area-inset-top));
       left: 50%;
       transform: translateX(-50%);
       max-width: calc(100vw - 32px);
@@ -1306,21 +1307,26 @@
     setSelection(state.selectedBuilding === value ? null : value);
   }
   document.addEventListener('keydown', (e) => {
+    // ESC traité en premier — ferme le modal ou clear la sélection.
+    if (e.key === 'Escape') {
+      if (!researchModal.hidden) closeResearchModal();
+      else                       setSelection(null);
+      return;
+    }
+    // Quand le modal Recherches est ouvert, on ignore tout le reste —
+    // sinon flèches/D/1-5 modifieraient le state pendant la lecture.
+    if (!researchModal.hidden) return;
+
     const step = 30;
     if (e.key === 'ArrowUp')    { state.camera.y += step; e.preventDefault(); }
     if (e.key === 'ArrowDown')  { state.camera.y -= step; e.preventDefault(); }
     if (e.key === 'ArrowLeft')  { state.camera.x += step; e.preventDefault(); }
     if (e.key === 'ArrowRight') { state.camera.x -= step; e.preventDefault(); }
-    if (e.key === 'Escape') {
-      // Modal Recherches en priorité, sinon clear toute sélection.
-      if (!researchModal.hidden) closeResearchModal();
-      else                       setSelection(null);
-    }
+
     // 'D' = mode Démolir (toggle)
-    if (e.key === 'd' || e.key === 'D') {
-      toggleSelection('__demolish__');
-    }
-    // Raccourcis 1..N pour la palette (toggle), dérivés des bâtiments dispos
+    if (e.key === 'd' || e.key === 'D') toggleSelection('__demolish__');
+
+    // Raccourcis 1..N pour la palette, dérivés des bâtiments dispos.
     const idx = parseInt(e.key, 10) - 1;
     const keys = currentBuildingKeys();
     if (idx >= 0 && idx < keys.length) toggleSelection(keys[idx]);
