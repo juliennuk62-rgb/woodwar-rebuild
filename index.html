@@ -1499,6 +1499,47 @@
       ctx.beginPath();
       ctx.ellipse(cx, top, inner * 0.35, inner * 0.35 * 0.55, 0, 0, Math.PI * 2);
       ctx.fill();
+
+    } else if (type === 'atelier') {
+      // Dôme + petite antenne — look "labo / établi de précision"
+      const r = 9 * z;
+      // Dôme (demi-ellipse)
+      ctx.fillStyle = shade(color, 1.05);
+      ctx.beginPath();
+      ctx.ellipse(cx, top, r, r * 0.7, 0, Math.PI, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      // Bande horizontale du dôme
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+      ctx.beginPath();
+      ctx.moveTo(cx - r, top);
+      ctx.lineTo(cx + r, top);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+      // Petite antenne au sommet
+      ctx.fillStyle = shade(color, 0.6);
+      ctx.fillRect(cx - 1 * z, top - r * 0.7 - 6 * z, 2 * z, 6 * z);
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.arc(cx, top - r * 0.7 - 7 * z, Math.max(2, 2 * z), 0, Math.PI * 2);
+      ctx.fill();
+
+    } else if (type === 'usine') {
+      // 3 cheminées de hauteurs différentes — look "complexe industriel"
+      const chimW = 5 * z;
+      const heights = [20, 14, 16];
+      const offsets = [-9, -1, 7];
+      for (let i = 0; i < 3; i++) {
+        const cH = heights[i] * z;
+        const ox = offsets[i] * z;
+        ctx.fillStyle = shade(color, 0.65);
+        ctx.fillRect(cx + ox, top - cH, chimW, cH);
+        ctx.strokeRect(cx + ox, top - cH, chimW, cH);
+        // Anneau métallique
+        ctx.fillStyle = '#3a2a1a';
+        ctx.fillRect(cx + ox - 1, top - cH - 2 * z, chimW + 2, 2 * z);
+      }
     }
   }
 
