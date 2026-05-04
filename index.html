@@ -553,8 +553,12 @@
     // dy = (col + row) * th/2  =>  col + row = dy * 2/th
     const a = dx / (TILE_W / 2);
     const b = dy / (TILE_H / 2);
-    const col = Math.floor((a + b) / 2);
-    const row = Math.floor((b - a) / 2);
+    // Math.round, pas Math.floor : les tuiles iso ont leur CENTRE en
+    // (col, row) entier — la tuile (5,5) "possède" la zone continue
+    // [4.5, 5.5] × [4.5, 5.5]. Avec floor, on serait décalé d'une
+    // demi-tuile vers le haut-gauche.
+    const col = Math.round((a + b) / 2);
+    const row = Math.round((b - a) / 2);
     if (col < 0 || col >= GRID_SIZE || row < 0 || row >= GRID_SIZE) return null;
     return { col, row };
   }
