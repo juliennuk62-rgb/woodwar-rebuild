@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Iron & Co — Tycoon isométrique</title>
   <style>
     /* ─── Reset minimal + thème ──────────────────────────────────── */
@@ -38,10 +38,14 @@
     }
     .hud > * { pointer-events: auto; }
 
-    /* Stocks (haut gauche) */
+    /* Stocks (haut gauche) — env() compense les notches iPhone/Android */
     .stocks {
-      top: 16px; left: 16px;
+      top: calc(16px + env(safe-area-inset-top));
+      left: calc(16px + env(safe-area-inset-left));
       display: flex; flex-direction: column; gap: 8px;
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .stock-row {
       display: flex; align-items: center; gap: 10px;
@@ -64,7 +68,8 @@
 
     /* Crédits (haut droite) */
     .credits {
-      top: 16px; right: 16px;
+      top: calc(16px + env(safe-area-inset-top));
+      right: calc(16px + env(safe-area-inset-right));
       background: rgba(15, 22, 17, 0.85);
       backdrop-filter: blur(6px);
       border: 1px solid rgba(255, 209, 102, 0.3);
@@ -82,8 +87,9 @@
     }
     .credits-rate {
       margin-top: 4px;
-      font-size: 12px;
-      color: #8fbf7d;
+      font-size: 13px;
+      color: #b6e8a3;     /* meilleur contraste sur fond sombre flouté */
+      font-weight: 600;
       font-family: 'Consolas', monospace;
     }
     .credits-energy {
@@ -94,27 +100,36 @@
     }
     .credits-energy.low { color: #ff6b6b; }
 
-    /* Palette de bâtiments (bas centre) */
+    /* Palette de bâtiments (bas centre) — scrollable horizontalement
+       sur mobile pour ne jamais déborder du viewport. */
     .palette {
-      bottom: 16px; left: 50%;
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      left: 50%;
       transform: translateX(-50%);
-      display: flex; gap: 8px;
+      display: flex; gap: 6px;
+      max-width: calc(100vw - 32px);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
       background: rgba(15, 22, 17, 0.92);
       backdrop-filter: blur(6px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px;
-      padding: 8px;
+      padding: 6px;
     }
+    .palette::-webkit-scrollbar { display: none; }
     .palette-btn {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
       background: transparent;
       border: 2px solid transparent;
       border-radius: 10px;
-      padding: 10px 16px;
+      padding: 10px 14px;
       color: #e8e8e8;
       cursor: pointer;
       transition: background 0.15s, border-color 0.15s, transform 0.1s;
-      min-width: 90px;
+      min-width: 88px;
+      min-height: 64px;          /* assure une cible tactile ≥ 44pt même avec icon+labels compacts */
+      flex-shrink: 0;
       font-family: inherit;
     }
     .palette-btn:hover:not(:disabled) {
@@ -134,7 +149,8 @@
 
     /* Bouton recherches (bas droite) */
     .research-btn {
-      bottom: 16px; right: 16px;
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      right: calc(16px + env(safe-area-inset-right));
       background: rgba(15, 22, 17, 0.92);
       border: 1px solid rgba(192, 132, 252, 0.4);
       border-radius: 12px;
@@ -144,18 +160,159 @@
       font-family: inherit;
       font-size: 13px;
       font-weight: 600;
+      min-height: 44px;
       display: flex; align-items: center; gap: 8px;
     }
     .research-btn:hover { background: rgba(192, 132, 252, 0.1); }
 
-    /* Aide en bas (raccourcis clavier/souris) */
+    /* Aide en bas (raccourcis clavier/souris) — masquée sur mobile pour
+       laisser de la place. Le user mobile la découvrira via les gestes. */
     .help-text {
-      bottom: 110px; left: 50%;
+      bottom: calc(110px + env(safe-area-inset-bottom));
+      left: 50%;
       transform: translateX(-50%);
       font-size: 11px;
       color: rgba(255, 255, 255, 0.45);
       text-align: center;
       pointer-events: none;
+      white-space: nowrap;
+    }
+    @media (max-width: 720px) {
+      .help-text { display: none; }
+    }
+
+    /* Indication visuelle sur les stocks proches du cap */
+    .stock-row.is-near .stock-qty { color: #ffd166; }
+    .stock-row.is-full .stock-qty { color: #ff6b6b; font-weight: 700; }
+    .stock-row.is-full {
+      border-color: rgba(255, 107, 107, 0.4);
+      box-shadow: 0 0 12px rgba(255, 107, 107, 0.15);
+    }
+
+    /* Le bouton Recherches pulse quand au moins une techno est achetable */
+    .research-btn.has-affordable {
+      animation: research-pulse 1.6s ease-in-out infinite;
+      border-color: #c084fc;
+    }
+    @keyframes research-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(192, 132, 252, 0); }
+      50%      { box-shadow: 0 0 16px 0 rgba(192, 132, 252, 0.55); }
+    }
+
+    /* Modal Recherches — overlay plein écran avec backdrop flouté */
+    .research-modal {
+      position: fixed; inset: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .research-modal[hidden] { display: none; }
+    .research-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+    }
+    .research-panel {
+      position: relative;
+      width: min(560px, 100%);
+      max-height: calc(100vh - 40px);
+      display: flex; flex-direction: column;
+      background: linear-gradient(180deg, #1a221c 0%, #10160f 100%);
+      border: 1px solid rgba(192, 132, 252, 0.25);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.7),
+                  0 0 30px rgba(192, 132, 252, 0.15);
+      overflow: hidden;
+    }
+    .research-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .research-header h2 {
+      font-size: 18px; font-weight: 700; color: #c084fc;
+    }
+    .research-close {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .research-close:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+    .research-list {
+      padding: 16px;
+      overflow-y: auto;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .research-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex; flex-direction: column; gap: 8px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .research-card.is-affordable { border-color: rgba(192, 132, 252, 0.5); }
+    .research-card.is-unlocked {
+      border-color: rgba(143, 191, 125, 0.4);
+      background: rgba(143, 191, 125, 0.05);
+    }
+    .research-card.is-locked { opacity: 0.55; }
+    .research-card-head {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .research-card-icon { font-size: 22px; }
+    .research-card-name { font-size: 14px; font-weight: 700; flex: 1; }
+    .research-card-cost {
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+      color: #ffd166;
+    }
+    .research-card-desc {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.4;
+    }
+    .research-card-action {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .research-buy {
+      flex: 1;
+      padding: 10px 14px;
+      background: linear-gradient(180deg, rgba(192, 132, 252, 0.2) 0%, rgba(192, 132, 252, 0.05) 100%);
+      border: 1px solid #c084fc;
+      border-radius: 8px;
+      color: #e9d5ff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+    .research-buy:hover:not(:disabled) { filter: brightness(1.2); }
+    .research-buy:disabled {
+      opacity: 0.4; cursor: not-allowed;
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .research-status {
+      font-size: 11px;
+      color: #8fbf7d;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .research-locked-msg {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      font-style: italic;
     }
 
     /* Toast info (bas, après une action invalide par ex.) */
@@ -193,7 +350,19 @@
 
   <div class="hud palette" id="palette"></div>
 
-  <button class="hud research-btn" id="research-btn" title="À venir">🔬 Recherches</button>
+  <button class="hud research-btn" id="research-btn" title="Ouvrir le panneau Recherches">🔬 Recherches</button>
+
+  <!-- Modal Recherches (caché par défaut). Construit dynamiquement par updateResearchModal(). -->
+  <div class="research-modal" id="research-modal" hidden>
+    <div class="research-backdrop"></div>
+    <div class="research-panel" role="dialog" aria-labelledby="research-title">
+      <header class="research-header">
+        <h2 id="research-title">🔬 Recherches</h2>
+        <button class="research-close" id="research-close" aria-label="Fermer">×</button>
+      </header>
+      <div class="research-list" id="research-list"></div>
+    </div>
+  </div>
 
   <div class="hud toast" id="toast"></div>
 
@@ -213,27 +382,36 @@
   const GRID_SIZE = 20;       // nb tuiles par côté
   const RESOURCE_DENSITY = 0.18; // ~18% des tuiles ont une ressource
   const TICK_MS = 1000;       // boucle de production = 1 tick/s
-  const SELL_RATE_PER_TICK = 5; // unités/sec vendues automatiquement par ressource
+  // Taux de vente auto par ressource. Volontairement bas : avec 1 extracteur
+  // qui produit 1 u/s, le 1er stock se draine ; à partir du 3e extracteur
+  // d'une même ressource, le stock monte → l'entrepôt devient utile.
+  const SELL_RATE_PER_TICK = 2;
   const MIN_ZOOM = 0.5;
   const MAX_ZOOM = 2;
 
   // ─── Définitions des ressources ─────────────────────────────────
-  // Chaque ressource a une couleur de base, un nom court (pour le HUD)
-  // et un prix de vente (en crédits par unité).
+  // `basic: true` → ressource brute extractible sur la map ; sinon =
+  // ressource crafted (apparaît dans les recettes). Les crafted ne sont
+  // affichées dans le HUD qu'une fois la techno correspondante débloquée.
   const RESOURCES = {
-    fer:     { name: 'Fer',     short: 'FE', color: '#a86a3c', price: 1.0 },
-    cuivre:  { name: 'Cuivre',  short: 'CU', color: '#d97e2a', price: 2.0 },
-    charbon: { name: 'Charbon', short: 'CH', color: '#3d3d3d', price: 1.5 },
+    fer:     { name: 'Fer',     short: 'FE', color: '#a86a3c', price: 1.0,  basic: true },
+    cuivre:  { name: 'Cuivre',  short: 'CU', color: '#d97e2a', price: 2.0,  basic: true },
+    charbon: { name: 'Charbon', short: 'CH', color: '#3d3d3d', price: 1.5,  basic: true },
+    lingot:  { name: 'Lingot',  short: 'LI', color: '#b6c0d4', price: 8.0  },
+    piece:   { name: 'Pièce',   short: 'PI', color: '#9aaab8', price: 50.0 },
   };
 
   // ─── Définitions des bâtiments ──────────────────────────────────
   // `requiresResource` : ne peut être posé que sur une tuile ressource
-  // `energyUsage`      : consomme N énergie par tick (sinon ne produit pas)
+  // `energyUsage`      : consomme N énergie/tick (si pas assez → bloqué)
   // `energyProduction` : ajoute N énergie au pool global
   // `storage`          : ajoute N à la capacité de stockage
+  // `recipe`           : { input: {res:n}, output: 'res', qty, cycleMs }
+  // `locked`           : true → masqué de la palette tant que la recherche
+  //                      correspondante n'est pas complétée
   const BUILDINGS = {
     extracteur: {
-      name: 'Extracteur', icon: '⛏️', cost: 50, color: '#5b8eff',
+      name: 'Extracteur', icon: '⛏️', cost: 50, color: '#a06848',
       requiresResource: true, energyUsage: 1, productionPerTick: 1,
     },
     entrepot: {
@@ -243,6 +421,32 @@
     generateur: {
       name: 'Générateur', icon: '⚡', cost: 75, color: '#ffd166',
       energyProduction: 10,
+    },
+    fonderie: {
+      name: 'Fonderie',   icon: '🏭', cost: 200, color: '#ef6c4a',
+      energyUsage: 2, locked: true,
+      recipe: { input: { fer: 1, charbon: 1 }, output: 'lingot', qty: 1, cycleMs: 2000 },
+    },
+    assembleur: {
+      name: 'Assembleur', icon: '⚙️', cost: 400, color: '#9b6dff',
+      energyUsage: 3, locked: true,
+      recipe: { input: { lingot: 2, cuivre: 1 }, output: 'piece', qty: 1, cycleMs: 3000 },
+    },
+  };
+
+  // ─── Recherches ─────────────────────────────────────────────────
+  // Achat instantané (pas de timer pour V1). Chaque techno débloque un ou
+  // plusieurs bâtiments + révèle de nouvelles ressources dans le HUD.
+  const RESEARCH = {
+    metallurgie: {
+      name: 'Métallurgie', icon: '🔥', cost: 500,
+      desc: 'Débloque la Fonderie : transforme Fer + Charbon en Lingot (×8 €).',
+      requires: [], unlocks: ['fonderie'], reveals: ['lingot'],
+    },
+    mecanique: {
+      name: 'Mécanique de précision', icon: '🛠️', cost: 1500,
+      desc: 'Débloque l\'Assembleur : combine 2 Lingots + 1 Cuivre en Pièce (50 €).',
+      requires: ['metallurgie'], unlocks: ['assembleur'], reveals: ['piece'],
     },
   };
 
@@ -254,10 +458,12 @@
     buildings: [],
     // Économie
     credits: 200,
-    stocks: { fer: 0, cuivre: 0, charbon: 0 },
+    stocks: { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0 },
     storageCap: 50,           // capacité de stockage par ressource
     revenuePerSec: 0,         // taux affiché dans le HUD
     energyBase: 5,            // énergie "gratuite" de base
+    // Recherches achetées (instantanées). Liste d'IDs de RESEARCH.
+    research: { unlocked: [] },
     // Caméra
     camera: { x: 0, y: 0, zoom: 1 },
     // Souris
@@ -557,27 +763,34 @@
 
   // ─── Tick : production + ventes auto ────────────────────────────
   function tick() {
-    // 1. Calcul de l'énergie disponible
-    const energyTotal = state.energyBase
-      + state.buildings.filter((b) => b.type === 'generateur').length * BUILDINGS.generateur.energyProduction;
-    const energyUsed = state.buildings.filter((b) => b.type === 'extracteur').length * BUILDINGS.extracteur.energyUsage;
+    // 1. Calcul de l'énergie : on parcourt les bâtiments une fois et on
+    //    additionne les flux. Plus extensible que filter() en boucle.
+    let energyTotal = state.energyBase;
+    let energyUsed = 0;
+    for (const b of state.buildings) {
+      const def = BUILDINGS[b.type];
+      if (def.energyProduction) energyTotal += def.energyProduction;
+      if (def.energyUsage)      energyUsed  += def.energyUsage;
+    }
     const hasEnoughEnergy = energyTotal >= energyUsed;
     state.energyTotal = energyTotal;
     state.energyUsed = energyUsed;
 
-    // 2. Production : chaque extracteur ajoute X de sa ressource au stock
-    //    (s'il y a assez d'énergie ET que le stock n'a pas atteint la cap).
+    // 2. Production. Si pas assez d'énergie → toutes les machines à
+    //    consommation sont bloquées (all-or-nothing, simple à comprendre).
     if (hasEnoughEnergy) {
       for (const b of state.buildings) {
-        if (b.type !== 'extracteur') continue;
-        const tile = state.tiles[b.row][b.col];
-        const r = tile.resource;
-        if (!r) continue;
-        if (state.stocks[r] < state.storageCap) {
-          state.stocks[r] = Math.min(
-            state.storageCap,
-            state.stocks[r] + BUILDINGS.extracteur.productionPerTick
-          );
+        const def = BUILDINGS[b.type];
+
+        if (b.type === 'extracteur') {
+          // Extracteur : produit la ressource de la tuile, capé.
+          const r = state.tiles[b.row][b.col].resource;
+          if (r && state.stocks[r] < state.storageCap) {
+            state.stocks[r] = Math.min(state.storageCap, state.stocks[r] + def.productionPerTick);
+          }
+        } else if (def.recipe) {
+          // Bâtiment à recette (Fonderie, Assembleur, …)
+          runRecipeTick(b, def.recipe);
         }
       }
     }
@@ -598,18 +811,69 @@
     updateHUD();
   }
 
+  // Avance d'un tick le cycle d'un bâtiment à recette. `b.progress` (en ms)
+  // suit la progression du cycle. Le bâtiment a 3 états possibles :
+  //   1. progress >= cycleMs et stock output plein → bloqué (waiting room)
+  //   2. progress === 0 et input manquant → idle (waiting room)
+  //   3. sinon → avance normalement
+  // Cette séparation évite de consommer un input pour ensuite jeter
+  // l'output si le stock est plein.
+  function runRecipeTick(b, recipe) {
+    if (!b.progress) b.progress = 0;
+
+    // Cycle terminé en attente d'écoulement → on tente de livrer l'output
+    if (b.progress >= recipe.cycleMs) {
+      if (state.stocks[recipe.output] >= state.storageCap) return; // bloqué
+      state.stocks[recipe.output] = Math.min(
+        state.storageCap,
+        state.stocks[recipe.output] + recipe.qty
+      );
+      b.progress = 0;
+    }
+
+    // Démarrage d'un nouveau cycle → on vérifie + on consomme les inputs
+    if (b.progress === 0) {
+      for (const [r, n] of Object.entries(recipe.input)) {
+        if ((state.stocks[r] ?? 0) < n) return; // input manquant → on attend
+      }
+      for (const [r, n] of Object.entries(recipe.input)) {
+        state.stocks[r] -= n;
+      }
+    }
+
+    b.progress += TICK_MS;
+  }
+
+  // ─── Helpers de découverte / déblocage ──────────────────────────
+  // Une ressource est "découverte" si elle est `basic: true` OU si une
+  // recherche déjà unlock l'a révélée (champ `reveals`). Évite d'afficher
+  // Lingot/Pièce dans le HUD avant que le joueur ait recherché Métallurgie.
+  function isResourceDiscovered(key) {
+    if (RESOURCES[key].basic) return true;
+    return state.research.unlocked.some((rid) => (RESEARCH[rid].reveals || []).includes(key));
+  }
+
+  // Un bâtiment est jouable s'il n'est pas `locked` OU si une recherche
+  // déjà acquise le débloque (champ `unlocks`).
+  function isBuildingAvailable(key) {
+    const def = BUILDINGS[key];
+    if (!def.locked) return true;
+    return state.research.unlocked.some((rid) => (RESEARCH[rid].unlocks || []).includes(key));
+  }
+
   // ─── Mise à jour du HUD (DOM) ───────────────────────────────────
-  // Beaucoup plus simple que de dessiner l'UI dans le canvas, et le HTML
-  // gère mieux les événements (clic sur les boutons de palette).
   let lastHudHash = '';
   function updateHUD() {
-    // Stocks (haut gauche)
+    // Stocks (haut gauche) — n'affiche que les ressources découvertes
     const stocksEl = document.getElementById('stocks');
     let html = '';
     for (const [key, def] of Object.entries(RESOURCES)) {
+      if (!isResourceDiscovered(key)) continue;
       const qty = Math.floor(state.stocks[key]);
+      const ratio = qty / state.storageCap;
+      const fullClass = ratio >= 1 ? ' is-full' : (ratio >= 0.85 ? ' is-near' : '');
       html += `
-        <div class="stock-row">
+        <div class="stock-row${fullClass}">
           <span class="stock-icon" style="background:${def.color}"></span>
           <span class="stock-name">${def.short} · ${def.name}</span>
           <span class="stock-qty">${qty} / ${state.storageCap}</span>
@@ -625,13 +889,17 @@
     enEl.textContent = `⚡ ${state.energyUsed || 0} / ${state.energyTotal || state.energyBase}`;
     enEl.classList.toggle('low', (state.energyUsed || 0) > (state.energyTotal || state.energyBase));
 
-    // Palette (bas centre) — mise à jour des `disabled` selon les crédits
+    // Palette (bas centre). Hash inclut l'affordability ET l'état de
+    // déblocage de chaque bâtiment pour rebuild quand une recherche entre.
     const palette = document.getElementById('palette');
-    // On ne reconstruit la palette que si le contenu change (ex. changement de sélection)
-    const wantHash = `${state.selectedBuilding}|${state.credits >= BUILDINGS.extracteur.cost}|${state.credits >= BUILDINGS.entrepot.cost}|${state.credits >= BUILDINGS.generateur.cost}`;
+    const availables = Object.keys(BUILDINGS).filter(isBuildingAvailable);
+    const hashParts = [state.selectedBuilding, availables.join(',')];
+    for (const k of availables) hashParts.push(state.credits >= BUILDINGS[k].cost ? '1' : '0');
+    const wantHash = hashParts.join('|');
     if (wantHash !== lastHudHash) {
       let pHtml = '';
-      for (const [key, def] of Object.entries(BUILDINGS)) {
+      for (const key of availables) {
+        const def = BUILDINGS[key];
         const affordable = state.credits >= def.cost;
         const isActive = state.selectedBuilding === key;
         pHtml += `
@@ -647,7 +915,6 @@
       }
       palette.innerHTML = pHtml;
       lastHudHash = wantHash;
-      // Re-bind des clics (innerHTML détruit les listeners précédents)
       palette.querySelectorAll('.palette-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
           const k = btn.dataset.building;
@@ -657,6 +924,16 @@
         });
       });
     }
+
+    // Notif "achetable" sur le bouton Recherches s'il y a au moins une
+    // techno qu'on peut acheter dès maintenant.
+    const researchBtn = document.getElementById('research-btn');
+    const hasAffordable = Object.entries(RESEARCH).some(([id, r]) =>
+      !state.research.unlocked.includes(id)
+      && r.requires.every((q) => state.research.unlocked.includes(q))
+      && state.credits >= r.cost
+    );
+    researchBtn.classList.toggle('has-affordable', hasAffordable);
   }
 
   function formatCredits(n) {
@@ -813,9 +1090,14 @@
     if (e.key === 'ArrowLeft')  { state.camera.x += step; e.preventDefault(); }
     if (e.key === 'ArrowRight') { state.camera.x -= step; e.preventDefault(); }
     if (e.key === 'Escape') {
-      state.selectedBuilding = null;
-      canvas.classList.remove('placing');
-      updateHUD();
+      // Si le modal Recherches est ouvert, on le ferme en priorité.
+      if (!researchModal.hidden) {
+        closeResearchModal();
+      } else {
+        state.selectedBuilding = null;
+        canvas.classList.remove('placing');
+        updateHUD();
+      }
     }
     // Raccourcis 1/2/3 pour la palette (toggle)
     const idx = parseInt(e.key, 10) - 1;
@@ -827,10 +1109,85 @@
     }
   });
 
-  // Clic sur le bouton recherche : placeholder pour l'instant
-  document.getElementById('research-btn').addEventListener('click', () => {
-    showToast('Panneau Recherches — bientôt disponible');
-  });
+  // ─── Panneau Recherches ─────────────────────────────────────────
+  const researchModal = document.getElementById('research-modal');
+  const researchListEl = document.getElementById('research-list');
+
+  function openResearchModal() {
+    renderResearchModal();
+    researchModal.hidden = false;
+  }
+  function closeResearchModal() {
+    researchModal.hidden = true;
+  }
+
+  // Construit la liste des cartes de recherche. Chaque carte a 3 états :
+  //   · unlocked   : déjà achetée → badge "ACQUIS"
+  //   · locked     : prérequis manquant → opacity réduite + message
+  //   · disponible : achetable si crédits suffisants
+  function renderResearchModal() {
+    let html = '';
+    for (const [id, def] of Object.entries(RESEARCH)) {
+      const unlocked = state.research.unlocked.includes(id);
+      const reqsOk = def.requires.every((q) => state.research.unlocked.includes(q));
+      const affordable = state.credits >= def.cost;
+      let cls = 'research-card';
+      if (unlocked)        cls += ' is-unlocked';
+      else if (!reqsOk)    cls += ' is-locked';
+      else if (affordable) cls += ' is-affordable';
+
+      let actionHtml = '';
+      if (unlocked) {
+        actionHtml = '<span class="research-status">✓ Acquis</span>';
+      } else if (!reqsOk) {
+        const missing = def.requires
+          .filter((q) => !state.research.unlocked.includes(q))
+          .map((q) => RESEARCH[q].name).join(', ');
+        actionHtml = `<span class="research-locked-msg">Prérequis : ${missing}</span>`;
+      } else {
+        actionHtml = `<button class="research-buy" data-research="${id}" ${affordable ? '' : 'disabled'}>
+          Acheter pour ${def.cost} €
+        </button>`;
+      }
+
+      html += `
+        <div class="${cls}">
+          <div class="research-card-head">
+            <span class="research-card-icon">${def.icon}</span>
+            <span class="research-card-name">${def.name}</span>
+            <span class="research-card-cost">${def.cost} €</span>
+          </div>
+          <div class="research-card-desc">${def.desc}</div>
+          <div class="research-card-action">${actionHtml}</div>
+        </div>`;
+    }
+    researchListEl.innerHTML = html;
+    // Re-bind des boutons d'achat
+    researchListEl.querySelectorAll('.research-buy').forEach((btn) => {
+      btn.addEventListener('click', () => buyResearch(btn.dataset.research));
+    });
+  }
+
+  function buyResearch(id) {
+    const def = RESEARCH[id];
+    if (!def) return;
+    if (state.research.unlocked.includes(id)) return;
+    if (!def.requires.every((q) => state.research.unlocked.includes(q))) return;
+    if (state.credits < def.cost) {
+      showToast(`Pas assez de crédits (${def.cost} € requis)`);
+      return;
+    }
+    state.credits -= def.cost;
+    state.research.unlocked.push(id);
+    showToast(`✓ ${def.name} débloqué !`);
+    renderResearchModal();
+    updateHUD();
+  }
+
+  document.getElementById('research-btn').addEventListener('click', openResearchModal);
+  document.getElementById('research-close').addEventListener('click', closeResearchModal);
+  // Clic sur le backdrop (mais pas sur le panel) ferme le modal
+  researchModal.querySelector('.research-backdrop').addEventListener('click', closeResearchModal);
 
   // Empêche le menu contextuel sur clic droit (réservé pour usage futur)
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
