@@ -153,11 +153,42 @@
     }
     .credits-energy {
       margin-top: 6px;
-      font-size: 12px;             /* +1px pour passer la barre 12px lisibilité */
-      color: var(--text-muted);    /* #d0d0d0 — passe WCAG AA (vs #aaa avant) */
+      font-size: 12px;
+      color: var(--text-muted);
       font-family: 'Consolas', monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: flex-end;
     }
     .credits-energy.low { color: var(--danger); font-weight: 700; }
+    /* Mini-bar visuelle pour l'énergie : remplace le simple "X / Y" par
+       une jauge dégradée → l'utilisateur capte le ratio sans lire les
+       chiffres. Largeur 60px à droite du texte. */
+    .energy-bar {
+      width: 60px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+    .energy-bar-fill {
+      position: absolute;
+      inset: 0;
+      width: var(--ratio, 0%);
+      background: linear-gradient(90deg, var(--success-bold) 0%, var(--primary) 70%, var(--danger) 100%);
+      border-radius: 3px;
+      transition: width 0.25s ease;
+    }
+    .credits-energy.low .energy-bar-fill {
+      /* À surchauffe (>100%), on ferme à 100% mais on signale en pulsant */
+      animation: energy-bar-overflow-pulse 0.9s ease-in-out infinite;
+    }
+    @keyframes energy-bar-overflow-pulse {
+      0%, 100% { filter: brightness(1); }
+      50%      { filter: brightness(1.4) saturate(1.3); }
+    }
 
     /* Palette de bâtiments (bas centre) — scrollable horizontalement
        sur mobile pour ne jamais déborder du viewport. */
@@ -333,15 +364,14 @@
     .research-close {
       background: transparent;
       border: none;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 28px;
-      line-height: 1;
+      color: rgba(255, 255, 255, 0.55);
       cursor: pointer;
-      width: 36px; height: 36px;
+      width: 40px; height: 40px;     /* ≥ 44pt tactile : un peu sous mais centré dans header */
       border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
       transition: background 0.15s, color 0.15s;
     }
-    .research-close:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+    .research-close:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
     .research-list {
       padding: 16px;
       overflow-y: auto;
@@ -562,6 +592,13 @@
         font-size: 12px;
       }
       .palette-btn { min-width: 76px; padding: 8px 10px; }
+      /* Sur petit écran, le bouton Recherches était quasi-collé à la
+         palette → mis-tap risque. On le remonte au-dessus de la palette. */
+      .research-btn {
+        bottom: calc(100px + env(safe-area-inset-bottom));
+        padding: 8px 12px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -574,7 +611,10 @@
   <div class="hud credits">
     <div class="credits-value" id="credits-value">200 €</div>
     <div class="credits-rate" id="credits-rate">+ 0 €/s</div>
-    <div class="credits-energy" id="credits-energy">⚡ 0 / 5</div>
+    <div class="credits-energy" id="credits-energy">
+      <span id="credits-energy-text">⚡ 0 / 5</span>
+      <span class="energy-bar"><span class="energy-bar-fill" id="credits-energy-bar"></span></span>
+    </div>
   </div>
 
   <div class="hud help-text">
@@ -598,7 +638,11 @@
     <div class="research-panel" role="dialog" aria-labelledby="research-title">
       <header class="research-header">
         <h2 id="research-title">🔬 Recherches</h2>
-        <button class="research-close" id="research-close" aria-label="Fermer">×</button>
+        <button class="research-close" id="research-close" aria-label="Fermer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
       </header>
       <div class="research-list" id="research-list"></div>
       <footer class="research-footer">
@@ -1595,8 +1639,15 @@
     document.getElementById('credits-rate').textContent =
       '+ ' + stats.expectedRevenue.toFixed(1) + ' €/s';
     const enEl = document.getElementById('credits-energy');
-    enEl.textContent = `⚡ ${stats.energyUsed} / ${stats.energyTotal}`;
+    document.getElementById('credits-energy-text').textContent =
+      `⚡ ${stats.energyUsed} / ${stats.energyTotal}`;
     enEl.classList.toggle('low', !stats.hasEnergy);
+    // Mini-bar — ratio capé à 100% pour l'affichage visuel ; au-delà,
+    // .low active la pulsation rouge pour signaler la surcharge.
+    const ratio = stats.energyTotal > 0
+      ? Math.min(100, (stats.energyUsed / stats.energyTotal) * 100)
+      : 0;
+    document.getElementById('credits-energy-bar').style.setProperty('--ratio', ratio + '%');
 
     // Bannière "énergie insuffisante" — visible seulement si on a déjà
     // posé au moins un bâtiment qui en consomme (sinon dès le départ
