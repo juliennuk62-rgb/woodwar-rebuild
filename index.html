@@ -458,12 +458,14 @@
     }
 
     /* ─── Focus-visible (accessibilité clavier) ────────────────────
-       Important pour navigation tab/Enter et lecteurs d'écran. */
+       Important pour navigation tab/Enter et lecteurs d'écran.
+       (Pas de border-radius: inherit — ça écrasait la border-radius
+       propre des boutons. Les navigateurs modernes suivent déjà la
+       courbure du bouton avec l'outline.) */
     button:focus-visible,
     a:focus-visible {
       outline: 2px solid var(--research);
       outline-offset: 2px;
-      border-radius: inherit;
     }
 
     /* ─── Animation d'apparition du modal Recherches ───────────────
