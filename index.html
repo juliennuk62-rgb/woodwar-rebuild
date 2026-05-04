@@ -645,6 +645,13 @@
         padding: 8px 12px;
         font-size: 12px;
       }
+      /* Prestige doit rester au-dessus de Recherches sur mobile (la palette
+         remonte à ~96 px ce qui chevauchait l'ancien bottom: 72 px). */
+      .prestige-btn {
+        bottom: calc(156px + env(safe-area-inset-bottom));
+        padding: 8px 12px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
