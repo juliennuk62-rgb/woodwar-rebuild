@@ -785,17 +785,21 @@
       }
 
     } else if (resource === 'charbon') {
-      // 3 éclats polygonaux noirs, plus une facette claire pour le relief
+      // 3 éclats polygonaux. Le corps est volontairement plus clair que
+      // le pur noir (#2c2e33 au lieu de #1a1a1a) parce que la tuile de
+      // fond est déjà très sombre — sinon les éclats étaient invisibles.
       const chunks = [
         { dx: -w * 0.18, dy: -h * 0.04, s: 5 },
         { dx:  w * 0.16, dy:  h * 0.04, s: 6 },
         { dx: -w * 0.02, dy:  h * 0.20, s: 5 },
       ];
+      // Outline plus clair pour ressortir sur fond sombre
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
       for (const c of chunks) {
         const cx = x + c.dx, cy = y + c.dy;
         const r = Math.max(3, c.s * z);
-        // Corps (charbon noir)
-        ctx.fillStyle = '#1a1a1a';
+        // Corps (charbon avec undertone bleuté)
+        ctx.fillStyle = '#2c2e33';
         ctx.beginPath();
         ctx.moveTo(cx - r * 0.85, cy + r * 0.35);
         ctx.lineTo(cx - r * 0.55, cy - r * 0.55);
@@ -806,8 +810,8 @@
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
-        // Facette supérieure (reflet bleuté pour le brillant du charbon)
-        ctx.fillStyle = '#4a4d55';
+        // Facette supérieure brillante (reflet caractéristique du charbon)
+        ctx.fillStyle = '#6a6e78';
         ctx.beginPath();
         ctx.moveTo(cx - r * 0.55, cy - r * 0.55);
         ctx.lineTo(cx + r * 0.45, cy - r * 0.65);
