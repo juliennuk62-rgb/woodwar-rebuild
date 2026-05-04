@@ -2783,6 +2783,8 @@
     generateGrid();
     centerCamera();
     canvas.classList.remove('placing', 'demolishing');
+    // Si on était en mode 3D, sync la scène avec la nouvelle grille.
+    if (state.theme === '3d' && three.inited) rebuildTiles3D();
     closeResearchModal();
     saveGame();
     updateHUD();
@@ -2829,6 +2831,10 @@
     if (three.inited) {
       // Resize au cas où la fenêtre a changé pendant qu'on était en 2D
       resize3D();
+      // Resync : on a peut-être placé/démoli en 2D pendant qu'on était
+      // sur l'autre skin, ou prestige a régénéré la grille. La scène 3D
+      // était figée → rebuild complet pour refléter l'état actuel.
+      rebuildTiles3D();
       return;
     }
     three.inited = true;
