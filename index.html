@@ -2171,7 +2171,14 @@
       state.buildings = [];
       for (const row of state.tiles) {
         for (const tile of row) {
-          if (tile.building) state.buildings.push(tile.building);
+          if (tile.building) {
+            // performance.now() redémarre à 0 à chaque page load — un placedAt
+            // hérité de la session précédente donne age = now - placedAt < 0
+            // → scale aberrant. On le drop pour que les bâtiments anciens
+            // s'affichent en taille pleine immédiatement.
+            delete tile.building.placedAt;
+            state.buildings.push(tile.building);
+          }
         }
       }
       return true;
