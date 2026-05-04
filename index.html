@@ -173,10 +173,13 @@
     }
     .palette-btn-demolish.active .palette-btn-name { color: #ff9d9d; }
 
-    /* Bouton recherches (bas droite) */
+    /* Bouton recherches (bas droite). pointer-events: auto explicite car
+       l'élément a la classe `.hud` (pointer-events: none) mais n'est pas
+       un enfant de `.hud` — la règle `.hud > *` ne le réactive donc pas. */
     .research-btn {
       bottom: calc(16px + env(safe-area-inset-bottom));
       right: calc(16px + env(safe-area-inset-right));
+      pointer-events: auto;
       background: rgba(15, 22, 17, 0.92);
       border: 1px solid rgba(192, 132, 252, 0.4);
       border-radius: 12px;
