@@ -1597,6 +1597,7 @@
   // Schéma versionné pour pouvoir migrer/casser proprement plus tard.
   const SAVE_KEY = 'iron-co-save-v1';
   const SAVE_VERSION = 1;
+  let saveErrorReported = false; // évite de spammer le toast à chaque tick
 
   function saveGame() {
     try {
@@ -1621,9 +1622,16 @@
         }))),
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+      saveErrorReported = false; // reset si on retombe sur un OK après un échec
       return true;
     } catch (e) {
       console.warn('[Iron & Co] échec sauvegarde:', e);
+      // Avertit le joueur UNE FOIS — sinon le toast spam à chaque tick.
+      // Cas typiques : quota dépassé, mode privé Safari (localStorage = 0 octet).
+      if (!saveErrorReported) {
+        showToast('⚠ Sauvegarde impossible — espace plein ou navigation privée');
+        saveErrorReported = true;
+      }
       return false;
     }
   }
@@ -1643,7 +1651,11 @@
       // nouvelles ressources entre 2 versions (lingot/piece initialisés à 0).
       state.stocks = { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0, ...(data.stocks || {}) };
       state.storageCap = data.storageCap ?? 50;
-      state.research = data.research || { unlocked: [] };
+      // Validation stricte de research.unlocked — si le champ est absent
+      // ou pas un array, on tombe sur [] pour éviter les .includes() crash.
+      state.research = {
+        unlocked: Array.isArray(data.research?.unlocked) ? data.research.unlocked : [],
+      };
       state.camera = data.camera || { x: 0, y: 0, zoom: 1 };
       state.tiles = data.tiles;
       // Reconstruction de state.buildings depuis tiles.
