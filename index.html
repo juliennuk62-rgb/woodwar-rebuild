@@ -1,18 +1,771 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/woodwar-rebuild/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#0d110e" />
-    <meta name="description" content="Le Jardin d'Agnès — idle tycoon botanique en 3D isométrique" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-    <title>Le Jardin d'Agnès</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Iron & Co — Tycoon isométrique</title>
+  <style>
+    /* ─── Reset minimal + thème ──────────────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #1a1f1a;
+      color: #e8e8e8;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    body { user-select: none; }
+
+    /* Canvas plein écran sous le HUD */
+    #game {
+      position: absolute;
+      inset: 0;
+      display: block;
+      cursor: grab;
+    }
+    #game.grabbing { cursor: grabbing; }
+    #game.placing  { cursor: crosshair; }
+
+    /* ─── HUD : couches en overlay ─────────────────────────────── */
+    .hud {
+      position: absolute;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .hud > * { pointer-events: auto; }
+
+    /* Stocks (haut gauche) */
+    .stocks {
+      top: 16px; left: 16px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .stock-row {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(15, 22, 17, 0.85);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 8px 12px;
+      min-width: 180px;
+      font-size: 13px;
+    }
+    .stock-icon {
+      width: 18px; height: 18px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+    }
+    .stock-name { font-weight: 600; flex: 1; }
+    .stock-qty { font-family: 'Consolas', 'Monaco', monospace; }
+
+    /* Crédits (haut droite) */
+    .credits {
+      top: 16px; right: 16px;
+      background: rgba(15, 22, 17, 0.85);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 209, 102, 0.3);
+      border-radius: 12px;
+      padding: 12px 18px;
+      text-align: right;
+      min-width: 200px;
+    }
+    .credits-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffd166;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .credits-rate {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #8fbf7d;
+      font-family: 'Consolas', monospace;
+    }
+    .credits-energy {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #aaa;
+      font-family: 'Consolas', monospace;
+    }
+    .credits-energy.low { color: #ff6b6b; }
+
+    /* Palette de bâtiments (bas centre) */
+    .palette {
+      bottom: 16px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 8px;
+      background: rgba(15, 22, 17, 0.92);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 8px;
+    }
+    .palette-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      background: transparent;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: #e8e8e8;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      min-width: 90px;
+      font-family: inherit;
+    }
+    .palette-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .palette-btn.active {
+      background: rgba(143, 191, 125, 0.15);
+      border-color: #8fbf7d;
+    }
+    .palette-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .palette-btn-icon { font-size: 22px; line-height: 1; }
+    .palette-btn-name { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .palette-btn-cost { font-size: 11px; color: #ffd166; font-family: 'Consolas', monospace; }
+
+    /* Bouton recherches (bas droite) */
+    .research-btn {
+      bottom: 16px; right: 16px;
+      background: rgba(15, 22, 17, 0.92);
+      border: 1px solid rgba(192, 132, 252, 0.4);
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: #c084fc;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .research-btn:hover { background: rgba(192, 132, 252, 0.1); }
+
+    /* Aide en bas (raccourcis clavier/souris) */
+    .help-text {
+      bottom: 110px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    /* Toast info (bas, après une action invalide par ex.) */
+    .toast {
+      top: 80px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 22, 17, 0.95);
+      border: 1px solid #ff6b6b;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: #ff6b6b;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- HUD : tout en HTML overlay pour rester simple à mettre à jour -->
+  <div class="hud stocks" id="stocks"></div>
+
+  <div class="hud credits">
+    <div class="credits-value" id="credits-value">200 €</div>
+    <div class="credits-rate" id="credits-rate">+ 0 €/s</div>
+    <div class="credits-energy" id="credits-energy">⚡ 0 / 5</div>
+  </div>
+
+  <div class="hud help-text">
+    Clic gauche + glisser : déplacer la caméra • Molette : zoom • Flèches : déplacer • Échap : annuler la sélection
+  </div>
+
+  <div class="hud palette" id="palette"></div>
+
+  <button class="hud research-btn" id="research-btn" title="À venir">🔬 Recherches</button>
+
+  <div class="hud toast" id="toast"></div>
+
+  <script>
+  'use strict';
+
+  /* ════════════════════════════════════════════════════════════════
+     IRON & CO — Tycoon isométrique en un seul fichier.
+     Inspiré de Satisfactory : pose des extracteurs sur des gisements,
+     produit des ressources, vend automatiquement contre des crédits.
+     V1 : grille statique 20×20, 3 types de bâtiments, vente auto.
+     ════════════════════════════════════════════════════════════════ */
+
+  // ─── Constantes de jeu ──────────────────────────────────────────
+  const TILE_W = 64;          // largeur d'une tuile iso (px)
+  const TILE_H = 32;          // hauteur d'une tuile iso (ratio 2:1)
+  const GRID_SIZE = 20;       // nb tuiles par côté
+  const RESOURCE_DENSITY = 0.18; // ~18% des tuiles ont une ressource
+  const TICK_MS = 1000;       // boucle de production = 1 tick/s
+  const SELL_RATE_PER_TICK = 5; // unités/sec vendues automatiquement par ressource
+  const MIN_ZOOM = 0.5;
+  const MAX_ZOOM = 2;
+
+  // ─── Définitions des ressources ─────────────────────────────────
+  // Chaque ressource a une couleur de base, un nom court (pour le HUD)
+  // et un prix de vente (en crédits par unité).
+  const RESOURCES = {
+    fer:     { name: 'Fer',     short: 'FE', color: '#a86a3c', price: 1.0 },
+    cuivre:  { name: 'Cuivre',  short: 'CU', color: '#d97e2a', price: 2.0 },
+    charbon: { name: 'Charbon', short: 'CH', color: '#3d3d3d', price: 1.5 },
+  };
+
+  // ─── Définitions des bâtiments ──────────────────────────────────
+  // `requiresResource` : ne peut être posé que sur une tuile ressource
+  // `energyUsage`      : consomme N énergie par tick (sinon ne produit pas)
+  // `energyProduction` : ajoute N énergie au pool global
+  // `storage`          : ajoute N à la capacité de stockage
+  const BUILDINGS = {
+    extracteur: {
+      name: 'Extracteur', icon: '⛏️', cost: 50, color: '#5b8eff',
+      requiresResource: true, energyUsage: 1, productionPerTick: 1,
+    },
+    entrepot: {
+      name: 'Entrepôt',   icon: '📦', cost: 100, color: '#8b6f47',
+      storage: 100,
+    },
+    generateur: {
+      name: 'Générateur', icon: '⚡', cost: 75, color: '#ffd166',
+      energyProduction: 10,
+    },
+  };
+
+  // ─── État global du jeu ─────────────────────────────────────────
+  const state = {
+    // Grille : tableau 2D, tiles[row][col] = { type, resource, building }
+    tiles: [],
+    // Liste plate des bâtiments (pour itérer plus vite que la grille)
+    buildings: [],
+    // Économie
+    credits: 200,
+    stocks: { fer: 0, cuivre: 0, charbon: 0 },
+    storageCap: 50,           // capacité de stockage par ressource
+    revenuePerSec: 0,         // taux affiché dans le HUD
+    energyBase: 5,            // énergie "gratuite" de base
+    // Caméra
+    camera: { x: 0, y: 0, zoom: 1 },
+    // Souris
+    mouse: { x: 0, y: 0 },
+    hoverTile: null,          // { col, row } ou null
+    // Drag de caméra
+    dragging: false,
+    dragStart: null,
+    dragMoved: false,         // pour distinguer un clic d'un drag
+    // Mode construction
+    selectedBuilding: null,   // ex: 'extracteur' ou null
+  };
+
+  // ─── Canvas + contexte ──────────────────────────────────────────
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    // Support écran HiDPI : on multiplie par devicePixelRatio
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // ─── Génération de la grille ─────────────────────────────────────
+  // Place des ressources aléatoirement (~18% des tuiles), réparties
+  // entre les 3 types possibles. Le reste reste en "ground".
+  function generateGrid() {
+    state.tiles = [];
+    const types = Object.keys(RESOURCES);
+    for (let r = 0; r < GRID_SIZE; r++) {
+      const row = [];
+      for (let c = 0; c < GRID_SIZE; c++) {
+        let resource = null;
+        if (Math.random() < RESOURCE_DENSITY) {
+          resource = types[Math.floor(Math.random() * types.length)];
+        }
+        row.push({
+          type: resource ? 'resource' : 'ground',
+          resource,
+          building: null,
+        });
+      }
+      state.tiles.push(row);
+    }
+  }
+
+  // ─── Conversions iso ↔ écran ────────────────────────────────────
+  // Formule iso classique : screenX = (col - row) * tw/2, screenY = (col + row) * th/2
+  // On applique zoom puis offset caméra pour obtenir les coords écran.
+  function worldToScreen(col, row) {
+    const z = state.camera.zoom;
+    const x = (col - row) * (TILE_W / 2) * z + state.camera.x;
+    const y = (col + row) * (TILE_H / 2) * z + state.camera.y;
+    return { x, y };
+  }
+
+  // Inverse : trouve la tuile sous un point d'écran (sx, sy).
+  // On résout le système linéaire en deux étapes.
+  function screenToTile(sx, sy) {
+    const z = state.camera.zoom;
+    const dx = (sx - state.camera.x) / z;
+    const dy = (sy - state.camera.y) / z;
+    // dx = (col - row) * tw/2  =>  col - row = dx * 2/tw
+    // dy = (col + row) * th/2  =>  col + row = dy * 2/th
+    const a = dx / (TILE_W / 2);
+    const b = dy / (TILE_H / 2);
+    const col = Math.floor((a + b) / 2);
+    const row = Math.floor((b - a) / 2);
+    if (col < 0 || col >= GRID_SIZE || row < 0 || row >= GRID_SIZE) return null;
+    return { col, row };
+  }
+
+  // Centre la caméra sur le milieu de la grille.
+  function centerCamera() {
+    state.camera.x = window.innerWidth / 2;
+    // Un peu décalé vers le haut pour laisser de la place au HUD bas
+    state.camera.y = window.innerHeight / 2 - (GRID_SIZE * TILE_H) / 4;
+    state.camera.zoom = 1;
+  }
+
+  // ─── Utilitaires couleur ────────────────────────────────────────
+  function hexToRgb(hex) {
+    const h = hex.replace('#', '');
+    return {
+      r: parseInt(h.substring(0, 2), 16),
+      g: parseInt(h.substring(2, 4), 16),
+      b: parseInt(h.substring(4, 6), 16),
+    };
+  }
+  function shade(hex, factor) {
+    // factor < 1 → assombrit, > 1 → éclaircit
+    const { r, g, b } = hexToRgb(hex);
+    const cl = (v) => Math.max(0, Math.min(255, Math.round(v * factor)));
+    return `rgb(${cl(r)}, ${cl(g)}, ${cl(b)})`;
+  }
+
+  // ─── Rendu ──────────────────────────────────────────────────────
+  function render() {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    // Fond dégradé subtil pour donner de la profondeur
+    const grad = ctx.createRadialGradient(
+      window.innerWidth / 2, window.innerHeight / 2, 100,
+      window.innerWidth / 2, window.innerHeight / 2, Math.max(window.innerWidth, window.innerHeight)
+    );
+    grad.addColorStop(0, '#252b25');
+    grad.addColorStop(1, '#10130f');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+    // Ordre iso : on dessine row par row, col par col → le bas devant
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        drawTile(c, r);
+      }
+    }
+
+    // Aperçu fantôme du bâtiment à poser
+    if (state.selectedBuilding && state.hoverTile) {
+      drawGhost(state.hoverTile.col, state.hoverTile.row);
+    }
+  }
+
+  function drawTile(col, row) {
+    const tile = state.tiles[row][col];
+    const { x, y } = worldToScreen(col, row);
+    const z = state.camera.zoom;
+    const w = TILE_W * z;
+    const h = TILE_H * z;
+
+    // Couleur de base : herbe pour ground, teintée pour ressource
+    let baseColor = '#3a5a3a';
+    if (tile.type === 'resource') {
+      // Mélange herbe + couleur ressource (plus foncé)
+      baseColor = shade(RESOURCES[tile.resource].color, 0.7);
+    }
+
+    // Surbrillance si on hover dessus en mode placement
+    const isHover = state.hoverTile
+      && state.hoverTile.col === col
+      && state.hoverTile.row === row
+      && state.selectedBuilding;
+
+    // Diamond (losange iso)
+    ctx.beginPath();
+    ctx.moveTo(x, y - h / 2);
+    ctx.lineTo(x + w / 2, y);
+    ctx.lineTo(x, y + h / 2);
+    ctx.lineTo(x - w / 2, y);
+    ctx.closePath();
+    ctx.fillStyle = isHover ? shade(baseColor, 1.4) : baseColor;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Marqueurs de ressource (3 petits ronds)
+    if (tile.type === 'resource' && !tile.building) {
+      ctx.fillStyle = RESOURCES[tile.resource].color;
+      const dotR = Math.max(2, 3 * z);
+      const positions = [
+        { dx: -w * 0.18, dy: 0 },
+        { dx:  w * 0.18, dy: -h * 0.12 },
+        { dx:  0,        dy:  h * 0.18 },
+      ];
+      for (const p of positions) {
+        ctx.beginPath();
+        ctx.arc(x + p.dx, y + p.dy, dotR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Bâtiment posé sur cette tuile
+    if (tile.building) {
+      drawBuilding(tile.building, x, y, false);
+    }
+  }
+
+  // Dessine un bâtiment en faux-3D : un cube vu de dessus en iso.
+  function drawBuilding(building, cx, cy, ghost) {
+    const def = BUILDINGS[building.type];
+    const z = state.camera.zoom;
+    const w = TILE_W * 0.7 * z;
+    const d = TILE_H * 0.7 * z;
+    const h = 26 * z;
+    const alpha = ghost ? 0.55 : 1;
+
+    ctx.globalAlpha = alpha;
+
+    // Face droite (légèrement assombrie)
+    ctx.fillStyle = shade(def.color, 0.75);
+    ctx.beginPath();
+    ctx.moveTo(cx,         cy - h);
+    ctx.lineTo(cx + w / 2, cy - h - d / 2);
+    ctx.lineTo(cx + w / 2, cy - d / 2);
+    ctx.lineTo(cx,         cy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Face gauche (encore plus sombre)
+    ctx.fillStyle = shade(def.color, 0.55);
+    ctx.beginPath();
+    ctx.moveTo(cx,         cy - h);
+    ctx.lineTo(cx - w / 2, cy - h - d / 2);
+    ctx.lineTo(cx - w / 2, cy - d / 2);
+    ctx.lineTo(cx,         cy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Face de dessus (claire)
+    ctx.fillStyle = def.color;
+    ctx.beginPath();
+    ctx.moveTo(cx,         cy - h - d);
+    ctx.lineTo(cx + w / 2, cy - h - d / 2);
+    ctx.lineTo(cx,         cy - h);
+    ctx.lineTo(cx - w / 2, cy - h - d / 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Icône (emoji) sur le toit
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `${Math.max(10, 16 * z)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(def.icon, cx, cy - h - d / 4);
+
+    ctx.globalAlpha = 1;
+  }
+
+  // Aperçu fantôme : on dessine le bâtiment sélectionné en transparent
+  // sur la tuile hover, en rouge si la pose est invalide.
+  function drawGhost(col, row) {
+    const { x, y } = worldToScreen(col, row);
+    const valid = canPlaceBuilding(state.selectedBuilding, col, row).ok;
+
+    // Halo coloré sous la tuile pour indiquer la validité
+    const z = state.camera.zoom;
+    const w = TILE_W * z;
+    const h = TILE_H * z;
+    ctx.beginPath();
+    ctx.moveTo(x, y - h / 2);
+    ctx.lineTo(x + w / 2, y);
+    ctx.lineTo(x, y + h / 2);
+    ctx.lineTo(x - w / 2, y);
+    ctx.closePath();
+    ctx.fillStyle = valid ? 'rgba(143, 191, 125, 0.35)' : 'rgba(255, 107, 107, 0.35)';
+    ctx.fill();
+    ctx.strokeStyle = valid ? '#8fbf7d' : '#ff6b6b';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Bâtiment fantôme par-dessus
+    drawBuilding({ type: state.selectedBuilding }, x, y, true);
+  }
+
+  // ─── Logique de placement ───────────────────────────────────────
+  // Renvoie { ok, reason } — `reason` permet d'afficher un toast.
+  function canPlaceBuilding(type, col, row) {
+    if (col < 0 || col >= GRID_SIZE || row < 0 || row >= GRID_SIZE)
+      return { ok: false, reason: 'Hors carte' };
+    const tile = state.tiles[row][col];
+    if (tile.building) return { ok: false, reason: 'Tuile occupée' };
+    const def = BUILDINGS[type];
+    if (state.credits < def.cost)
+      return { ok: false, reason: `Pas assez de crédits (${def.cost} € requis)` };
+    if (def.requiresResource && tile.type !== 'resource')
+      return { ok: false, reason: 'Doit être posé sur une ressource' };
+    return { ok: true };
+  }
+
+  function placeBuilding(type, col, row) {
+    const check = canPlaceBuilding(type, col, row);
+    if (!check.ok) {
+      showToast(check.reason);
+      return false;
+    }
+    const def = BUILDINGS[type];
+    state.credits -= def.cost;
+    const b = { type, col, row };
+    state.tiles[row][col].building = b;
+    state.buildings.push(b);
+    if (def.storage) state.storageCap += def.storage;
+    updateHUD();
+    return true;
+  }
+
+  // ─── Tick : production + ventes auto ────────────────────────────
+  function tick() {
+    // 1. Calcul de l'énergie disponible
+    const energyTotal = state.energyBase
+      + state.buildings.filter((b) => b.type === 'generateur').length * BUILDINGS.generateur.energyProduction;
+    const energyUsed = state.buildings.filter((b) => b.type === 'extracteur').length * BUILDINGS.extracteur.energyUsage;
+    const hasEnoughEnergy = energyTotal >= energyUsed;
+    state.energyTotal = energyTotal;
+    state.energyUsed = energyUsed;
+
+    // 2. Production : chaque extracteur ajoute X de sa ressource au stock
+    //    (s'il y a assez d'énergie ET que le stock n'a pas atteint la cap).
+    if (hasEnoughEnergy) {
+      for (const b of state.buildings) {
+        if (b.type !== 'extracteur') continue;
+        const tile = state.tiles[b.row][b.col];
+        const r = tile.resource;
+        if (!r) continue;
+        if (state.stocks[r] < state.storageCap) {
+          state.stocks[r] = Math.min(
+            state.storageCap,
+            state.stocks[r] + BUILDINGS.extracteur.productionPerTick
+          );
+        }
+      }
+    }
+
+    // 3. Vente automatique : on écoule jusqu'à SELL_RATE_PER_TICK unités
+    //    de chaque ressource par tick. Si la production dépasse ce taux,
+    //    le stock monte → il faut bâtir des entrepôts pour ne pas saturer.
+    let revenue = 0;
+    for (const r of Object.keys(state.stocks)) {
+      const sellQty = Math.min(state.stocks[r], SELL_RATE_PER_TICK);
+      if (sellQty <= 0) continue;
+      state.stocks[r] -= sellQty;
+      revenue += sellQty * RESOURCES[r].price;
+    }
+    state.credits += revenue;
+    state.revenuePerSec = revenue;
+
+    updateHUD();
+  }
+
+  // ─── Mise à jour du HUD (DOM) ───────────────────────────────────
+  // Beaucoup plus simple que de dessiner l'UI dans le canvas, et le HTML
+  // gère mieux les événements (clic sur les boutons de palette).
+  let lastHudHash = '';
+  function updateHUD() {
+    // Stocks (haut gauche)
+    const stocksEl = document.getElementById('stocks');
+    let html = '';
+    for (const [key, def] of Object.entries(RESOURCES)) {
+      const qty = Math.floor(state.stocks[key]);
+      html += `
+        <div class="stock-row">
+          <span class="stock-icon" style="background:${def.color}"></span>
+          <span class="stock-name">${def.short} · ${def.name}</span>
+          <span class="stock-qty">${qty} / ${state.storageCap}</span>
+        </div>`;
+    }
+    stocksEl.innerHTML = html;
+
+    // Crédits + €/s + énergie (haut droite)
+    document.getElementById('credits-value').textContent = formatCredits(state.credits) + ' €';
+    document.getElementById('credits-rate').textContent =
+      '+ ' + state.revenuePerSec.toFixed(1) + ' €/s';
+    const enEl = document.getElementById('credits-energy');
+    enEl.textContent = `⚡ ${state.energyUsed || 0} / ${state.energyTotal || state.energyBase}`;
+    enEl.classList.toggle('low', (state.energyUsed || 0) > (state.energyTotal || state.energyBase));
+
+    // Palette (bas centre) — mise à jour des `disabled` selon les crédits
+    const palette = document.getElementById('palette');
+    // On ne reconstruit la palette que si le contenu change (ex. changement de sélection)
+    const wantHash = `${state.selectedBuilding}|${state.credits >= BUILDINGS.extracteur.cost}|${state.credits >= BUILDINGS.entrepot.cost}|${state.credits >= BUILDINGS.generateur.cost}`;
+    if (wantHash !== lastHudHash) {
+      let pHtml = '';
+      for (const [key, def] of Object.entries(BUILDINGS)) {
+        const affordable = state.credits >= def.cost;
+        const isActive = state.selectedBuilding === key;
+        pHtml += `
+          <button
+            class="palette-btn ${isActive ? 'active' : ''}"
+            data-building="${key}"
+            ${!affordable ? 'disabled' : ''}
+          >
+            <span class="palette-btn-icon">${def.icon}</span>
+            <span class="palette-btn-name">${def.name}</span>
+            <span class="palette-btn-cost">${def.cost} €</span>
+          </button>`;
+      }
+      palette.innerHTML = pHtml;
+      lastHudHash = wantHash;
+      // Re-bind des clics (innerHTML détruit les listeners précédents)
+      palette.querySelectorAll('.palette-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const k = btn.dataset.building;
+          state.selectedBuilding = state.selectedBuilding === k ? null : k;
+          canvas.classList.toggle('placing', !!state.selectedBuilding);
+          updateHUD();
+        });
+      });
+    }
+  }
+
+  function formatCredits(n) {
+    // Sépare les milliers par un espace insécable (style FR)
+    return Math.floor(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+
+  // ─── Toast (message d'erreur éphémère) ──────────────────────────
+  let toastTimer = null;
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+
+  // ─── Inputs souris ──────────────────────────────────────────────
+  canvas.addEventListener('mousedown', (e) => {
+    state.mouse.x = e.clientX;
+    state.mouse.y = e.clientY;
+    state.dragging = true;
+    state.dragMoved = false;
+    state.dragStart = { x: e.clientX, y: e.clientY, camX: state.camera.x, camY: state.camera.y };
+    canvas.classList.add('grabbing');
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    state.mouse.x = e.clientX;
+    state.mouse.y = e.clientY;
+    if (state.dragging) {
+      const dx = e.clientX - state.dragStart.x;
+      const dy = e.clientY - state.dragStart.y;
+      // Si on bouge plus de 4px, on considère qu'on est en train de drag
+      if (Math.abs(dx) + Math.abs(dy) > 4) state.dragMoved = true;
+      state.camera.x = state.dragStart.camX + dx;
+      state.camera.y = state.dragStart.camY + dy;
+    }
+    // Met à jour la tuile sous la souris (pour hover et ghost preview)
+    state.hoverTile = screenToTile(e.clientX, e.clientY);
+  });
+
+  canvas.addEventListener('mouseup', (e) => {
+    canvas.classList.remove('grabbing');
+    if (!state.dragging) return;
+    state.dragging = false;
+    // Si pas de drag réel et on a un bâtiment sélectionné → on tente de poser
+    if (!state.dragMoved && state.selectedBuilding && state.hoverTile) {
+      placeBuilding(state.selectedBuilding, state.hoverTile.col, state.hoverTile.row);
+    }
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    state.dragging = false;
+    state.hoverTile = null;
+    canvas.classList.remove('grabbing');
+  });
+
+  // Zoom à la molette, centré sur le curseur (sensation Satisfactory)
+  canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const oldZoom = state.camera.zoom;
+    const delta = -Math.sign(e.deltaY) * 0.1;
+    const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, oldZoom + delta));
+    if (newZoom === oldZoom) return;
+    // Zoom autour du point souris : on ajuste l'offset pour que la position
+    // sous le curseur reste la même après changement de zoom.
+    const ratio = newZoom / oldZoom;
+    state.camera.x = e.clientX - (e.clientX - state.camera.x) * ratio;
+    state.camera.y = e.clientY - (e.clientY - state.camera.y) * ratio;
+    state.camera.zoom = newZoom;
+  }, { passive: false });
+
+  // Inputs clavier : flèches pour pan, Échap pour annuler la sélection
+  document.addEventListener('keydown', (e) => {
+    const step = 30;
+    if (e.key === 'ArrowUp')    { state.camera.y += step; e.preventDefault(); }
+    if (e.key === 'ArrowDown')  { state.camera.y -= step; e.preventDefault(); }
+    if (e.key === 'ArrowLeft')  { state.camera.x += step; e.preventDefault(); }
+    if (e.key === 'ArrowRight') { state.camera.x -= step; e.preventDefault(); }
+    if (e.key === 'Escape') {
+      state.selectedBuilding = null;
+      canvas.classList.remove('placing');
+      updateHUD();
+    }
+  });
+
+  // Clic sur le bouton recherche : placeholder pour l'instant
+  document.getElementById('research-btn').addEventListener('click', () => {
+    showToast('Panneau Recherches — bientôt disponible');
+  });
+
+  // Empêche le menu contextuel sur clic droit (réservé pour usage futur)
+  canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // ─── Boucle principale ──────────────────────────────────────────
+  function loop() {
+    render();
+    requestAnimationFrame(loop);
+  }
+
+  // ─── Démarrage ──────────────────────────────────────────────────
+  generateGrid();
+  centerCamera();
+  updateHUD();
+  loop();
+  setInterval(tick, TICK_MS);
+
+  // Petit log dev pour vérifier le bon démarrage
+  console.log('[Iron & Co] Démarré — grille', GRID_SIZE + '×' + GRID_SIZE,
+    '— ressources placées :',
+    state.tiles.flat().filter((t) => t.type === 'resource').length);
+  </script>
+</body>
 </html>
