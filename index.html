@@ -277,6 +277,26 @@
       overflow-y: auto;
       display: flex; flex-direction: column; gap: 12px;
     }
+    /* Footer du modal Recherches — héberge l'action destructive (reset).
+       Volontairement caché ici plutôt que dans le HUD principal pour éviter
+       un clic accidentel. */
+    .research-footer {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex; justify-content: center;
+    }
+    .research-reset {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid rgba(255, 107, 107, 0.4);
+      border-radius: 8px;
+      color: #ff9d9d;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .research-reset:hover { background: rgba(255, 107, 107, 0.12); color: #ffb6b6; }
     .research-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -424,6 +444,11 @@
         <button class="research-close" id="research-close" aria-label="Fermer">×</button>
       </header>
       <div class="research-list" id="research-list"></div>
+      <footer class="research-footer">
+        <button class="research-reset" id="reset-btn" title="Effacer la sauvegarde et recommencer">
+          🔄 Réinitialiser la partie
+        </button>
+      </footer>
     </div>
   </div>
 
@@ -1124,6 +1149,9 @@
     state.credits += revenue;
 
     updateHUD();
+    // Sauvegarde auto à chaque tick (1 Hz). LocalStorage est synchrone
+    // mais reste rapide sur un payload de cette taille (< 5 ko).
+    saveGame();
   }
 
   // Avance d'un tick le cycle d'un bâtiment à recette. `b.progress` (en ms)
@@ -1555,11 +1583,84 @@
 
   document.getElementById('research-btn').addEventListener('click', openResearchModal);
   document.getElementById('research-close').addEventListener('click', closeResearchModal);
+  document.getElementById('reset-btn').addEventListener('click', resetGame);
   // Clic sur le backdrop (mais pas sur le panel) ferme le modal
   researchModal.querySelector('.research-backdrop').addEventListener('click', closeResearchModal);
 
   // Empêche le menu contextuel sur clic droit (réservé pour usage futur)
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // ─── Persistence (localStorage) ─────────────────────────────────
+  // Sauvegarde automatique à chaque tick (1 Hz) — pas plus rapide,
+  // localStorage est synchrone et bloquant. Au refresh de la page,
+  // si une sauvegarde valide existe on la restaure ; sinon nouvelle partie.
+  // Schéma versionné pour pouvoir migrer/casser proprement plus tard.
+  const SAVE_KEY = 'iron-co-save-v1';
+  const SAVE_VERSION = 1;
+
+  function saveGame() {
+    try {
+      const payload = {
+        v: SAVE_VERSION,
+        credits: state.credits,
+        stocks: state.stocks,
+        storageCap: state.storageCap,
+        research: { unlocked: [...(state.research.unlocked || [])] },
+        camera: { x: state.camera.x, y: state.camera.y, zoom: state.camera.zoom },
+        // On sérialise les tuiles avec leur bâtiment éventuel — `state.buildings`
+        // sera reconstruit au load à partir de ces références (single source of truth).
+        tiles: state.tiles.map((row) => row.map((t) => ({
+          type: t.type,
+          resource: t.resource,
+          building: t.building ? {
+            type: t.building.type,
+            col: t.building.col,
+            row: t.building.row,
+            progress: t.building.progress || 0,
+          } : null,
+        }))),
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+      return true;
+    } catch (e) {
+      console.warn('[Iron & Co] échec sauvegarde:', e);
+      return false;
+    }
+  }
+
+  function loadGame() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      if (!data || data.v !== SAVE_VERSION) return false;
+      state.credits = data.credits ?? 200;
+      // Merge avec tous les keys de RESOURCES pour gérer l'ajout de
+      // nouvelles ressources entre 2 versions (lingot/piece initialisés à 0).
+      state.stocks = { fer: 0, cuivre: 0, charbon: 0, lingot: 0, piece: 0, ...(data.stocks || {}) };
+      state.storageCap = data.storageCap ?? 50;
+      state.research = data.research || { unlocked: [] };
+      state.camera = data.camera || { x: 0, y: 0, zoom: 1 };
+      state.tiles = data.tiles;
+      // Reconstruction de state.buildings depuis tiles.
+      state.buildings = [];
+      for (const row of state.tiles) {
+        for (const tile of row) {
+          if (tile.building) state.buildings.push(tile.building);
+        }
+      }
+      return true;
+    } catch (e) {
+      console.warn('[Iron & Co] échec chargement:', e);
+      return false;
+    }
+  }
+
+  function resetGame() {
+    if (!confirm('Effacer la sauvegarde et recommencer une nouvelle partie ?')) return;
+    try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+    location.reload();
+  }
 
   // ─── Boucle principale ──────────────────────────────────────────
   function loop() {
@@ -1568,14 +1669,20 @@
   }
 
   // ─── Démarrage ──────────────────────────────────────────────────
-  generateGrid();
-  centerCamera();
+  // Tentative de restauration ; sinon nouvelle partie procédurale.
+  const loaded = loadGame();
+  if (!loaded) {
+    generateGrid();
+    centerCamera();
+  }
   updateHUD();
   loop();
   setInterval(tick, TICK_MS);
+  // Toast de bienvenue / confirmation de chargement (non bloquant)
+  setTimeout(() => showToast(loaded ? '✓ Partie chargée' : 'Bienvenue ! Pose ton premier extracteur ⛏️'), 200);
 
-  // Petit log dev pour vérifier le bon démarrage
-  console.log('[Iron & Co] Démarré — grille', GRID_SIZE + '×' + GRID_SIZE,
+  console.log('[Iron & Co]', loaded ? 'Save chargée' : 'Nouvelle partie',
+    '— grille', GRID_SIZE + '×' + GRID_SIZE,
     '— ressources placées :',
     state.tiles.flat().filter((t) => t.type === 'resource').length);
   </script>
