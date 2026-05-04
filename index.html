@@ -482,21 +482,25 @@
     }
 
     /* ─── Affordance de scroll horizontal sur la palette ───────────
-       Sur mobile la palette déborde mais le scroll-x est invisible.
-       Un dégradé sur les bords suggère "il y en a plus à scroller". */
-    .palette {
-      mask-image: linear-gradient(90deg,
-        transparent 0,
-        #000 20px,
-        #000 calc(100% - 20px),
-        transparent 100%
-      );
-      -webkit-mask-image: linear-gradient(90deg,
-        transparent 0,
-        #000 20px,
-        #000 calc(100% - 20px),
-        transparent 100%
-      );
+       Sur mobile la palette déborde et le scroll-x est invisible :
+       on fade les bords pour suggérer "il y a plus à voir". Sur desktop
+       large où la palette ne déborde pas, on ne l'applique pas — sinon
+       les boutons d'extrémité seraient fadés sans raison. */
+    @media (max-width: 720px) {
+      .palette {
+        mask-image: linear-gradient(90deg,
+          transparent 0,
+          #000 20px,
+          #000 calc(100% - 20px),
+          transparent 100%
+        );
+        -webkit-mask-image: linear-gradient(90deg,
+          transparent 0,
+          #000 20px,
+          #000 calc(100% - 20px),
+          transparent 100%
+        );
+      }
     }
 
     /* ─── Compaction écrans étroits (iPhone SE 375 px) ─────────────
