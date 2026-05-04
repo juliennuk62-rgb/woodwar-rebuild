@@ -562,6 +562,10 @@
     dragMoved: false,         // pour distinguer un clic d'un drag
     // Mode construction
     selectedBuilding: null,   // ex: 'extracteur' ou null
+    // Nombres flottants spawn par les bâtiments productifs : feedback
+    // visuel "tycoon" classique (Cookie Clicker / AdVenture Capitalist).
+    // Volatile — pas sauvegardé.
+    floaters: [],
   };
 
   // ─── Canvas + contexte ──────────────────────────────────────────
@@ -682,6 +686,9 @@
     if (state.selectedBuilding && state.hoverTile) {
       drawGhost(state.hoverTile.col, state.hoverTile.row);
     }
+
+    // Floaters au-dessus de tout (les "+€X" qui montent des bâtiments)
+    drawFloaters();
   }
 
   function drawTile(col, row) {
@@ -963,6 +970,64 @@
     }
   }
 
+  // ─── Floating numbers (feedback visuel des productions) ─────────
+  // Chaque bâtiment qui produit spawn un petit "+€X" qui monte et fade.
+  // Donne au joueur un retour immédiat et "vivant" sur ce que sa base
+  // génère — sans ça, regarder l'argent monter dans le HUD est plat.
+  const FLOATER_LIFETIME_MS = 1100;
+  const FLOATER_RISE_PX = 28;
+
+  function spawnFloater(col, row, text, color) {
+    state.floaters.push({
+      col, row, text, color,
+      spawnedAt: performance.now(),
+      // Petit jitter horizontal pour que des floaters simultanés du même
+      // bâtiment ne se superposent pas pixel-perfect.
+      jitterX: (Math.random() - 0.5) * 16,
+    });
+    // Cap dur — sur de très grandes bases on évite que le rendu
+    // s'écroule sous des centaines de floaters simultanés.
+    if (state.floaters.length > 80) state.floaters.shift();
+  }
+
+  function drawFloaters() {
+    const now = performance.now();
+    // Filtre les expirés en place.
+    let writeIdx = 0;
+    for (let i = 0; i < state.floaters.length; i++) {
+      if (now - state.floaters[i].spawnedAt < FLOATER_LIFETIME_MS) {
+        state.floaters[writeIdx++] = state.floaters[i];
+      }
+    }
+    state.floaters.length = writeIdx;
+
+    const z = state.camera.zoom;
+    ctx.save();
+    ctx.font = `bold ${Math.max(11, 14 * z)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+    ctx.shadowBlur = 4;
+
+    for (const f of state.floaters) {
+      const age = now - f.spawnedAt;
+      const t = age / FLOATER_LIFETIME_MS; // 0..1
+      // Easing : monte vite au début, ralentit. Fade rapide en fin.
+      const opacity = t < 0.85 ? 1 : (1 - (t - 0.85) / 0.15);
+      const offsetY = -Math.pow(t, 0.7) * FLOATER_RISE_PX * z;
+
+      const { x, y } = worldToScreen(f.col, f.row);
+      // Au-dessus du toit du bâtiment (h=26z, d/2=11.2z, +marge)
+      const py = y - 50 * z + offsetY;
+      const px = x + f.jitterX * z;
+
+      ctx.globalAlpha = opacity;
+      ctx.fillStyle = f.color;
+      ctx.fillText(f.text, px, py);
+    }
+    ctx.restore();
+  }
+
   // Aperçu fantôme : on dessine le bâtiment sélectionné en transparent
   // sur la tuile hover, en rouge si la pose est invalide.
   function drawGhost(col, row) {
@@ -1130,6 +1195,8 @@
           const r = state.tiles[b.row][b.col].resource;
           if (r && state.stocks[r] < state.storageCap) {
             state.stocks[r] = Math.min(state.storageCap, state.stocks[r] + def.productionPerTick);
+            // Floater "+€X" qui matérialise visuellement la production
+            spawnFloater(b.col, b.row, '+' + RESOURCES[r].price + '€', '#b6e8a3');
           }
         } else if (def.recipe) {
           runRecipeTick(b, def.recipe);
@@ -1171,6 +1238,9 @@
         state.storageCap,
         state.stocks[recipe.output] + recipe.qty
       );
+      // Floater doré pour les cycles de recette — plus gros gain, couleur
+      // qui se distingue des extracteurs (vert).
+      spawnFloater(b.col, b.row, '+' + (RESOURCES[recipe.output].price * recipe.qty) + '€', '#ffd166');
       b.progress = 0;
     }
 
