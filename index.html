@@ -685,6 +685,10 @@
     state.dragging = true;
     state.dragMoved = false;
     state.dragStart = { x, y, camX: state.camera.x, camY: state.camera.y };
+    // Important pour le tactile : on n'a pas de "mousemove" continu pour
+    // garder hoverTile à jour. Sans ça, un tap sans mouvement utiliserait
+    // la position du tap précédent → bâtiment posé au mauvais endroit.
+    state.hoverTile = screenToTile(x, y);
     canvas.classList.add('grabbing');
   }
 
@@ -743,7 +747,6 @@
   // ─── Tactile ─────
   // Un doigt = pan (équivalent souris). Deux doigts = pinch-zoom.
   let pinchPrev = null;     // { dist, cx, cy } pendant un pinch en cours
-  let touchStartedAt = 0;   // pour distinguer un tap court d'un drag
 
   function getPinchData(touches) {
     const t1 = touches[0], t2 = touches[1];
@@ -759,7 +762,6 @@
   canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
     if (e.touches.length === 1) {
-      touchStartedAt = Date.now();
       const t = e.touches[0];
       pointerDown(t.clientX, t.clientY);
     } else if (e.touches.length === 2) {
