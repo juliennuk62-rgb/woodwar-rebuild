@@ -357,6 +357,7 @@
       display: flex; justify-content: space-between; align-items: center;
       padding: 16px 20px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;          /* sticky : ne se rétrécit jamais avec la liste */
     }
     .research-header h2 {
       font-size: 18px; font-weight: 700; color: #c084fc;
@@ -375,6 +376,8 @@
     .research-list {
       padding: 16px;
       overflow-y: auto;
+      flex: 1 1 auto;          /* prend l'espace restant entre header/footer */
+      min-height: 0;           /* nécessaire pour que overflow-y fonctionne en flex column */
       display: flex; flex-direction: column; gap: 12px;
     }
     /* Footer du modal Recherches — héberge l'action destructive (reset).
@@ -384,6 +387,7 @@
       padding: 12px 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.06);
       display: flex; justify-content: center;
+      flex-shrink: 0;          /* sticky : reste collé en bas même si la liste scrolle */
     }
     .research-reset {
       padding: 8px 16px;
@@ -721,7 +725,9 @@
       info: 'Fer+Charbon → Lingot · 2s · 2⚡',
     },
     assembleur: {
-      name: 'Assembleur', icon: '⚙️', cost: 400, color: '#7e6dff',
+      // Bronze chaud — cohérent avec la palette industrielle "vert/brun/or"
+      // au lieu du violet précédent qui détonnait (audit 10 agents).
+      name: 'Assembleur', icon: '⚙️', cost: 400, color: '#b89060',
       energyUsage: 3, locked: true,
       recipe: { input: { lingot: 2, cuivre: 1 }, output: 'piece', qty: 1, cycleMs: 3000 },
       info: '2 Lingot+Cuivre → Pièce · 3s · 3⚡',
@@ -772,6 +778,9 @@
     // visuel "tycoon" classique (Cookie Clicker / AdVenture Capitalist).
     // Volatile — pas sauvegardé.
     floaters: [],
+    // "Fantômes" de bâtiments en train de disparaître après une démolition.
+    // Maintenus 280 ms le temps de jouer l'animation (scale down + fade).
+    demolishGhosts: [],
   };
 
   // ─── Canvas + contexte ──────────────────────────────────────────
@@ -893,8 +902,77 @@
       drawGhost(state.hoverTile.col, state.hoverTile.row);
     }
 
+    // Bâtiments en train de disparaître (animation de démolition)
+    drawDemolishGhosts();
+
     // Floaters au-dessus de tout (les "+€X" qui montent des bâtiments)
     drawFloaters();
+  }
+
+  // Dessine les fantômes de démolition : bâtiments retirés mais qu'on
+  // continue d'afficher pendant ~280 ms en scale down + fade pour
+  // la cohérence visuelle (sinon le bâtiment disparaît brutalement).
+  function drawDemolishGhosts() {
+    const now = performance.now();
+    const DEMOLISH_MS = 280;
+    // Filtre en place
+    let writeIdx = 0;
+    for (let i = 0; i < state.demolishGhosts.length; i++) {
+      if (now - state.demolishGhosts[i].demolishedAt < DEMOLISH_MS) {
+        state.demolishGhosts[writeIdx++] = state.demolishGhosts[i];
+      }
+    }
+    state.demolishGhosts.length = writeIdx;
+
+    for (const g of state.demolishGhosts) {
+      const t = (now - g.demolishedAt) / DEMOLISH_MS;
+      // Easing in : commence taille pleine, rétrécit accélérant
+      const scale = 1 - Math.pow(t, 1.6);
+      const opacity = 1 - t;
+      const { x, y } = worldToScreen(g.col, g.row);
+      // Réutilise drawBuilding avec un objet temporaire qui simule le scale
+      // via placedAt lointain (équivalent à pop terminé) — on triche en
+      // injectant le scale directement.
+      ctx.save();
+      ctx.globalAlpha = opacity;
+      // Petit hack : on construit un building virtuel avec scale forcé via
+      // placedAt manipulé. drawBuilding lit performance.now() - placedAt
+      // pour calculer son scale, donc on calcule un placedAt fictif qui
+      // donne le bon ease. Plus simple : on duplique brièvement le calcul.
+      const z = state.camera.zoom * scale;
+      const w = TILE_W * 0.7 * z;
+      const d = TILE_H * 0.7 * z;
+      const h = 26 * z;
+      const def = BUILDINGS[g.type];
+      // Face droite
+      ctx.fillStyle = shade(def.color, 0.75);
+      ctx.beginPath();
+      ctx.moveTo(x,         y - h);
+      ctx.lineTo(x + w / 2, y - h - d / 2);
+      ctx.lineTo(x + w / 2, y - d / 2);
+      ctx.lineTo(x,         y);
+      ctx.closePath();
+      ctx.fill();
+      // Face gauche
+      ctx.fillStyle = shade(def.color, 0.55);
+      ctx.beginPath();
+      ctx.moveTo(x,         y - h);
+      ctx.lineTo(x - w / 2, y - h - d / 2);
+      ctx.lineTo(x - w / 2, y - d / 2);
+      ctx.lineTo(x,         y);
+      ctx.closePath();
+      ctx.fill();
+      // Toit
+      ctx.fillStyle = def.color;
+      ctx.beginPath();
+      ctx.moveTo(x,         y - h - d);
+      ctx.lineTo(x + w / 2, y - h - d / 2);
+      ctx.lineTo(x,         y - h);
+      ctx.lineTo(x - w / 2, y - h - d / 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   function drawTile(col, row) {
@@ -1066,10 +1144,26 @@
   function drawBuilding(building, cx, cy, ghost) {
     const def = BUILDINGS[building.type];
     const z = state.camera.zoom;
-    const w = TILE_W * 0.7 * z;
-    const d = TILE_H * 0.7 * z;
-    const h = 26 * z;
     const alpha = ghost ? 0.55 : 1;
+
+    // Animation "pop" à la pose : scale de 0.4 → 1 en ~280 ms avec easing
+    // back-out (overshoot léger) — feedback tactile satisfaisant.
+    let popScale = 1;
+    if (!ghost && building.placedAt) {
+      const POP_MS = 280;
+      const age = performance.now() - building.placedAt;
+      if (age < POP_MS) {
+        const t = age / POP_MS;
+        const ease = 1 + 2.7 * Math.pow(t - 1, 3) + 1.7 * Math.pow(t - 1, 2);
+        popScale = 0.4 + 0.6 * ease;
+      } else {
+        delete building.placedAt; // cycle fini, on libère
+      }
+    }
+    const ez = z * popScale; // "effective z" qui inclut le scale du pop
+    const w = TILE_W * 0.7 * ez;
+    const d = TILE_H * 0.7 * ez;
+    const h = 26 * ez;
 
     ctx.globalAlpha = alpha;
 
@@ -1110,7 +1204,7 @@
 
     // Détails distinctifs par type — dessinés au-dessus du toit pour
     // qu'on identifie le bâtiment d'un coup d'œil sans emoji.
-    drawBuildingDetails(building.type, cx, cy, w, d, h, z);
+    drawBuildingDetails(building.type, cx, cy, w, d, h, ez);
 
     // Barre de progression au-dessus des bâtiments à recette.
     // Toujours affichée (sauf ghost preview) :
@@ -1413,7 +1507,7 @@
     }
     const def = BUILDINGS[type];
     state.credits -= def.cost;
-    const b = { type, col, row };
+    const b = { type, col, row, placedAt: performance.now() };
     state.tiles[row][col].building = b;
     state.buildings.push(b);
     if (def.storage) state.storageCap += def.storage;
@@ -1441,6 +1535,8 @@
     if (def.storage) state.storageCap = Math.max(50, state.storageCap - def.storage);
     tile.building = null;
     state.buildings = state.buildings.filter((x) => x !== b);
+    // Push un fantôme pour l'animation de disparition (scale down + fade)
+    state.demolishGhosts.push({ type: b.type, col, row, demolishedAt: performance.now() });
     // Floater vert "+€X" pour matérialiser le refund
     spawnFloater(col, row, '+' + refund + '€', '#b6e8a3');
     showToast(`✓ Démoli — ${refund} € remboursés`);
