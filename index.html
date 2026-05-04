@@ -1911,25 +1911,41 @@
     const effectiveCycleMs = recipe.cycleMs * boosts.cycleMult;
     const cap = getEffectiveStorageCap();
 
-    // Cycle terminé en attente d'écoulement → on tente de livrer l'output
-    if (b.progress >= effectiveCycleMs) {
-      if (state.stocks[recipe.output] >= cap) return; // bloqué
-      state.stocks[recipe.output] = Math.min(cap, state.stocks[recipe.output] + recipe.qty);
-      spawnFloater(b.col, b.row, '+' + (RESOURCES[recipe.output].price * recipe.qty) + '€', '#ffd166');
-      b.progress = 0;
-    }
+    // Le tick avance le progress de TICK_MS. Plusieurs cycles peuvent être
+    // complétés en un seul tick si effectiveCycleMs < TICK_MS (boost massif).
+    // Surtout, on CONSERVE le surplus (progress -= effectiveCycleMs au lieu
+    // de = 0) — sinon une recherche qui réduit le cycle de 2000 à 1400 ms ne
+    // changeait rien parce que le progress passait quand même par 1000ms/tick
+    // et perdait 600 ms à chaque reset à 0. Le boost cycles_rapides est
+    // maintenant réellement effectif.
+    b.progress += TICK_MS;
 
-    // Démarrage d'un nouveau cycle → on vérifie + on consomme les inputs
-    if (b.progress === 0) {
-      for (const [r, n] of Object.entries(recipe.input)) {
-        if ((state.stocks[r] ?? 0) < n) return; // input manquant → on attend
+    // Inputs/outputs sont consommés/produits en même temps à la fin de chaque
+    // cycle. Sémantique simplifiée vs l'ancien "consume at start" qui ne se
+    // combinait pas avec les cycles multiples.
+    while (b.progress >= effectiveCycleMs) {
+      if (state.stocks[recipe.output] >= cap) {
+        // Output plein → on clamp progress pour ne pas accumuler ad vitam
+        b.progress = effectiveCycleMs;
+        return;
       }
+      // Tous les inputs présents ?
+      let hasInputs = true;
+      for (const [r, n] of Object.entries(recipe.input)) {
+        if ((state.stocks[r] ?? 0) < n) { hasInputs = false; break; }
+      }
+      if (!hasInputs) {
+        b.progress = effectiveCycleMs;
+        return;
+      }
+      // Consume + produce
       for (const [r, n] of Object.entries(recipe.input)) {
         state.stocks[r] -= n;
       }
+      state.stocks[recipe.output] = Math.min(cap, state.stocks[recipe.output] + recipe.qty);
+      spawnFloater(b.col, b.row, '+' + (RESOURCES[recipe.output].price * recipe.qty) + '€', '#ffd166');
+      b.progress -= effectiveCycleMs;
     }
-
-    b.progress += TICK_MS;
   }
 
   // ─── Helpers de découverte / déblocage ──────────────────────────
