@@ -629,7 +629,8 @@
     // Marqueurs de ressource (3 petits ronds)
     if (tile.type === 'resource' && !tile.building) {
       ctx.fillStyle = RESOURCES[tile.resource].color;
-      const dotR = Math.max(2, 3 * z);
+      // Plus visibles à zoom bas — sinon les gisements deviennent invisibles
+      const dotR = Math.max(3, 4.5 * z);
       const positions = [
         { dx: -w * 0.18, dy: 0 },
         { dx:  w * 0.18, dy: -h * 0.12 },
@@ -700,6 +701,24 @@
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(def.icon, cx, cy - h - d / 4);
+
+    // Barre de progression au-dessus des bâtiments à recette en cours.
+    // Donne un feedback visuel du cycle (sinon une fonderie qui tourne
+    // semble inerte). Pas affichée pour le ghost preview.
+    if (!ghost && def.recipe && building.progress > 0) {
+      const ratio = Math.min(1, building.progress / def.recipe.cycleMs);
+      const barW = w * 0.85;
+      const barH = Math.max(3, 4 * z);
+      const barX = cx - barW / 2;
+      const barY = cy - h - d - barH - 2 * z;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+      ctx.fillRect(barX, barY, barW, barH);
+      ctx.fillStyle = '#8fbf7d';
+      ctx.fillRect(barX, barY, barW * ratio, barH);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(barX, barY, barW, barH);
+    }
 
     ctx.globalAlpha = 1;
   }
@@ -1081,8 +1100,12 @@
   });
 
   // ─── Clavier ────
-  // Flèches = pan ; Échap = annule la sélection ; 1/2/3 = sélectionne un bâtiment
-  const buildingKeys = ['extracteur', 'entrepot', 'generateur'];
+  // Flèches = pan ; Échap = annule la sélection ; 1..N = sélectionne un bâtiment
+  // dans l'ordre courant de la palette (recalculé à chaque pression pour
+  // tenir compte des recherches qui débloquent de nouveaux bâtiments).
+  function currentBuildingKeys() {
+    return Object.keys(BUILDINGS).filter(isBuildingAvailable);
+  }
   document.addEventListener('keydown', (e) => {
     const step = 30;
     if (e.key === 'ArrowUp')    { state.camera.y += step; e.preventDefault(); }
@@ -1099,10 +1122,11 @@
         updateHUD();
       }
     }
-    // Raccourcis 1/2/3 pour la palette (toggle)
+    // Raccourcis 1..N pour la palette (toggle), dérivés des bâtiments dispos
     const idx = parseInt(e.key, 10) - 1;
-    if (idx >= 0 && idx < buildingKeys.length) {
-      const k = buildingKeys[idx];
+    const keys = currentBuildingKeys();
+    if (idx >= 0 && idx < keys.length) {
+      const k = keys[idx];
       state.selectedBuilding = state.selectedBuilding === k ? null : k;
       canvas.classList.toggle('placing', !!state.selectedBuilding);
       updateHUD();
