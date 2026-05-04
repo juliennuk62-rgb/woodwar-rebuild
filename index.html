@@ -23,6 +23,9 @@
       inset: 0;
       display: block;
       cursor: grab;
+      /* Empêche les gestes par défaut du navigateur (scroll, pinch-zoom de
+         page) — on gère tout nous-mêmes pour le tactile. */
+      touch-action: none;
     }
     #game.grabbing { cursor: grabbing; }
     #game.placing  { cursor: crosshair; }
@@ -185,7 +188,7 @@
   </div>
 
   <div class="hud help-text">
-    Clic gauche + glisser : déplacer la caméra • Molette : zoom • Flèches : déplacer • Échap : annuler la sélection
+    Glisser : déplacer la caméra • Molette / pincer : zoom • Touches 1·2·3 : choisir un bâtiment • Échap : annuler
   </div>
 
   <div class="hud palette" id="palette"></div>
@@ -671,63 +674,136 @@
     toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
   }
 
-  // ─── Inputs souris ──────────────────────────────────────────────
-  canvas.addEventListener('mousedown', (e) => {
-    state.mouse.x = e.clientX;
-    state.mouse.y = e.clientY;
+  // ─── Inputs unifiés (souris + tactile) ──────────────────────────
+  // Toute la logique passe par 3 fonctions agnostiques (pointer*) qui
+  // sont appelées indifféremment depuis les events souris ou tactiles.
+  // Pour le tactile, on gère en plus le pinch-zoom à 2 doigts.
+
+  function pointerDown(x, y) {
+    state.mouse.x = x;
+    state.mouse.y = y;
     state.dragging = true;
     state.dragMoved = false;
-    state.dragStart = { x: e.clientX, y: e.clientY, camX: state.camera.x, camY: state.camera.y };
+    state.dragStart = { x, y, camX: state.camera.x, camY: state.camera.y };
     canvas.classList.add('grabbing');
-  });
+  }
 
-  canvas.addEventListener('mousemove', (e) => {
-    state.mouse.x = e.clientX;
-    state.mouse.y = e.clientY;
+  function pointerMove(x, y) {
+    state.mouse.x = x;
+    state.mouse.y = y;
     if (state.dragging) {
-      const dx = e.clientX - state.dragStart.x;
-      const dy = e.clientY - state.dragStart.y;
-      // Si on bouge plus de 4px, on considère qu'on est en train de drag
-      if (Math.abs(dx) + Math.abs(dy) > 4) state.dragMoved = true;
+      const dx = x - state.dragStart.x;
+      const dy = y - state.dragStart.y;
+      // Au-delà de 6 px on considère qu'on est en train de drag (un peu
+      // plus généreux qu'à la souris pour éviter les faux drags tactiles).
+      if (Math.abs(dx) + Math.abs(dy) > 6) state.dragMoved = true;
       state.camera.x = state.dragStart.camX + dx;
       state.camera.y = state.dragStart.camY + dy;
     }
-    // Met à jour la tuile sous la souris (pour hover et ghost preview)
-    state.hoverTile = screenToTile(e.clientX, e.clientY);
-  });
+    state.hoverTile = screenToTile(x, y);
+  }
 
-  canvas.addEventListener('mouseup', (e) => {
+  function pointerUp() {
     canvas.classList.remove('grabbing');
     if (!state.dragging) return;
     state.dragging = false;
-    // Si pas de drag réel et on a un bâtiment sélectionné → on tente de poser
+    // Tap/clic court avec un bâtiment sélectionné → on tente de poser
     if (!state.dragMoved && state.selectedBuilding && state.hoverTile) {
       placeBuilding(state.selectedBuilding, state.hoverTile.col, state.hoverTile.row);
     }
-  });
+  }
 
+  // Applique un zoom centré sur le point (cx, cy) — utilisé par la molette
+  // ET par le pinch tactile.
+  function applyZoom(newZoom, cx, cy) {
+    const oldZoom = state.camera.zoom;
+    newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+    if (newZoom === oldZoom) return;
+    const ratio = newZoom / oldZoom;
+    state.camera.x = cx - (cx - state.camera.x) * ratio;
+    state.camera.y = cy - (cy - state.camera.y) * ratio;
+    state.camera.zoom = newZoom;
+  }
+
+  // ─── Souris ─────
+  canvas.addEventListener('mousedown',  (e) => pointerDown(e.clientX, e.clientY));
+  canvas.addEventListener('mousemove',  (e) => pointerMove(e.clientX, e.clientY));
+  canvas.addEventListener('mouseup',    () => pointerUp());
   canvas.addEventListener('mouseleave', () => {
     state.dragging = false;
     state.hoverTile = null;
     canvas.classList.remove('grabbing');
   });
-
-  // Zoom à la molette, centré sur le curseur (sensation Satisfactory)
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
-    const oldZoom = state.camera.zoom;
     const delta = -Math.sign(e.deltaY) * 0.1;
-    const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, oldZoom + delta));
-    if (newZoom === oldZoom) return;
-    // Zoom autour du point souris : on ajuste l'offset pour que la position
-    // sous le curseur reste la même après changement de zoom.
-    const ratio = newZoom / oldZoom;
-    state.camera.x = e.clientX - (e.clientX - state.camera.x) * ratio;
-    state.camera.y = e.clientY - (e.clientY - state.camera.y) * ratio;
-    state.camera.zoom = newZoom;
+    applyZoom(state.camera.zoom + delta, e.clientX, e.clientY);
   }, { passive: false });
 
-  // Inputs clavier : flèches pour pan, Échap pour annuler la sélection
+  // ─── Tactile ─────
+  // Un doigt = pan (équivalent souris). Deux doigts = pinch-zoom.
+  let pinchPrev = null;     // { dist, cx, cy } pendant un pinch en cours
+  let touchStartedAt = 0;   // pour distinguer un tap court d'un drag
+
+  function getPinchData(touches) {
+    const t1 = touches[0], t2 = touches[1];
+    const dx = t2.clientX - t1.clientX;
+    const dy = t2.clientY - t1.clientY;
+    return {
+      dist: Math.sqrt(dx * dx + dy * dy),
+      cx: (t1.clientX + t2.clientX) / 2,
+      cy: (t1.clientY + t2.clientY) / 2,
+    };
+  }
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      touchStartedAt = Date.now();
+      const t = e.touches[0];
+      pointerDown(t.clientX, t.clientY);
+    } else if (e.touches.length === 2) {
+      // Démarrage d'un pinch — on annule le drag éventuel
+      state.dragging = false;
+      pinchPrev = getPinchData(e.touches);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (e.touches.length === 1 && !pinchPrev) {
+      const t = e.touches[0];
+      pointerMove(t.clientX, t.clientY);
+    } else if (e.touches.length === 2) {
+      const cur = getPinchData(e.touches);
+      if (pinchPrev) {
+        const ratio = cur.dist / pinchPrev.dist;
+        applyZoom(state.camera.zoom * ratio, cur.cx, cur.cy);
+      }
+      pinchPrev = cur;
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', (e) => {
+    if (e.touches.length === 0) {
+      pinchPrev = null;
+      pointerUp();
+    } else if (e.touches.length === 1) {
+      // Fin du pinch mais un doigt reste : on évite que ça déclenche un tap
+      pinchPrev = null;
+      state.dragging = false;
+    }
+  });
+
+  canvas.addEventListener('touchcancel', () => {
+    pinchPrev = null;
+    state.dragging = false;
+    canvas.classList.remove('grabbing');
+  });
+
+  // ─── Clavier ────
+  // Flèches = pan ; Échap = annule la sélection ; 1/2/3 = sélectionne un bâtiment
+  const buildingKeys = ['extracteur', 'entrepot', 'generateur'];
   document.addEventListener('keydown', (e) => {
     const step = 30;
     if (e.key === 'ArrowUp')    { state.camera.y += step; e.preventDefault(); }
@@ -737,6 +813,14 @@
     if (e.key === 'Escape') {
       state.selectedBuilding = null;
       canvas.classList.remove('placing');
+      updateHUD();
+    }
+    // Raccourcis 1/2/3 pour la palette (toggle)
+    const idx = parseInt(e.key, 10) - 1;
+    if (idx >= 0 && idx < buildingKeys.length) {
+      const k = buildingKeys[idx];
+      state.selectedBuilding = state.selectedBuilding === k ? null : k;
+      canvas.classList.toggle('placing', !!state.selectedBuilding);
       updateHUD();
     }
   });
