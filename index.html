@@ -1634,6 +1634,10 @@
       if (!raw) return false;
       const data = JSON.parse(raw);
       if (!data || data.v !== SAVE_VERSION) return false;
+      // Garde-fou : on refuse une save dont la grille est mal formée plutôt
+      // que de planter le rendu. Le caller fallback sur generateGrid().
+      if (!Array.isArray(data.tiles) || data.tiles.length !== GRID_SIZE) return false;
+      if (!data.tiles.every((r) => Array.isArray(r) && r.length === GRID_SIZE)) return false;
       state.credits = data.credits ?? 200;
       // Merge avec tous les keys de RESOURCES pour gérer l'ajout de
       // nouvelles ressources entre 2 versions (lingot/piece initialisés à 0).
