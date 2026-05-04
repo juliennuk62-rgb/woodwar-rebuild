@@ -1102,6 +1102,8 @@
     state.tiles[row][col].building = b;
     state.buildings.push(b);
     if (def.storage) state.storageCap += def.storage;
+    // Floater rouge "-€X" pour matérialiser la dépense
+    spawnFloater(col, row, '-' + def.cost + '€', '#ff9d9d');
     updateHUD();
     return true;
   }
@@ -1124,6 +1126,8 @@
     if (def.storage) state.storageCap = Math.max(50, state.storageCap - def.storage);
     tile.building = null;
     state.buildings = state.buildings.filter((x) => x !== b);
+    // Floater vert "+€X" pour matérialiser le refund
+    spawnFloater(col, row, '+' + refund + '€', '#b6e8a3');
     showToast(`✓ Démoli — ${refund} € remboursés`);
     updateHUD();
     return true;
