@@ -52,16 +52,19 @@
     }
     body { user-select: none; }
 
-    /* Canvas plein écran sous le HUD */
-    #game {
+    /* Canvas plein écran sous le HUD — partagé par les 2 canvas (2D et 3D) */
+    #game, #game3d {
       position: absolute;
       inset: 0;
       display: block;
       cursor: grab;
+      width: 100%;
+      height: 100%;
       /* Empêche les gestes par défaut du navigateur (scroll, pinch-zoom de
          page) — on gère tout nous-mêmes pour le tactile. */
       touch-action: none;
     }
+    #game[hidden], #game3d[hidden] { display: none; }
     #game.grabbing    { cursor: grabbing; }
     #game.placing     { cursor: crosshair; }
     #game.demolishing { cursor: not-allowed; }
@@ -3143,18 +3146,33 @@
     // Bascule entre canvas 2D et canvas 3D selon le skin
     const c2d = document.getElementById('game');
     const c3d = document.getElementById('game3d');
+    const minimapEl = document.getElementById('minimap');
     if (theme === '3d') {
       if (typeof THREE === 'undefined') {
-        showToast('Three.js pas encore chargé — réessaie dans une seconde');
-        applyTheme('classic');
+        // Retry tant que la lib n'est pas chargée — le defer fait que ça
+        // peut prendre quelques 100 ms après le DOMContentLoaded.
+        showToast('Chargement de la 3D…');
+        const start = Date.now();
+        const retryId = setInterval(() => {
+          if (typeof THREE !== 'undefined') {
+            clearInterval(retryId);
+            applyTheme('3d');
+          } else if (Date.now() - start > 8000) {
+            clearInterval(retryId);
+            showToast('⚠ Three.js indisponible — repasse en Classique');
+            applyTheme('classic');
+          }
+        }, 200);
         return;
       }
       c2d.hidden = true;
       c3d.hidden = false;
+      if (minimapEl) minimapEl.hidden = true; // pas pertinente en 3D
       init3D();
     } else {
       c2d.hidden = false;
       c3d.hidden = true;
+      if (minimapEl) minimapEl.hidden = false;
     }
   }
   function setupThemeTabs() {
