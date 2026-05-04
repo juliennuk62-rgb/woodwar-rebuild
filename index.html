@@ -27,8 +27,9 @@
          page) — on gère tout nous-mêmes pour le tactile. */
       touch-action: none;
     }
-    #game.grabbing { cursor: grabbing; }
-    #game.placing  { cursor: crosshair; }
+    #game.grabbing    { cursor: grabbing; }
+    #game.placing     { cursor: crosshair; }
+    #game.demolishing { cursor: not-allowed; }
 
     /* ─── HUD : couches en overlay ─────────────────────────────── */
     .hud {
@@ -164,6 +165,13 @@
     .palette-btn-icon { font-size: 22px; line-height: 1; }
     .palette-btn-name { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
     .palette-btn-cost { font-size: 11px; color: #ffd166; font-family: 'Consolas', monospace; }
+    /* Démolir : style rouge pour bien le distinguer des bâtiments à poser */
+    .palette-btn-demolish .palette-btn-cost { color: #b6e8a3; }
+    .palette-btn-demolish.active {
+      background: rgba(255, 107, 107, 0.18);
+      border-color: #ff6b6b;
+    }
+    .palette-btn-demolish.active .palette-btn-name { color: #ff9d9d; }
 
     /* Bouton recherches (bas droite) */
     .research-btn {
@@ -333,6 +341,32 @@
       font-style: italic;
     }
 
+    /* Bannière énergie insuffisante — bien visible, bloque visuellement
+       le centre supérieur de l'écran tant que le problème n'est pas résolu. */
+    .energy-warning {
+      top: calc(16px + env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: calc(100vw - 32px);
+      background: linear-gradient(180deg, rgba(255, 107, 107, 0.92) 0%, rgba(180, 60, 60, 0.92) 100%);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 8px 24px -4px rgba(255, 107, 107, 0.4);
+      animation: energy-warn-pulse 1.6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .energy-warning[hidden] { display: none; }
+    @keyframes energy-warn-pulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50%      { transform: translateX(-50%) scale(1.03); }
+    }
+
     /* Toast info (bas, après une action invalide par ex.) */
     .toast {
       top: 80px; left: 50%;
@@ -369,6 +403,13 @@
   <div class="hud palette" id="palette"></div>
 
   <button class="hud research-btn" id="research-btn" title="Ouvrir le panneau Recherches">🔬 Recherches</button>
+
+  <!-- Avertissement plein-écran quand l'énergie est insuffisante.
+       Sans ça, le joueur peut spammer des extracteurs sans s'en rendre compte
+       et finir bloqué (rien ne tourne, plus assez de crédits pour un générateur). -->
+  <div class="hud energy-warning" id="energy-warning" hidden>
+    ⚠ Énergie insuffisante — construis des Générateurs ou démolis des bâtiments
+  </div>
 
   <!-- Modal Recherches (caché par défaut). Construit dynamiquement par updateResearchModal(). -->
   <div class="research-modal" id="research-modal" hidden>
@@ -754,12 +795,29 @@
   // sur la tuile hover, en rouge si la pose est invalide.
   function drawGhost(col, row) {
     const { x, y } = worldToScreen(col, row);
-    const valid = canPlaceBuilding(state.selectedBuilding, col, row).ok;
-
-    // Halo coloré sous la tuile pour indiquer la validité
     const z = state.camera.zoom;
     const w = TILE_W * z;
     const h = TILE_H * z;
+
+    // Mode démolir : tuile rouge si occupée, gris/désactivé sinon.
+    if (state.selectedBuilding === '__demolish__') {
+      const target = state.tiles[row][col].building;
+      ctx.beginPath();
+      ctx.moveTo(x, y - h / 2);
+      ctx.lineTo(x + w / 2, y);
+      ctx.lineTo(x, y + h / 2);
+      ctx.lineTo(x - w / 2, y);
+      ctx.closePath();
+      ctx.fillStyle = target ? 'rgba(255, 107, 107, 0.45)' : 'rgba(120, 120, 120, 0.18)';
+      ctx.fill();
+      ctx.strokeStyle = target ? '#ff6b6b' : 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      return;
+    }
+
+    // Mode placement : halo + ghost preview.
+    const valid = canPlaceBuilding(state.selectedBuilding, col, row).ok;
     ctx.beginPath();
     ctx.moveTo(x, y - h / 2);
     ctx.lineTo(x + w / 2, y);
@@ -772,7 +830,6 @@
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Bâtiment fantôme par-dessus
     drawBuilding({ type: state.selectedBuilding }, x, y, true);
   }
 
@@ -807,44 +864,78 @@
     return true;
   }
 
-  // ─── Tick : production + ventes auto ────────────────────────────
+  // Démolit le bâtiment de la tuile et rembourse 50% du coût initial.
+  // Indispensable pour sortir d'un état "trop d'extracteurs, pas assez
+  // d'énergie, plus assez de crédits pour un générateur".
+  const REFUND_RATIO = 0.5;
+  function demolishAt(col, row) {
+    if (col < 0 || col >= GRID_SIZE || row < 0 || row >= GRID_SIZE) return false;
+    const tile = state.tiles[row][col];
+    if (!tile.building) {
+      showToast('Pas de bâtiment ici');
+      return false;
+    }
+    const b = tile.building;
+    const def = BUILDINGS[b.type];
+    const refund = Math.floor(def.cost * REFUND_RATIO);
+    state.credits += refund;
+    if (def.storage) state.storageCap = Math.max(50, state.storageCap - def.storage);
+    tile.building = null;
+    state.buildings = state.buildings.filter((x) => x !== b);
+    showToast(`✓ Démoli — ${refund} € remboursés`);
+    updateHUD();
+    return true;
+  }
+
   // ─── Stats live (énergie + taux de production par ressource) ───
   // Calculé à la demande pour que tout réagisse instantanément aux
-  // placements/destructions de bâtiments — pas besoin d'attendre le
-  // prochain tick pour voir le HUD bouger.
+  // placements/destructions de bâtiments. Les taux affichés reflètent
+  // la production RÉELLE, pas théorique : un extracteur sans énergie
+  // ou sur un stock plein contribue 0.
   function computeStats() {
+    // Passe 1 : énergie globale (indépendante de la production)
     let energyTotal = state.energyBase;
     let energyUsed = 0;
-    const rates = {};
-    for (const k of Object.keys(RESOURCES)) rates[k] = 0;
-
     for (const b of state.buildings) {
       const def = BUILDINGS[b.type];
       if (def.energyProduction) energyTotal += def.energyProduction;
       if (def.energyUsage)      energyUsed  += def.energyUsage;
+    }
+    const hasEnergy = energyTotal >= energyUsed;
 
-      if (b.type === 'extracteur') {
-        const r = state.tiles[b.row][b.col].resource;
-        if (r) rates[r] += def.productionPerTick; // unités/tick == unités/s (TICK_MS=1000)
-      } else if (def.recipe) {
-        const sec = def.recipe.cycleMs / 1000;
-        rates[def.recipe.output] += def.recipe.qty / sec;
-        for (const [r, n] of Object.entries(def.recipe.input)) {
-          rates[r] -= n / sec;
+    // Passe 2 : taux par ressource. On n'additionne que ce qui produit
+    // ou consomme RÉELLEMENT (pas l'idéal théorique).
+    const rates = {};
+    for (const k of Object.keys(RESOURCES)) rates[k] = 0;
+
+    if (hasEnergy) {
+      for (const b of state.buildings) {
+        const def = BUILDINGS[b.type];
+        if (b.type === 'extracteur') {
+          const r = state.tiles[b.row][b.col].resource;
+          // Stock plein → l'extracteur tourne pour rien, on ne compte pas.
+          if (r && state.stocks[r] < state.storageCap) {
+            rates[r] += def.productionPerTick;
+          }
+        } else if (def.recipe) {
+          // Recettes : on garde le calcul théorique (cycle moyen) car
+          // la simulation par bâtiment est trop coûteuse à reproduire ici.
+          // Acceptable parce que le joueur voit la barre de progression
+          // sur chaque bâtiment pour distinguer actif/idle.
+          const sec = def.recipe.cycleMs / 1000;
+          rates[def.recipe.output] += def.recipe.qty / sec;
+          for (const [r, n] of Object.entries(def.recipe.input)) {
+            rates[r] -= n / sec;
+          }
         }
       }
     }
 
-    const hasEnergy = energyTotal >= energyUsed;
-    // Revenu attendu = somme(min(taux net, sell rate) × prix). Approximation
-    // des actuals — assume la chaîne est alimentée. Si bloquée par énergie
-    // ou input manquant, ce sera optimiste mais reste informatif.
+    // Revenu attendu : produit × prix, capé par la vente auto.
     let expectedRevenue = 0;
-    if (hasEnergy) {
-      for (const [r, rate] of Object.entries(rates)) {
-        const sellable = Math.max(0, Math.min(rate, SELL_RATE_PER_TICK));
-        expectedRevenue += sellable * RESOURCES[r].price;
-      }
+    for (const [r, rate] of Object.entries(rates)) {
+      const sellable = Math.max(0, Math.min(rate, SELL_RATE_PER_TICK));
+      expectedRevenue += sellable * RESOURCES[r].price;
     }
 
     return { energyTotal, energyUsed, hasEnergy, rates, expectedRevenue };
@@ -982,11 +1073,19 @@
     enEl.textContent = `⚡ ${stats.energyUsed} / ${stats.energyTotal}`;
     enEl.classList.toggle('low', !stats.hasEnergy);
 
+    // Bannière "énergie insuffisante" — visible seulement si on a déjà
+    // posé au moins un bâtiment qui en consomme (sinon dès le départ
+    // elle serait affichée alors qu'aucun problème réel n'existe).
+    document.getElementById('energy-warning').hidden = stats.hasEnergy || stats.energyUsed === 0;
+
     // Palette (bas centre). Hash inclut l'affordability ET l'état de
     // déblocage de chaque bâtiment pour rebuild quand une recherche entre.
     const palette = document.getElementById('palette');
     const availables = Object.keys(BUILDINGS).filter(isBuildingAvailable);
-    const hashParts = [state.selectedBuilding, availables.join(',')];
+    // Hash inclut la sélection courante (incluant le mode __demolish__),
+    // les bâtiments dispos, et l'affordability de chacun → rebuild dès
+    // qu'un de ces critères change.
+    const hashParts = [state.selectedBuilding || '', availables.join(',')];
     for (const k of availables) hashParts.push(state.credits >= BUILDINGS[k].cost ? '1' : '0');
     const wantHash = hashParts.join('|');
     if (wantHash !== lastHudHash) {
@@ -1006,6 +1105,17 @@
             <span class="palette-btn-cost">${def.cost} €</span>
           </button>`;
       }
+      // Bouton "Démolir" — toujours présent, gratuit, refund 50% du coût.
+      const demolishActive = state.selectedBuilding === '__demolish__';
+      pHtml += `
+        <button
+          class="palette-btn palette-btn-demolish ${demolishActive ? 'active' : ''}"
+          data-building="__demolish__"
+        >
+          <span class="palette-btn-icon">🗑️</span>
+          <span class="palette-btn-name">Démolir</span>
+          <span class="palette-btn-cost">+ 50%</span>
+        </button>`;
       palette.innerHTML = pHtml;
       lastHudHash = wantHash;
       palette.querySelectorAll('.palette-btn').forEach((btn) => {
@@ -1013,6 +1123,7 @@
           const k = btn.dataset.building;
           state.selectedBuilding = state.selectedBuilding === k ? null : k;
           canvas.classList.toggle('placing', !!state.selectedBuilding);
+          canvas.classList.toggle('demolishing', state.selectedBuilding === '__demolish__');
           updateHUD();
         });
       });
@@ -1081,9 +1192,13 @@
     canvas.classList.remove('grabbing');
     if (!state.dragging) return;
     state.dragging = false;
-    // Tap/clic court avec un bâtiment sélectionné → on tente de poser
-    if (!state.dragMoved && state.selectedBuilding && state.hoverTile) {
-      placeBuilding(state.selectedBuilding, state.hoverTile.col, state.hoverTile.row);
+    // Tap/clic court → action selon le mode actif
+    if (!state.dragMoved && state.hoverTile) {
+      if (state.selectedBuilding === '__demolish__') {
+        demolishAt(state.hoverTile.col, state.hoverTile.row);
+      } else if (state.selectedBuilding) {
+        placeBuilding(state.selectedBuilding, state.hoverTile.col, state.hoverTile.row);
+      }
     }
   }
 
