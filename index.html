@@ -707,6 +707,36 @@
     .speed-btn[data-speed="2"].active { background: var(--primary); }
     .speed-btn[data-speed="4"].active { background: var(--danger); color: #fff; }
 
+    /* Contrôles caméra 3D — visibles uniquement quand state.theme === '3d'.
+       Position : à droite des speed controls, en haut à gauche. */
+    .cam3d-ctrl {
+      top: calc(56px + env(safe-area-inset-top));
+      left: calc(16px + env(safe-area-inset-left));
+      display: flex;
+      gap: 2px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 4px;
+      pointer-events: auto;
+    }
+    .cam3d-ctrl[hidden] { display: none; }
+    .cam3d-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      min-width: 32px;
+      transition: background 0.12s, color 0.12s;
+    }
+    .cam3d-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+    .cam3d-btn:active { background: rgba(255, 209, 102, 0.2); }
+
     /* Mini-map */
     .minimap {
       bottom: calc(110px + env(safe-area-inset-bottom));
@@ -893,6 +923,16 @@
        payer le coût Three.js si le user reste en 2D. -->
   <canvas id="game3d" hidden></canvas>
 
+  <!-- Contrôles spécifiques à la 3D : rotation + tilt. Visibles uniquement
+       en mode 3D. -->
+  <div class="hud cam3d-ctrl" id="cam3d-ctrl" hidden aria-label="Contrôles caméra 3D">
+    <button class="cam3d-btn" data-cam="rot-l" title="Tourner à gauche">↺</button>
+    <button class="cam3d-btn" data-cam="rot-r" title="Tourner à droite">↻</button>
+    <button class="cam3d-btn" data-cam="tilt-u" title="Pencher vers le haut">▲</button>
+    <button class="cam3d-btn" data-cam="tilt-d" title="Pencher vers le bas">▼</button>
+    <button class="cam3d-btn" data-cam="reset" title="Vue par défaut">⌂</button>
+  </div>
+
   <!-- HUD : tout en HTML overlay pour rester simple à mettre à jour -->
   <div class="hud stocks" id="stocks"></div>
 
@@ -983,7 +1023,16 @@
   // ─── Constantes de jeu ──────────────────────────────────────────
   const TILE_W = 64;          // largeur d'une tuile iso (px)
   const TILE_H = 32;          // hauteur d'une tuile iso (ratio 2:1)
-  const GRID_SIZE = 20;       // nb tuiles par côté
+  // Taille de grille — démarre à 20×20, augmente à chaque prestige selon la
+  // formule `gridSizeFor(totalPrestiges)`. Persisté dans la save sous
+  // state.gridSize. C'est `let` (pas `const`) parce qu'on doit pouvoir
+  // l'augmenter dynamiquement quand un prestige est effectué.
+  let GRID_SIZE = 20;
+  function gridSizeFor(prestiges) {
+    // Min 20, +8 par prestige, plafond 60. Donne : 20, 28, 36, 44, 52, 60.
+    // Cap pour éviter d'avoir 100×100 = 10 000 tuiles qui font ramer.
+    return Math.max(20, Math.min(60, 20 + 8 * (prestiges || 0)));
+  }
   const RESOURCE_DENSITY = 0.18; // ~18% des tuiles ont une ressource
   const TICK_MS = 1000;       // boucle de production = 1 tick/s
   // Taux de vente auto par ressource. Volontairement bas : avec 1 extracteur
@@ -2672,6 +2721,7 @@
         camera: { x: state.camera.x, y: state.camera.y, zoom: state.camera.zoom },
         theme: state.theme || 'classic',
         speedMul: state.speedMul == null ? 1 : state.speedMul,
+        gridSize: GRID_SIZE,
         // On sérialise les tuiles avec leur bâtiment éventuel — `state.buildings`
         // sera reconstruit au load à partir de ces références (single source of truth).
         tiles: state.tiles.map((row) => row.map((t) => ({
@@ -2708,8 +2758,13 @@
       if (!data || data.v !== SAVE_VERSION) return false;
       // Garde-fou : on refuse une save dont la grille est mal formée plutôt
       // que de planter le rendu. Le caller fallback sur generateGrid().
-      if (!Array.isArray(data.tiles) || data.tiles.length !== GRID_SIZE) return false;
-      if (!data.tiles.every((r) => Array.isArray(r) && r.length === GRID_SIZE)) return false;
+      // Validation tiles : on accepte n'importe quelle taille carrée entre
+       // 20 et 60 (les paliers de gridSizeFor). On adopte la taille de la save.
+      if (!Array.isArray(data.tiles)) return false;
+      const savedGrid = data.tiles.length;
+      if (savedGrid < 20 || savedGrid > 60) return false;
+      if (!data.tiles.every((r) => Array.isArray(r) && r.length === savedGrid)) return false;
+      GRID_SIZE = savedGrid; // adopte la taille du save
       state.credits = data.credits ?? 200;
       // Merge avec tous les keys de RESOURCES pour gérer l'ajout de
       // nouvelles ressources entre 2 versions (lingot/piece initialisés à 0).
@@ -2787,7 +2842,10 @@
     state.demolishGhosts = [];
     state.selectedBuilding = null;
     state.prestige = { tokens: newTokens, lifetimeEarned: 0, totalPrestiges: newTotal };
-    // Régénère une carte neuve (placement aléatoire des ressources)
+    // Map plus grande à chaque prestige (jusqu'au plafond) — récompense
+    // visuelle et stratégique : plus de tuiles pour exploiter, plus de
+    // cuivre rare disponible.
+    GRID_SIZE = gridSizeFor(newTotal);
     generateGrid();
     centerCamera();
     canvas.classList.remove('placing', 'demolishing');
@@ -2829,11 +2887,14 @@
     dragging3d: false,
     dragStart3d: null,
     dragMoved3d: false,
-    cameraOffset: null, // pivot world position — on pan en bougeant ça
+    cameraOffset: null,    // pivot world position (XZ) — on pan en bougeant ça
     cameraZoom: 1,
+    cameraYaw: Math.PI / 4,   // rotation horizontale (autour de l'axe Y) — démarre à 45° pour un angle iso
+    cameraPitch: Math.PI / 6, // inclinaison verticale — 30° par défaut (iso)
   };
   const TILE_3D = 1;       // taille d'une tuile en unités world
-  const GRID_HALF = (GRID_SIZE - 1) / 2;
+  // GRID_HALF est dérivé dynamiquement dans tilePosition3D — pas const
+  // car GRID_SIZE peut changer après un prestige.
 
   function init3D() {
     if (three.inited) {
@@ -2853,7 +2914,8 @@
     three.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     three.scene = new THREE.Scene();
     three.scene.background = new THREE.Color(0x1a1f1a);
-    three.scene.fog = new THREE.Fog(0x1a1f1a, 25, 60);
+    // Pas de fog : visibilité uniforme partout (demande user). Les bâtiments
+    // distants restent aussi nets que ceux du centre.
 
     // Caméra orthographique avec angle iso classique (rotation Y -45° puis X 30°)
     three.camera = new THREE.OrthographicCamera(-12, 12, 8, -8, 0.1, 200);
@@ -2917,19 +2979,28 @@
   }
 
   function updateCamera3D() {
-    // Position de la caméra : iso classique avec offset de pan
+    // Caméra orbitale autour de cameraOffset selon yaw + pitch.
+    // yaw  = rotation horizontale (autour de Y). 0 = face nord.
+    // pitch = inclinaison (clampée 0.05..1.45 rad pour éviter passer sous le sol
+    // ou regarder droit en haut, qui cassent l'orthographique).
     const isoDist = 30;
+    const py = Math.max(0.05, Math.min(1.45, three.cameraPitch));
+    const cosP = Math.cos(py), sinP = Math.sin(py);
+    const cosY = Math.cos(three.cameraYaw), sinY = Math.sin(three.cameraYaw);
+    // Position sphérique → cartésienne autour de l'offset
     three.camera.position.set(
-      three.cameraOffset.x + isoDist,
-      three.cameraOffset.y + isoDist,
-      three.cameraOffset.z + isoDist
+      three.cameraOffset.x + isoDist * cosP * sinY,
+      three.cameraOffset.y + isoDist * sinP,
+      three.cameraOffset.z + isoDist * cosP * cosY
     );
     three.camera.lookAt(three.cameraOffset);
   }
 
   function tilePosition3D(col, row) {
-    // Centre la grille à l'origine — col/row 0..GRID-1 → world -GRID_HALF..+GRID_HALF
-    return { x: (col - GRID_HALF) * TILE_3D, z: (row - GRID_HALF) * TILE_3D };
+    // Centre la grille à l'origine — col/row 0..GRID-1 → world -GRID_HALF..+GRID_HALF.
+    // Recalculé à chaque appel pour suivre les changements de GRID_SIZE post-prestige.
+    const half = (GRID_SIZE - 1) / 2;
+    return { x: (col - half) * TILE_3D, z: (row - half) * TILE_3D };
   }
 
   function rebuildTiles3D() {
@@ -3193,12 +3264,39 @@
       c2d.hidden = true;
       c3d.hidden = false;
       if (minimapEl) minimapEl.hidden = true;
+      const camCtrl = document.getElementById('cam3d-ctrl');
+      if (camCtrl) camCtrl.hidden = false;
       init3D();
     } else {
       c2d.hidden = false;
       c3d.hidden = true;
       if (minimapEl) minimapEl.hidden = false;
+      const camCtrl = document.getElementById('cam3d-ctrl');
+      if (camCtrl) camCtrl.hidden = true;
     }
+  }
+
+  // Bind des contrôles caméra 3D — appelé une seule fois au boot.
+  function setupCam3DCtrl() {
+    document.querySelectorAll('.cam3d-btn').forEach((b) => {
+      b.addEventListener('click', () => {
+        const action = b.dataset.cam;
+        if (!three.inited) return;
+        const ROT_STEP = Math.PI / 12; // 15°
+        if (action === 'rot-l')  three.cameraYaw -= ROT_STEP;
+        if (action === 'rot-r')  three.cameraYaw += ROT_STEP;
+        if (action === 'tilt-u') three.cameraPitch = Math.min(1.45, three.cameraPitch + ROT_STEP);
+        if (action === 'tilt-d') three.cameraPitch = Math.max(0.05, three.cameraPitch - ROT_STEP);
+        if (action === 'reset') {
+          three.cameraYaw = Math.PI / 4;
+          three.cameraPitch = Math.PI / 6;
+          three.cameraOffset.set(0, 0, 0);
+          three.cameraZoom = 1;
+          resize3D();
+        }
+        updateCamera3D();
+      });
+    });
   }
 
   // Charge Three.js depuis un CDN de secours (jsdelivr) si le tag <script>
@@ -3375,6 +3473,7 @@
   applySpeed(state.speedMul == null ? 1 : state.speedMul);
   setupThemeTabs();
   setupSpeedCtrl();
+  setupCam3DCtrl();
   setupMinimap();
   setupBuildingTooltip();
   updateHUD();
