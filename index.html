@@ -4,10 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Iron & Co — Tycoon isométrique</title>
-  <!-- Three.js depuis CDN. Utilisé uniquement par le skin "3D Beta" ;
-       les skins Classique et Néo n'en ont pas besoin et continuent à
-       fonctionner même si le CDN est down. -->
-  <script src="https://unpkg.com/three@0.166.1/build/three.min.js" defer></script>
+  <!-- Three.js depuis CDN — utilisé uniquement par le skin "3D Beta".
+       Version 0.149.0 : C'EST LA DERNIÈRE qui distribue le build UMD
+       `three.min.js` accessible via un simple <script src>. À partir
+       de r156 (oct 2023), Three.js ne shipte plus que des ES modules,
+       qui nécessitent un <script type="module"> + importmap.
+       Si on upgrade un jour, prévoir le passage en module. -->
+  <script src="https://unpkg.com/three@0.149.0/build/three.min.js" defer
+          onerror="window._threeLoadError = 'unpkg ' + this.src;"></script>
   <style>
     /* ─── Reset minimal + thème ──────────────────────────────────── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -3178,7 +3182,7 @@
             applyTheme('3d');
           } else if (Date.now() - start > 12000) {
             clearInterval(retryId);
-            showToast('⚠ Three.js indisponible — réseau ou CDN bloqué');
+            showToast('⚠ ' + diagnose3DFailure());
             applyTheme('classic');
           }
         }, 250);
@@ -3202,9 +3206,23 @@
     if (typeof THREE !== 'undefined' || _threeFallbackTried) return;
     _threeFallbackTried = true;
     const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.min.js';
+    // Même version 0.149.0 (dernière UMD) sur jsdelivr en cas d'échec d'unpkg.
+    s.src = 'https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js';
     s.async = true;
+    s.onerror = () => { window._threeLoadError = 'jsdelivr ' + s.src; };
     document.head.appendChild(s);
+  }
+
+  // Surface les erreurs de chargement Three.js dans le toast — sinon le user
+  // n'a aucun moyen de comprendre POURQUOI la 3D ne marche pas.
+  function diagnose3DFailure() {
+    if (window._threeLoadError) {
+      return 'Échec chargement: ' + window._threeLoadError.slice(0, 80);
+    }
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      return 'Hors-ligne — la 3D nécessite une connexion (CDN Three.js)';
+    }
+    return 'CDN bloqué ou réseau lent — réessaie plus tard ou repasse en Classique';
   }
   function setupThemeTabs() {
     document.querySelectorAll('.theme-tab').forEach((btn) => {
