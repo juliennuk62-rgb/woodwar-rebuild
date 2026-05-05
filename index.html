@@ -914,7 +914,6 @@
        de rendu HTML/CSS change. -->
   <nav class="theme-tabs" id="theme-tabs" aria-label="Skin de l'interface">
     <button class="theme-tab" data-theme="classic" aria-pressed="true">▮ Classique</button>
-    <button class="theme-tab" data-theme="neo" aria-pressed="false">▰ Néo</button>
     <button class="theme-tab" data-theme="3d" aria-pressed="false">▼ 3D Beta</button>
   </nav>
 
@@ -1079,7 +1078,7 @@
     extracteur: {
       name: 'Extracteur', icon: '⛏️', cost: 50, color: '#a06848',
       requiresResource: true, energyUsage: 1, productionPerTick: 1,
-      info: 'Sur minerai · vitesse selon ressource · 1⚡',
+      info: 'Sur minerai · clusters bonus · 1⚡',
     },
     entrepot: {
       name: 'Entrepôt',   icon: '📦', cost: 100, color: '#8b6f47',
@@ -2079,6 +2078,27 @@
       storageMult:   u.includes('stockage_massif') ? 2   : 1,
     };
   }
+  // Bonus d'adjacence pour un extracteur : encourage les clusters au lieu
+  // du spam d'extracteurs isolés. +5% par extracteur adjacent (4-cardinal),
+  // +15% par générateur adjacent. Capé à +50% pour éviter l'effet runaway.
+  // Math : un extracteur entouré de 4 autres + 1 générateur diagonal n'aide
+  // pas (on regarde uniquement N/S/E/O), donc max théorique +20% × 4 = +80%
+  // → capé à +50%. Stratégique : l'extracteur idéal est entouré de 3 voisins.
+  function getAdjacencyMultiplier(b) {
+    if (!b || b.type !== 'extracteur') return 1;
+    const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    let bonus = 0;
+    for (const [dr, dc] of dirs) {
+      const nr = b.row + dr, nc = b.col + dc;
+      if (nr < 0 || nr >= GRID_SIZE || nc < 0 || nc >= GRID_SIZE) continue;
+      const adj = state.tiles[nr][nc].building;
+      if (!adj) continue;
+      if (adj.type === 'extracteur')      bonus += 0.05;
+      else if (adj.type === 'generateur') bonus += 0.15;
+    }
+    return Math.min(1.5, 1 + bonus);
+  }
+
   function getEffectiveSellRate() {
     return SELL_RATE_PER_TICK + getResearchBoosts().sellRateBonus;
   }
@@ -2118,7 +2138,8 @@
           // fer rapide (1.0), charbon medium (0.8), cuivre lent (0.6).
           if (r && state.stocks[r] < cap) {
             const tileRate = RESOURCES[r].prodRate ?? 1;
-            rates[r] += def.productionPerTick * tileRate * boosts.extractorMult;
+            const adjMult = getAdjacencyMultiplier(b);
+            rates[r] += def.productionPerTick * tileRate * boosts.extractorMult * adjMult;
           }
         } else if (def.recipe) {
           // Recettes : taux théorique en supposant le cycle alimenté.
@@ -2166,7 +2187,8 @@
           const r = state.tiles[b.row][b.col].resource;
           if (r && state.stocks[r] < cap) {
             const tileRate = RESOURCES[r].prodRate ?? 1;
-            const produced = def.productionPerTick * tileRate * boosts.extractorMult;
+            const adjMult = getAdjacencyMultiplier(b);
+            const produced = def.productionPerTick * tileRate * boosts.extractorMult * adjMult;
             state.stocks[r] = Math.min(cap, state.stocks[r] + produced);
             // Le floater spawn avec proba = prodRate (fer 100%, cuivre 60%)
             // → on voit visuellement que le cuivre extrait moins souvent.
@@ -2789,7 +2811,8 @@
         totalPrestiges: Number(data.prestige?.totalPrestiges) || 0,
       };
       state.camera = data.camera || { x: 0, y: 0, zoom: 1 };
-      state.theme = (data.theme === 'neo' || data.theme === 'classic') ? data.theme : 'classic';
+      // Theme : on accepte 'classic' ou '3d'. 'neo' est déprécié — migré vers 'classic'.
+      state.theme = (data.theme === '3d') ? '3d' : 'classic';
       state.speedMul = [0, 1, 2, 4].includes(data.speedMul) ? data.speedMul : 1;
       state.tiles = data.tiles;
       // Reconstruction de state.buildings depuis tiles.
@@ -3066,12 +3089,31 @@
       chim.castShadow = true;
       three.buildingGroup.add(chim);
     } else if (b.type === 'extracteur') {
-      // Petit derrick triangulaire
-      const tipGeo = new THREE.ConeGeometry(0.12, 0.3, 4);
-      const tipMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.4, metalness: 0.6, emissive: 0xfbbf24, emissiveIntensity: 0.3 });
+      // Modèle plus détaillé style tycoon : pump house en haut, mât central
+      // (derrick), voyant doré au sommet. Bien plus reconnaissable que le
+      // simple cône précédent.
+      const baseY = 0.2 + h;
+      // Pump house — petit box en haut
+      const phGeo = new THREE.BoxGeometry(w * 0.55, 0.18, w * 0.55);
+      const phMat = new THREE.MeshStandardMaterial({ color: 0x5a3a2a, roughness: 0.65, metalness: 0.3 });
+      const ph = new THREE.Mesh(phGeo, phMat);
+      ph.position.set(pos.x, baseY + 0.09, pos.z);
+      ph.castShadow = true;
+      three.buildingGroup.add(ph);
+      // Mât / derrick (cylindre vertical)
+      const mastGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.42, 8);
+      const mastMat = new THREE.MeshStandardMaterial({ color: 0x2a1f1a, metalness: 0.85, roughness: 0.3 });
+      const mast = new THREE.Mesh(mastGeo, mastMat);
+      mast.position.set(pos.x, baseY + 0.18 + 0.21, pos.z);
+      mast.castShadow = true;
+      three.buildingGroup.add(mast);
+      // Voyant doré émissif au sommet
+      const tipGeo = new THREE.ConeGeometry(0.08, 0.16, 6);
+      const tipMat = new THREE.MeshStandardMaterial({
+        color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.6, metalness: 0.4
+      });
       const tip = new THREE.Mesh(tipGeo, tipMat);
-      tip.position.set(pos.x, 0.2 + h + 0.2, pos.z);
-      tip.castShadow = true;
+      tip.position.set(pos.x, baseY + 0.18 + 0.42 + 0.08, pos.z);
       three.buildingGroup.add(tip);
     } else if (b.type === 'generateur') {
       // Antenne avec sphère lumineuse
@@ -3465,9 +3507,13 @@
       if (b.type === 'extracteur') {
         const r = state.tiles[t.row][t.col].resource;
         if (r) {
-          const rate = (RESOURCES[r].prodRate || 1) * getResearchBoosts().extractorMult;
+          const adjMult = getAdjacencyMultiplier(b);
+          const rate = (RESOURCES[r].prodRate || 1) * getResearchBoosts().extractorMult * adjMult;
           html += `<div class="building-tooltip-row is-pos">${RESOURCES[r].name}<span>+${rate.toFixed(2)}/s</span></div>`;
           html += `<div class="building-tooltip-row">Valeur<span>${(rate * RESOURCES[r].price).toFixed(2)} €/s</span></div>`;
+          if (adjMult > 1) {
+            html += `<div class="building-tooltip-row is-pos">Voisinage<span>×${adjMult.toFixed(2)}</span></div>`;
+          }
         }
       }
       if (def.recipe) {
