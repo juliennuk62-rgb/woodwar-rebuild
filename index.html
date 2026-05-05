@@ -3163,25 +3163,27 @@
     const minimapEl = document.getElementById('minimap');
     if (theme === '3d') {
       if (typeof THREE === 'undefined') {
-        // Three.js pas encore chargé — soit le defer prend du temps,
-        // soit le CDN primaire (unpkg) est bloqué/lent. On tente un
-        // fallback (jsdelivr) puis on patiente jusqu'à 12 s.
+        // Three.js pas encore chargé — fallback CDN + retry. Si un
+        // retry est déjà en cours (clic impatient), on l'annule pour
+        // ne pas accumuler des intervals parallèles qui appelleraient
+        // applyTheme('3d') plusieurs fois quand THREE arrive.
+        if (window._threeRetryId) clearInterval(window._threeRetryId);
         showToast('Chargement de la 3D…');
         loadThreeJSFallback();
         const start = Date.now();
-        const retryId = setInterval(() => {
+        window._threeRetryId = setInterval(() => {
           // L'utilisateur a peut-être changé d'avis pendant l'attente
           // (clic sur Classique/Néo) → on annule pour ne pas le forcer
           // de retour en 3D contre sa volonté.
           if (state.theme !== '3d') {
-            clearInterval(retryId);
+            clearInterval(window._threeRetryId); window._threeRetryId = null;
             return;
           }
           if (typeof THREE !== 'undefined') {
-            clearInterval(retryId);
+            clearInterval(window._threeRetryId); window._threeRetryId = null;
             applyTheme('3d');
           } else if (Date.now() - start > 12000) {
-            clearInterval(retryId);
+            clearInterval(window._threeRetryId); window._threeRetryId = null;
             showToast('⚠ ' + diagnose3DFailure());
             applyTheme('classic');
           }
