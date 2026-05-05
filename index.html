@@ -2922,7 +2922,10 @@
     // distants restent aussi nets que ceux du centre.
 
     // Caméra orthographique avec angle iso classique (rotation Y -45° puis X 30°)
-    three.camera = new THREE.OrthographicCamera(-12, 12, 8, -8, 0.1, 200);
+    // Caméra perspective avec un FOV étroit (35°) — donne un look iso
+    // crédible tout en respectant la perspective (les objets distants
+    // rétrécissent quand on tilte/tourne, contrairement à orthographique).
+    three.camera = new THREE.PerspectiveCamera(35, 1, 0.1, 500);
     three.cameraOffset = new THREE.Vector3(0, 0, 0); // pivot
     three.cameraZoom = 1;
     updateCamera3D();
@@ -2977,33 +2980,23 @@
     if (!three.renderer) return;
     const w = window.innerWidth, h = window.innerHeight;
     three.renderer.setSize(w, h, false);
-    const aspect = w / h;
-    // viewSize adapté à la taille de grille pour qu'au zoom 1 la grille
-    // entière soit visible (sinon le joueur doit dézoomer manuellement
-    // après chaque prestige qui agrandit la map).
-    const baseView = Math.max(12, GRID_SIZE * 0.6);
-    const viewSize = baseView / three.cameraZoom;
-    three.camera.left = -viewSize * aspect;
-    three.camera.right = viewSize * aspect;
-    three.camera.top = viewSize;
-    three.camera.bottom = -viewSize;
+    three.camera.aspect = w / h;
     three.camera.updateProjectionMatrix();
   }
 
   function updateCamera3D() {
-    // Caméra orbitale autour de cameraOffset selon yaw + pitch.
-    // yaw  = rotation horizontale (autour de Y). 0 = face nord.
-    // pitch = inclinaison (clampée 0.05..1.45 rad pour éviter passer sous le sol
-    // ou regarder droit en haut, qui cassent l'orthographique).
-    const isoDist = 30;
+    // Caméra orbitale (perspective) autour de cameraOffset selon yaw + pitch.
+    // Distance adaptée à la taille de grille pour cadrer correctement +
+    // au zoom (zoom up = caméra plus proche). FOV 35° donne le look iso.
+    const baseDist = Math.max(20, GRID_SIZE * 1.6);
+    const dist = baseDist / three.cameraZoom;
     const py = Math.max(0.05, Math.min(1.45, three.cameraPitch));
     const cosP = Math.cos(py), sinP = Math.sin(py);
     const cosY = Math.cos(three.cameraYaw), sinY = Math.sin(three.cameraYaw);
-    // Position sphérique → cartésienne autour de l'offset
     three.camera.position.set(
-      three.cameraOffset.x + isoDist * cosP * sinY,
-      three.cameraOffset.y + isoDist * sinP,
-      three.cameraOffset.z + isoDist * cosP * cosY
+      three.cameraOffset.x + dist * cosP * sinY,
+      three.cameraOffset.y + dist * sinP,
+      three.cameraOffset.z + dist * cosP * cosY
     );
     three.camera.lookAt(three.cameraOffset);
   }
@@ -3187,7 +3180,7 @@
       e.preventDefault();
       const delta = -Math.sign(e.deltaY) * 0.1;
       three.cameraZoom = Math.max(0.5, Math.min(2.5, three.cameraZoom + delta));
-      resize3D();
+      updateCamera3D();
     }, { passive: false });
 
     // Tactile basique : 1 doigt = drag/tap, comme la souris
