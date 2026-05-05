@@ -3115,20 +3115,40 @@
     }
 
     c.addEventListener('mousedown', (e) => {
+      // Clic molette (button 1) ou clic droit (button 2) → rotation/tilt
+      // de la caméra. Évite l'autoscroll Chrome avec preventDefault.
+      if (e.button === 1 || e.button === 2) {
+        e.preventDefault();
+        three.rotating3d = true;
+        three.rotStart3d = { x: e.clientX, y: e.clientY,
+          yaw: three.cameraYaw, pitch: three.cameraPitch };
+        return;
+      }
       three.dragging3d = true;
       three.dragMoved3d = false;
       three.dragStart3d = { x: e.clientX, y: e.clientY,
         camX: three.cameraOffset.x, camZ: three.cameraOffset.z };
     });
+    // Désactive le menu contextuel sur le canvas 3D pour permettre
+    // d'utiliser le clic droit pour la rotation aussi.
+    c.addEventListener('contextmenu', (e) => e.preventDefault());
     c.addEventListener('mousemove', (e) => {
       updatePointer(e);
+      // Rotation/tilt en cours via clic molette
+      if (three.rotating3d) {
+        const dx = e.clientX - three.rotStart3d.x;
+        const dy = e.clientY - three.rotStart3d.y;
+        // Sensibilité : 0.005 rad par pixel = ~285° pour traverser 1000 px.
+        three.cameraYaw = three.rotStart3d.yaw + dx * 0.005;
+        three.cameraPitch = Math.max(0.05, Math.min(1.45,
+          three.rotStart3d.pitch - dy * 0.005));
+        updateCamera3D();
+        return;
+      }
       if (three.dragging3d) {
         const dx = e.clientX - three.dragStart3d.x;
         const dy = e.clientY - three.dragStart3d.y;
         if (Math.abs(dx) + Math.abs(dy) > 6) three.dragMoved3d = true;
-        // Pan en world space — la projection iso fait que dy correspond à la
-        // diagonale (col+row) et dx à l'antidiagonale (col-row). Approx : on
-        // bouge la caméra dans le plan XZ proportionnellement.
         const k = 0.025 / three.cameraZoom;
         three.cameraOffset.x = three.dragStart3d.camX - dx * k - dy * k;
         three.cameraOffset.z = three.dragStart3d.camZ + dx * k - dy * k;
@@ -3140,7 +3160,6 @@
         const pos = tilePosition3D(t.col, t.row);
         three.hoverHelper.position.set(pos.x, 0.21, pos.z);
         three.hoverHelper.visible = true;
-        // Couleur selon validité
         const ok = state.selectedBuilding === '__demolish__'
           ? !!state.tiles[t.row][t.col].building
           : canPlaceBuilding(state.selectedBuilding, t.col, t.row).ok;
@@ -3149,7 +3168,8 @@
         three.hoverHelper.visible = false;
       }
     });
-    c.addEventListener('mouseup', () => {
+    c.addEventListener('mouseup', (e) => {
+      if (three.rotating3d) { three.rotating3d = false; return; }
       if (!three.dragging3d) return;
       three.dragging3d = false;
       if (!three.dragMoved3d) {
