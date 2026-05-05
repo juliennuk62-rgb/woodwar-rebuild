@@ -865,6 +865,10 @@
         padding: 8px 12px;
         font-size: 12px;
       }
+      /* Mini-map cachée sur très petit écran : elle se confondait avec
+         la map principale (les 2 vues iso côte à côte). Sur grand écran
+         elle reste utile, sur mobile c'est de la pollution visuelle. */
+      .minimap { display: none; }
     }
   </style>
 </head>
@@ -3155,31 +3159,45 @@
     const minimapEl = document.getElementById('minimap');
     if (theme === '3d') {
       if (typeof THREE === 'undefined') {
-        // Retry tant que la lib n'est pas chargée — le defer fait que ça
-        // peut prendre quelques 100 ms après le DOMContentLoaded.
+        // Three.js pas encore chargé — soit le defer prend du temps,
+        // soit le CDN primaire (unpkg) est bloqué/lent. On tente un
+        // fallback (jsdelivr) puis on patiente jusqu'à 12 s.
         showToast('Chargement de la 3D…');
+        loadThreeJSFallback();
         const start = Date.now();
         const retryId = setInterval(() => {
           if (typeof THREE !== 'undefined') {
             clearInterval(retryId);
             applyTheme('3d');
-          } else if (Date.now() - start > 8000) {
+          } else if (Date.now() - start > 12000) {
             clearInterval(retryId);
-            showToast('⚠ Three.js indisponible — repasse en Classique');
+            showToast('⚠ Three.js indisponible — réseau ou CDN bloqué');
             applyTheme('classic');
           }
-        }, 200);
+        }, 250);
         return;
       }
       c2d.hidden = true;
       c3d.hidden = false;
-      if (minimapEl) minimapEl.hidden = true; // pas pertinente en 3D
+      if (minimapEl) minimapEl.hidden = true;
       init3D();
     } else {
       c2d.hidden = false;
       c3d.hidden = true;
       if (minimapEl) minimapEl.hidden = false;
     }
+  }
+
+  // Charge Three.js depuis un CDN de secours (jsdelivr) si le tag <script>
+  // initial (unpkg) a échoué. Ne fait rien si déjà chargé ou déjà tenté.
+  let _threeFallbackTried = false;
+  function loadThreeJSFallback() {
+    if (typeof THREE !== 'undefined' || _threeFallbackTried) return;
+    _threeFallbackTried = true;
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.min.js';
+    s.async = true;
+    document.head.appendChild(s);
   }
   function setupThemeTabs() {
     document.querySelectorAll('.theme-tab').forEach((btn) => {
