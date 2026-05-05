@@ -2849,8 +2849,12 @@
     generateGrid();
     centerCamera();
     canvas.classList.remove('placing', 'demolishing');
-    // Si on était en mode 3D, sync la scène avec la nouvelle grille.
-    if (state.theme === '3d' && three.inited) rebuildTiles3D();
+    // Si on était en mode 3D, sync la scène avec la nouvelle grille
+    // (taille différente → resize la frustum orthographique aussi).
+    if (state.theme === '3d' && three.inited) {
+      rebuildTiles3D();
+      resize3D();
+    }
     closeResearchModal();
     saveGame();
     updateHUD();
@@ -2923,14 +2927,18 @@
     three.cameraZoom = 1;
     updateCamera3D();
 
-    // Lumière directionnelle (soleil) avec ombres
+    // Lumière directionnelle (soleil) avec ombres. La frustum d'ombre
+    // est dimensionnée pour couvrir toute la grille (jusqu'à 60×60 après
+    // 5 prestiges), sinon les bâtiments distants n'ont pas d'ombre.
     const sun = new THREE.DirectionalLight(0xffffff, 1.2);
     sun.position.set(20, 30, 15);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.camera.left = -20; sun.shadow.camera.right = 20;
-    sun.shadow.camera.top = 20; sun.shadow.camera.bottom = -20;
+    const shadowExtent = 40; // couvre une grille jusqu'à 60×60 + marge
+    sun.shadow.camera.left = -shadowExtent; sun.shadow.camera.right = shadowExtent;
+    sun.shadow.camera.top = shadowExtent; sun.shadow.camera.bottom = -shadowExtent;
     sun.shadow.bias = -0.0005;
+    three.sun = sun;
     three.scene.add(sun);
     three.scene.add(new THREE.AmbientLight(0xffffff, 0.45));
     // Hémisphère pour adoucir les ombres
@@ -2970,7 +2978,11 @@
     const w = window.innerWidth, h = window.innerHeight;
     three.renderer.setSize(w, h, false);
     const aspect = w / h;
-    const viewSize = 12 / three.cameraZoom;
+    // viewSize adapté à la taille de grille pour qu'au zoom 1 la grille
+    // entière soit visible (sinon le joueur doit dézoomer manuellement
+    // après chaque prestige qui agrandit la map).
+    const baseView = Math.max(12, GRID_SIZE * 0.6);
+    const viewSize = baseView / three.cameraZoom;
     three.camera.left = -viewSize * aspect;
     three.camera.right = viewSize * aspect;
     three.camera.top = viewSize;
