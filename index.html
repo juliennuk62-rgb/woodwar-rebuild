@@ -2849,11 +2849,12 @@
     generateGrid();
     centerCamera();
     canvas.classList.remove('placing', 'demolishing');
-    // Si on était en mode 3D, sync la scène avec la nouvelle grille
-    // (taille différente → resize la frustum orthographique aussi).
+    // Si on était en mode 3D, sync la scène avec la nouvelle grille.
+    // updateCamera3D recalcule baseDist en fonction de GRID_SIZE pour
+    // que la caméra perspective cadre la nouvelle map agrandie.
     if (state.theme === '3d' && three.inited) {
       rebuildTiles3D();
-      resize3D();
+      updateCamera3D();
     }
     closeResearchModal();
     saveGame();
