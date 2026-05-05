@@ -3166,6 +3166,13 @@
         loadThreeJSFallback();
         const start = Date.now();
         const retryId = setInterval(() => {
+          // L'utilisateur a peut-être changé d'avis pendant l'attente
+          // (clic sur Classique/Néo) → on annule pour ne pas le forcer
+          // de retour en 3D contre sa volonté.
+          if (state.theme !== '3d') {
+            clearInterval(retryId);
+            return;
+          }
           if (typeof THREE !== 'undefined') {
             clearInterval(retryId);
             applyTheme('3d');
