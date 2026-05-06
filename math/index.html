@@ -787,6 +787,7 @@ function defaultState() {
     xp: 0,
     streak: 0,
     lastDay: null,        // ISO date "YYYY-MM-DD" du dernier exo
+    lastStreakDay: null,  // dernier jour où la streak a été créditée
     exosToday: 0,
     lastTick: Date.now(),
     concepts: Object.fromEntries(CONCEPTS.map(c => [c.id, {
@@ -883,7 +884,8 @@ function onExerciseSolved() {
       return localDateISO(d);
     })();
     // On stocke le dernier jour où la streak a été créditée
-    if (state.lastStreakDay === yesterday || state.lastStreakDay === undefined) {
+    // (== null couvre null et undefined pour les anciens saves)
+    if (state.lastStreakDay === yesterday || state.lastStreakDay == null) {
       state.streak = (state.streak || 0) + 1;
     } else if (state.lastStreakDay !== todayISO()) {
       state.streak = 1;
@@ -1377,7 +1379,7 @@ function refreshTest() {
 
 function setStreak(days) {
   state.streak = days;
-  state.lastStreakDay = days > 0 ? todayISO() : undefined;
+  state.lastStreakDay = days > 0 ? todayISO() : null;
   refreshTest();
   toast(`🔥 Streak forcée à ${days} jour${days > 1 ? 's' : ''} (×${streakMultiplier()})`);
 }
