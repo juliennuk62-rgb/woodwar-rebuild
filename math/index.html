@@ -698,13 +698,16 @@ const CONCEPT_BY_ID = Object.fromEntries(CONCEPTS.map(c => [c.id, c]));
 
 // ─── Paliers / production / coûts (cf. §2 et §9) ─────────────────
 const TIERS = [
-  { name: '—',           prodPerMin: 0,   nextCost: 50,    exReq: 3 },
-  { name: 'Atelier',     prodPerMin: 1,   nextCost: 200,   exReq: 5 },
-  { name: 'Laboratoire', prodPerMin: 5,   nextCost: 800,   exReq: 8 },
-  { name: 'Institut',    prodPerMin: 20,  nextCost: 3000,  exReq: 12 },
-  { name: 'Académie',    prodPerMin: 80,  nextCost: 12000, exReq: 30 },
-  { name: 'Légende',     prodPerMin: 300, nextCost: null,  exReq: null },
+  { name: 'À construire', prodPerMin: 0,   nextCost: 50,    exReq: 3 },
+  { name: 'Atelier',      prodPerMin: 1,   nextCost: 200,   exReq: 5 },
+  { name: 'Laboratoire',  prodPerMin: 5,   nextCost: 800,   exReq: 8 },
+  { name: 'Institut',     prodPerMin: 20,  nextCost: 3000,  exReq: 12 },
+  { name: 'Académie',     prodPerMin: 80,  nextCost: 12000, exReq: 30 },
+  { name: 'Légende',      prodPerMin: 300, nextCost: null,  exReq: null },
 ];
+
+// Récompense de base par exo (cf. §9 : Normal = 15-25T)
+const BASE_REWARD_T = 15;
 
 const MASTERY_LABELS = ['Découvert', 'Pratiqué', 'Maîtrisé', 'Expert', 'Légendaire'];
 const MASTERY_ICONS  = ['🔓', '📚', '✅', '🌟', '💎'];
@@ -881,8 +884,8 @@ function renderCity() {
     prodLine.appendChild(el('span', { class: 'mastery' }, `${sc.exercisesSolved} exos`));
     card.appendChild(prodLine);
 
-    if (next && next.exReq) {
-      const pct = Math.min(100, (sc.exercisesSolved / next.exReq) * 100);
+    if (tierData.exReq) {
+      const pct = Math.min(100, (sc.exercisesSolved / tierData.exReq) * 100);
       const bar = el('div', { class: 'progress-bar' });
       bar.appendChild(el('div', { class: 'fill', style: `width:${pct}%` }));
       card.appendChild(bar);
@@ -977,11 +980,13 @@ function renderModal() {
       `Total de cette journée : ${state.exosToday} exo${state.exosToday > 1 ? 's' : ''}.`
     ]));
 
-    // Tentative d'upgrade ?
-    const next = TIERS[sc.tier + 1];
-    if (next && next.exReq) {
-      const remaining = Math.max(0, next.exReq - sc.exercisesSolved);
-      const canAfford = state.T >= next.nextCost;
+    // Tentative d'upgrade : nextCost/exReq sont stockés sur le tier ACTUEL
+    // (= ce qu'il faut pour passer au suivant). On lit juste le NOM du tier suivant.
+    const cur = TIERS[sc.tier];
+    const nextName = TIERS[sc.tier + 1] ? TIERS[sc.tier + 1].name : null;
+    if (nextName && cur.nextCost != null) {
+      const remaining = Math.max(0, cur.exReq - sc.exercisesSolved);
+      const canAfford = state.T >= cur.nextCost;
       const canUpgrade = remaining === 0 && canAfford;
       const upBtn = el('button', {
         class: 'btn',
@@ -992,10 +997,10 @@ function renderModal() {
           }
         }
       }, canUpgrade
-        ? `⬆️ Faire monter au palier ${next.name} (${fmtNum(next.nextCost)} 🪙)`
+        ? `⬆️ Faire monter au palier ${nextName} (${fmtNum(cur.nextCost)} 🪙)`
         : remaining > 0
-          ? `Encore ${remaining} exos pour débloquer ${next.name}`
-          : `Manque ${fmtNum(next.nextCost - state.T)} 🪙 pour ${next.name}`
+          ? `Encore ${remaining} exos pour débloquer ${nextName}`
+          : `Manque ${fmtNum(cur.nextCost - state.T)} 🪙 pour ${nextName}`
       );
       body.appendChild(el('div', { style: 'margin-top:14px' }, upBtn));
     }
@@ -1015,7 +1020,8 @@ function renderExercise(ex) {
 
   const header = el('div', { class: 'ex-header' });
   header.appendChild(el('span', {}, `Exercice ${currentSession.currentIdx + 1} / ${currentSession.exos.length}`));
-  header.appendChild(el('span', { class: 'ex-reward' }, `+10 🪙`));
+  const expectedReward = Math.round(BASE_REWARD_T * streakMultiplier());
+  header.appendChild(el('span', { class: 'ex-reward' }, `+${expectedReward} 🪙`));
   wrap.appendChild(header);
 
   wrap.appendChild(el('div', { class: 'ex-q', html: ex.q }));
@@ -1059,23 +1065,20 @@ function renderExercise(ex) {
       input.disabled = true;
       submitBtn.disabled = true;
       hintBtn.disabled = true;
-      const reward = Math.max(2, Math.round(10 * Math.pow(0.75, ex.hintsUsed) * streakMultiplier()));
+      const reward = Math.max(2, Math.round(BASE_REWARD_T * Math.pow(0.75, ex.hintsUsed) * streakMultiplier()));
       state.T += reward;
       state.xp += 1;
       state.concepts[currentSession.conceptId].exercisesSolved += 1;
-      // Mastery progression : pratiqué après 5 exos, maîtrisé après 12, expert 30, légendaire 80
-      const totalSolved = state.concepts[currentSession.conceptId].exercisesSolved;
+      // Mastery progression : pratiqué 5, maîtrisé 12, expert 30, légendaire 80
+      // On prend le max pour ne jamais downgrade un mastery déjà acquis (ex: après upgrade tier).
       const sc = state.concepts[currentSession.conceptId];
-      if (totalSolved >= 80) sc.mastery = 4;
-      else if (totalSolved >= 30) sc.mastery = 3;
-      else if (totalSolved >= 12) sc.mastery = 2;
-      else if (totalSolved >= 5)  sc.mastery = 1;
-      else sc.mastery = Math.max(sc.mastery, 0);
-      // Construit l'atelier dès le 1er exo si tier 0
-      if (state.concepts[currentSession.conceptId].tier === 0) {
-        state.concepts[currentSession.conceptId].tier = 1;
-        toast(`🏗️ ${CONCEPT_BY_ID[currentSession.conceptId].name} : Atelier construit !`);
-      }
+      const totalSolved = sc.exercisesSolved;
+      let newMastery = 0;
+      if (totalSolved >= 80) newMastery = 4;
+      else if (totalSolved >= 30) newMastery = 3;
+      else if (totalSolved >= 12) newMastery = 2;
+      else if (totalSolved >= 5)  newMastery = 1;
+      sc.mastery = Math.max(sc.mastery, newMastery);
       currentSession.correctCount += 1;
       onExerciseSolved();
 
