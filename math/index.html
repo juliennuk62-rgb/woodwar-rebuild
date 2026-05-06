@@ -455,6 +455,43 @@
     }
     .reset-link:hover { color: var(--danger); }
 
+    /* Panneau de test (dev) ──────────────────────────────────── */
+    .test-panel { padding: 18px; }
+    .test-panel h4 {
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      color: var(--gold);
+      margin: 14px 0 8px;
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 4px;
+    }
+    .test-panel h4:first-child { margin-top: 0; }
+    .test-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .test-btn {
+      background: var(--panel-hi);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .test-btn:hover { background: var(--panel); border-color: var(--gold); }
+    .test-btn.danger { color: var(--danger); }
+    .test-btn.danger:hover { border-color: var(--danger); }
+    .test-concept {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .test-concept .name { flex: 1; min-width: 140px; font-size: 13px; }
+    .test-concept .state { color: var(--text-muted); font-size: 11px; }
+
     @media (max-width: 600px) {
       .hud { padding: 10px 14px; gap: 8px; }
       .hud-title { font-size: 22px; width: 100%; margin-bottom: 4px; }
@@ -497,6 +534,7 @@
     <div class="city" id="city"></div>
 
     <div class="footer-actions">
+      <button class="reset-link" id="btn-test" title="Panneau de test pour explorer toutes les fonctionnalités">🧪 Mode test</button>
       <button class="reset-link" id="btn-reset">Réinitialiser ma cité</button>
     </div>
   </main>
@@ -518,7 +556,11 @@ const el = (tag, attrs = {}, children = []) => {
     if (k === 'class') e.className = v;
     else if (k === 'html') e.innerHTML = v;
     else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
-    else e.setAttribute(k, v);
+    // Booleans : on ne pose l'attribut QUE si true (sinon `disabled="false"`
+    // est interprété comme disabled par le navigateur, n'importe quelle
+    // présence de l'attribut le déclenche).
+    else if (typeof v === 'boolean') { if (v) e.setAttribute(k, ''); }
+    else if (v != null) e.setAttribute(k, v);
   }
   for (const c of [].concat(children)) {
     if (c == null) continue;
@@ -1185,6 +1227,167 @@ function toast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
+// ─── Panneau de test (dev) ───────────────────────────────────────
+// Permet de tester toutes les fonctionnalités sans grinder pendant des
+// heures : ajout de T/I, avance de streak, simulation d'idle, montée de
+// tier par bâtiment, mastery max, déblocage complet, etc.
+function openTestPanel() {
+  // On force la fermeture d'une session d'exos en cours (sinon currentSession
+  // garde une référence qui empêche l'auto-focus / cleanup).
+  currentSession = null;
+  const modal = $('#modal');
+  modal.innerHTML = '';
+
+  const header = el('div', { class: 'modal-header' });
+  header.appendChild(el('div', { class: 'icon' }, '🧪'));
+  const titleBox = el('div');
+  titleBox.appendChild(el('h2', {}, 'Mode test'));
+  titleBox.appendChild(el('div', { class: 'sub' }, 'Raccourcis pour explorer toutes les fonctionnalités'));
+  header.appendChild(titleBox);
+  header.appendChild(el('button', { class: 'modal-close', onclick: closeModal, 'aria-label': 'Fermer' }, '✕'));
+  modal.appendChild(header);
+
+  const body = el('div', { class: 'test-panel' });
+
+  // ── Section : Ressources ──
+  body.appendChild(el('h4', {}, '🪙 Ressources'));
+  const resRow = el('div', { class: 'test-actions' }, [
+    el('button', { class: 'test-btn', onclick: () => { state.T += 100; refreshTest(); } }, '+100 🪙'),
+    el('button', { class: 'test-btn', onclick: () => { state.T += 1000; refreshTest(); } }, '+1 000 🪙'),
+    el('button', { class: 'test-btn', onclick: () => { state.T += 50000; refreshTest(); } }, '+50 000 🪙'),
+    el('button', { class: 'test-btn', onclick: () => { state.I += 1; refreshTest(); } }, '+1 💎'),
+    el('button', { class: 'test-btn', onclick: () => { state.I += 10; refreshTest(); } }, '+10 💎'),
+    el('button', { class: 'test-btn', onclick: () => { state.xp += 50; refreshTest(); } }, '+50 ⭐ XP'),
+  ]);
+  body.appendChild(resRow);
+
+  // ── Section : Streak ──
+  body.appendChild(el('h4', {}, '🔥 Streak (multiplicateur de récompense)'));
+  const streakRow = el('div', { class: 'test-actions' }, [
+    el('button', { class: 'test-btn', onclick: () => setStreak(0) }, 'Streak 0 (×1)'),
+    el('button', { class: 'test-btn', onclick: () => setStreak(7) }, 'Streak 7 (×1.2)'),
+    el('button', { class: 'test-btn', onclick: () => setStreak(14) }, 'Streak 14 (×1.5)'),
+    el('button', { class: 'test-btn', onclick: () => setStreak(30) }, 'Streak 30 (×2)'),
+    el('button', { class: 'test-btn', onclick: () => setStreak(60) }, 'Streak 60 (×2.5)'),
+    el('button', { class: 'test-btn', onclick: () => setStreak(100) }, 'Streak 100 (×3)'),
+  ]);
+  body.appendChild(streakRow);
+
+  // ── Section : Production idle ──
+  body.appendChild(el('h4', {}, '💤 Production idle'));
+  const idleInfo = el('div', { class: 'state', style: 'font-size:12px;color:var(--text-muted);margin-bottom:8px' },
+    `Production actuelle : ${fmtNum(totalProdPerMin())} 🪙/min · Cap offline : ${MAX_OFFLINE_HOURS}h`);
+  body.appendChild(idleInfo);
+  const idleRow = el('div', { class: 'test-actions' }, [
+    el('button', { class: 'test-btn', onclick: () => simulateIdle(60) }, 'Simuler +1 h offline'),
+    el('button', { class: 'test-btn', onclick: () => simulateIdle(360) }, `Simuler +${MAX_OFFLINE_HOURS} h (cap)`),
+    el('button', { class: 'test-btn', onclick: () => simulateIdle(1440) }, 'Simuler +24 h (test cap)'),
+  ]);
+  body.appendChild(idleRow);
+
+  // ── Section : Bâtiments individuels ──
+  body.appendChild(el('h4', {}, '🏛️ Bâtiments (par concept)'));
+  for (const c of CONCEPTS) {
+    const sc = state.concepts[c.id];
+    const row = el('div', { class: 'test-concept' });
+    row.appendChild(el('span', { class: 'name', html: `${c.icon} <strong>${c.name}</strong>` }));
+    row.appendChild(el('span', { class: 'state' },
+      `${TIERS[sc.tier].name} · ${MASTERY_ICONS[sc.mastery]}${MASTERY_LABELS[sc.mastery]} · ${sc.exercisesSolved} exos`
+    ));
+    row.appendChild(el('button', { class: 'test-btn', onclick: () => { sc.exercisesSolved += 5; refreshTest(); } }, '+5 exos'));
+    row.appendChild(el('button', {
+      class: 'test-btn',
+      disabled: sc.tier >= 5,
+      onclick: () => { if (sc.tier < 5) { sc.tier++; sc.mastery = Math.max(sc.mastery, sc.tier - 1); refreshTest(); } }
+    }, '⬆ Tier'));
+    row.appendChild(el('button', {
+      class: 'test-btn',
+      disabled: sc.mastery >= 4,
+      onclick: () => { sc.mastery = Math.min(4, sc.mastery + 1); refreshTest(); }
+    }, '⬆ Mastery'));
+    body.appendChild(row);
+  }
+
+  // ── Section : raccourcis globaux ──
+  body.appendChild(el('h4', {}, '⚡ Raccourcis globaux'));
+  const globRow = el('div', { class: 'test-actions' }, [
+    el('button', { class: 'test-btn', onclick: () => {
+      // Tous les bâtiments à Atelier (tier 1) avec 5 exos chacun
+      for (const c of CONCEPTS) {
+        const sc = state.concepts[c.id];
+        sc.tier = Math.max(sc.tier, 1);
+        sc.exercisesSolved = Math.max(sc.exercisesSolved, 5);
+        sc.mastery = Math.max(sc.mastery, 1);
+      }
+      refreshTest();
+    }}, 'Tout en Atelier'),
+    el('button', { class: 'test-btn', onclick: () => {
+      // Débloque la chaîne complète : tous Maîtrisés (mastery 2) pour tester les prereqs
+      for (const c of CONCEPTS) {
+        const sc = state.concepts[c.id];
+        sc.mastery = Math.max(sc.mastery, 2);
+        sc.exercisesSolved = Math.max(sc.exercisesSolved, 12);
+      }
+      refreshTest();
+    }}, 'Tout Maîtrisé (débloque prereqs)'),
+    el('button', { class: 'test-btn', onclick: () => {
+      // Tout au max : Légende + Légendaire
+      for (const c of CONCEPTS) {
+        const sc = state.concepts[c.id];
+        sc.tier = 5;
+        sc.mastery = 4;
+        sc.exercisesSolved = Math.max(sc.exercisesSolved, 100);
+      }
+      state.T += 50000;
+      refreshTest();
+    }}, '👑 Tout en Légende'),
+    el('button', { class: 'test-btn danger', onclick: () => {
+      if (confirm('Réinitialiser tout l\'état (sans recharger la page) ?')) {
+        Object.assign(state, defaultState());
+        refreshTest();
+      }
+    }}, '🗑️ Reset état'),
+  ]);
+  body.appendChild(globRow);
+
+  // ── Footer ──
+  body.appendChild(el('div', { style: 'margin-top:18px;display:flex;gap:10px;flex-wrap:wrap' }, [
+    el('button', { class: 'btn', onclick: closeModal }, 'Fermer'),
+  ]));
+
+  modal.appendChild(body);
+  $('#modal-bg').classList.add('show');
+}
+
+function refreshTest() {
+  saveState();
+  renderHUD();
+  renderCity();
+  // Re-render test panel to refresh state lines
+  openTestPanel();
+}
+
+function setStreak(days) {
+  state.streak = days;
+  state.lastStreakDay = days > 0 ? todayISO() : undefined;
+  refreshTest();
+  toast(`🔥 Streak forcée à ${days} jour${days > 1 ? 's' : ''} (×${streakMultiplier()})`);
+}
+
+function simulateIdle(minutes) {
+  const earned = totalProdPerMin() * minutes;
+  if (earned <= 0) {
+    toast(`⚠️ Aucune production : construis au moins un Atelier`);
+    return;
+  }
+  // Capper comme applyIdle()
+  const capped = Math.min(minutes, MAX_OFFLINE_HOURS * 60);
+  const realEarned = totalProdPerMin() * capped;
+  state.T += realEarned;
+  refreshTest();
+  toast(`💤 Simulé ${minutes}min (capé à ${capped}min) : +${fmtNum(realEarned)} 🪙`);
+}
+
 // ─── Boot ────────────────────────────────────────────────────────
 function boot() {
   state = loadState();
@@ -1213,6 +1416,17 @@ function boot() {
     if (confirm('Réinitialiser ta cité ? Toute ta progression sera perdue.')) {
       localStorage.removeItem(STATE_KEY);
       location.reload();
+    }
+  });
+
+  // Mode test
+  $('#btn-test').addEventListener('click', openTestPanel);
+  // Raccourci clavier : Maj + T
+  document.addEventListener('keydown', (e) => {
+    if (e.shiftKey && (e.key === 'T' || e.key === 't') && !e.ctrlKey && !e.metaKey
+        && document.activeElement.tagName !== 'INPUT') {
+      e.preventDefault();
+      openTestPanel();
     }
   });
 
