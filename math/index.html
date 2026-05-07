@@ -884,10 +884,11 @@ function chapters1ere() {
         <h2>4. Tableau de variations standard</h2>
         ${lc.example("Tableau type", `<p>Pour <code>f(x) = x³ − 3x</code>, on résume :</p>
           <table>
-            <tr><th>x</th><th>−∞</th><th>−1</th><th>1</th><th>+∞</th></tr>
-            <tr><td>f'(x)</td><td>+</td><td>0</td><td>−</td><td>0</td><td>+</td></tr>
-            <tr><td>f(x)</td><td>−∞</td><td>2</td><td></td><td>−2</td><td>+∞</td></tr>
-          </table>`)}
+            <tr><th>Intervalle</th><th>]−∞ ; −1[</th><th>]−1 ; 1[</th><th>]1 ; +∞[</th></tr>
+            <tr><td>signe de f'(x)</td><td>+</td><td>−</td><td>+</td></tr>
+            <tr><td>variations de f</td><td>↗ jusqu'à 2</td><td>↘ jusqu'à −2</td><td>↗ vers +∞</td></tr>
+          </table>
+          <p>Aux bornes : <code>f'(−1) = 0</code> et <code>f'(1) = 0</code> ; <code>f(−1) = 2</code> est le maximum local, <code>f(1) = −2</code> le minimum local.</p>`)}
 
         <h2>5. Application : optimisation</h2>
         ${lc.example("Boîte de volume maximal", `<p>On découpe des carrés de côté <code>x</code> aux 4 coins d'une feuille rectangulaire de 20 cm × 30 cm pour faire une boîte. Quel volume maximum ?</p>
