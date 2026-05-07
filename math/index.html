@@ -1832,7 +1832,31 @@ function chaptersProbasPostBac() {
 
         <h2>5. Convergence en loi (vue rapide)</h2>
         ${lc.def("Convergence en loi", `<p><code>Xₙ</code> converge en loi vers <code>X</code> si <code>F_{Xₙ}(x) → F_X(x)</code> en tout point de continuité de <code>F_X</code>.</p>`)}
-        ${lc.tip("Hiérarchie des convergences", `<p>Convergence presque sûre ⇒ convergence en probabilité ⇒ convergence en loi.</p>`)}
+        ${lc.tip("Hiérarchie des convergences", `<p>Convergence presque sûre ⇒ convergence en probabilité ⇒ convergence en loi. Les implications réciproques sont fausses en général.</p>`)}
+
+        <h2>6. Loi forte des grands nombres</h2>
+        ${lc.prop("LGN forte (Kolmogorov)", `<p>Soit <code>(Xₙ)</code> i.i.d. d'espérance <code>μ</code> finie. Alors la moyenne empirique converge <strong>presque sûrement</strong> vers <code>μ</code> :</p>`)}
+        ${lc.formula("M_n = (X₁ + … + Xₙ)/n &nbsp;⟶&nbsp; μ &nbsp;&nbsp; (presque sûrement)")}
+        ${lc.tip("Différence avec LGN faible", `<p>La LGN <strong>faible</strong> donne convergence en probabilité. La LGN <strong>forte</strong> donne convergence presque sûre, plus puissante : pour <em>presque toute</em> trajectoire individuelle, <code>M_n(ω) → μ</code>. C'est le résultat qui justifie rigoureusement la modélisation fréquentiste des probabilités.</p>`)}
+
+        <h2>7. Fonction caractéristique</h2>
+        ${lc.def("Fonction caractéristique", `<p>La <strong>fonction caractéristique</strong> d'une variable aléatoire <code>X</code> est :</p>`)}
+        ${lc.formula("φ_X(t) = E(e^{itX}) &nbsp;&nbsp; (t ∈ ℝ, i² = −1)")}
+        ${lc.prop("Propriétés-clé", `<ul>
+          <li><code>φ_X(0) = 1</code> et <code>|φ_X(t)| ≤ 1</code> pour tout <code>t</code>.</li>
+          <li><code>φ_{aX+b}(t) = e^{ibt} × φ_X(at)</code>.</li>
+          <li>Si <code>X</code> et <code>Y</code> sont indépendantes : <code>φ_{X+Y} = φ_X × φ_Y</code>.</li>
+          <li><code>φ_X</code> caractérise entièrement la loi de <code>X</code> (deux variables qui ont même fonction caractéristique ont même loi).</li>
+        </ul>`)}
+        ${lc.example("Exemples", `<ul>
+          <li>Bernoulli ℬ(p) : <code>φ(t) = 1 − p + p·e^{it}</code>.</li>
+          <li>Normale N(0, 1) : <code>φ(t) = e^{−t²/2}</code>.</li>
+          <li>Normale N(μ, σ²) : <code>φ(t) = e^{iμt − σ²t²/2}</code>.</li>
+          <li>Poisson 𝒫(λ) : <code>φ(t) = e^{λ(e^{it} − 1)}</code>.</li>
+        </ul>`)}
+
+        <h2>8. Démonstration du TCL via la fonction caractéristique</h2>
+        ${lc.tip("Esquisse", `<p>Soit <code>(Xₙ)</code> i.i.d. centrées réduites. La fonction caractéristique de la somme normalisée <code>S_n / √n</code> est <code>(φ(t/√n))ⁿ</code>. Un développement de Taylor donne <code>φ(t/√n) ≈ 1 − t²/(2n)</code>, et donc <code>(1 − t²/(2n))ⁿ → e^{−t²/2}</code>, qui est la fonction caractéristique de N(0, 1). Par le théorème de Lévy, on a convergence en loi : c'est le TCL.</p>`)}
       `,
     },
 
