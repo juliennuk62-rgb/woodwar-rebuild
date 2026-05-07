@@ -3,26 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Mathopolis — Apprends les maths en bâtissant ta cité</title>
+  <title>Mathopolis — Apprends les maths sans douleur</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #1a1410;
-      --bg-soft: #241b15;
-      --panel: #2d2018;
-      --panel-hi: #3a2a1f;
-      --border: #4a3525;
-      --text: #f5e6d3;
-      --text-muted: #c9a987;
-      --text-dim: #8a6f55;
-      --gold: #ffd166;
-      --gold-bold: #f4a01a;
-      --diamond: #6ec1f2;
-      --success: #b6e8a3;
-      --success-bold: #6fa85a;
-      --danger: #ff8b8b;
-      --danger-bold: #c44b4b;
-      --streak: #ff8c42;
-      --shadow: 0 4px 0 rgba(0,0,0,0.35);
+      /* Surfaces (flat, scolaire, lumineux) */
+      --bg: #f7f8fa;
+      --bg-elev: #ffffff;
+      --bg-soft: #eef1f6;
+
+      /* Texte */
+      --text: #111827;
+      --text-2: #4b5563;
+      --text-3: #9ca3af;
+
+      /* Bordures */
+      --border: #e5e7eb;
+      --border-strong: #d1d5db;
+
+      /* Brand : bleu scolaire / encre */
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --primary-100: #dbeafe;
+
+      /* Sémantique */
+      --success: #059669;
+      --success-soft: #ecfdf5;
+      --success-text: #065f46;
+      --warning: #d97706;
+      --warning-soft: #fffbeb;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --danger-text: #991b1b;
+
+      /* Monnaies */
+      --gold: #d97706;       /* théorèmes — ambre soutenu */
+      --gold-soft: #fef3c7;
+      --diamond: #7c3aed;    /* insights — violet */
+      --diamond-soft: #ede9fe;
+      --streak: #ea580c;     /* flamme — orange profond */
+      --streak-soft: #ffedd5;
+      --xp: #10b981;         /* XP — vert émeraude */
+      --xp-soft: #d1fae5;
+
+      /* Ombres */
+      --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04);
+      --shadow: 0 1px 3px rgba(17, 24, 39, 0.06), 0 4px 12px rgba(17, 24, 39, 0.04);
+      --shadow-md: 0 4px 12px rgba(17, 24, 39, 0.08), 0 16px 32px rgba(17, 24, 39, 0.06);
+
+      /* Radius */
+      --r-sm: 6px;
+      --r: 10px;
+      --r-lg: 14px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,165 +67,231 @@
       color: var(--text);
       font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
       -webkit-font-smoothing: antialiased;
+      font-feature-settings: 'cv11', 'ss01';
     }
     body {
-      background:
-        radial-gradient(circle at 20% 10%, rgba(255,209,102,0.08), transparent 40%),
-        radial-gradient(circle at 80% 90%, rgba(110,193,242,0.06), transparent 40%),
-        var(--bg);
       min-height: 100vh;
-      padding-bottom: 40px;
+      padding-bottom: 60px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
     }
 
-    .pixel { font-family: 'VT323', 'Press Start 2P', 'Courier New', monospace; letter-spacing: 0.5px; }
-
-    /* HUD du haut */
+    /* ─── HUD ──────────────────────────────────────────────── */
     .hud {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(36, 27, 21, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 2px solid var(--border);
-      padding: 12px 20px;
-      display: flex; align-items: center; gap: 14px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px) saturate(160%);
+      -webkit-backdrop-filter: blur(12px) saturate(160%);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex; align-items: center; gap: 10px;
       flex-wrap: wrap;
     }
     .hud-title {
-      font-family: 'VT323', monospace;
-      font-size: 28px;
-      color: var(--gold);
-      letter-spacing: 1px;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text);
       margin-right: auto;
-      text-shadow: 2px 2px 0 #000;
+      display: flex; align-items: center; gap: 8px;
+      letter-spacing: -0.01em;
+    }
+    .hud-title .logo {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: white; font-size: 16px;
+      box-shadow: var(--shadow-sm);
     }
     .stat {
-      display: flex; align-items: center; gap: 6px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 999px;
       padding: 6px 12px;
+      font-size: 13px;
       font-weight: 600;
-      box-shadow: var(--shadow);
+      background: var(--bg-soft);
+      color: var(--text-2);
+      transition: background 0.15s;
     }
-    .stat .val { font-family: 'VT323', monospace; font-size: 22px; }
-    .stat.gold .val { color: var(--gold); }
-    .stat.diamond .val { color: var(--diamond); }
-    .stat.streak .val { color: var(--streak); }
-    .stat.xp .val { color: var(--success); }
+    .stat .val { font-variant-numeric: tabular-nums; font-size: 14px; }
+    .stat.gold    { color: var(--gold);    background: var(--gold-soft); }
+    .stat.diamond { color: var(--diamond); background: var(--diamond-soft); }
+    .stat.streak  { color: var(--streak);  background: var(--streak-soft); }
+    .stat.xp      { color: var(--xp);      background: var(--xp-soft); }
 
-    /* Container */
+    /* ─── Layout ──────────────────────────────────────────── */
     .wrap {
-      max-width: 1100px;
+      max-width: 1080px;
       margin: 0 auto;
-      padding: 24px 20px;
+      padding: 32px 24px;
     }
 
     .intro {
-      background: linear-gradient(135deg, var(--panel) 0%, var(--panel-hi) 100%);
-      border: 2px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 24px;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow);
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-sm);
     }
     .intro h2 {
-      font-family: 'VT323', monospace;
-      font-size: 26px;
-      color: var(--gold);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
       margin-bottom: 8px;
+      letter-spacing: -0.02em;
     }
-    .intro p { color: var(--text-muted); line-height: 1.6; }
+    .intro p {
+      color: var(--text-2);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+    .intro p strong { color: var(--text); font-weight: 600; }
 
     /* Section header */
     h3.section {
-      font-family: 'VT323', monospace;
-      font-size: 24px;
-      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-2);
       margin-bottom: 14px;
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    h3.section .label {
+      color: var(--text);
+      text-transform: none;
+      letter-spacing: -0.01em;
+      font-size: 18px;
+      font-weight: 700;
     }
     h3.section .tag {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 2px 10px;
-      font-size: 16px;
-      color: var(--text-muted);
+      background: var(--bg-soft);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 12px;
+      color: var(--text-2);
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 500;
     }
 
-    /* Grille des bâtiments */
+    /* ─── Cartes des bâtiments ─────────────────────────────── */
     .city {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 36px;
     }
     .building {
-      background: var(--panel);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 18px;
       cursor: pointer;
-      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
-      box-shadow: var(--shadow);
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.15s,
+                  box-shadow 0.15s;
+      box-shadow: var(--shadow-sm);
       position: relative;
-      overflow: hidden;
-    }
-    .building::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, transparent 0%, rgba(255,209,102,0.04) 100%);
-      pointer-events: none;
     }
     .building:hover {
-      transform: translateY(-3px);
-      border-color: var(--gold);
-      box-shadow: 0 8px 0 rgba(0,0,0,0.4);
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
     }
     .building.locked {
-      opacity: 0.5;
+      background: var(--bg-soft);
       cursor: not-allowed;
     }
     .building.locked:hover {
       transform: none;
       border-color: var(--border);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-sm);
     }
+    .building.locked .building-icon { filter: grayscale(0.6); opacity: 0.6; }
     .building-icon {
-      font-size: 42px;
-      text-align: center;
-      margin-bottom: 8px;
-      filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.4));
+      font-size: 36px;
+      margin-bottom: 10px;
+      line-height: 1;
     }
     .building-name {
-      font-weight: 700;
+      font-weight: 600;
       font-size: 15px;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
+      color: var(--text);
+      letter-spacing: -0.01em;
     }
-    .building-tier {
-      font-family: 'VT323', monospace;
-      font-size: 18px;
-      color: var(--gold);
-      margin-bottom: 6px;
+    .building-meta {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 8px;
+    }
+    .tier-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+    .tier-0 { background: var(--bg-soft); color: var(--text-3); }
+    .tier-1 { background: #e0f2fe; color: #075985; }
+    .tier-2 { background: #cffafe; color: #155e75; }
+    .tier-3 { background: var(--primary-100); color: #1e40af; }
+    .tier-4 { background: var(--diamond-soft); color: #5b21b6; }
+    .tier-5 { background: linear-gradient(135deg, #fde68a, var(--diamond-soft)); color: #5b21b6; }
+    .mastery-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--bg-soft);
+      color: var(--text-2);
+    }
+    .mastery-badge.m-2, .mastery-badge.m-3, .mastery-badge.m-4 {
+      background: var(--xp-soft);
+      color: var(--success-text);
     }
     .building-prod {
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--text-2);
       display: flex; justify-content: space-between;
+      margin-top: 4px;
     }
-    .building-prod .mastery {
-      color: var(--success);
-    }
+    .building-prod .exos { color: var(--text-3); }
     .building-prereqs {
       font-size: 11px;
       color: var(--danger);
       margin-top: 6px;
+      font-weight: 500;
     }
 
-    /* Modal */
+    /* Progress bar fine */
+    .progress-bar {
+      height: 4px;
+      background: var(--bg-soft);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 999px;
+    }
+
+    /* ─── Modal ───────────────────────────────────────────── */
     .modal-bg {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75);
+      background: rgba(17, 24, 39, 0.45);
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       z-index: 100;
       display: none;
       align-items: flex-start;
@@ -200,316 +301,389 @@
     }
     .modal-bg.show { display: flex; }
     .modal {
-      background: var(--bg-soft);
-      border: 2px solid var(--border);
-      border-radius: 16px;
+      background: var(--bg-elev);
+      border-radius: var(--r-lg);
       max-width: 720px;
       width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      box-shadow: var(--shadow-md);
       overflow: hidden;
+      border: 1px solid var(--border);
     }
     .modal-header {
-      background: linear-gradient(135deg, var(--panel-hi) 0%, var(--panel) 100%);
-      border-bottom: 2px solid var(--border);
-      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
       display: flex; align-items: center; gap: 14px;
     }
-    .modal-header .icon { font-size: 36px; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.4)); }
+    .modal-header .icon { font-size: 32px; line-height: 1; }
     .modal-header h2 {
-      font-family: 'VT323', monospace;
-      font-size: 28px;
-      color: var(--gold);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
     }
     .modal-header .sub {
       font-size: 13px;
-      color: var(--text-muted);
+      color: var(--text-2);
+      margin-top: 2px;
     }
     .modal-close {
       margin-left: auto;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      color: var(--text);
+      background: var(--bg-soft);
+      border: none;
+      color: var(--text-2);
       width: 36px; height: 36px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 18px;
-      transition: background 0.15s;
+      transition: background 0.15s, color 0.15s;
     }
-    .modal-close:hover { background: var(--danger-bold); }
-    .modal-body { padding: 22px; }
+    .modal-close:hover { background: var(--danger-soft); color: var(--danger); }
+    .modal-body { padding: 24px; }
 
+    /* ─── Leçon ───────────────────────────────────────────── */
     .lesson {
-      background: var(--panel);
-      border-left: 4px solid var(--gold);
-      border-radius: 8px;
-      padding: 16px 18px;
-      margin-bottom: 18px;
-      line-height: 1.7;
+      background: var(--primary-soft);
+      border-left: 3px solid var(--primary);
+      border-radius: var(--r);
+      padding: 18px 22px;
+      margin-bottom: 22px;
+      line-height: 1.65;
+      font-size: 15px;
+      color: var(--text);
     }
     .lesson .narrative {
       font-style: italic;
-      color: var(--text-muted);
-      margin-bottom: 12px;
+      color: var(--text-2);
+      margin-bottom: 14px;
       font-size: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed rgba(37, 99, 235, 0.2);
     }
-    .lesson h4 { color: var(--gold); margin-bottom: 8px; font-size: 16px; }
+    .lesson h4 {
+      color: var(--primary);
+      margin: 14px 0 6px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .lesson h4:first-of-type { margin-top: 0; }
     .lesson p { margin-bottom: 8px; }
     .lesson code {
-      background: var(--bg);
-      padding: 2px 6px;
+      background: rgba(37, 99, 235, 0.08);
+      padding: 1px 6px;
       border-radius: 4px;
       font-family: 'JetBrains Mono', 'Courier New', monospace;
       font-size: 0.9em;
-      color: var(--gold);
+      color: var(--primary-hover);
+      font-weight: 500;
     }
     .lesson .example {
-      background: var(--bg);
-      border: 1px dashed var(--border);
-      border-radius: 6px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
       padding: 10px 14px;
-      margin: 8px 0;
-      color: var(--success);
+      margin: 10px 0;
+      color: var(--success-text);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
+      font-size: 13.5px;
+      line-height: 1.6;
     }
     .lesson .warn {
-      background: rgba(196,75,75,0.15);
-      border-left: 3px solid var(--danger);
-      padding: 8px 12px;
-      margin: 8px 0;
-      border-radius: 4px;
-      font-size: 13px;
+      background: var(--warning-soft);
+      border-left: 3px solid var(--warning);
+      padding: 10px 14px;
+      margin: 12px 0;
+      border-radius: var(--r-sm);
+      font-size: 13.5px;
+      color: var(--text);
+      line-height: 1.55;
     }
 
+    /* ─── Exercice ───────────────────────────────────────── */
     .exercise {
-      background: var(--panel);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      padding: 18px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
       margin-bottom: 14px;
+      transition: border-color 0.2s, background 0.2s;
     }
-    .exercise.correct { border-color: var(--success-bold); }
-    .exercise.wrong   { border-color: var(--danger-bold); }
+    .exercise.correct { border-color: var(--success); background: var(--success-soft); }
+    .exercise.wrong   { border-color: var(--danger); background: var(--danger-soft); }
     .exercise .ex-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 10px;
-      font-size: 13px;
-      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--text-3);
+      font-weight: 500;
     }
     .exercise .ex-reward {
       color: var(--gold);
       font-weight: 700;
     }
     .exercise .ex-q {
-      font-size: 17px;
-      margin-bottom: 14px;
-      line-height: 1.5;
+      font-size: 16px;
+      margin-bottom: 16px;
+      line-height: 1.55;
+      color: var(--text);
     }
-    .exercise .ex-q .formula {
+    .formula {
       font-family: 'JetBrains Mono', monospace;
-      background: var(--bg);
-      padding: 4px 10px;
-      border-radius: 6px;
-      color: var(--gold);
+      background: var(--bg-soft);
+      padding: 3px 10px;
+      border-radius: var(--r-sm);
+      color: var(--text);
       display: inline-block;
-      margin: 0 2px;
+      font-weight: 500;
+      font-size: 0.95em;
     }
+
     .ex-row { display: flex; gap: 8px; flex-wrap: wrap; }
     .ex-input {
       flex: 1;
       min-width: 140px;
-      background: var(--bg);
-      border: 2px solid var(--border);
+      background: var(--bg-elev);
+      border: 1.5px solid var(--border);
       color: var(--text);
       padding: 10px 14px;
-      border-radius: 8px;
+      border-radius: var(--r-sm);
       font-size: 16px;
       font-family: 'JetBrains Mono', monospace;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .ex-input:focus { outline: none; border-color: var(--gold); }
-    .ex-choices { display: flex; flex-direction: column; gap: 8px; }
-    .ex-choice {
-      background: var(--bg);
-      border: 2px solid var(--border);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: left;
-      transition: border-color 0.15s, background 0.15s;
-      font-size: 15px;
-    }
-    .ex-choice:hover { border-color: var(--gold); }
-    .ex-choice.selected { border-color: var(--gold); background: var(--panel-hi); }
-
-    .btn {
-      background: var(--gold);
-      color: #2a1d0f;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 15px;
-      box-shadow: 0 3px 0 var(--gold-bold);
-      transition: transform 0.1s, box-shadow 0.1s;
-    }
-    .btn:hover { transform: translateY(1px); box-shadow: 0 2px 0 var(--gold-bold); }
-    .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--gold-bold); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn.secondary {
-      background: var(--panel);
-      color: var(--text);
-      box-shadow: 0 3px 0 var(--border);
-      border: 1px solid var(--border);
-    }
-    .btn.ghost {
-      background: transparent;
-      color: var(--text-muted);
-      box-shadow: none;
-      border: 1px solid var(--border);
+    .ex-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
 
     .feedback {
-      margin-top: 10px;
+      margin-top: 12px;
       padding: 10px 14px;
-      border-radius: 6px;
+      border-radius: var(--r-sm);
       font-size: 14px;
       line-height: 1.5;
     }
     .feedback.correct {
-      background: rgba(110,168,90,0.2);
-      color: var(--success);
-      border-left: 3px solid var(--success-bold);
+      background: var(--success-soft);
+      color: var(--success-text);
+      border-left: 3px solid var(--success);
     }
     .feedback.wrong {
-      background: rgba(196,75,75,0.2);
-      color: var(--danger);
-      border-left: 3px solid var(--danger-bold);
+      background: var(--danger-soft);
+      color: var(--danger-text);
+      border-left: 3px solid var(--danger);
     }
     .feedback.hint {
-      background: rgba(110,193,242,0.15);
-      color: var(--diamond);
-      border-left: 3px solid var(--diamond);
+      background: var(--warning-soft);
+      color: #92400e;
+      border-left: 3px solid var(--warning);
     }
 
-    .progress-bar {
-      height: 8px;
-      background: var(--bg);
+    /* ─── Solution détaillée ─────────────────────────────── */
+    .solution {
+      background: var(--primary-soft);
+      border: 1px solid var(--primary-100);
+      border-radius: var(--r);
+      padding: 16px 18px;
+      margin-top: 14px;
+      animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .solution-title {
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+      font-size: 13px;
+      display: flex; align-items: center; gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .solution ol {
+      margin: 0 0 12px 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: step;
+    }
+    .solution ol li {
+      counter-increment: step;
+      margin-bottom: 10px;
+      line-height: 1.6;
+      color: var(--text);
+      font-size: 14.5px;
+      padding-left: 32px;
+      position: relative;
+    }
+    .solution ol li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0; top: 0;
+      width: 22px; height: 22px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .solution-final {
+      margin-top: 4px;
+      padding: 12px 14px;
+      background: var(--bg-elev);
+      border-radius: var(--r-sm);
+      border: 1px solid var(--success);
+      color: var(--success-text);
+      font-weight: 600;
+      font-size: 15px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .solution code {
+      background: rgba(37, 99, 235, 0.1);
+      padding: 1px 6px;
       border-radius: 4px;
-      overflow: hidden;
-      margin-top: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92em;
+      color: var(--primary-hover);
+    }
+
+    /* ─── Boutons ────────────────────────────────────────── */
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: var(--r);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s, transform 0.08s;
+      font-family: inherit;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:disabled:hover { background: var(--primary); }
+    .btn.secondary {
+      background: var(--bg-soft);
+      color: var(--text);
+    }
+    .btn.secondary:hover { background: var(--border); }
+    .btn.ghost {
+      background: transparent;
+      color: var(--text-2);
       border: 1px solid var(--border);
     }
-    .progress-bar .fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--gold-bold), var(--gold));
-      transition: width 0.3s;
+    .btn.ghost:hover { background: var(--bg-soft); border-color: var(--border-strong); }
+    .btn.success {
+      background: var(--success);
     }
-
-    .tier-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-    .tier-0 { background: #444; color: #aaa; }
-    .tier-1 { background: #5a3a1f; color: var(--gold); }
-    .tier-2 { background: #6e4724; color: #ffd86e; }
-    .tier-3 { background: #8a5a2c; color: #fff0a8; }
-    .tier-4 { background: #a06f37; color: #fff; }
-    .tier-5 { background: linear-gradient(90deg, #c084fc, #ffd166); color: #fff; }
-
-    .toast {
-      position: fixed;
-      top: 80px; left: 50%;
-      transform: translateX(-50%);
-      background: var(--panel-hi);
-      border: 2px solid var(--gold);
-      color: var(--text);
-      padding: 12px 20px;
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      z-index: 200;
-      font-weight: 600;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s, transform 0.3s;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .btn.success:hover { background: #047857; }
+    .btn.success:disabled:hover { background: var(--success); }
 
     .footer-actions {
       display: flex; gap: 10px; flex-wrap: wrap;
-      margin-top: 20px;
+      margin-top: 24px;
+      align-items: center;
     }
 
     .reset-link {
-      color: var(--text-dim);
+      color: var(--text-3);
       font-size: 12px;
       background: none;
       border: none;
       cursor: pointer;
       text-decoration: underline;
+      padding: 0;
+      font-family: inherit;
     }
     .reset-link:hover { color: var(--danger); }
 
-    /* Panneau de test (dev) ──────────────────────────────────── */
-    .test-panel { padding: 18px; }
+    /* ─── Panneau de test ─────────────────────────────── */
+    .test-panel { padding: 20px 24px; }
     .test-panel h4 {
-      font-family: 'VT323', monospace;
-      font-size: 20px;
-      color: var(--gold);
-      margin: 14px 0 8px;
-      border-bottom: 1px dashed var(--border);
+      font-size: 12px;
+      color: var(--text-2);
+      margin: 18px 0 8px;
       padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
     }
     .test-panel h4:first-child { margin-top: 0; }
-    .test-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .test-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
     .test-btn {
-      background: var(--panel-hi);
+      background: var(--bg-elev);
       color: var(--text);
       border: 1px solid var(--border);
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 6px 11px;
+      border-radius: var(--r-sm);
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
       font-family: 'JetBrains Mono', monospace;
-      transition: background 0.15s, border-color 0.15s;
+      transition: background 0.12s, border-color 0.12s;
     }
-    .test-btn:hover { background: var(--panel); border-color: var(--gold); }
-    .test-btn.danger { color: var(--danger); }
-    .test-btn.danger:hover { border-color: var(--danger); }
+    .test-btn:hover { background: var(--bg-soft); border-color: var(--primary); }
+    .test-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .test-btn:disabled:hover { background: var(--bg-elev); border-color: var(--border); }
+    .test-btn.danger { color: var(--danger); border-color: var(--danger-soft); }
+    .test-btn.danger:hover { background: var(--danger-soft); border-color: var(--danger); }
     .test-concept {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
+      background: var(--bg-soft);
+      border-radius: var(--r-sm);
+      padding: 8px 12px;
+      margin-bottom: 6px;
       display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
     }
     .test-concept .name { flex: 1; min-width: 140px; font-size: 13px; }
-    .test-concept .state { color: var(--text-muted); font-size: 11px; }
+    .test-concept .state { color: var(--text-3); font-size: 11px; }
 
+    /* ─── Toast ───────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      top: 80px; left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: var(--text);
+      color: white;
+      padding: 10px 18px;
+      border-radius: var(--r);
+      box-shadow: var(--shadow-md);
+      z-index: 200;
+      font-weight: 500;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ─── Mobile ─────────────────────────────────────── */
     @media (max-width: 600px) {
-      .hud { padding: 10px 14px; gap: 8px; }
-      .hud-title { font-size: 22px; width: 100%; margin-bottom: 4px; }
-      .stat { padding: 4px 10px; font-size: 13px; }
-      .stat .val { font-size: 18px; }
-      .wrap { padding: 16px 14px; }
+      .hud { padding: 10px 14px; gap: 6px; }
+      .hud-title { font-size: 16px; flex: 1 1 100%; margin-bottom: 4px; }
+      .stat { padding: 5px 10px; font-size: 12px; }
+      .wrap { padding: 22px 16px; }
       .city { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .building { padding: 12px; }
-      .building-icon { font-size: 32px; }
-      .building-name { font-size: 13px; }
-      .modal { border-radius: 12px; }
-      .modal-header h2 { font-size: 22px; }
+      .building { padding: 14px; }
+      .building-icon { font-size: 30px; }
+      .building-name { font-size: 14px; }
+      .modal-header h2 { font-size: 17px; }
+      .modal-body { padding: 18px; }
+      .lesson { padding: 14px 16px; font-size: 14px; }
+      .exercise { padding: 16px; }
     }
   </style>
 </head>
 <body>
   <header class="hud">
-    <div class="hud-title">📐 Mathopolis</div>
+    <div class="hud-title">
+      <span class="logo">∑</span>
+      <span>Mathopolis</span>
+    </div>
     <div class="stat gold" title="Théorèmes">
       🪙 <span class="val" id="stat-T">0</span>
     </div>
@@ -526,15 +700,18 @@
 
   <main class="wrap">
     <div class="intro">
-      <h2>Bienvenue à Mathopolis, Recteur</h2>
-      <p id="intro-text">Ta cité de mathématiciens t'attend. Clique sur un bâtiment pour suivre la leçon, résous les exos, et regarde tes <strong>théorèmes</strong> 🪙 s'accumuler — même quand tu n'es pas là. Maintiens ta streak en faisant <strong>3 exos par jour</strong>.</p>
+      <h2>Bienvenue, Recteur</h2>
+      <p>Ta cité de mathématiciens t'attend. Clique sur un bâtiment pour suivre la leçon, résous quelques exos, et regarde tes <strong>théorèmes</strong> 🪙 s'accumuler — même quand tu n'es pas là. Maintiens ta streak en faisant <strong>3 exos par jour</strong>.</p>
     </div>
 
-    <h3 class="section">🏛️ Quartier des Fondations <span class="tag" id="founda-progress">0/5 maîtrisés</span></h3>
+    <h3 class="section">
+      <span class="label">🏛️ Quartier des Fondations</span>
+      <span class="tag" id="founda-progress">0/5 maîtrisés</span>
+    </h3>
     <div class="city" id="city"></div>
 
     <div class="footer-actions">
-      <button class="reset-link" id="btn-test" title="Panneau de test pour explorer toutes les fonctionnalités">🧪 Mode test</button>
+      <button class="reset-link" id="btn-test" title="Panneau de test (raccourci : Maj+T)">🧪 Mode test</button>
       <button class="reset-link" id="btn-reset">Réinitialiser ma cité</button>
     </div>
   </main>
@@ -556,9 +733,6 @@ const el = (tag, attrs = {}, children = []) => {
     if (k === 'class') e.className = v;
     else if (k === 'html') e.innerHTML = v;
     else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
-    // Booleans : on ne pose l'attribut QUE si true (sinon `disabled="false"`
-    // est interprété comme disabled par le navigateur, n'importe quelle
-    // présence de l'attribut le déclenche).
     else if (typeof v === 'boolean') { if (v) e.setAttribute(k, ''); }
     else if (v != null) e.setAttribute(k, v);
   }
@@ -577,10 +751,7 @@ const fmtNum = (n) => {
   return Math.floor(n).toString();
 };
 
-// ─── Concepts (Quartier des Fondations — 5 premiers) ─────────────
-// Chaque concept déclare : id, nom, icône, prérequis, leçon, et un
-// générateur d'exo (renvoie {q, ans, choices?, type}).
-
+// ─── Concepts du Quartier des Fondations (5 premiers) ────────────
 const CONCEPTS = [
   {
     id: 'arith_base',
@@ -588,22 +759,43 @@ const CONCEPTS = [
     icon: '🧮',
     prereq: [],
     lesson: {
-      narrative: "Maître Abakos ouvre son atelier. Avant de bâtir des théorèmes complexes, il faut maîtriser les quatre opérations.",
+      narrative: "Avant de bâtir des théorèmes complexes, il faut maîtriser les quatre opérations.",
       content: `
         <h4>Les 4 opérations</h4>
         <p>L'<strong>addition</strong> (+), la <strong>soustraction</strong> (−), la <strong>multiplication</strong> (×) et la <strong>division</strong> (÷) sont les briques de tout calcul.</p>
-        <div class="example">12 + 8 = 20 &nbsp;&nbsp; 15 − 7 = 8 &nbsp;&nbsp; 6 × 7 = 42 &nbsp;&nbsp; 36 ÷ 4 = 9</div>
-        <p>Petit truc : pour multiplier par 9, multiplie par 10 puis enlève le nombre. <code>9 × 7 = 70 − 7 = 63</code>.</p>
-        <div class="warn">⚠️ Attention : 0 ÷ n'importe quoi = 0, mais on ne divise jamais <em>par</em> 0 !</div>
+        <div class="example">12 + 8 = 20 &nbsp;·&nbsp; 15 − 7 = 8 &nbsp;·&nbsp; 6 × 7 = 42 &nbsp;·&nbsp; 36 ÷ 4 = 9</div>
+        <h4>Astuces de calcul mental</h4>
+        <p>Pour multiplier par 9 : multiplie par 10, puis enlève le nombre. <code>9 × 7 = 70 − 7 = 63</code>.</p>
+        <p>Pour ajouter un nombre proche de 10 : ajoute 10 et corrige. <code>47 + 9 = 47 + 10 − 1 = 56</code>.</p>
+        <div class="warn">⚠️ <strong>0 ÷ n</strong> = 0 (toujours), mais on ne divise jamais <em>par</em> 0.</div>
       `
     },
     generate: () => {
       const op = pick(['+', '−', '×']);
-      let a, b, ans;
-      if (op === '+') { a = rand(15, 99); b = rand(15, 99); ans = a + b; }
-      else if (op === '−') { a = rand(40, 99); b = rand(10, a - 1); ans = a - b; }
-      else { a = rand(3, 12); b = rand(3, 12); ans = a * b; }
-      return { type: 'number', q: `Calcule : <span class="formula">${a} ${op} ${b}</span>`, ans };
+      let a, b, ans, steps;
+      if (op === '+') {
+        a = rand(15, 99); b = rand(15, 99); ans = a + b;
+        steps = [
+          `On pose l'addition : <code>${a} + ${b}</code>.`,
+          `On peut décomposer : <code>${a} + ${b} = ${a} + ${b - (b % 10)} + ${b % 10}</code>.`,
+          `Résultat : <code>${ans}</code>.`
+        ];
+      } else if (op === '−') {
+        a = rand(40, 99); b = rand(10, a - 1); ans = a - b;
+        steps = [
+          `On pose la soustraction : <code>${a} − ${b}</code>.`,
+          `Comme ${a} > ${b}, le résultat est positif.`,
+          `<code>${a} − ${b} = ${ans}</code>.`
+        ];
+      } else {
+        a = rand(3, 12); b = rand(3, 12); ans = a * b;
+        steps = [
+          `On reconnaît la table de multiplication.`,
+          `<code>${a} × ${b} = ${ans}</code> (équivalent à <code>${b} × ${a}</code> par commutativité).`,
+          `Résultat : <code>${ans}</code>.`
+        ];
+      }
+      return { type: 'number', q: `Calcule : <span class="formula">${a} ${op} ${b}</span>`, ans, steps };
     }
   },
 
@@ -613,60 +805,109 @@ const CONCEPTS = [
     icon: '⚖️',
     prereq: ['arith_base'],
     lesson: {
-      narrative: "Dame Priora veille à l'ordre. Sans règles, le même calcul donnerait dix résultats différents : c'est le chaos.",
+      narrative: "Sans règles, le même calcul donnerait dix résultats différents. C'est la convention PEMDAS qui met de l'ordre.",
       content: `
         <h4>L'ordre PEMDAS</h4>
-        <p>On effectue d'abord les <strong>parenthèses</strong>, puis les <strong>multiplications/divisions</strong>, puis les <strong>additions/soustractions</strong>, de gauche à droite.</p>
-        <div class="example">2 + 3 × 4 = 2 + 12 = 14 &nbsp;&nbsp; (et non 5 × 4 = 20 !)</div>
+        <p>On effectue dans cet ordre :</p>
+        <p>1. <strong>Parenthèses</strong> d'abord</p>
+        <p>2. Puis <strong>multiplications</strong> et <strong>divisions</strong> (gauche à droite)</p>
+        <p>3. Enfin <strong>additions</strong> et <strong>soustractions</strong> (gauche à droite)</p>
+        <div class="example">2 + 3 × 4 = 2 + 12 = 14<br>(et <em>non</em> 5 × 4 = 20 !)</div>
         <div class="example">(2 + 3) × 4 = 5 × 4 = 20</div>
-        <div class="warn">⚠️ Piège classique : <code>10 − 3 + 2</code> = (10−3)+2 = 9, et non 10−5 = 5.</div>
+        <div class="warn">⚠️ Piège classique : <code>10 − 3 + 2</code> = (10−3)+2 = <strong>9</strong>, et non 10−5 = 5. On va de gauche à droite à priorité égale.</div>
       `
     },
     generate: () => {
       const types = [
-        () => { const a = rand(2,9), b = rand(2,9), c = rand(2,9); return { q: `${a} + ${b} × ${c}`, ans: a + b*c }; },
-        () => { const a = rand(2,9), b = rand(2,9), c = rand(2,9); return { q: `(${a} + ${b}) × ${c}`, ans: (a+b)*c }; },
-        () => { const a = rand(20,40), b = rand(2,9), c = rand(2,9); return { q: `${a} − ${b} × ${c}`, ans: a - b*c }; },
-        () => { const a = rand(2,9), b = rand(2,9), c = rand(2,9), d = rand(2,9); return { q: `${a} × ${b} + ${c} × ${d}`, ans: a*b + c*d }; },
+        () => {
+          const a = rand(2,9), b = rand(2,9), c = rand(2,9);
+          return {
+            q: `${a} + ${b} × ${c}`,
+            ans: a + b*c,
+            steps: [
+              `PEMDAS : la multiplication est prioritaire sur l'addition.`,
+              `On calcule d'abord <code>${b} × ${c} = ${b*c}</code>.`,
+              `Puis <code>${a} + ${b*c} = ${a + b*c}</code>.`
+            ]
+          };
+        },
+        () => {
+          const a = rand(2,9), b = rand(2,9), c = rand(2,9);
+          return {
+            q: `(${a} + ${b}) × ${c}`,
+            ans: (a+b)*c,
+            steps: [
+              `Les parenthèses sont prioritaires.`,
+              `<code>(${a} + ${b}) = ${a+b}</code>.`,
+              `Puis <code>${a+b} × ${c} = ${(a+b)*c}</code>.`
+            ]
+          };
+        },
+        () => {
+          const a = rand(20,40), b = rand(2,9), c = rand(2,9);
+          return {
+            q: `${a} − ${b} × ${c}`,
+            ans: a - b*c,
+            steps: [
+              `PEMDAS : on calcule la multiplication avant la soustraction.`,
+              `<code>${b} × ${c} = ${b*c}</code>.`,
+              `Puis <code>${a} − ${b*c} = ${a - b*c}</code>.`
+            ]
+          };
+        },
+        () => {
+          const a = rand(2,9), b = rand(2,9), c = rand(2,9), d = rand(2,9);
+          return {
+            q: `${a} × ${b} + ${c} × ${d}`,
+            ans: a*b + c*d,
+            steps: [
+              `On effectue les deux multiplications avant l'addition.`,
+              `<code>${a} × ${b} = ${a*b}</code> et <code>${c} × ${d} = ${c*d}</code>.`,
+              `Puis <code>${a*b} + ${c*d} = ${a*b + c*d}</code>.`
+            ]
+          };
+        },
       ];
       const t = pick(types)();
-      return { type: 'number', q: `Calcule : <span class="formula">${t.q}</span>`, ans: t.ans };
+      return { type: 'number', q: `Calcule : <span class="formula">${t.q}</span>`, ans: t.ans, steps: t.steps };
     }
   },
 
   {
     id: 'fractions',
-    name: 'Fractions : sens et simplification',
+    name: 'Fractions : sens & simplification',
     icon: '🍰',
     prereq: ['arith_base'],
     lesson: {
-      narrative: "Au marché de Mathopolis, Sieur Fractio coupe des tartes. Une fraction, c'est un nombre de parts (numérateur) sur un total de parts (dénominateur).",
+      narrative: "Une fraction, c'est un nombre de parts (numérateur) sur un total de parts (dénominateur).",
       content: `
         <h4>Sens d'une fraction</h4>
         <p><code>3/4</code> signifie « 3 parts sur 4 ». C'est aussi <code>3 ÷ 4 = 0,75</code>.</p>
         <h4>Simplification</h4>
-        <p>On divise numérateur et dénominateur par leur <strong>plus grand diviseur commun (PGCD)</strong>.</p>
-        <div class="example">6/8 = (6÷2)/(8÷2) = 3/4</div>
-        <div class="example">15/20 = (15÷5)/(20÷5) = 3/4</div>
-        <div class="warn">⚠️ Une fraction est dite <em>irréductible</em> quand on ne peut plus la simplifier (PGCD = 1).</div>
+        <p>On divise numérateur ET dénominateur par leur <strong>plus grand diviseur commun</strong> (PGCD).</p>
+        <div class="example">6/8 = (6÷2)/(8÷2) = 3/4<br>15/20 = (15÷5)/(20÷5) = 3/4</div>
+        <h4>Comment trouver le PGCD ?</h4>
+        <p>On cherche le plus grand nombre qui divise les deux. Pour 12 et 18 : les diviseurs communs sont 1, 2, 3, 6 → le PGCD vaut <strong>6</strong>.</p>
+        <div class="warn">⚠️ Une fraction est <strong>irréductible</strong> quand on ne peut plus la simplifier (PGCD = 1). Une copie comme « 6/8 » sans simplifier est considérée fausse au lycée.</div>
       `
     },
     generate: () => {
-      // On part d'une fraction irréductible propre (sx < sy, pgcd = 1) et on
-      // multiplie par k pour générer la version non simplifiée. Évite les
-      // dégénérescences (1/1, 2/1, etc.).
-      const IRREDUCIBLES = [
-        [1,2],[1,3],[2,3],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5],
-        [1,6],[5,6],[1,7],[2,7],[3,7],[4,7],[5,7],[6,7],
-        [1,8],[3,8],[5,8],[7,8],[1,9],[2,9],[4,9],[5,9],[7,9],[8,9],
-      ];
-      const [sx, sy] = pick(IRREDUCIBLES);
+      const x = rand(1, 7), y = rand(2, 9);
       const k = rand(2, 5);
-      const a = sx * k, b = sy * k;
+      const a = x * k, b = y * k;
+      const g = gcd(x, y);
+      const sx = x / g, sy = y / g;
+      const pgcd = gcd(a, b);
       return {
         type: 'fraction',
         q: `Simplifie la fraction <span class="formula">${a}/${b}</span> au maximum (format : <code>num/den</code>).`,
         ans: `${sx}/${sy}`,
+        steps: [
+          `On cherche le PGCD de ${a} et ${b}.`,
+          `PGCD(${a}, ${b}) = <code>${pgcd}</code>.`,
+          `On divise haut et bas : <code>${a} ÷ ${pgcd} = ${sx}</code> et <code>${b} ÷ ${pgcd} = ${sy}</code>.`,
+          `Fraction simplifiée : <code>${sx}/${sy}</code>.`
+        ],
         validate: (input) => {
           const m = input.replace(/\s/g, '').match(/^(-?\d+)\/(-?\d+)$/);
           if (!m) return false;
@@ -684,41 +925,65 @@ const CONCEPTS = [
     icon: '📊',
     prereq: ['fractions'],
     lesson: {
-      narrative: "Dame Centa tient le bureau des taxes. « Un pourcentage, m'expliquait-elle, c'est une fraction sur 100. Rien de plus, rien de moins. »",
+      narrative: "Un pourcentage, c'est juste une fraction sur 100. Rien de plus, rien de moins.",
       content: `
         <h4>Définition</h4>
         <p><code>p%</code> de <code>n</code> signifie <code>(p / 100) × n</code>.</p>
-        <div class="example">20% de 50 = (20/100) × 50 = 0,2 × 50 = 10</div>
-        <div class="example">15% de 80 = 0,15 × 80 = 12</div>
-        <h4>Astuce mentale</h4>
-        <p>Pour <code>10%</code>, divise par 10. Pour <code>5%</code>, prends la moitié de 10%. Pour <code>20%</code>, divise par 5.</p>
-        <div class="warn">⚠️ Une augmentation de 50% suivie d'une baisse de 50% ne ramène <em>pas</em> au point de départ ! 100 → 150 → 75.</div>
+        <div class="example">20% de 50 = (20/100) × 50 = 0,2 × 50 = 10<br>15% de 80 = 0,15 × 80 = 12</div>
+        <h4>Astuces mentales</h4>
+        <p>• Pour <strong>10%</strong> : divise par 10. <code>10% de 240 = 24</code>.</p>
+        <p>• Pour <strong>5%</strong> : prends la moitié de 10%.</p>
+        <p>• Pour <strong>20%</strong> : divise par 5.</p>
+        <p>• Pour <strong>25%</strong> : divise par 4.</p>
+        <h4>Augmentation / réduction</h4>
+        <p>Augmenter de p% revient à multiplier par <code>(1 + p/100)</code>. Réduire de p% revient à multiplier par <code>(1 − p/100)</code>.</p>
+        <div class="warn">⚠️ Une augmentation de 50% suivie d'une baisse de 50% ne ramène <em>pas</em> au point de départ : 100 → 150 → 75 !</div>
       `
     },
     generate: () => {
-      // Tous les couples ci-dessous donnent une réponse entière (vérifié).
-      // On évite les arrondis qui marqueraient « 33,33 » faux contre « 33 ».
       const types = [
         () => {
-          const p = pick([5, 10, 15, 20, 25, 50]);
-          const n = pick([20, 40, 60, 80, 100, 200]);
-          return { q: `Calcule : <span class="formula">${p}% de ${n}</span>`, ans: p * n / 100 };
+          const p = pick([10,20,25,50,5,15]), n = pick([20,40,60,80,100,200]);
+          return {
+            q: `Calcule : <span class="formula">${p}% de ${n}</span>`,
+            ans: p*n/100,
+            steps: [
+              `<code>${p}%</code> = <code>${p}/100</code> = <code>${p/100}</code>.`,
+              `<code>${p}% de ${n}</code> = <code>${p/100} × ${n}</code>.`,
+              `= <code>${p*n/100}</code>.`
+            ]
+          };
         },
         () => {
-          const p = pick([10, 20, 25, 50]);
-          const n = pick([40, 60, 80, 100, 200]);
-          return { q: `Un produit coûtait ${n}€. Son prix augmente de ${p}%. Quel est le nouveau prix (en €) ?`, ans: n + p * n / 100 };
+          const p = pick([10,25,50]), n = pick([40,60,80,200]);
+          const incr = p*n/100;
+          const r = n + incr;
+          return {
+            q: `Un produit coûtait ${n}€. Son prix augmente de ${p}%. Quel est le nouveau prix (en €) ?`,
+            ans: r,
+            steps: [
+              `Augmentation = <code>${p}% de ${n}€</code> = <code>${incr}€</code>.`,
+              `Nouveau prix = prix initial + augmentation = <code>${n} + ${incr}</code>.`,
+              `= <code>${r}€</code>.`
+            ]
+          };
         },
         () => {
-          // On choisit le pourcentage et le total, on en déduit la part entière.
-          const p = pick([10, 20, 25, 50]);
-          const tot = pick([20, 40, 60, 80, 100, 200]);
-          const part = p * tot / 100;
-          return { q: `${part} élèves sur ${tot} ont réussi. Quel pourcentage cela représente-t-il ?`, ans: p };
+          const part = pick([15,20,25,30]), tot = pick([60,80,100,200]);
+          const ans = Math.round(part/tot*100);
+          return {
+            q: `${part} élèves sur ${tot} ont réussi. Quel pourcentage cela représente-t-il ?`,
+            ans,
+            steps: [
+              `Pourcentage = <code>(partie / total) × 100</code>.`,
+              `= <code>(${part} / ${tot}) × 100</code>.`,
+              `= <code>${ans}%</code>.`
+            ]
+          };
         },
       ];
       const t = pick(types)();
-      return { type: 'number', q: t.q, ans: t.ans };
+      return { type: 'number', q: t.q, ans: t.ans, steps: t.steps };
     }
   },
 
@@ -728,53 +993,61 @@ const CONCEPTS = [
     icon: '🟰',
     prereq: ['priorites'],
     lesson: {
-      narrative: "Maître Equan murmure : « Trouver x, c'est rétablir l'équilibre. Ce que tu fais à un côté, fais-le à l'autre. »",
+      narrative: "Trouver x, c'est rétablir l'équilibre. Ce que tu fais à un côté, fais-le à l'autre.",
       content: `
         <h4>Principe</h4>
-        <p>Une équation <code>ax + b = c</code> se résout en isolant <code>x</code> :</p>
-        <p>1. On retire <code>b</code> des deux côtés : <code>ax = c − b</code></p>
-        <p>2. On divise par <code>a</code> : <code>x = (c − b) / a</code></p>
-        <div class="example">3x + 5 = 17 → 3x = 12 → x = 4</div>
-        <div class="example">2x − 7 = 9 → 2x = 16 → x = 8</div>
-        <div class="warn">⚠️ Si <code>a</code> est négatif, attention au signe lors de la division.</div>
+        <p>Une équation <code>ax + b = c</code> se résout en deux temps :</p>
+        <p><strong>1.</strong> Isoler le terme en x : on retire <code>b</code> des deux côtés → <code>ax = c − b</code>.</p>
+        <p><strong>2.</strong> Diviser par <code>a</code> → <code>x = (c − b) / a</code>.</p>
+        <div class="example">3x + 5 = 17<br>3x = 17 − 5 = 12<br>x = 12 / 3 = 4</div>
+        <div class="example">2x − 7 = 9<br>2x = 9 + 7 = 16<br>x = 16 / 2 = 8</div>
+        <h4>Vérification</h4>
+        <p>Toujours vérifier : remplacer x par la valeur trouvée et s'assurer que l'égalité est juste.</p>
+        <div class="warn">⚠️ Si <code>a</code> est négatif, attention au signe lors de la division : <code>−2x = 8</code> donne <code>x = −4</code>.</div>
       `
     },
     generate: () => {
-      // ax + b = c, avec x entier
       const a = pick([2,3,4,5,6,7]);
       const x = rand(2, 12);
       const b = rand(-15, 15);
       const c = a*x + b;
       const bStr = b >= 0 ? `+ ${b}` : `− ${-b}`;
+      const moveStep = b >= 0
+        ? `On retranche ${b} des deux côtés : <code>${a}x = ${c} − ${b} = ${c - b}</code>.`
+        : `On ajoute ${-b} des deux côtés : <code>${a}x = ${c} + ${-b} = ${c - b}</code>.`;
       return {
         type: 'number',
         q: `Résous : <span class="formula">${a}x ${bStr} = ${c}</span>. Quelle est la valeur de x ?`,
-        ans: x
+        ans: x,
+        steps: [
+          `On part de <code>${a}x ${bStr} = ${c}</code>.`,
+          moveStep,
+          `On divise par ${a} : <code>x = ${c-b} / ${a}</code>.`,
+          `<code>x = ${x}</code>. Vérification : <code>${a}×${x} ${bStr} = ${a*x + b} = ${c}</code> ✓`
+        ]
       };
     }
   },
 ];
 
-// Indice du concept par id pour résolution prereqs
 const CONCEPT_BY_ID = Object.fromEntries(CONCEPTS.map(c => [c.id, c]));
 
-// ─── Paliers / production / coûts (cf. §2 et §9) ─────────────────
+// ─── Paliers / production / coûts ────────────────────────────────
 const TIERS = [
-  { name: 'À construire', prodPerMin: 0,   nextCost: 50,    exReq: 3 },
-  { name: 'Atelier',      prodPerMin: 1,   nextCost: 200,   exReq: 5 },
-  { name: 'Laboratoire',  prodPerMin: 5,   nextCost: 800,   exReq: 8 },
-  { name: 'Institut',     prodPerMin: 20,  nextCost: 3000,  exReq: 12 },
-  { name: 'Académie',     prodPerMin: 80,  nextCost: 12000, exReq: 30 },
-  { name: 'Légende',      prodPerMin: 300, nextCost: null,  exReq: null },
+  { name: '—',           prodPerMin: 0,   nextCost: 50,    exReq: 3 },
+  { name: 'Atelier',     prodPerMin: 1,   nextCost: 200,   exReq: 5 },
+  { name: 'Laboratoire', prodPerMin: 5,   nextCost: 800,   exReq: 8 },
+  { name: 'Institut',    prodPerMin: 20,  nextCost: 3000,  exReq: 12 },
+  { name: 'Académie',    prodPerMin: 80,  nextCost: 12000, exReq: 30 },
+  { name: 'Légende',     prodPerMin: 300, nextCost: null,  exReq: null },
 ];
-
-// Récompense de base par exo (cf. §9 : Normal = 15-25T)
-const BASE_REWARD_T = 15;
 
 const MASTERY_LABELS = ['Découvert', 'Pratiqué', 'Maîtrisé', 'Expert', 'Légendaire'];
 const MASTERY_ICONS  = ['🔓', '📚', '✅', '🌟', '💎'];
 
-const MAX_OFFLINE_HOURS = 6; // §2 : cap idle
+const MAX_OFFLINE_HOURS = 6;
+const SOLUTION_COST_INSIGHTS = 2;
+const FREE_SOLUTION_AFTER_FAILS = 3;
 
 // ─── Game state ──────────────────────────────────────────────────
 const STATE_KEY = 'mathopolis_save_v1';
@@ -786,14 +1059,14 @@ function defaultState() {
     I: 0,
     xp: 0,
     streak: 0,
-    lastDay: null,        // ISO date "YYYY-MM-DD" du dernier exo
-    lastStreakDay: null,  // dernier jour où la streak a été créditée
+    lastDay: null,
+    lastStreakDay: null,
     exosToday: 0,
     lastTick: Date.now(),
     concepts: Object.fromEntries(CONCEPTS.map(c => [c.id, {
-      tier: 0,             // 0 = pas construit, 1-5 paliers
+      tier: 0,
       exercisesSolved: 0,
-      mastery: 0,          // 0..4
+      mastery: 0,
     }])),
     createdAt: Date.now(),
   };
@@ -804,10 +1077,13 @@ function loadState() {
     const raw = localStorage.getItem(STATE_KEY);
     if (!raw) return defaultState();
     const parsed = JSON.parse(raw);
-    // S'assurer que tous les concepts existent (forward-compat)
     const def = defaultState();
     for (const id of Object.keys(def.concepts)) {
       if (!parsed.concepts[id]) parsed.concepts[id] = def.concepts[id];
+    }
+    // Forward-compat : remplir les nouveaux champs
+    for (const k of Object.keys(def)) {
+      if (parsed[k] === undefined) parsed[k] = def[k];
     }
     return parsed;
   } catch (e) {
@@ -836,26 +1112,20 @@ function applyIdle() {
   const cappedMs = Math.min(elapsedMs, MAX_OFFLINE_HOURS * 3600 * 1000);
   const minutes = cappedMs / 60000;
   const earned = totalProdPerMin() * minutes;
-  if (earned > 0) {
-    state.T += earned;
-  }
+  if (earned > 0) state.T += earned;
   state.lastTick = now;
   return earned;
 }
 
 // ─── Streak ──────────────────────────────────────────────────────
-// On utilise la date LOCALE (pas UTC) pour que la frontière de journée
-// corresponde au ressenti du joueur (sinon, à UTC+1, l'heure locale
-// 00h30 mardi tombe encore le « lundi » UTC, ce qui déphase la streak).
 function localDateISO(d = new Date()) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 }
-function todayISO() {
-  return localDateISO();
-}
+function todayISO() { return localDateISO(); }
+
 function streakMultiplier() {
   const s = state.streak;
   if (s >= 100) return 3;
@@ -868,23 +1138,18 @@ function streakMultiplier() {
 function bumpStreakIfNewDay() {
   const today = todayISO();
   if (state.lastDay !== today) {
-    // Si lastDay était hier, incrémente; sinon reset à 0 (sera incrémenté à 1 quand il fait son 3e exo aujourd'hui)
     state.exosToday = 0;
     state.lastDay = today;
   }
 }
 function onExerciseSolved() {
   state.exosToday += 1;
-  // À la 3e réussite du jour, on incrémente la streak (une fois par jour seulement)
   if (state.exosToday === 3) {
-    // Vérifier si la streak doit continuer ou démarrer
     const yesterday = (() => {
       const d = new Date();
       d.setDate(d.getDate() - 1);
       return localDateISO(d);
     })();
-    // On stocke le dernier jour où la streak a été créditée
-    // (== null couvre null et undefined pour les anciens saves)
     if (state.lastStreakDay === yesterday || state.lastStreakDay == null) {
       state.streak = (state.streak || 0) + 1;
     } else if (state.lastStreakDay !== todayISO()) {
@@ -914,22 +1179,21 @@ function tryUpgradeBuilding(conceptId) {
   return true;
 }
 
-// ─── Vérif prereqs ───────────────────────────────────────────────
 function isUnlocked(conceptId) {
   const c = CONCEPT_BY_ID[conceptId];
   if (!c.prereq.length) return true;
-  return c.prereq.every(p => state.concepts[p].mastery >= 2); // ≥ Maîtrisé
+  return c.prereq.every(p => state.concepts[p].mastery >= 2);
 }
 
-// ─── Rendering ───────────────────────────────────────────────────
+// ─── Rendering : HUD + City ──────────────────────────────────────
 function renderHUD() {
   $('#stat-T').textContent = fmtNum(state.T);
   $('#stat-I').textContent = state.I;
   $('#stat-streak').textContent = state.streak;
   $('#stat-xp').textContent = state.xp;
-  // Sous-titre de progression
   const mastered = CONCEPTS.filter(c => state.concepts[c.id].mastery >= 2).length;
-  $('#founda-progress').textContent = `${mastered}/${CONCEPTS.length} maîtrisés · +${fmtNum(totalProdPerMin())} 🪙/min`;
+  $('#founda-progress').textContent =
+    `${mastered}/${CONCEPTS.length} maîtrisés · +${fmtNum(totalProdPerMin())} 🪙/min`;
 }
 
 function renderCity() {
@@ -944,20 +1208,20 @@ function renderCity() {
     const card = el('div', { class: 'building' + (unlocked ? '' : ' locked'), 'data-id': c.id });
     card.appendChild(el('div', { class: 'building-icon' }, c.icon));
     card.appendChild(el('div', { class: 'building-name' }, c.name));
-    const tierBadge = el('div', { class: 'building-tier' }, [
-      el('span', { class: 'tier-badge tier-' + sc.tier }, tierData.name),
-      ' ',
-      el('span', { html: `${MASTERY_ICONS[sc.mastery]} ${MASTERY_LABELS[sc.mastery]}` })
-    ]);
-    card.appendChild(tierBadge);
+
+    const meta = el('div', { class: 'building-meta' });
+    meta.appendChild(el('span', { class: 'tier-badge tier-' + sc.tier }, tierData.name));
+    meta.appendChild(el('span', { class: 'mastery-badge m-' + sc.mastery },
+      `${MASTERY_ICONS[sc.mastery]} ${MASTERY_LABELS[sc.mastery]}`));
+    card.appendChild(meta);
 
     const prodLine = el('div', { class: 'building-prod' });
     prodLine.appendChild(el('span', {}, sc.tier > 0 ? `+${tierData.prodPerMin} 🪙/min` : 'Non construit'));
-    prodLine.appendChild(el('span', { class: 'mastery' }, `${sc.exercisesSolved} exos`));
+    prodLine.appendChild(el('span', { class: 'exos' }, `${sc.exercisesSolved} exos`));
     card.appendChild(prodLine);
 
-    if (tierData.exReq) {
-      const pct = Math.min(100, (sc.exercisesSolved / tierData.exReq) * 100);
+    if (next && next.exReq) {
+      const pct = Math.min(100, (sc.exercisesSolved / next.exReq) * 100);
       const bar = el('div', { class: 'progress-bar' });
       bar.appendChild(el('div', { class: 'fill', style: `width:${pct}%` }));
       card.appendChild(bar);
@@ -969,9 +1233,7 @@ function renderCity() {
       card.appendChild(el('div', { class: 'building-prereqs' }, `🔒 Requiert : ${missing}`));
     }
 
-    if (unlocked) {
-      card.addEventListener('click', () => openConcept(c.id));
-    }
+    if (unlocked) card.addEventListener('click', () => openConcept(c.id));
     city.appendChild(card);
   }
 }
@@ -981,23 +1243,20 @@ let currentSession = null;
 
 function openConcept(conceptId) {
   const c = CONCEPT_BY_ID[conceptId];
-  const sc = state.concepts[conceptId];
 
   currentSession = {
     conceptId,
-    exos: [],         // exercices générés
+    exos: [],
     currentIdx: 0,
     correctCount: 0,
-    hintsThisExo: 0,
-    showLessonOnly: sc.tier === 0, // 1ère visite = leçon en avant
   };
 
-  // Génère 4 exos d'avance
   for (let i = 0; i < 4; i++) {
     const ex = c.generate();
     ex.solved = false;
     ex.attempts = 0;
     ex.hintsUsed = 0;
+    ex.solutionShown = false;
     currentSession.exos.push(ex);
   }
 
@@ -1034,54 +1293,46 @@ function renderModal() {
 
   const body = el('div', { class: 'modal-body' });
 
-  // Leçon
+  // Leçon (toujours visible)
   const lessonBox = el('div', { class: 'lesson' });
-  lessonBox.appendChild(el('div', { class: 'narrative' }, '« ' + c.lesson.narrative + ' »'));
+  lessonBox.appendChild(el('div', { class: 'narrative' }, '“ ' + c.lesson.narrative + ' ”'));
   lessonBox.appendChild(el('div', { html: c.lesson.content }));
   body.appendChild(lessonBox);
 
-  // Exercice courant
   const ex = currentSession.exos[currentSession.currentIdx];
   if (ex) {
     body.appendChild(renderExercise(ex));
   } else {
-    // Tous résolus / fin de session
     body.appendChild(el('div', { class: 'feedback correct' }, [
-      el('strong', {}, '🎉 Session terminée ! '),
-      `Tu as résolu ${currentSession.correctCount} exos sur cette session. `,
-      `Total de cette journée : ${state.exosToday} exo${state.exosToday > 1 ? 's' : ''}.`
+      el('strong', {}, '🎉 Session terminée. '),
+      `Tu as résolu ${currentSession.correctCount} exos. `,
+      `Total aujourd'hui : ${state.exosToday} exo${state.exosToday > 1 ? 's' : ''}.`
     ]));
 
-    // Tentative d'upgrade : nextCost/exReq sont stockés sur le tier ACTUEL
-    // (= ce qu'il faut pour passer au suivant). On lit juste le NOM du tier suivant.
-    const cur = TIERS[sc.tier];
-    const nextName = TIERS[sc.tier + 1] ? TIERS[sc.tier + 1].name : null;
-    if (nextName && cur.nextCost != null) {
-      const remaining = Math.max(0, cur.exReq - sc.exercisesSolved);
-      const canAfford = state.T >= cur.nextCost;
+    const next = TIERS[sc.tier + 1];
+    if (next && next.exReq) {
+      const remaining = Math.max(0, next.exReq - sc.exercisesSolved);
+      const canAfford = state.T >= next.nextCost;
       const canUpgrade = remaining === 0 && canAfford;
       const upBtn = el('button', {
-        class: 'btn',
+        class: 'btn success',
         disabled: !canUpgrade,
         onclick: () => {
-          if (tryUpgradeBuilding(currentSession.conceptId)) {
-            renderModal();
-          }
+          if (tryUpgradeBuilding(currentSession.conceptId)) renderModal();
         }
       }, canUpgrade
-        ? `⬆️ Faire monter au palier ${nextName} (${fmtNum(cur.nextCost)} 🪙)`
+        ? `⬆ Faire monter au palier ${next.name} (${fmtNum(next.nextCost)} 🪙)`
         : remaining > 0
-          ? `Encore ${remaining} exos pour débloquer ${nextName}`
-          : `Manque ${fmtNum(cur.nextCost - state.T)} 🪙 pour ${nextName}`
+          ? `Encore ${remaining} exos pour débloquer ${next.name}`
+          : `Manque ${fmtNum(next.nextCost - state.T)} 🪙 pour ${next.name}`
       );
       body.appendChild(el('div', { style: 'margin-top:14px' }, upBtn));
     }
 
-    const replay = el('div', { class: 'footer-actions' }, [
-      el('button', { class: 'btn secondary', onclick: () => openConcept(currentSession.conceptId) }, 'Faire d\'autres exos'),
+    body.appendChild(el('div', { class: 'footer-actions' }, [
+      el('button', { class: 'btn secondary', onclick: () => openConcept(currentSession.conceptId) }, "Faire d'autres exos"),
       el('button', { class: 'btn ghost', onclick: closeModal }, 'Retour à la cité'),
-    ]);
-    body.appendChild(replay);
+    ]));
   }
 
   modal.appendChild(body);
@@ -1092,44 +1343,34 @@ function renderExercise(ex) {
 
   const header = el('div', { class: 'ex-header' });
   header.appendChild(el('span', {}, `Exercice ${currentSession.currentIdx + 1} / ${currentSession.exos.length}`));
-  const expectedReward = Math.round(BASE_REWARD_T * streakMultiplier());
-  header.appendChild(el('span', { class: 'ex-reward' }, `+${expectedReward} 🪙`));
+  header.appendChild(el('span', { class: 'ex-reward' }, `+10 🪙`));
   wrap.appendChild(header);
 
   wrap.appendChild(el('div', { class: 'ex-q', html: ex.q }));
 
-  // Input ou choix
   const row = el('div', { class: 'ex-row' });
   const input = el('input', {
     class: 'ex-input',
     type: 'text',
     inputmode: ex.type === 'number' ? 'decimal' : 'text',
-    placeholder: ex.type === 'fraction' ? 'ex: 3/4' : 'Ta réponse',
+    placeholder: ex.type === 'fraction' ? 'ex : 3/4' : 'Ta réponse',
     autocomplete: 'off',
     spellcheck: 'false'
   });
-  // Submit on Enter
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); submit(); }
-  });
-  row.appendChild(input);
 
   const submit = () => {
     const raw = input.value.trim();
     if (!raw) return;
     ex.attempts += 1;
     let ok = false;
-    if (ex.validate) {
-      ok = ex.validate(raw);
-    } else if (ex.type === 'number') {
+    if (ex.validate) ok = ex.validate(raw);
+    else if (ex.type === 'number') {
       const v = parseFloat(raw.replace(',', '.'));
       ok = !isNaN(v) && Math.abs(v - ex.ans) < 1e-6;
-    } else {
-      ok = raw === String(ex.ans);
-    }
+    } else ok = raw === String(ex.ans);
 
-    const fb = wrap.querySelector('.feedback');
-    if (fb) fb.remove();
+    const oldFb = wrap.querySelector('.feedback');
+    if (oldFb) oldFb.remove();
 
     if (ok) {
       ex.solved = true;
@@ -1137,64 +1378,67 @@ function renderExercise(ex) {
       input.disabled = true;
       submitBtn.disabled = true;
       hintBtn.disabled = true;
-      const reward = Math.max(2, Math.round(BASE_REWARD_T * Math.pow(0.75, ex.hintsUsed) * streakMultiplier()));
+      solveBtn.disabled = true;
+      const reward = Math.max(2, Math.round(10 * Math.pow(0.75, ex.hintsUsed) * streakMultiplier()));
       state.T += reward;
       state.xp += 1;
-      state.concepts[currentSession.conceptId].exercisesSolved += 1;
-      // Mastery progression : pratiqué 5, maîtrisé 12, expert 30, légendaire 80
-      // On prend le max pour ne jamais downgrade un mastery déjà acquis (ex: après upgrade tier).
       const sc = state.concepts[currentSession.conceptId];
+      sc.exercisesSolved += 1;
       const totalSolved = sc.exercisesSolved;
-      let newMastery = 0;
-      if (totalSolved >= 80) newMastery = 4;
-      else if (totalSolved >= 30) newMastery = 3;
-      else if (totalSolved >= 12) newMastery = 2;
-      else if (totalSolved >= 5)  newMastery = 1;
-      sc.mastery = Math.max(sc.mastery, newMastery);
+      if (totalSolved >= 80) sc.mastery = 4;
+      else if (totalSolved >= 30) sc.mastery = 3;
+      else if (totalSolved >= 12) sc.mastery = 2;
+      else if (totalSolved >= 5)  sc.mastery = 1;
+      if (sc.tier === 0) {
+        sc.tier = 1;
+        toast(`🏗️ ${CONCEPT_BY_ID[currentSession.conceptId].name} : Atelier construit !`);
+      }
       currentSession.correctCount += 1;
       onExerciseSolved();
 
-      const fbEl = el('div', { class: 'feedback correct', html:
-        `✅ Bravo ! +${reward} 🪙 (×${streakMultiplier()} streak)` +
+      wrap.appendChild(el('div', { class: 'feedback correct', html:
+        `✓ Bravo ! +${reward} 🪙 (×${streakMultiplier()} streak)` +
         (ex.hintsUsed > 0 ? ` · indice utilisé : récompense réduite` : '')
-      });
-      wrap.appendChild(fbEl);
+      }));
 
       saveState();
       renderHUD();
 
-      // Prochain exo après court délai
       setTimeout(() => {
         currentSession.currentIdx += 1;
         renderModal();
       }, 1100);
     } else {
       wrap.classList.add('wrong');
-      const fbEl = el('div', { class: 'feedback wrong', html:
-        ex.attempts >= 3
-          ? `❌ La réponse était <strong>${ex.ans}</strong>. On passe au suivant.`
-          : `❌ Pas tout à fait. Réessaie ou utilise un indice.`
-      });
-      wrap.appendChild(fbEl);
-      if (ex.attempts >= 3) {
+      const remainingFails = FREE_SOLUTION_AFTER_FAILS - ex.attempts;
+      wrap.appendChild(el('div', { class: 'feedback wrong', html:
+        ex.attempts >= FREE_SOLUTION_AFTER_FAILS
+          ? `✗ La réponse était <strong>${ex.ans}</strong>. La solution détaillée est désormais gratuite.`
+          : `✗ Pas tout à fait. ${remainingFails === 1 ? 'Encore 1 tentative avant la solution gratuite.' : 'Réessaie ou demande un indice.'}`
+      }));
+      // Si 3 échecs : on dévoile automatiquement la solution
+      if (ex.attempts >= FREE_SOLUTION_AFTER_FAILS && !ex.solutionShown) {
+        showSolution(ex, wrap, true);
         input.disabled = true;
         submitBtn.disabled = true;
         hintBtn.disabled = true;
-        setTimeout(() => {
-          currentSession.currentIdx += 1;
-          renderModal();
-        }, 1800);
       }
     }
+    setTimeout(() => { wrap.classList.remove('wrong'); }, 600);
   };
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); submit(); }
+  });
+  row.appendChild(input);
 
   const submitBtn = el('button', { class: 'btn', onclick: submit }, 'Valider');
   row.appendChild(submitBtn);
 
   const hintBtn = el('button', { class: 'btn ghost', onclick: () => {
     ex.hintsUsed += 1;
-    const fb = wrap.querySelector('.feedback');
-    if (fb) fb.remove();
+    const oldFb = wrap.querySelector('.feedback');
+    if (oldFb) oldFb.remove();
     let hint = '💡 ';
     if (ex.type === 'number') {
       const v = ex.ans;
@@ -1203,7 +1447,7 @@ function renderExercise(ex) {
     } else if (ex.type === 'fraction') {
       hint += `Cherche le PGCD du numérateur et du dénominateur.`;
     } else {
-      hint += `La réponse commence par "${String(ex.ans).slice(0, 1)}".`;
+      hint += `La réponse commence par « ${String(ex.ans).slice(0, 1)} ».`;
     }
     if (ex.hintsUsed >= 2) {
       hint = `💡 La réponse est : <strong>${ex.ans}</strong>.`;
@@ -1213,6 +1457,23 @@ function renderExercise(ex) {
   }}, '💡 Indice');
   row.appendChild(hintBtn);
 
+  // Solution détaillée
+  const solveBtn = el('button', { class: 'btn ghost', onclick: () => {
+    if (ex.solutionShown) return;
+    const failedEnough = ex.attempts >= FREE_SOLUTION_AFTER_FAILS;
+    if (!failedEnough && state.I < SOLUTION_COST_INSIGHTS) {
+      toast(`Il te faut ${SOLUTION_COST_INSIGHTS} 💎 (ou ${FREE_SOLUTION_AFTER_FAILS} échecs) pour voir la solution.`);
+      return;
+    }
+    if (!failedEnough) {
+      state.I -= SOLUTION_COST_INSIGHTS;
+      saveState();
+      renderHUD();
+    }
+    showSolution(ex, wrap, false);
+  }}, '📝 Solution');
+  row.appendChild(solveBtn);
+
   const skipBtn = el('button', { class: 'btn ghost', onclick: () => {
     currentSession.currentIdx += 1;
     renderModal();
@@ -1221,13 +1482,28 @@ function renderExercise(ex) {
 
   wrap.appendChild(row);
 
-  // Auto-focus
   setTimeout(() => input.focus(), 50);
-
   return wrap;
 }
 
-// ─── Toasts ──────────────────────────────────────────────────────
+function showSolution(ex, wrap, free) {
+  if (ex.solutionShown) return;
+  ex.solutionShown = true;
+  const sol = el('div', { class: 'solution' });
+  sol.appendChild(el('div', { class: 'solution-title' }, [
+    '📝 Solution détaillée',
+    free ? ' · gratuite' : ` · −${SOLUTION_COST_INSIGHTS} 💎`,
+  ].join('')));
+  const ol = el('ol');
+  for (const step of (ex.steps || ['(pas de solution disponible)'])) {
+    ol.appendChild(el('li', { html: step }));
+  }
+  sol.appendChild(ol);
+  sol.appendChild(el('div', { class: 'solution-final', html: `✓ Réponse : <code>${ex.ans}</code>` }));
+  wrap.appendChild(sol);
+}
+
+// ─── Toast ───────────────────────────────────────────────────────
 let toastTimer = null;
 function toast(msg) {
   const t = $('#toast');
@@ -1237,13 +1513,8 @@ function toast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-// ─── Panneau de test (dev) ───────────────────────────────────────
-// Permet de tester toutes les fonctionnalités sans grinder pendant des
-// heures : ajout de T/I, avance de streak, simulation d'idle, montée de
-// tier par bâtiment, mastery max, déblocage complet, etc.
+// ─── Panneau de test ─────────────────────────────────────────────
 function openTestPanel() {
-  // On force la fermeture d'une session d'exos en cours (sinon currentSession
-  // garde une référence qui empêche l'auto-focus / cleanup).
   currentSession = null;
   const modal = $('#modal');
   modal.innerHTML = '';
@@ -1259,44 +1530,36 @@ function openTestPanel() {
 
   const body = el('div', { class: 'test-panel' });
 
-  // ── Section : Ressources ──
-  body.appendChild(el('h4', {}, '🪙 Ressources'));
-  const resRow = el('div', { class: 'test-actions' }, [
+  body.appendChild(el('h4', {}, 'Ressources'));
+  body.appendChild(el('div', { class: 'test-actions' }, [
     el('button', { class: 'test-btn', onclick: () => { state.T += 100; refreshTest(); } }, '+100 🪙'),
     el('button', { class: 'test-btn', onclick: () => { state.T += 1000; refreshTest(); } }, '+1 000 🪙'),
     el('button', { class: 'test-btn', onclick: () => { state.T += 50000; refreshTest(); } }, '+50 000 🪙'),
     el('button', { class: 'test-btn', onclick: () => { state.I += 1; refreshTest(); } }, '+1 💎'),
     el('button', { class: 'test-btn', onclick: () => { state.I += 10; refreshTest(); } }, '+10 💎'),
-    el('button', { class: 'test-btn', onclick: () => { state.xp += 50; refreshTest(); } }, '+50 ⭐ XP'),
-  ]);
-  body.appendChild(resRow);
+    el('button', { class: 'test-btn', onclick: () => { state.xp += 50; refreshTest(); } }, '+50 ⭐'),
+  ]));
 
-  // ── Section : Streak ──
-  body.appendChild(el('h4', {}, '🔥 Streak (multiplicateur de récompense)'));
-  const streakRow = el('div', { class: 'test-actions' }, [
+  body.appendChild(el('h4', {}, 'Streak (multiplicateur)'));
+  body.appendChild(el('div', { class: 'test-actions' }, [
     el('button', { class: 'test-btn', onclick: () => setStreak(0) }, 'Streak 0 (×1)'),
     el('button', { class: 'test-btn', onclick: () => setStreak(7) }, 'Streak 7 (×1.2)'),
     el('button', { class: 'test-btn', onclick: () => setStreak(14) }, 'Streak 14 (×1.5)'),
     el('button', { class: 'test-btn', onclick: () => setStreak(30) }, 'Streak 30 (×2)'),
     el('button', { class: 'test-btn', onclick: () => setStreak(60) }, 'Streak 60 (×2.5)'),
     el('button', { class: 'test-btn', onclick: () => setStreak(100) }, 'Streak 100 (×3)'),
-  ]);
-  body.appendChild(streakRow);
+  ]));
 
-  // ── Section : Production idle ──
-  body.appendChild(el('h4', {}, '💤 Production idle'));
-  const idleInfo = el('div', { class: 'state', style: 'font-size:12px;color:var(--text-muted);margin-bottom:8px' },
-    `Production actuelle : ${fmtNum(totalProdPerMin())} 🪙/min · Cap offline : ${MAX_OFFLINE_HOURS}h`);
-  body.appendChild(idleInfo);
-  const idleRow = el('div', { class: 'test-actions' }, [
-    el('button', { class: 'test-btn', onclick: () => simulateIdle(60) }, 'Simuler +1 h offline'),
-    el('button', { class: 'test-btn', onclick: () => simulateIdle(360) }, `Simuler +${MAX_OFFLINE_HOURS} h (cap)`),
-    el('button', { class: 'test-btn', onclick: () => simulateIdle(1440) }, 'Simuler +24 h (test cap)'),
-  ]);
-  body.appendChild(idleRow);
+  body.appendChild(el('h4', {}, 'Production idle'));
+  body.appendChild(el('div', { style: 'font-size:12px;color:var(--text-3);margin-bottom:8px' },
+    `Production actuelle : ${fmtNum(totalProdPerMin())} 🪙/min · Cap offline : ${MAX_OFFLINE_HOURS} h`));
+  body.appendChild(el('div', { class: 'test-actions' }, [
+    el('button', { class: 'test-btn', onclick: () => simulateIdle(60) }, '+1 h offline'),
+    el('button', { class: 'test-btn', onclick: () => simulateIdle(360) }, `+${MAX_OFFLINE_HOURS} h (cap)`),
+    el('button', { class: 'test-btn', onclick: () => simulateIdle(1440) }, '+24 h (test cap)'),
+  ]));
 
-  // ── Section : Bâtiments individuels ──
-  body.appendChild(el('h4', {}, '🏛️ Bâtiments (par concept)'));
+  body.appendChild(el('h4', {}, 'Bâtiments par concept'));
   for (const c of CONCEPTS) {
     const sc = state.concepts[c.id];
     const row = el('div', { class: 'test-concept' });
@@ -1318,11 +1581,9 @@ function openTestPanel() {
     body.appendChild(row);
   }
 
-  // ── Section : raccourcis globaux ──
-  body.appendChild(el('h4', {}, '⚡ Raccourcis globaux'));
-  const globRow = el('div', { class: 'test-actions' }, [
+  body.appendChild(el('h4', {}, 'Raccourcis globaux'));
+  body.appendChild(el('div', { class: 'test-actions' }, [
     el('button', { class: 'test-btn', onclick: () => {
-      // Tous les bâtiments à Atelier (tier 1) avec 5 exos chacun
       for (const c of CONCEPTS) {
         const sc = state.concepts[c.id];
         sc.tier = Math.max(sc.tier, 1);
@@ -1332,36 +1593,31 @@ function openTestPanel() {
       refreshTest();
     }}, 'Tout en Atelier'),
     el('button', { class: 'test-btn', onclick: () => {
-      // Débloque la chaîne complète : tous Maîtrisés (mastery 2) pour tester les prereqs
       for (const c of CONCEPTS) {
         const sc = state.concepts[c.id];
         sc.mastery = Math.max(sc.mastery, 2);
         sc.exercisesSolved = Math.max(sc.exercisesSolved, 12);
       }
       refreshTest();
-    }}, 'Tout Maîtrisé (débloque prereqs)'),
+    }}, 'Tout Maîtrisé'),
     el('button', { class: 'test-btn', onclick: () => {
-      // Tout au max : Légende + Légendaire
       for (const c of CONCEPTS) {
         const sc = state.concepts[c.id];
-        sc.tier = 5;
-        sc.mastery = 4;
+        sc.tier = 5; sc.mastery = 4;
         sc.exercisesSolved = Math.max(sc.exercisesSolved, 100);
       }
       state.T += 50000;
       refreshTest();
     }}, '👑 Tout en Légende'),
     el('button', { class: 'test-btn danger', onclick: () => {
-      if (confirm('Réinitialiser tout l\'état (sans recharger la page) ?')) {
+      if (confirm("Réinitialiser tout l'état (sans recharger la page) ?")) {
         Object.assign(state, defaultState());
         refreshTest();
       }
-    }}, '🗑️ Reset état'),
-  ]);
-  body.appendChild(globRow);
+    }}, '🗑 Reset état'),
+  ]));
 
-  // ── Footer ──
-  body.appendChild(el('div', { style: 'margin-top:18px;display:flex;gap:10px;flex-wrap:wrap' }, [
+  body.appendChild(el('div', { class: 'footer-actions' }, [
     el('button', { class: 'btn', onclick: closeModal }, 'Fermer'),
   ]));
 
@@ -1373,7 +1629,6 @@ function refreshTest() {
   saveState();
   renderHUD();
   renderCity();
-  // Re-render test panel to refresh state lines
   openTestPanel();
 }
 
@@ -1385,17 +1640,15 @@ function setStreak(days) {
 }
 
 function simulateIdle(minutes) {
-  const earned = totalProdPerMin() * minutes;
-  if (earned <= 0) {
+  if (totalProdPerMin() <= 0) {
     toast(`⚠️ Aucune production : construis au moins un Atelier`);
     return;
   }
-  // Capper comme applyIdle()
   const capped = Math.min(minutes, MAX_OFFLINE_HOURS * 60);
-  const realEarned = totalProdPerMin() * capped;
-  state.T += realEarned;
+  const earned = totalProdPerMin() * capped;
+  state.T += earned;
   refreshTest();
-  toast(`💤 Simulé ${minutes}min (capé à ${capped}min) : +${fmtNum(realEarned)} 🪙`);
+  toast(`💤 Simulé ${minutes} min (capé à ${capped} min) : +${fmtNum(earned)} 🪙`);
 }
 
 // ─── Boot ────────────────────────────────────────────────────────
@@ -1403,25 +1656,15 @@ function boot() {
   state = loadState();
   bumpStreakIfNewDay();
   const earned = applyIdle();
-  if (earned > 0.5) {
-    toast(`💤 Pendant ton absence : +${fmtNum(earned)} 🪙`);
-  }
+  if (earned > 0.5) toast(`💤 Pendant ton absence : +${fmtNum(earned)} 🪙`);
   saveState();
   renderHUD();
   renderCity();
 
-  // Tick continu pour la production idle pendant la session
-  setInterval(() => {
-    applyIdle();
-    renderHUD();
-  }, 5000);
-
-  // Save périodique (sécurité)
+  setInterval(() => { applyIdle(); renderHUD(); }, 5000);
   setInterval(saveState, 15000);
-  // Save à la fermeture
   window.addEventListener('beforeunload', saveState);
 
-  // Reset
   $('#btn-reset').addEventListener('click', () => {
     if (confirm('Réinitialiser ta cité ? Toute ta progression sera perdue.')) {
       localStorage.removeItem(STATE_KEY);
@@ -1429,9 +1672,7 @@ function boot() {
     }
   });
 
-  // Mode test
   $('#btn-test').addEventListener('click', openTestPanel);
-  // Raccourci clavier : Maj + T
   document.addEventListener('keydown', (e) => {
     if (e.shiftKey && (e.key === 'T' || e.key === 't') && !e.ctrlKey && !e.metaKey
         && document.activeElement.tagName !== 'INPUT') {
@@ -1440,11 +1681,9 @@ function boot() {
     }
   });
 
-  // Fermeture modal au clic sur backdrop
   $('#modal-bg').addEventListener('click', (e) => {
     if (e.target.id === 'modal-bg') closeModal();
   });
-  // Échap
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && $('#modal-bg').classList.contains('show')) closeModal();
   });
