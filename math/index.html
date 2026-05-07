@@ -746,8 +746,10 @@ const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const gcd  = (a, b) => b === 0 ? Math.abs(a) : gcd(b, a % b);
 const fmtNum = (n) => {
-  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
-  if (n >= 1e3) return (n/1e3).toFixed(1) + 'k';
+  // Une décimale uniquement quand elle apporte de l'info (< 10).
+  // Évite « 50.0k » au profit de « 50k » sur les nombres ronds.
+  if (n >= 1e6) { const v = n / 1e6; return (v < 10 ? v.toFixed(1) : Math.round(v)) + 'M'; }
+  if (n >= 1e3) { const v = n / 1e3; return (v < 10 ? v.toFixed(1) : Math.round(v)) + 'k'; }
   return Math.floor(n).toString();
 };
 
@@ -1391,10 +1393,15 @@ function renderExercise(ex) {
       const sc = state.concepts[currentSession.conceptId];
       sc.exercisesSolved += 1;
       const totalSolved = sc.exercisesSolved;
-      if (totalSolved >= 80) sc.mastery = 4;
-      else if (totalSolved >= 30) sc.mastery = 3;
-      else if (totalSolved >= 12) sc.mastery = 2;
-      else if (totalSolved >= 5)  sc.mastery = 1;
+      // Mastery monotone : on ne redescend jamais. Sans le Math.max,
+      // si la mastery a été bumpée plus haut par une upgrade de tier,
+      // un nouvel exo dans une plage basse (ex: 9 exos) ramènerait
+      // mastery à 1, ce qui pourrait reverrouiller un concept aval.
+      const computed = totalSolved >= 80 ? 4
+                     : totalSolved >= 30 ? 3
+                     : totalSolved >= 12 ? 2
+                     : totalSolved >= 5  ? 1 : 0;
+      sc.mastery = Math.max(sc.mastery, computed);
       if (sc.tier === 0) {
         sc.tier = 1;
         toast(`🏗️ ${CONCEPT_BY_ID[currentSession.conceptId].name} : Atelier construit !`);
