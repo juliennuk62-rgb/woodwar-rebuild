@@ -3,33 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Mathopolis — Apprends les maths sans douleur</title>
+  <title>Cours de maths — du collège au post-bac</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Surfaces (flat, scolaire, lumineux) */
       --bg: #f7f8fa;
       --bg-elev: #ffffff;
       --bg-soft: #eef1f6;
-
-      /* Texte */
       --text: #111827;
       --text-2: #4b5563;
       --text-3: #9ca3af;
-
-      /* Bordures */
       --border: #e5e7eb;
       --border-strong: #d1d5db;
-
-      /* Brand : bleu scolaire / encre */
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
       --primary-soft: #eff6ff;
       --primary-100: #dbeafe;
-
-      /* Sémantique */
       --success: #059669;
       --success-soft: #ecfdf5;
       --success-text: #065f46;
@@ -37,24 +28,10 @@
       --warning-soft: #fffbeb;
       --danger: #dc2626;
       --danger-soft: #fef2f2;
-      --danger-text: #991b1b;
-
-      /* Monnaies */
-      --gold: #d97706;       /* théorèmes — ambre soutenu */
-      --gold-soft: #fef3c7;
-      --diamond: #7c3aed;    /* insights — violet */
+      --diamond: #7c3aed;
       --diamond-soft: #ede9fe;
-      --streak: #ea580c;     /* flamme — orange profond */
-      --streak-soft: #ffedd5;
-      --xp: #10b981;         /* XP — vert émeraude */
-      --xp-soft: #d1fae5;
-
-      /* Ombres */
       --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04);
       --shadow: 0 1px 3px rgba(17, 24, 39, 0.06), 0 4px 12px rgba(17, 24, 39, 0.04);
-      --shadow-md: 0 4px 12px rgba(17, 24, 39, 0.08), 0 16px 32px rgba(17, 24, 39, 0.06);
-
-      /* Radius */
       --r-sm: 6px;
       --r: 10px;
       --r-lg: 14px;
@@ -67,12 +44,8 @@
       color: var(--text);
       font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
       -webkit-font-smoothing: antialiased;
-      font-feature-settings: 'cv11', 'ss01';
     }
-    body {
-      min-height: 100vh;
-      padding-bottom: 60px;
-    }
+    body { min-height: 100vh; }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -80,643 +53,81 @@
       }
     }
 
-    /* ─── HUD ──────────────────────────────────────────────── */
-    .hud {
+    /* ─── Header ──────────────────────────────────── */
+    header.app-header {
       position: sticky; top: 0; z-index: 50;
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(12px) saturate(160%);
       -webkit-backdrop-filter: blur(12px) saturate(160%);
       border-bottom: 1px solid var(--border);
       padding: 14px 24px;
-      display: flex; align-items: center; gap: 10px;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 12px;
     }
-    .hud-title {
+    .app-title {
+      display: flex; align-items: center; gap: 10px;
       font-weight: 800;
-      font-size: 18px;
+      font-size: 17px;
       color: var(--text);
-      margin-right: auto;
-      display: flex; align-items: center; gap: 8px;
       letter-spacing: -0.01em;
     }
-    .hud-title .logo {
-      width: 30px; height: 30px;
+    .app-title .logo {
+      width: 32px; height: 32px;
       border-radius: 8px;
       background: linear-gradient(135deg, var(--primary), #4f46e5);
       display: inline-flex; align-items: center; justify-content: center;
-      color: white; font-size: 16px;
+      color: white; font-size: 17px; font-weight: 700;
       box-shadow: var(--shadow-sm);
     }
-    .stat {
-      display: inline-flex; align-items: center; gap: 6px;
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      background: var(--bg-soft);
-      color: var(--text-2);
-      transition: background 0.15s;
-    }
-    .stat .val { font-variant-numeric: tabular-nums; font-size: 14px; }
-    .stat.gold    { color: var(--gold);    background: var(--gold-soft); }
-    .stat.diamond { color: var(--diamond); background: var(--diamond-soft); }
-    .stat.streak  { color: var(--streak);  background: var(--streak-soft); }
-    .stat.xp      { color: var(--xp);      background: var(--xp-soft); }
-
-    /* ─── Layout ──────────────────────────────────────────── */
-    .wrap {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 32px 24px;
-    }
-
-    .intro {
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      padding: 24px 28px;
-      margin-bottom: 32px;
-      box-shadow: var(--shadow-sm);
-    }
-    .intro h2 {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 8px;
-      letter-spacing: -0.02em;
-    }
-    .intro p {
-      color: var(--text-2);
-      line-height: 1.65;
-      font-size: 15px;
-    }
-    .intro p strong { color: var(--text); font-weight: 600; }
-
-    /* Section header */
-    h3.section {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-2);
-      margin-bottom: 14px;
-      display: flex; align-items: center; gap: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    h3.section .label {
-      color: var(--text);
-      text-transform: none;
-      letter-spacing: -0.01em;
-      font-size: 18px;
-      font-weight: 700;
-    }
-    h3.section .tag {
-      background: var(--bg-soft);
-      border-radius: 999px;
-      padding: 3px 10px;
-      font-size: 12px;
-      color: var(--text-2);
-      text-transform: none;
-      letter-spacing: 0;
-      font-weight: 500;
-    }
-
-    /* ─── Cartes des bâtiments ─────────────────────────────── */
-    .city {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 14px;
-      margin-bottom: 36px;
-    }
-    .building {
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      padding: 18px;
-      cursor: pointer;
-      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-                  border-color 0.15s,
-                  box-shadow 0.15s;
-      box-shadow: var(--shadow-sm);
-      position: relative;
-    }
-    .building:hover {
-      transform: translateY(-2px);
-      border-color: var(--primary);
-      box-shadow: var(--shadow);
-    }
-    .building.locked {
-      background: var(--bg-soft);
-      cursor: not-allowed;
-    }
-    .building.locked:hover {
-      transform: none;
-      border-color: var(--border);
-      box-shadow: var(--shadow-sm);
-    }
-    .building.locked .building-icon { filter: grayscale(0.6); opacity: 0.6; }
-    .building-icon {
-      font-size: 36px;
-      margin-bottom: 10px;
-      line-height: 1;
-    }
-    .building-name {
-      font-weight: 600;
-      font-size: 15px;
-      margin-bottom: 8px;
-      color: var(--text);
-      letter-spacing: -0.01em;
-    }
-    .building-meta {
-      display: flex; flex-wrap: wrap; gap: 6px;
-      margin-bottom: 8px;
-    }
-    .tier-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0;
-    }
-    .tier-0 { background: var(--bg-soft); color: var(--text-3); }
-    .tier-1 { background: #e0f2fe; color: #075985; }
-    .tier-2 { background: #cffafe; color: #155e75; }
-    .tier-3 { background: var(--primary-100); color: #1e40af; }
-    .tier-4 { background: var(--diamond-soft); color: #5b21b6; }
-    .tier-5 { background: linear-gradient(135deg, #fde68a, var(--diamond-soft)); color: #5b21b6; }
-    .mastery-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 500;
-      background: var(--bg-soft);
-      color: var(--text-2);
-    }
-    .mastery-badge.m-2, .mastery-badge.m-3, .mastery-badge.m-4 {
-      background: var(--xp-soft);
-      color: var(--success-text);
-    }
-    .building-prod {
-      font-size: 12px;
-      color: var(--text-2);
-      display: flex; justify-content: space-between;
-      margin-top: 4px;
-    }
-    .building-prod .exos { color: var(--text-3); }
-    .building-prereqs {
-      font-size: 11px;
-      color: var(--danger);
-      margin-top: 6px;
-      font-weight: 500;
-    }
-
-    /* Progress bar fine */
-    .progress-bar {
-      height: 4px;
-      background: var(--bg-soft);
-      border-radius: 999px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-    .progress-bar .fill {
-      height: 100%;
-      background: var(--primary);
-      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      border-radius: 999px;
-    }
-
-    /* ─── Modal ───────────────────────────────────────────── */
-    .modal-bg {
-      position: fixed; inset: 0;
-      background: rgba(17, 24, 39, 0.45);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      z-index: 100;
-      display: none;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 30px 16px;
-      overflow-y: auto;
-    }
-    .modal-bg.show { display: flex; }
-    .modal {
-      background: var(--bg-elev);
-      border-radius: var(--r-lg);
-      max-width: 720px;
-      width: 100%;
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-    .modal-header {
-      border-bottom: 1px solid var(--border);
-      padding: 20px 24px;
-      display: flex; align-items: center; gap: 14px;
-    }
-    .modal-header .icon { font-size: 32px; line-height: 1; }
-    .modal-header h2 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.02em;
-    }
-    .modal-header .sub {
-      font-size: 13px;
-      color: var(--text-2);
-      margin-top: 2px;
-    }
-    .modal-close {
+    .breadcrumb-bar {
       margin-left: auto;
-      background: var(--bg-soft);
-      border: none;
-      color: var(--text-2);
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 18px;
-      transition: background 0.15s, color 0.15s;
-    }
-    .modal-close:hover { background: var(--danger-soft); color: var(--danger); }
-    .modal-body { padding: 24px; }
-
-    /* ─── Leçon ───────────────────────────────────────────── */
-    .lesson {
-      background: var(--primary-soft);
-      border-left: 3px solid var(--primary);
-      border-radius: var(--r);
-      padding: 18px 22px;
-      margin-bottom: 22px;
-      line-height: 1.65;
-      font-size: 15px;
-      color: var(--text);
-    }
-    .lesson .narrative {
-      font-style: italic;
-      color: var(--text-2);
-      margin-bottom: 14px;
-      font-size: 14px;
-      padding-bottom: 12px;
-      border-bottom: 1px dashed rgba(37, 99, 235, 0.2);
-    }
-    .lesson h4 {
-      color: var(--primary);
-      margin: 14px 0 6px;
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .lesson h4:first-of-type { margin-top: 0; }
-    .lesson p { margin-bottom: 8px; }
-    .lesson code {
-      background: rgba(37, 99, 235, 0.08);
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-family: 'JetBrains Mono', 'Courier New', monospace;
-      font-size: 0.9em;
-      color: var(--primary-hover);
-      font-weight: 500;
-    }
-    .lesson .example {
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      padding: 10px 14px;
-      margin: 10px 0;
-      color: var(--success-text);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13.5px;
-      line-height: 1.6;
-    }
-    .lesson .warn {
-      background: var(--warning-soft);
-      border-left: 3px solid var(--warning);
-      padding: 10px 14px;
-      margin: 12px 0;
-      border-radius: var(--r-sm);
-      font-size: 13.5px;
-      color: var(--text);
-      line-height: 1.55;
-    }
-
-    /* ─── Exercice ───────────────────────────────────────── */
-    .exercise {
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 20px;
-      margin-bottom: 14px;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .exercise.correct { border-color: var(--success); background: var(--success-soft); }
-    .exercise.wrong   { border-color: var(--danger); background: var(--danger-soft); }
-    .exercise .ex-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 12px;
-      font-size: 12px;
-      color: var(--text-3);
-      font-weight: 500;
-    }
-    .exercise .ex-reward {
-      color: var(--gold);
-      font-weight: 700;
-    }
-    .exercise .ex-q {
-      font-size: 16px;
-      margin-bottom: 16px;
-      line-height: 1.55;
-      color: var(--text);
-    }
-    .formula {
-      font-family: 'JetBrains Mono', monospace;
-      background: var(--bg-soft);
-      padding: 3px 10px;
-      border-radius: var(--r-sm);
-      color: var(--text);
-      display: inline-block;
-      font-weight: 500;
-      font-size: 0.95em;
-    }
-
-    .ex-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .ex-input {
-      flex: 1;
-      min-width: 140px;
-      background: var(--bg-elev);
-      border: 1.5px solid var(--border);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: var(--r-sm);
-      font-size: 16px;
-      font-family: 'JetBrains Mono', monospace;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .ex-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
-
-    .feedback {
-      margin-top: 12px;
-      padding: 10px 14px;
-      border-radius: var(--r-sm);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .feedback.correct {
-      background: var(--success-soft);
-      color: var(--success-text);
-      border-left: 3px solid var(--success);
-    }
-    .feedback.wrong {
-      background: var(--danger-soft);
-      color: var(--danger-text);
-      border-left: 3px solid var(--danger);
-    }
-    .feedback.hint {
-      background: var(--warning-soft);
-      color: #92400e;
-      border-left: 3px solid var(--warning);
-    }
-
-    /* ─── Solution détaillée ─────────────────────────────── */
-    .solution {
-      background: var(--primary-soft);
-      border: 1px solid var(--primary-100);
-      border-radius: var(--r);
-      padding: 16px 18px;
-      margin-top: 14px;
-      animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .solution-title {
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 12px;
       font-size: 13px;
+      color: var(--text-2);
       display: flex; align-items: center; gap: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
     }
-    .solution ol {
-      margin: 0 0 12px 0;
-      padding: 0;
-      list-style: none;
-      counter-reset: step;
-    }
-    .solution ol li {
-      counter-increment: step;
-      margin-bottom: 10px;
-      line-height: 1.6;
-      color: var(--text);
-      font-size: 14.5px;
-      padding-left: 32px;
-      position: relative;
-    }
-    .solution ol li::before {
-      content: counter(step);
-      position: absolute;
-      left: 0; top: 0;
-      width: 22px; height: 22px;
-      background: var(--primary);
-      color: white;
-      border-radius: 50%;
-      font-size: 12px;
-      font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .solution-final {
-      margin-top: 4px;
-      padding: 12px 14px;
-      background: var(--bg-elev);
-      border-radius: var(--r-sm);
-      border: 1px solid var(--success);
-      color: var(--success-text);
-      font-weight: 600;
-      font-size: 15px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .solution code {
-      background: rgba(37, 99, 235, 0.1);
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.92em;
-      color: var(--primary-hover);
-    }
+    .breadcrumb-bar .sep { color: var(--text-3); }
+    .breadcrumb-bar .crumb { color: var(--text-2); }
+    .breadcrumb-bar .crumb.current { color: var(--text); font-weight: 600; }
 
-    /* ─── Boutons ────────────────────────────────────────── */
-    .btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: var(--r);
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.15s, transform 0.08s;
-      font-family: inherit;
-    }
-    .btn:hover { background: var(--primary-hover); }
-    .btn:active { transform: translateY(1px); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn:disabled:hover { background: var(--primary); }
-    .btn.secondary {
+    .menu-btn {
+      display: none;
       background: var(--bg-soft);
-      color: var(--text);
-    }
-    .btn.secondary:hover { background: var(--border); }
-    .btn.ghost {
-      background: transparent;
-      color: var(--text-2);
       border: 1px solid var(--border);
-    }
-    .btn.ghost:hover { background: var(--bg-soft); border-color: var(--border-strong); }
-    .btn.success {
-      background: var(--success);
-    }
-    .btn.success:hover { background: #047857; }
-    .btn.success:disabled:hover { background: var(--success); }
-
-    .footer-actions {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      margin-top: 24px;
-      align-items: center;
-    }
-
-    .reset-link {
-      color: var(--text-3);
-      font-size: 12px;
-      background: none;
-      border: none;
+      border-radius: var(--r-sm);
+      padding: 6px 10px;
       cursor: pointer;
-      text-decoration: underline;
-      padding: 0;
       font-family: inherit;
-    }
-    .reset-link:hover { color: var(--danger); }
-
-    /* ─── Panneau de test ─────────────────────────────── */
-    .test-panel { padding: 20px 24px; }
-    .test-panel h4 {
-      font-size: 12px;
-      color: var(--text-2);
-      margin: 18px 0 8px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid var(--border);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 600;
-    }
-    .test-panel h4:first-child { margin-top: 0; }
-    .test-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
-    .test-btn {
-      background: var(--bg-elev);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 6px 11px;
-      border-radius: var(--r-sm);
-      cursor: pointer;
-      font-size: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      transition: background 0.12s, border-color 0.12s;
-    }
-    .test-btn:hover { background: var(--bg-soft); border-color: var(--primary); }
-    .test-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .test-btn:disabled:hover { background: var(--bg-elev); border-color: var(--border); }
-    .test-btn.danger { color: var(--danger); border-color: var(--danger-soft); }
-    .test-btn.danger:hover { background: var(--danger-soft); border-color: var(--danger); }
-    .test-concept {
-      background: var(--bg-soft);
-      border-radius: var(--r-sm);
-      padding: 8px 12px;
-      margin-bottom: 6px;
-      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    }
-    .test-concept .name { flex: 1; min-width: 140px; font-size: 13px; }
-    .test-concept .state { color: var(--text-3); font-size: 11px; }
-
-    /* ─── Toast ───────────────────────────────────────── */
-    .toast {
-      position: fixed;
-      top: 80px; left: 50%;
-      transform: translateX(-50%) translateY(-10px);
-      background: var(--text);
-      color: white;
-      padding: 10px 18px;
-      border-radius: var(--r);
-      box-shadow: var(--shadow-md);
-      z-index: 200;
-      font-weight: 500;
-      font-size: 14px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ─── Tabs ──────────────────────────────────────── */
-    .tabs {
-      display: flex; gap: 4px;
-      background: var(--bg-soft);
-      padding: 4px;
-      border-radius: var(--r);
-    }
-    .tab {
-      background: transparent;
-      border: none;
-      padding: 6px 14px;
       font-size: 13px;
-      font-weight: 600;
-      color: var(--text-2);
-      cursor: pointer;
-      border-radius: var(--r-sm);
-      font-family: inherit;
-      transition: background 0.15s, color 0.15s;
+      color: var(--text);
     }
-    .tab:hover { background: rgba(255,255,255,0.6); }
-    .tab.active {
-      background: var(--bg-elev);
-      color: var(--primary);
-      box-shadow: var(--shadow-sm);
-    }
-    .hud-stats { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+    .menu-btn:hover { background: var(--border); }
 
-    /* ─── Vue Apprentissage ─────────────────────────── */
-    .learn-layout {
+    /* ─── Layout ────────────────────────────────── */
+    .layout {
       display: grid;
       grid-template-columns: 280px 1fr;
-      gap: 0;
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
-      min-height: calc(100vh - 70px);
+      min-height: calc(100vh - 64px);
     }
-    .learn-sidebar {
+
+    /* ─── Sidebar ──────────────────────────────── */
+    aside.sidebar {
       background: var(--bg-elev);
       border-right: 1px solid var(--border);
       padding: 20px 0;
       position: sticky;
-      top: 70px;
-      height: calc(100vh - 70px);
+      top: 64px;
+      height: calc(100vh - 64px);
       overflow-y: auto;
       align-self: start;
     }
-    .learn-sidebar .level-group {
+    .sidebar .group {
       padding: 0 14px 14px;
       border-bottom: 1px solid var(--border);
       margin-bottom: 12px;
     }
-    .learn-sidebar .level-group:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-    }
-    .learn-sidebar h4 {
+    .sidebar .group:last-child { border-bottom: none; margin-bottom: 0; }
+    .sidebar h4 {
       font-size: 11px;
       font-weight: 700;
       color: var(--text-3);
@@ -725,7 +136,7 @@
       padding: 4px 8px 6px;
       margin-bottom: 4px;
     }
-    .learn-sidebar .level-btn {
+    .sidebar .lvl-btn {
       display: block;
       width: 100%;
       text-align: left;
@@ -740,19 +151,36 @@
       font-weight: 500;
       transition: background 0.12s, color 0.12s;
     }
-    .learn-sidebar .level-btn:hover { background: var(--bg-soft); color: var(--text); }
-    .learn-sidebar .level-btn.active {
+    .sidebar .lvl-btn:hover { background: var(--bg-soft); color: var(--text); }
+    .sidebar .lvl-btn.active {
       background: var(--primary-soft);
       color: var(--primary);
       font-weight: 600;
     }
-    .learn-sidebar .chapters {
+    .sidebar .lvl-btn .count {
+      float: right;
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .sidebar .lvl-btn.active .count { color: var(--primary); }
+    .sidebar .chapters {
       margin-left: 12px;
       margin-top: 2px;
       padding-left: 8px;
       border-left: 1px solid var(--border);
     }
-    .learn-sidebar .chapter-btn {
+    .sidebar .chap-cat {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 8px 8px 4px;
+    }
+    .sidebar .chap-cat:first-child { padding-top: 4px; }
+    .sidebar .chap-btn {
       display: block;
       width: 100%;
       text-align: left;
@@ -767,24 +195,25 @@
       transition: background 0.12s, color 0.12s;
       line-height: 1.4;
     }
-    .learn-sidebar .chapter-btn:hover { background: var(--bg-soft); color: var(--text); }
-    .learn-sidebar .chapter-btn.active {
+    .sidebar .chap-btn:hover { background: var(--bg-soft); color: var(--text); }
+    .sidebar .chap-btn.active {
       background: var(--primary);
       color: white;
     }
-    .learn-sidebar .chapter-btn.placeholder {
+    .sidebar .chap-btn.placeholder {
       color: var(--text-3);
       font-style: italic;
     }
-    .learn-sidebar .chapter-btn.placeholder:hover { color: var(--text-3); }
+    .sidebar .chap-btn.placeholder:hover { color: var(--text-3); background: var(--bg-soft); }
 
-    .learn-content {
+    /* ─── Content ────────────────────────────── */
+    article.content {
       padding: 36px 48px 80px;
-      max-width: 760px;
+      max-width: 820px;
       line-height: 1.7;
       color: var(--text);
     }
-    .learn-content .breadcrumb {
+    .content .breadcrumb {
       font-size: 12px;
       color: var(--text-3);
       text-transform: uppercase;
@@ -792,47 +221,47 @@
       margin-bottom: 8px;
       font-weight: 600;
     }
-    .learn-content h1 {
+    .content h1 {
       font-size: 32px;
       font-weight: 800;
       letter-spacing: -0.02em;
       margin-bottom: 8px;
-      color: var(--text);
     }
-    .learn-content .chapter-meta {
-      display: flex; gap: 10px; flex-wrap: wrap;
+    .content .meta {
+      display: flex; gap: 8px; flex-wrap: wrap;
       margin-bottom: 28px;
       font-size: 13px;
-      color: var(--text-2);
     }
-    .learn-content .chapter-meta .pill {
+    .content .pill {
       background: var(--bg-soft);
       padding: 3px 10px;
       border-radius: 999px;
+      color: var(--text-2);
       font-weight: 500;
     }
-    .learn-content h2 {
+    .content .pill.placeholder {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+    .content h2 {
       font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.01em;
       margin: 32px 0 12px;
       padding-bottom: 8px;
       border-bottom: 2px solid var(--border);
-      color: var(--text);
     }
-    .learn-content h3 {
+    .content h3 {
       font-size: 17px;
       font-weight: 700;
       margin: 22px 0 8px;
-      color: var(--text);
     }
-    .learn-content p { margin-bottom: 12px; font-size: 15.5px; }
-    .learn-content ul, .learn-content ol {
+    .content p { margin-bottom: 12px; font-size: 15.5px; }
+    .content ul, .content ol {
       margin: 0 0 14px 22px;
-      padding: 0;
     }
-    .learn-content li { margin-bottom: 6px; font-size: 15.5px; }
-    .learn-content code {
+    .content li { margin-bottom: 6px; font-size: 15.5px; }
+    .content code {
       background: var(--bg-soft);
       padding: 2px 7px;
       border-radius: 4px;
@@ -841,60 +270,54 @@
       color: var(--primary-hover);
       font-weight: 500;
     }
-    .learn-content strong { font-weight: 700; color: var(--text); }
-    .learn-content em { color: var(--text); }
-    .learn-content a { color: var(--primary); text-decoration: underline; }
+    .content strong { font-weight: 700; }
+    .content a {
+      color: var(--primary); text-decoration: none;
+      border-bottom: 1px solid var(--primary-100);
+    }
+    .content a:hover { border-bottom-color: var(--primary); }
 
-    /* Boîtes spéciales */
-    .lc-def {
-      background: var(--primary-soft);
-      border-left: 3px solid var(--primary);
-      padding: 14px 18px;
-      border-radius: var(--r-sm);
+    /* Boîtes typées */
+    .lc-def, .lc-prop, .lc-warn, .lc-tip, .lc-example, .lc-formula {
       margin: 14px 0;
+      border-radius: var(--r-sm);
     }
-    .lc-def .label {
+    .lc-def, .lc-prop, .lc-warn, .lc-tip {
+      padding: 14px 18px;
+      border-left: 3px solid;
+    }
+    .lc-def { background: var(--primary-soft); border-color: var(--primary); }
+    .lc-prop { background: var(--success-soft); border-color: var(--success); }
+    .lc-warn { background: var(--warning-soft); border-color: var(--warning); }
+    .lc-tip { background: var(--diamond-soft); border-color: var(--diamond); }
+    .lc-def .label, .lc-prop .label, .lc-warn .label, .lc-tip .label {
       display: block;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: var(--primary);
       margin-bottom: 4px;
     }
-    .lc-prop {
-      background: var(--success-soft);
-      border-left: 3px solid var(--success);
-      padding: 14px 18px;
-      border-radius: var(--r-sm);
-      margin: 14px 0;
-    }
-    .lc-prop .label {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--success);
-      margin-bottom: 4px;
-    }
+    .lc-def .label { color: var(--primary); }
+    .lc-prop .label { color: var(--success); }
+    .lc-warn .label { color: var(--warning); }
+    .lc-warn .label::before { content: "⚠️ "; }
+    .lc-tip .label { color: var(--diamond); }
+    .lc-tip .label::before { content: "💡 "; }
+
     .lc-formula {
       background: var(--bg-elev);
       border: 1.5px solid var(--border-strong);
       padding: 14px 18px;
-      border-radius: var(--r-sm);
-      margin: 14px 0;
       text-align: center;
       font-family: 'JetBrains Mono', monospace;
       font-size: 16px;
-      color: var(--text);
     }
+
     .lc-example {
       background: var(--bg-elev);
       border: 1px solid var(--border);
       padding: 16px 20px;
-      border-radius: var(--r-sm);
-      margin: 14px 0;
       box-shadow: var(--shadow-sm);
     }
     .lc-example .label {
@@ -906,18 +329,22 @@
       color: var(--text-2);
       margin-bottom: 8px;
     }
-    .lc-example .label.solved::before { content: "✏️ "; }
-    .lc-example ol { counter-reset: stp; list-style: none; margin-left: 0; padding-left: 0; }
+    .lc-example .label::before { content: "✏️ "; }
+    .lc-example ol {
+      counter-reset: stp;
+      list-style: none;
+      margin-left: 0;
+    }
     .lc-example ol li {
       counter-increment: stp;
-      padding-left: 28px;
+      padding-left: 30px;
       position: relative;
       margin-bottom: 6px;
     }
     .lc-example ol li::before {
       content: counter(stp);
       position: absolute; left: 0; top: 1px;
-      width: 20px; height: 20px;
+      width: 22px; height: 22px;
       background: var(--primary);
       color: white;
       border-radius: 50%;
@@ -925,150 +352,209 @@
       font-weight: 700;
       display: flex; align-items: center; justify-content: center;
     }
-    .lc-warn {
-      background: var(--warning-soft);
-      border-left: 3px solid var(--warning);
-      padding: 12px 16px;
-      border-radius: var(--r-sm);
-      margin: 14px 0;
-    }
-    .lc-warn .label {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--warning);
-      margin-bottom: 4px;
-    }
-    .lc-warn .label::before { content: "⚠️ "; }
-    .lc-tip {
-      background: var(--diamond-soft);
-      border-left: 3px solid var(--diamond);
-      padding: 12px 16px;
-      border-radius: var(--r-sm);
-      margin: 14px 0;
-    }
-    .lc-tip .label {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--diamond);
-      margin-bottom: 4px;
-    }
-    .lc-tip .label::before { content: "💡 "; }
 
-    .lc-empty {
+    .empty-state {
       max-width: 480px;
       margin: 80px auto;
       text-align: center;
       color: var(--text-3);
       font-size: 15px;
     }
-    .lc-empty .big { font-size: 56px; margin-bottom: 12px; }
+    .empty-state .big { font-size: 56px; margin-bottom: 12px; }
 
-    /* ─── Mobile ─────────────────────────────────────── */
+    /* Boutons navigation chapitres */
+    .chap-nav {
+      display: flex; gap: 10px; justify-content: space-between;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .nav-btn {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: var(--r);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+      max-width: 280px;
+    }
+    .nav-btn:hover { background: var(--bg-soft); border-color: var(--primary); }
+    .nav-btn.next { background: var(--primary); color: white; border-color: var(--primary); }
+    .nav-btn.next:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+    .nav-btn .small {
+      display: block;
+      font-size: 11px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .nav-btn.next .small { color: rgba(255,255,255,0.7); }
+
+    /* Cartes de niveaux sur l'accueil */
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .lvl-card {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 18px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      box-shadow: var(--shadow-sm);
+    }
+    .lvl-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+    .lvl-card .lvl-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .lvl-card .lvl-info {
+      font-size: 12px;
+      color: var(--text-2);
+    }
+    .lvl-card .lvl-info .filled {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    /* Catégories de chapitres sur la page niveau */
+    .cat-section {
+      margin-top: 24px;
+    }
+    .cat-section h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-2);
+      margin: 18px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .chap-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .chap-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-family: inherit;
+      text-align: left;
+      width: 100%;
+      color: var(--text);
+      font-size: 14.5px;
+    }
+    .chap-item:hover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+    .chap-item .num {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .chap-item.placeholder { opacity: 0.6; cursor: default; }
+    .chap-item.placeholder:hover {
+      border-color: var(--border);
+      background: var(--bg-elev);
+    }
+    .chap-item.placeholder .num { background: var(--bg-soft); color: var(--text-3); }
+    .chap-item .badge-todo {
+      margin-left: auto;
+      background: var(--warning-soft);
+      color: var(--warning);
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Mobile */
     @media (max-width: 900px) {
-      .learn-layout {
-        grid-template-columns: 1fr;
+      .layout { grid-template-columns: 1fr; }
+      aside.sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        height: 100vh;
+        width: 280px;
+        z-index: 60;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease-out;
+        box-shadow: 8px 0 24px rgba(0,0,0,0.1);
       }
-      .learn-sidebar {
-        position: static;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-        max-height: 280px;
+      aside.sidebar.open { transform: translateX(0); }
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.4);
+        z-index: 55;
       }
-      .learn-content { padding: 24px 20px 60px; }
+      .sidebar-backdrop.show { display: block; }
+      .menu-btn { display: inline-flex; align-items: center; gap: 4px; }
+      article.content { padding: 24px 20px 60px; }
     }
     @media (max-width: 600px) {
-      .hud { padding: 10px 14px; gap: 6px; }
-      .hud-title { font-size: 16px; }
-      .tabs { padding: 3px; flex: 1 1 100%; order: 2; margin-top: 4px; }
-      .tab { flex: 1; padding: 6px 10px; font-size: 12px; }
-      .hud-stats { width: 100%; order: 3; margin-top: 4px; }
-      .stat { padding: 5px 10px; font-size: 12px; }
-      .wrap { padding: 22px 16px; }
-      .city { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .building { padding: 14px; }
-      .building-icon { font-size: 30px; }
-      .building-name { font-size: 14px; }
-      .modal-header h2 { font-size: 17px; }
-      .modal-body { padding: 18px; }
-      .lesson { padding: 14px 16px; font-size: 14px; }
-      .exercise { padding: 16px; }
-      .learn-content h1 { font-size: 26px; }
-      .learn-content h2 { font-size: 19px; }
-      .learn-content { font-size: 15px; }
+      header.app-header { padding: 10px 14px; }
+      .app-title { font-size: 15px; }
+      .breadcrumb-bar { font-size: 12px; }
+      .content h1 { font-size: 26px; }
+      .content h2 { font-size: 19px; }
     }
   </style>
 </head>
 <body>
-  <header class="hud">
-    <div class="hud-title">
+  <header class="app-header">
+    <button class="menu-btn" id="menu-btn" aria-label="Ouvrir le menu">☰ Menu</button>
+    <div class="app-title">
       <span class="logo">∑</span>
-      <span>Mathopolis</span>
+      <span>Cours de maths</span>
     </div>
-    <nav class="tabs" role="tablist">
-      <button class="tab active" data-tab="city" role="tab">🏛️ Cité</button>
-      <button class="tab" data-tab="learn" role="tab">📚 Apprentissage</button>
-    </nav>
-    <div class="hud-stats">
-      <div class="stat gold" title="Théorèmes">
-        🪙 <span class="val" id="stat-T">0</span>
-      </div>
-      <div class="stat diamond" title="Insights">
-        💎 <span class="val" id="stat-I">0</span>
-      </div>
-      <div class="stat streak" title="Streak quotidienne">
-        🔥 <span class="val" id="stat-streak">0</span>
-      </div>
-      <div class="stat xp" title="XP Recteur">
-        ⭐ <span class="val" id="stat-xp">0</span>
-      </div>
-    </div>
+    <div class="breadcrumb-bar" id="breadcrumb"></div>
   </header>
 
-  <main>
-    <section id="view-city" class="wrap">
-      <div class="intro">
-        <h2>Bienvenue, Recteur</h2>
-        <p>Ta cité de mathématiciens t'attend. Clique sur un bâtiment pour suivre la leçon, résous quelques exos, et regarde tes <strong>théorèmes</strong> 🪙 s'accumuler — même quand tu n'es pas là. Maintiens ta streak en faisant <strong>3 exos par jour</strong>.</p>
-      </div>
-
-      <h3 class="section">
-        <span class="label">🏛️ Quartier des Fondations</span>
-        <span class="tag" id="founda-progress">0/5 maîtrisés</span>
-      </h3>
-      <div class="city" id="city"></div>
-
-      <div class="footer-actions">
-        <button class="reset-link" id="btn-test" title="Panneau de test (raccourci : Maj+T)">🧪 Mode test</button>
-        <button class="reset-link" id="btn-reset">Réinitialiser ma cité</button>
-      </div>
-    </section>
-
-    <section id="view-learn" hidden>
-      <div class="learn-layout">
-        <aside class="learn-sidebar" id="learn-sidebar"></aside>
-        <article class="learn-content" id="learn-content"></article>
-      </div>
-    </section>
-  </main>
-
-  <div class="modal-bg" id="modal-bg">
-    <div class="modal" id="modal"></div>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <article class="content" id="content"></article>
   </div>
-
-  <div class="toast" id="toast"></div>
+  <div class="sidebar-backdrop" id="backdrop"></div>
 
 <script>
 'use strict';
 
-// ─── Utilities ───────────────────────────────────────────────────
-const $  = (sel) => document.querySelector(sel);
+// ─── Helpers ────────────────────────────────────────────────────
+const $ = (sel) => document.querySelector(sel);
 const el = (tag, attrs = {}, children = []) => {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -1084,1128 +570,154 @@ const el = (tag, attrs = {}, children = []) => {
   }
   return e;
 };
-const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-const gcd  = (a, b) => b === 0 ? Math.abs(a) : gcd(b, a % b);
-const fmtNum = (n) => {
-  // Une décimale uniquement quand elle apporte de l'info (< 10).
-  // Évite « 50.0k » au profit de « 50k » sur les nombres ronds.
-  if (n >= 1e6) { const v = n / 1e6; return (v < 10 ? v.toFixed(1) : Math.round(v)) + 'M'; }
-  if (n >= 1e3) { const v = n / 1e3; return (v < 10 ? v.toFixed(1) : Math.round(v)) + 'k'; }
-  return Math.floor(n).toString();
-};
 
-// ─── Concepts du Quartier des Fondations (5 premiers) ────────────
-const CONCEPTS = [
-  {
-    id: 'arith_base',
-    name: 'Opérations de base',
-    icon: '🧮',
-    prereq: [],
-    lesson: {
-      narrative: "Avant de bâtir des théorèmes complexes, il faut maîtriser les quatre opérations.",
-      content: `
-        <h4>Les 4 opérations</h4>
-        <p>L'<strong>addition</strong> (+), la <strong>soustraction</strong> (−), la <strong>multiplication</strong> (×) et la <strong>division</strong> (÷) sont les briques de tout calcul.</p>
-        <div class="example">12 + 8 = 20 &nbsp;·&nbsp; 15 − 7 = 8 &nbsp;·&nbsp; 6 × 7 = 42 &nbsp;·&nbsp; 36 ÷ 4 = 9</div>
-        <h4>Astuces de calcul mental</h4>
-        <p>Pour multiplier par 9 : multiplie par 10, puis enlève le nombre. <code>9 × 7 = 70 − 7 = 63</code>.</p>
-        <p>Pour ajouter un nombre proche de 10 : ajoute 10 et corrige. <code>47 + 9 = 47 + 10 − 1 = 56</code>.</p>
-        <div class="warn">⚠️ <strong>0 ÷ n</strong> = 0 (toujours), mais on ne divise jamais <em>par</em> 0.</div>
-      `
-    },
-    generate: () => {
-      const op = pick(['+', '−', '×']);
-      let a, b, ans, steps;
-      if (op === '+') {
-        a = rand(15, 99); b = rand(15, 99); ans = a + b;
-        steps = [
-          `On pose l'addition : <code>${a} + ${b}</code>.`,
-          `On peut décomposer : <code>${a} + ${b} = ${a} + ${b - (b % 10)} + ${b % 10}</code>.`,
-          `Résultat : <code>${ans}</code>.`
-        ];
-      } else if (op === '−') {
-        a = rand(40, 99); b = rand(10, a - 1); ans = a - b;
-        steps = [
-          `On pose la soustraction : <code>${a} − ${b}</code>.`,
-          `Comme ${a} > ${b}, le résultat est positif.`,
-          `<code>${a} − ${b} = ${ans}</code>.`
-        ];
-      } else {
-        a = rand(3, 12); b = rand(3, 12); ans = a * b;
-        steps = [
-          `On reconnaît la table de multiplication.`,
-          `<code>${a} × ${b} = ${ans}</code> (équivalent à <code>${b} × ${a}</code> par commutativité).`,
-          `Résultat : <code>${ans}</code>.`
-        ];
-      }
-      return { type: 'number', q: `Calcule : <span class="formula">${a} ${op} ${b}</span>`, ans, steps };
-    }
-  },
-
-  {
-    id: 'priorites',
-    name: 'Priorités opératoires',
-    icon: '⚖️',
-    prereq: ['arith_base'],
-    lesson: {
-      narrative: "Sans règles, le même calcul donnerait dix résultats différents. C'est la convention PEMDAS qui met de l'ordre.",
-      content: `
-        <h4>L'ordre PEMDAS</h4>
-        <p>On effectue dans cet ordre :</p>
-        <p>1. <strong>Parenthèses</strong> d'abord</p>
-        <p>2. Puis <strong>multiplications</strong> et <strong>divisions</strong> (gauche à droite)</p>
-        <p>3. Enfin <strong>additions</strong> et <strong>soustractions</strong> (gauche à droite)</p>
-        <div class="example">2 + 3 × 4 = 2 + 12 = 14<br>(et <em>non</em> 5 × 4 = 20 !)</div>
-        <div class="example">(2 + 3) × 4 = 5 × 4 = 20</div>
-        <div class="warn">⚠️ Piège classique : <code>10 − 3 + 2</code> = (10−3)+2 = <strong>9</strong>, et non 10−5 = 5. On va de gauche à droite à priorité égale.</div>
-      `
-    },
-    generate: () => {
-      const types = [
-        () => {
-          const a = rand(2,9), b = rand(2,9), c = rand(2,9);
-          return {
-            q: `${a} + ${b} × ${c}`,
-            ans: a + b*c,
-            steps: [
-              `PEMDAS : la multiplication est prioritaire sur l'addition.`,
-              `On calcule d'abord <code>${b} × ${c} = ${b*c}</code>.`,
-              `Puis <code>${a} + ${b*c} = ${a + b*c}</code>.`
-            ]
-          };
-        },
-        () => {
-          const a = rand(2,9), b = rand(2,9), c = rand(2,9);
-          return {
-            q: `(${a} + ${b}) × ${c}`,
-            ans: (a+b)*c,
-            steps: [
-              `Les parenthèses sont prioritaires.`,
-              `<code>(${a} + ${b}) = ${a+b}</code>.`,
-              `Puis <code>${a+b} × ${c} = ${(a+b)*c}</code>.`
-            ]
-          };
-        },
-        () => {
-          const a = rand(20,40), b = rand(2,9), c = rand(2,9);
-          return {
-            q: `${a} − ${b} × ${c}`,
-            ans: a - b*c,
-            steps: [
-              `PEMDAS : on calcule la multiplication avant la soustraction.`,
-              `<code>${b} × ${c} = ${b*c}</code>.`,
-              `Puis <code>${a} − ${b*c} = ${a - b*c}</code>.`
-            ]
-          };
-        },
-        () => {
-          const a = rand(2,9), b = rand(2,9), c = rand(2,9), d = rand(2,9);
-          return {
-            q: `${a} × ${b} + ${c} × ${d}`,
-            ans: a*b + c*d,
-            steps: [
-              `On effectue les deux multiplications avant l'addition.`,
-              `<code>${a} × ${b} = ${a*b}</code> et <code>${c} × ${d} = ${c*d}</code>.`,
-              `Puis <code>${a*b} + ${c*d} = ${a*b + c*d}</code>.`
-            ]
-          };
-        },
-      ];
-      const t = pick(types)();
-      return { type: 'number', q: `Calcule : <span class="formula">${t.q}</span>`, ans: t.ans, steps: t.steps };
-    }
-  },
-
-  {
-    id: 'fractions',
-    name: 'Fractions : sens & simplification',
-    icon: '🍰',
-    prereq: ['arith_base'],
-    lesson: {
-      narrative: "Une fraction, c'est un nombre de parts (numérateur) sur un total de parts (dénominateur).",
-      content: `
-        <h4>Sens d'une fraction</h4>
-        <p><code>3/4</code> signifie « 3 parts sur 4 ». C'est aussi <code>3 ÷ 4 = 0,75</code>.</p>
-        <h4>Simplification</h4>
-        <p>On divise numérateur ET dénominateur par leur <strong>plus grand diviseur commun</strong> (PGCD).</p>
-        <div class="example">6/8 = (6÷2)/(8÷2) = 3/4<br>15/20 = (15÷5)/(20÷5) = 3/4</div>
-        <h4>Comment trouver le PGCD ?</h4>
-        <p>On cherche le plus grand nombre qui divise les deux. Pour 12 et 18 : les diviseurs communs sont 1, 2, 3, 6 → le PGCD vaut <strong>6</strong>.</p>
-        <div class="warn">⚠️ Une fraction est <strong>irréductible</strong> quand on ne peut plus la simplifier (PGCD = 1). Une copie comme « 6/8 » sans simplifier est considérée fausse au lycée.</div>
-      `
-    },
-    generate: () => {
-      const x = rand(1, 7), y = rand(2, 9);
-      const k = rand(2, 5);
-      const a = x * k, b = y * k;
-      const g = gcd(x, y);
-      const sx = x / g, sy = y / g;
-      const pgcd = gcd(a, b);
-      return {
-        type: 'fraction',
-        q: `Simplifie la fraction <span class="formula">${a}/${b}</span> au maximum (format : <code>num/den</code>).`,
-        ans: `${sx}/${sy}`,
-        steps: [
-          `On cherche le PGCD de ${a} et ${b}.`,
-          `PGCD(${a}, ${b}) = <code>${pgcd}</code>.`,
-          `On divise haut et bas : <code>${a} ÷ ${pgcd} = ${sx}</code> et <code>${b} ÷ ${pgcd} = ${sy}</code>.`,
-          `Fraction simplifiée : <code>${sx}/${sy}</code>.`
-        ],
-        validate: (input) => {
-          const m = input.replace(/\s/g, '').match(/^(-?\d+)\/(-?\d+)$/);
-          if (!m) return false;
-          const ni = parseInt(m[1], 10), di = parseInt(m[2], 10);
-          if (di === 0) return false;
-          return ni * sy === sx * di && gcd(Math.abs(ni), Math.abs(di)) === 1;
-        }
-      };
-    }
-  },
-
-  {
-    id: 'pourcentages',
-    name: 'Pourcentages',
-    icon: '📊',
-    prereq: ['fractions'],
-    lesson: {
-      narrative: "Un pourcentage, c'est juste une fraction sur 100. Rien de plus, rien de moins.",
-      content: `
-        <h4>Définition</h4>
-        <p><code>p%</code> de <code>n</code> signifie <code>(p / 100) × n</code>.</p>
-        <div class="example">20% de 50 = (20/100) × 50 = 0,2 × 50 = 10<br>15% de 80 = 0,15 × 80 = 12</div>
-        <h4>Astuces mentales</h4>
-        <p>• Pour <strong>10%</strong> : divise par 10. <code>10% de 240 = 24</code>.</p>
-        <p>• Pour <strong>5%</strong> : prends la moitié de 10%.</p>
-        <p>• Pour <strong>20%</strong> : divise par 5.</p>
-        <p>• Pour <strong>25%</strong> : divise par 4.</p>
-        <h4>Augmentation / réduction</h4>
-        <p>Augmenter de p% revient à multiplier par <code>(1 + p/100)</code>. Réduire de p% revient à multiplier par <code>(1 − p/100)</code>.</p>
-        <div class="warn">⚠️ Une augmentation de 50% suivie d'une baisse de 50% ne ramène <em>pas</em> au point de départ : 100 → 150 → 75 !</div>
-      `
-    },
-    generate: () => {
-      const types = [
-        () => {
-          const p = pick([10,20,25,50,5,15]), n = pick([20,40,60,80,100,200]);
-          return {
-            q: `Calcule : <span class="formula">${p}% de ${n}</span>`,
-            ans: p*n/100,
-            steps: [
-              `<code>${p}%</code> = <code>${p}/100</code> = <code>${p/100}</code>.`,
-              `<code>${p}% de ${n}</code> = <code>${p/100} × ${n}</code>.`,
-              `= <code>${p*n/100}</code>.`
-            ]
-          };
-        },
-        () => {
-          const p = pick([10,25,50]), n = pick([40,60,80,200]);
-          const incr = p*n/100;
-          const r = n + incr;
-          return {
-            q: `Un produit coûtait ${n}€. Son prix augmente de ${p}%. Quel est le nouveau prix (en €) ?`,
-            ans: r,
-            steps: [
-              `Augmentation = <code>${p}% de ${n}€</code> = <code>${incr}€</code>.`,
-              `Nouveau prix = prix initial + augmentation = <code>${n} + ${incr}</code>.`,
-              `= <code>${r}€</code>.`
-            ]
-          };
-        },
-        () => {
-          const part = pick([15,20,25,30]), tot = pick([60,80,100,200]);
-          const ans = Math.round(part/tot*100);
-          return {
-            q: `${part} élèves sur ${tot} ont réussi. Quel pourcentage cela représente-t-il ?`,
-            ans,
-            steps: [
-              `Pourcentage = <code>(partie / total) × 100</code>.`,
-              `= <code>(${part} / ${tot}) × 100</code>.`,
-              `= <code>${ans}%</code>.`
-            ]
-          };
-        },
-      ];
-      const t = pick(types)();
-      return { type: 'number', q: t.q, ans: t.ans, steps: t.steps };
-    }
-  },
-
-  {
-    id: 'equations1',
-    name: 'Équations du 1er degré',
-    icon: '🟰',
-    prereq: ['priorites'],
-    lesson: {
-      narrative: "Trouver x, c'est rétablir l'équilibre. Ce que tu fais à un côté, fais-le à l'autre.",
-      content: `
-        <h4>Principe</h4>
-        <p>Une équation <code>ax + b = c</code> se résout en deux temps :</p>
-        <p><strong>1.</strong> Isoler le terme en x : on retire <code>b</code> des deux côtés → <code>ax = c − b</code>.</p>
-        <p><strong>2.</strong> Diviser par <code>a</code> → <code>x = (c − b) / a</code>.</p>
-        <div class="example">3x + 5 = 17<br>3x = 17 − 5 = 12<br>x = 12 / 3 = 4</div>
-        <div class="example">2x − 7 = 9<br>2x = 9 + 7 = 16<br>x = 16 / 2 = 8</div>
-        <h4>Vérification</h4>
-        <p>Toujours vérifier : remplacer x par la valeur trouvée et s'assurer que l'égalité est juste.</p>
-        <div class="warn">⚠️ Si <code>a</code> est négatif, attention au signe lors de la division : <code>−2x = 8</code> donne <code>x = −4</code>.</div>
-      `
-    },
-    generate: () => {
-      const a = pick([2,3,4,5,6,7]);
-      const x = rand(2, 12);
-      const b = rand(-15, 15);
-      const c = a*x + b;
-      const bStr = b >= 0 ? `+ ${b}` : `− ${-b}`;
-      const moveStep = b >= 0
-        ? `On retranche ${b} des deux côtés : <code>${a}x = ${c} − ${b} = ${c - b}</code>.`
-        : `On ajoute ${-b} des deux côtés : <code>${a}x = ${c} + ${-b} = ${c - b}</code>.`;
-      return {
-        type: 'number',
-        q: `Résous : <span class="formula">${a}x ${bStr} = ${c}</span>. Quelle est la valeur de x ?`,
-        ans: x,
-        steps: [
-          `On part de <code>${a}x ${bStr} = ${c}</code>.`,
-          moveStep,
-          `On divise par ${a} : <code>x = ${c-b} / ${a}</code>.`,
-          `<code>x = ${x}</code>. Vérification : <code>${a}×${x} ${bStr} = ${a*x + b} = ${c}</code> ✓`
-        ]
-      };
-    }
-  },
-];
-
-const CONCEPT_BY_ID = Object.fromEntries(CONCEPTS.map(c => [c.id, c]));
-
-// ─── Paliers / production / coûts ────────────────────────────────
-const TIERS = [
-  { name: '—',           prodPerMin: 0,   nextCost: 50,    exReq: 3 },
-  { name: 'Atelier',     prodPerMin: 1,   nextCost: 200,   exReq: 5 },
-  { name: 'Laboratoire', prodPerMin: 5,   nextCost: 800,   exReq: 8 },
-  { name: 'Institut',    prodPerMin: 20,  nextCost: 3000,  exReq: 12 },
-  { name: 'Académie',    prodPerMin: 80,  nextCost: 12000, exReq: 30 },
-  { name: 'Légende',     prodPerMin: 300, nextCost: null,  exReq: null },
-];
-
-const MASTERY_LABELS = ['Découvert', 'Pratiqué', 'Maîtrisé', 'Expert', 'Légendaire'];
-const MASTERY_ICONS  = ['🔓', '📚', '✅', '🌟', '💎'];
-
-const MAX_OFFLINE_HOURS = 6;
-const SOLUTION_COST_INSIGHTS = 2;
-const FREE_SOLUTION_AFTER_FAILS = 3;
-
-// ─── Game state ──────────────────────────────────────────────────
-const STATE_KEY = 'mathopolis_save_v1';
-let state = null;
-
-function defaultState() {
-  return {
-    T: 0,
-    I: 0,
-    xp: 0,
-    streak: 0,
-    lastDay: null,
-    lastStreakDay: null,
-    exosToday: 0,
-    lastTick: Date.now(),
-    concepts: Object.fromEntries(CONCEPTS.map(c => [c.id, {
-      tier: 0,
-      exercisesSolved: 0,
-      mastery: 0,
-    }])),
-    createdAt: Date.now(),
-  };
-}
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STATE_KEY);
-    if (!raw) return defaultState();
-    const parsed = JSON.parse(raw);
-    const def = defaultState();
-    for (const id of Object.keys(def.concepts)) {
-      if (!parsed.concepts[id]) parsed.concepts[id] = def.concepts[id];
-    }
-    // Forward-compat : remplir les nouveaux champs
-    for (const k of Object.keys(def)) {
-      if (parsed[k] === undefined) parsed[k] = def[k];
-    }
-    return parsed;
-  } catch (e) {
-    console.warn('Save corrompu, reset', e);
-    return defaultState();
-  }
-}
-
-function saveState() {
-  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
-  catch (e) { console.warn('Save échouée', e); }
-}
-
-// ─── Production idle ─────────────────────────────────────────────
-function totalProdPerMin() {
-  let p = 0;
-  for (const c of CONCEPTS) {
-    p += TIERS[state.concepts[c.id].tier].prodPerMin;
-  }
-  return p;
-}
-
-function applyIdle() {
-  const now = Date.now();
-  const elapsedMs = Math.max(0, now - state.lastTick);
-  const cappedMs = Math.min(elapsedMs, MAX_OFFLINE_HOURS * 3600 * 1000);
-  const minutes = cappedMs / 60000;
-  const earned = totalProdPerMin() * minutes;
-  if (earned > 0) state.T += earned;
-  state.lastTick = now;
-  return earned;
-}
-
-// ─── Streak ──────────────────────────────────────────────────────
-function localDateISO(d = new Date()) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-function todayISO() { return localDateISO(); }
-
-function streakMultiplier() {
-  const s = state.streak;
-  if (s >= 100) return 3;
-  if (s >= 60) return 2.5;
-  if (s >= 30) return 2;
-  if (s >= 14) return 1.5;
-  if (s >= 7) return 1.2;
-  return 1;
-}
-function bumpStreakIfNewDay() {
-  const today = todayISO();
-  if (state.lastDay !== today) {
-    state.exosToday = 0;
-    state.lastDay = today;
-  }
-}
-function onExerciseSolved() {
-  state.exosToday += 1;
-  if (state.exosToday === 3) {
-    const yesterday = (() => {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      return localDateISO(d);
-    })();
-    if (state.lastStreakDay === yesterday || state.lastStreakDay == null) {
-      state.streak = (state.streak || 0) + 1;
-    } else if (state.lastStreakDay !== todayISO()) {
-      state.streak = 1;
-    }
-    state.lastStreakDay = todayISO();
-    toast(`🔥 Streak ${state.streak} jour${state.streak > 1 ? 's' : ''} ! Multiplicateur ×${streakMultiplier()}`);
-  }
-}
-
-// ─── Mastery / tier upgrade ──────────────────────────────────────
-function tryUpgradeBuilding(conceptId) {
-  const c = CONCEPT_BY_ID[conceptId];
-  const sc = state.concepts[conceptId];
-  if (sc.tier >= 5) return false;
-  const tierData = TIERS[sc.tier];
-  if (sc.exercisesSolved < tierData.exReq) return false;
-  if (state.T < tierData.nextCost) return false;
-
-  state.T -= tierData.nextCost;
-  sc.tier += 1;
-  sc.mastery = Math.min(4, Math.max(sc.mastery, sc.tier - 1));
-  toast(`⬆️ ${c.name} → ${TIERS[sc.tier].name} !`);
-  saveState();
-  renderHUD();
-  renderCity();
-  return true;
-}
-
-function isUnlocked(conceptId) {
-  const c = CONCEPT_BY_ID[conceptId];
-  if (!c.prereq.length) return true;
-  return c.prereq.every(p => state.concepts[p].mastery >= 2);
-}
-
-// ─── Rendering : HUD + City ──────────────────────────────────────
-function renderHUD() {
-  $('#stat-T').textContent = fmtNum(state.T);
-  $('#stat-I').textContent = state.I;
-  $('#stat-streak').textContent = state.streak;
-  $('#stat-xp').textContent = state.xp;
-  const mastered = CONCEPTS.filter(c => state.concepts[c.id].mastery >= 2).length;
-  $('#founda-progress').textContent =
-    `${mastered}/${CONCEPTS.length} maîtrisés · +${fmtNum(totalProdPerMin())} 🪙/min`;
-}
-
-function renderCity() {
-  const city = $('#city');
-  city.innerHTML = '';
-  for (const c of CONCEPTS) {
-    const sc = state.concepts[c.id];
-    const unlocked = isUnlocked(c.id);
-    const tierData = TIERS[sc.tier];
-
-    const card = el('div', { class: 'building' + (unlocked ? '' : ' locked'), 'data-id': c.id });
-    card.appendChild(el('div', { class: 'building-icon' }, c.icon));
-    card.appendChild(el('div', { class: 'building-name' }, c.name));
-
-    const meta = el('div', { class: 'building-meta' });
-    meta.appendChild(el('span', { class: 'tier-badge tier-' + sc.tier }, tierData.name));
-    meta.appendChild(el('span', { class: 'mastery-badge m-' + sc.mastery },
-      `${MASTERY_ICONS[sc.mastery]} ${MASTERY_LABELS[sc.mastery]}`));
-    card.appendChild(meta);
-
-    const prodLine = el('div', { class: 'building-prod' });
-    prodLine.appendChild(el('span', {}, sc.tier > 0 ? `+${tierData.prodPerMin} 🪙/min` : 'Non construit'));
-    prodLine.appendChild(el('span', { class: 'exos' }, `${sc.exercisesSolved} exos`));
-    card.appendChild(prodLine);
-
-    // Progression vers la prochaine upgrade : on lit les requirements
-    // sur TIERS[sc.tier] (= « ce qu'il faut pour passer AU palier suivant »),
-    // pas sur TIERS[sc.tier+1] qui serait le palier d'après.
-    if (tierData.exReq) {
-      const pct = Math.min(100, (sc.exercisesSolved / tierData.exReq) * 100);
-      const bar = el('div', { class: 'progress-bar' });
-      bar.appendChild(el('div', { class: 'fill', style: `width:${pct}%` }));
-      card.appendChild(bar);
-    }
-
-    if (!unlocked) {
-      const missing = c.prereq.filter(p => state.concepts[p].mastery < 2)
-                              .map(p => CONCEPT_BY_ID[p].name).join(', ');
-      card.appendChild(el('div', { class: 'building-prereqs' }, `🔒 Requiert : ${missing}`));
-    }
-
-    if (unlocked) card.addEventListener('click', () => openConcept(c.id));
-    city.appendChild(card);
-  }
-}
-
-// ─── Modal / leçon / exos ────────────────────────────────────────
-let currentSession = null;
-
-function openConcept(conceptId) {
-  const c = CONCEPT_BY_ID[conceptId];
-
-  currentSession = {
-    conceptId,
-    exos: [],
-    currentIdx: 0,
-    correctCount: 0,
-  };
-
-  for (let i = 0; i < 4; i++) {
-    const ex = c.generate();
-    ex.solved = false;
-    ex.attempts = 0;
-    ex.hintsUsed = 0;
-    ex.solutionShown = false;
-    currentSession.exos.push(ex);
-  }
-
-  renderModal();
-  $('#modal-bg').classList.add('show');
-}
-
-function closeModal() {
-  $('#modal-bg').classList.remove('show');
-  currentSession = null;
-  saveState();
-  renderHUD();
-  renderCity();
-}
-
-function renderModal() {
-  if (!currentSession) return;
-  const c = CONCEPT_BY_ID[currentSession.conceptId];
-  const sc = state.concepts[currentSession.conceptId];
-  const modal = $('#modal');
-  modal.innerHTML = '';
-
-  // Header
-  const header = el('div', { class: 'modal-header' });
-  header.appendChild(el('div', { class: 'icon' }, c.icon));
-  const titleBox = el('div');
-  titleBox.appendChild(el('h2', {}, c.name));
-  titleBox.appendChild(el('div', { class: 'sub' },
-    `${TIERS[sc.tier].name} · ${MASTERY_ICONS[sc.mastery]} ${MASTERY_LABELS[sc.mastery]} · ${sc.exercisesSolved} exos résolus`
-  ));
-  header.appendChild(titleBox);
-  header.appendChild(el('button', { class: 'modal-close', onclick: closeModal, 'aria-label': 'Fermer' }, '✕'));
-  modal.appendChild(header);
-
-  const body = el('div', { class: 'modal-body' });
-
-  // Leçon (toujours visible)
-  const lessonBox = el('div', { class: 'lesson' });
-  lessonBox.appendChild(el('div', { class: 'narrative' }, '“ ' + c.lesson.narrative + ' ”'));
-  lessonBox.appendChild(el('div', { html: c.lesson.content }));
-  body.appendChild(lessonBox);
-
-  const ex = currentSession.exos[currentSession.currentIdx];
-  if (ex) {
-    body.appendChild(renderExercise(ex));
-  } else {
-    body.appendChild(el('div', { class: 'feedback correct' }, [
-      el('strong', {}, '🎉 Session terminée. '),
-      `Tu as résolu ${currentSession.correctCount} exos. `,
-      `Total aujourd'hui : ${state.exosToday} exo${state.exosToday > 1 ? 's' : ''}.`
-    ]));
-
-    // cur = requirements pour upgrader DEPUIS le tier courant.
-    // next = palier de DESTINATION (juste pour afficher son nom).
-    const cur = TIERS[sc.tier];
-    const next = TIERS[sc.tier + 1];
-    if (next && cur.exReq) {
-      const remaining = Math.max(0, cur.exReq - sc.exercisesSolved);
-      const canAfford = state.T >= cur.nextCost;
-      const canUpgrade = remaining === 0 && canAfford;
-      const upBtn = el('button', {
-        class: 'btn success',
-        disabled: !canUpgrade,
-        onclick: () => {
-          if (tryUpgradeBuilding(currentSession.conceptId)) renderModal();
-        }
-      }, canUpgrade
-        ? `⬆ Faire monter au palier ${next.name} (${fmtNum(cur.nextCost)} 🪙)`
-        : remaining > 0
-          ? `Encore ${remaining} exos pour débloquer ${next.name}`
-          : `Manque ${fmtNum(cur.nextCost - state.T)} 🪙 pour ${next.name}`
-      );
-      body.appendChild(el('div', { style: 'margin-top:14px' }, upBtn));
-    }
-
-    body.appendChild(el('div', { class: 'footer-actions' }, [
-      el('button', { class: 'btn secondary', onclick: () => openConcept(currentSession.conceptId) }, "Faire d'autres exos"),
-      el('button', { class: 'btn ghost', onclick: closeModal }, 'Retour à la cité'),
-    ]));
-  }
-
-  modal.appendChild(body);
-}
-
-function renderExercise(ex) {
-  const wrap = el('div', { class: 'exercise' });
-
-  const header = el('div', { class: 'ex-header' });
-  header.appendChild(el('span', {}, `Exercice ${currentSession.currentIdx + 1} / ${currentSession.exos.length}`));
-  header.appendChild(el('span', { class: 'ex-reward' }, `+10 🪙`));
-  wrap.appendChild(header);
-
-  wrap.appendChild(el('div', { class: 'ex-q', html: ex.q }));
-
-  const row = el('div', { class: 'ex-row' });
-  const input = el('input', {
-    class: 'ex-input',
-    type: 'text',
-    inputmode: ex.type === 'number' ? 'decimal' : 'text',
-    placeholder: ex.type === 'fraction' ? 'ex : 3/4' : 'Ta réponse',
-    autocomplete: 'off',
-    spellcheck: 'false'
-  });
-
-  const submit = () => {
-    const raw = input.value.trim();
-    if (!raw) return;
-    ex.attempts += 1;
-    let ok = false;
-    if (ex.validate) ok = ex.validate(raw);
-    else if (ex.type === 'number') {
-      const v = parseFloat(raw.replace(',', '.'));
-      ok = !isNaN(v) && Math.abs(v - ex.ans) < 1e-6;
-    } else ok = raw === String(ex.ans);
-
-    const oldFb = wrap.querySelector('.feedback');
-    if (oldFb) oldFb.remove();
-
-    if (ok) {
-      ex.solved = true;
-      wrap.classList.add('correct');
-      input.disabled = true;
-      submitBtn.disabled = true;
-      hintBtn.disabled = true;
-      solveBtn.disabled = true;
-      const reward = Math.max(2, Math.round(10 * Math.pow(0.75, ex.hintsUsed) * streakMultiplier()));
-      state.T += reward;
-      state.xp += 1;
-      const sc = state.concepts[currentSession.conceptId];
-      sc.exercisesSolved += 1;
-      const totalSolved = sc.exercisesSolved;
-      // Mastery monotone : on ne redescend jamais. Sans le Math.max,
-      // si la mastery a été bumpée plus haut par une upgrade de tier,
-      // un nouvel exo dans une plage basse (ex: 9 exos) ramènerait
-      // mastery à 1, ce qui pourrait reverrouiller un concept aval.
-      const computed = totalSolved >= 80 ? 4
-                     : totalSolved >= 30 ? 3
-                     : totalSolved >= 12 ? 2
-                     : totalSolved >= 5  ? 1 : 0;
-      sc.mastery = Math.max(sc.mastery, computed);
-      if (sc.tier === 0) {
-        sc.tier = 1;
-        toast(`🏗️ ${CONCEPT_BY_ID[currentSession.conceptId].name} : Atelier construit !`);
-      }
-      currentSession.correctCount += 1;
-      onExerciseSolved();
-
-      wrap.appendChild(el('div', { class: 'feedback correct', html:
-        `✓ Bravo ! +${reward} 🪙 (×${streakMultiplier()} streak)` +
-        (ex.hintsUsed > 0 ? ` · indice utilisé : récompense réduite` : '')
-      }));
-
-      saveState();
-      renderHUD();
-
-      setTimeout(() => {
-        currentSession.currentIdx += 1;
-        renderModal();
-      }, 1100);
-    } else {
-      wrap.classList.add('wrong');
-      const remainingFails = FREE_SOLUTION_AFTER_FAILS - ex.attempts;
-      wrap.appendChild(el('div', { class: 'feedback wrong', html:
-        ex.attempts >= FREE_SOLUTION_AFTER_FAILS
-          ? `✗ La réponse était <strong>${ex.ans}</strong>. La solution détaillée est désormais gratuite.`
-          : `✗ Pas tout à fait. ${remainingFails === 1 ? 'Encore 1 tentative avant la solution gratuite.' : 'Réessaie ou demande un indice.'}`
-      }));
-      // Si 3 échecs : on dévoile automatiquement la solution
-      if (ex.attempts >= FREE_SOLUTION_AFTER_FAILS && !ex.solutionShown) {
-        showSolution(ex, wrap, true);
-        input.disabled = true;
-        submitBtn.disabled = true;
-        hintBtn.disabled = true;
-        solveBtn.disabled = true;
-      }
-    }
-  };
-
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); submit(); }
-  });
-  row.appendChild(input);
-
-  const submitBtn = el('button', { class: 'btn', onclick: submit }, 'Valider');
-  row.appendChild(submitBtn);
-
-  const hintBtn = el('button', { class: 'btn ghost', onclick: () => {
-    ex.hintsUsed += 1;
-    const oldFb = wrap.querySelector('.feedback');
-    if (oldFb) oldFb.remove();
-    let hint = '💡 ';
-    if (ex.type === 'number') {
-      const v = ex.ans;
-      if (Number.isInteger(v)) hint += `La réponse est un entier compris entre ${v - 5} et ${v + 5}.`;
-      else hint += `La réponse vaut environ ${v.toFixed(1)}.`;
-    } else if (ex.type === 'fraction') {
-      hint += `Cherche le PGCD du numérateur et du dénominateur.`;
-    } else {
-      hint += `La réponse commence par « ${String(ex.ans).slice(0, 1)} ».`;
-    }
-    if (ex.hintsUsed >= 2) {
-      hint = `💡 La réponse est : <strong>${ex.ans}</strong>.`;
-      hintBtn.disabled = true;
-    }
-    wrap.appendChild(el('div', { class: 'feedback hint', html: hint }));
-  }}, '💡 Indice');
-  row.appendChild(hintBtn);
-
-  // Solution détaillée
-  const solveBtn = el('button', { class: 'btn ghost', onclick: () => {
-    if (ex.solutionShown) return;
-    const failedEnough = ex.attempts >= FREE_SOLUTION_AFTER_FAILS;
-    if (!failedEnough && state.I < SOLUTION_COST_INSIGHTS) {
-      toast(`Il te faut ${SOLUTION_COST_INSIGHTS} 💎 (ou ${FREE_SOLUTION_AFTER_FAILS} échecs) pour voir la solution.`);
-      return;
-    }
-    if (!failedEnough) {
-      state.I -= SOLUTION_COST_INSIGHTS;
-      saveState();
-      renderHUD();
-    }
-    showSolution(ex, wrap, false);
-    solveBtn.disabled = true;
-  }}, '📝 Solution');
-  row.appendChild(solveBtn);
-
-  const skipBtn = el('button', { class: 'btn ghost', onclick: () => {
-    currentSession.currentIdx += 1;
-    renderModal();
-  }}, 'Passer');
-  row.appendChild(skipBtn);
-
-  wrap.appendChild(row);
-
-  setTimeout(() => input.focus(), 50);
-  return wrap;
-}
-
-function showSolution(ex, wrap, free) {
-  if (ex.solutionShown) return;
-  ex.solutionShown = true;
-  const sol = el('div', { class: 'solution' });
-  sol.appendChild(el('div', { class: 'solution-title' }, [
-    '📝 Solution détaillée',
-    free ? ' · gratuite' : ` · −${SOLUTION_COST_INSIGHTS} 💎`,
-  ].join('')));
-  const ol = el('ol');
-  for (const step of (ex.steps || ['(pas de solution disponible)'])) {
-    ol.appendChild(el('li', { html: step }));
-  }
-  sol.appendChild(ol);
-  sol.appendChild(el('div', { class: 'solution-final', html: `✓ Réponse : <code>${ex.ans}</code>` }));
-  wrap.appendChild(sol);
-}
-
-// ─── Toast ───────────────────────────────────────────────────────
-let toastTimer = null;
-function toast(msg) {
-  const t = $('#toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
-}
-
-// ─── Panneau de test ─────────────────────────────────────────────
-function openTestPanel() {
-  currentSession = null;
-  const modal = $('#modal');
-  modal.innerHTML = '';
-
-  const header = el('div', { class: 'modal-header' });
-  header.appendChild(el('div', { class: 'icon' }, '🧪'));
-  const titleBox = el('div');
-  titleBox.appendChild(el('h2', {}, 'Mode test'));
-  titleBox.appendChild(el('div', { class: 'sub' }, 'Raccourcis pour explorer toutes les fonctionnalités'));
-  header.appendChild(titleBox);
-  header.appendChild(el('button', { class: 'modal-close', onclick: closeModal, 'aria-label': 'Fermer' }, '✕'));
-  modal.appendChild(header);
-
-  const body = el('div', { class: 'test-panel' });
-
-  body.appendChild(el('h4', {}, 'Ressources'));
-  body.appendChild(el('div', { class: 'test-actions' }, [
-    el('button', { class: 'test-btn', onclick: () => { state.T += 100; refreshTest(); } }, '+100 🪙'),
-    el('button', { class: 'test-btn', onclick: () => { state.T += 1000; refreshTest(); } }, '+1 000 🪙'),
-    el('button', { class: 'test-btn', onclick: () => { state.T += 50000; refreshTest(); } }, '+50 000 🪙'),
-    el('button', { class: 'test-btn', onclick: () => { state.I += 1; refreshTest(); } }, '+1 💎'),
-    el('button', { class: 'test-btn', onclick: () => { state.I += 10; refreshTest(); } }, '+10 💎'),
-    el('button', { class: 'test-btn', onclick: () => { state.xp += 50; refreshTest(); } }, '+50 ⭐'),
-  ]));
-
-  body.appendChild(el('h4', {}, 'Streak (multiplicateur)'));
-  body.appendChild(el('div', { class: 'test-actions' }, [
-    el('button', { class: 'test-btn', onclick: () => setStreak(0) }, 'Streak 0 (×1)'),
-    el('button', { class: 'test-btn', onclick: () => setStreak(7) }, 'Streak 7 (×1.2)'),
-    el('button', { class: 'test-btn', onclick: () => setStreak(14) }, 'Streak 14 (×1.5)'),
-    el('button', { class: 'test-btn', onclick: () => setStreak(30) }, 'Streak 30 (×2)'),
-    el('button', { class: 'test-btn', onclick: () => setStreak(60) }, 'Streak 60 (×2.5)'),
-    el('button', { class: 'test-btn', onclick: () => setStreak(100) }, 'Streak 100 (×3)'),
-  ]));
-
-  body.appendChild(el('h4', {}, 'Production idle'));
-  body.appendChild(el('div', { style: 'font-size:12px;color:var(--text-3);margin-bottom:8px' },
-    `Production actuelle : ${fmtNum(totalProdPerMin())} 🪙/min · Cap offline : ${MAX_OFFLINE_HOURS} h`));
-  body.appendChild(el('div', { class: 'test-actions' }, [
-    el('button', { class: 'test-btn', onclick: () => simulateIdle(60) }, '+1 h offline'),
-    el('button', { class: 'test-btn', onclick: () => simulateIdle(360) }, `+${MAX_OFFLINE_HOURS} h (cap)`),
-    el('button', { class: 'test-btn', onclick: () => simulateIdle(1440) }, '+24 h (test cap)'),
-  ]));
-
-  body.appendChild(el('h4', {}, 'Bâtiments par concept'));
-  for (const c of CONCEPTS) {
-    const sc = state.concepts[c.id];
-    const row = el('div', { class: 'test-concept' });
-    row.appendChild(el('span', { class: 'name', html: `${c.icon} <strong>${c.name}</strong>` }));
-    row.appendChild(el('span', { class: 'state' },
-      `${TIERS[sc.tier].name} · ${MASTERY_ICONS[sc.mastery]}${MASTERY_LABELS[sc.mastery]} · ${sc.exercisesSolved} exos`
-    ));
-    row.appendChild(el('button', { class: 'test-btn', onclick: () => { sc.exercisesSolved += 5; refreshTest(); } }, '+5 exos'));
-    row.appendChild(el('button', {
-      class: 'test-btn',
-      disabled: sc.tier >= 5,
-      onclick: () => { if (sc.tier < 5) { sc.tier++; sc.mastery = Math.max(sc.mastery, sc.tier - 1); refreshTest(); } }
-    }, '⬆ Tier'));
-    row.appendChild(el('button', {
-      class: 'test-btn',
-      disabled: sc.mastery >= 4,
-      onclick: () => { sc.mastery = Math.min(4, sc.mastery + 1); refreshTest(); }
-    }, '⬆ Mastery'));
-    body.appendChild(row);
-  }
-
-  body.appendChild(el('h4', {}, 'Raccourcis globaux'));
-  body.appendChild(el('div', { class: 'test-actions' }, [
-    el('button', { class: 'test-btn', onclick: () => {
-      for (const c of CONCEPTS) {
-        const sc = state.concepts[c.id];
-        sc.tier = Math.max(sc.tier, 1);
-        sc.exercisesSolved = Math.max(sc.exercisesSolved, 5);
-        sc.mastery = Math.max(sc.mastery, 1);
-      }
-      refreshTest();
-    }}, 'Tout en Atelier'),
-    el('button', { class: 'test-btn', onclick: () => {
-      for (const c of CONCEPTS) {
-        const sc = state.concepts[c.id];
-        sc.mastery = Math.max(sc.mastery, 2);
-        sc.exercisesSolved = Math.max(sc.exercisesSolved, 12);
-      }
-      refreshTest();
-    }}, 'Tout Maîtrisé'),
-    el('button', { class: 'test-btn', onclick: () => {
-      for (const c of CONCEPTS) {
-        const sc = state.concepts[c.id];
-        sc.tier = 5; sc.mastery = 4;
-        sc.exercisesSolved = Math.max(sc.exercisesSolved, 100);
-      }
-      state.T += 50000;
-      refreshTest();
-    }}, '👑 Tout en Légende'),
-    el('button', { class: 'test-btn danger', onclick: () => {
-      if (confirm("Réinitialiser tout l'état (sans recharger la page) ?")) {
-        Object.assign(state, defaultState());
-        refreshTest();
-      }
-    }}, '🗑 Reset état'),
-  ]));
-
-  body.appendChild(el('div', { class: 'footer-actions' }, [
-    el('button', { class: 'btn', onclick: closeModal }, 'Fermer'),
-  ]));
-
-  modal.appendChild(body);
-  $('#modal-bg').classList.add('show');
-}
-
-function refreshTest() {
-  saveState();
-  renderHUD();
-  renderCity();
-  openTestPanel();
-}
-
-function setStreak(days) {
-  state.streak = days;
-  state.lastStreakDay = days > 0 ? todayISO() : null;
-  refreshTest();
-  toast(`🔥 Streak forcée à ${days} jour${days > 1 ? 's' : ''} (×${streakMultiplier()})`);
-}
-
-function simulateIdle(minutes) {
-  if (totalProdPerMin() <= 0) {
-    toast(`⚠️ Aucune production : construis au moins un Atelier`);
-    return;
-  }
-  const capped = Math.min(minutes, MAX_OFFLINE_HOURS * 60);
-  const earned = totalProdPerMin() * capped;
-  state.T += earned;
-  refreshTest();
-  toast(`💤 Simulé ${minutes} min (capé à ${capped} min) : +${fmtNum(earned)} 🪙`);
-}
-
-// ─── Curriculum scolaire (Apprentissage) ─────────────────────────
-// Structure : groupes (collège / lycée / post-bac) → niveaux (6e, 5e…)
-// → chapitres. Chaque chapitre a un id, un titre, une catégorie et un
-// content HTML (null = à rédiger dans une session ultérieure).
-//
-// Helper pour produire des blocs pédagogiques typés en HTML.
+// Helpers de blocs pédagogiques pour le contenu HTML des chapitres.
 const lc = {
   def:  (label, html) => `<div class="lc-def"><span class="label">${label}</span>${html}</div>`,
   prop: (label, html) => `<div class="lc-prop"><span class="label">${label}</span>${html}</div>`,
   formula: (html) => `<div class="lc-formula">${html}</div>`,
-  example: (label, html) => `<div class="lc-example"><span class="label solved">${label}</span>${html}</div>`,
+  example: (label, html) => `<div class="lc-example"><span class="label">${label}</span>${html}</div>`,
   warn: (label, html) => `<div class="lc-warn"><span class="label">${label}</span>${html}</div>`,
   tip:  (label, html) => `<div class="lc-tip"><span class="label">${label}</span>${html}</div>`,
 };
 
-// Liste de chapitres avec content=null (à rédiger plus tard).
-// IMPORTANT : doit être déclaré AVANT buildCurriculum() car les
-// fonctions chaptersXX() l'utilisent dès l'évaluation du module.
-// Sans ça, la TDZ du const fait planter tout le script (page vide).
+// Crée un chapitre placeholder (pas encore rédigé).
+// IMPORTANT : déclaré AVANT toute structure qui l'utilise au niveau module.
 const todo = (title, category) => ({ title, category, content: null });
 
-const CURRICULUM = buildCurriculum();
-let learnState = { levelId: null, chapterId: null };
-
-function buildCurriculum() {
-  return [
-    {
-      id: 'college', name: 'Collège',
-      levels: [
-        { id: '6e',  name: '6e',  chapters: chapters6e() },
-        { id: '5e',  name: '5e',  chapters: chapters5e() },
-        { id: '4e',  name: '4e',  chapters: chapters4e() },
-        { id: '3e',  name: '3e',  chapters: chapters3e() },
-      ],
-    },
-    {
-      id: 'lycee', name: 'Lycée',
-      levels: [
-        { id: '2nde', name: '2nde',     chapters: chapters2nde() },
-        { id: '1ere', name: '1ère',     chapters: chapters1ere() },
-        { id: 'tle',  name: 'Terminale', chapters: chaptersTle() },
-      ],
-    },
-    {
-      id: 'postbac', name: 'Post-bac',
-      levels: [
-        { id: 'analyse', name: 'Analyse',         chapters: chaptersAnalyse() },
-        { id: 'algebre', name: 'Algèbre linéaire', chapters: chaptersAlgebre() },
-        { id: 'probas',  name: 'Probabilités',     chapters: chaptersProbasPostBac() },
-      ],
-    },
-  ];
-}
-
-// Chapitres niveau par niveau ─────────────────────────────────────
-function chapters6e() {
-  return [
-    todo("Nombres entiers : lecture et écriture", "Nombres et calcul"),
-    todo("Nombres décimaux : lecture, comparaison", "Nombres et calcul"),
-    todo("Addition, soustraction, multiplication", "Nombres et calcul"),
-    todo("Division euclidienne", "Nombres et calcul"),
-    todo("Fractions : sens et premières représentations", "Nombres et calcul"),
-    todo("Proportionnalité (sensibilisation)", "Organisation des données"),
-    todo("Droites perpendiculaires et parallèles", "Géométrie"),
-    todo("Cercle, médiatrice", "Géométrie"),
-    todo("Triangles et quadrilatères : reconnaissance", "Géométrie"),
-    todo("Symétrie axiale", "Géométrie"),
-    todo("Périmètre et aire", "Grandeurs et mesures"),
-    todo("Lecture de tableaux et de graphiques", "Organisation des données"),
-  ];
-}
-
-function chapters5e() {
-  // RÉDIGÉ À FOND DANS chapters5eFull()
-  return chapters5eFull();
-}
-
-function chapters4e() {
-  return [
-    todo("Nombres relatifs : multiplication et division", "Nombres et calcul"),
-    todo("Fractions : opérations avancées", "Nombres et calcul"),
-    todo("Puissances et notation scientifique", "Nombres et calcul"),
-    todo("Calcul littéral : développement", "Calcul littéral"),
-    todo("Équations du 1er degré", "Calcul littéral"),
-    todo("Théorème de Pythagore", "Géométrie"),
-    todo("Théorème de Thalès (configuration de base)", "Géométrie"),
-    todo("Cosinus dans le triangle rectangle", "Géométrie"),
-    todo("Translations", "Géométrie"),
-    todo("Proportionnalité avancée", "Organisation des données"),
-    todo("Statistiques : moyenne", "Organisation des données"),
-    todo("Probabilités (introduction)", "Organisation des données"),
-  ];
-}
-
-function chapters3e() {
-  return [
-    todo("Arithmétique : PGCD, fractions irréductibles", "Nombres et calcul"),
-    todo("Racines carrées", "Nombres et calcul"),
-    todo("Calcul littéral : factorisation, identités remarquables", "Calcul littéral"),
-    todo("Équations produits", "Calcul littéral"),
-    todo("Inéquations du 1er degré", "Calcul littéral"),
-    todo("Systèmes d'équations", "Calcul littéral"),
-    todo("Théorème de Thalès et réciproque", "Géométrie"),
-    todo("Trigonométrie : sin, cos, tan", "Géométrie"),
-    todo("Géométrie dans l'espace (volumes)", "Géométrie"),
-    todo("Homothéties", "Géométrie"),
-    todo("Fonctions linéaires et affines", "Fonctions"),
-    todo("Statistiques : médiane, étendue", "Organisation des données"),
-    todo("Probabilités : événements", "Organisation des données"),
-  ];
-}
-
-function chapters2nde() {
-  return [
-    todo("Ensembles de nombres ℕ, ℤ, 𝔻, ℚ, ℝ", "Nombres et calculs"),
-    todo("Calcul numérique et algébrique", "Nombres et calculs"),
-    todo("Inéquations et intervalles", "Nombres et calculs"),
-    todo("Fonctions : généralités", "Fonctions"),
-    todo("Fonction affine, équations de droites", "Fonctions"),
-    todo("Fonction carré, racine carrée, cube", "Fonctions"),
-    todo("Fonction inverse", "Fonctions"),
-    todo("Vecteurs : définition, somme, colinéarité", "Géométrie"),
-    todo("Géométrie repérée", "Géométrie"),
-    todo("Statistiques : moyenne, médiane, écart-type", "Statistiques"),
-    todo("Probabilités : modélisation", "Probabilités"),
-    todo("Algorithmique et programmation Python", "Algorithmique"),
-  ];
-}
-
-function chapters1ere() {
-  return [
-    todo("Suites numériques (arithmétique, géométrique)", "Suites"),
-    todo("Limites de suites (intuition)", "Suites"),
-    todo("Dérivation : nombre dérivé, fonction dérivée", "Analyse"),
-    todo("Études de fonctions, extremums", "Analyse"),
-    todo("Fonction exponentielle", "Analyse"),
-    todo("Polynômes du second degré", "Analyse"),
-    todo("Trigonométrie : cercle trigo, formules", "Géométrie"),
-    todo("Vecteurs : produit scalaire", "Géométrie"),
-    todo("Probabilités conditionnelles, indépendance", "Probabilités"),
-    todo("Variables aléatoires, espérance, variance", "Probabilités"),
-    todo("Loi binomiale", "Probabilités"),
-  ];
-}
-
-function chaptersTle() {
-  return [
-    todo("Limites de fonctions", "Analyse"),
-    todo("Continuité, théorème des valeurs intermédiaires", "Analyse"),
-    todo("Compléments sur la dérivation (composées)", "Analyse"),
-    todo("Fonction logarithme", "Analyse"),
-    todo("Primitives", "Analyse"),
-    todo("Intégrales", "Analyse"),
-    todo("Suites : raisonnement par récurrence", "Suites"),
-    todo("Limites de suites (formel)", "Suites"),
-    todo("Géométrie dans l'espace : vecteurs, droites, plans", "Géométrie"),
-    todo("Produit scalaire dans l'espace", "Géométrie"),
-    todo("Lois de probabilité à densité", "Probabilités"),
-    todo("Loi normale", "Probabilités"),
-    todo("Échantillonnage et estimation", "Probabilités"),
-  ];
-}
-
-function chaptersAnalyse() {
-  return [
-    todo("Suites : convergence formelle", "Suites"),
-    todo("Séries numériques", "Séries"),
-    todo("Fonctions de plusieurs variables", "Analyse"),
-    todo("Intégration par parties", "Analyse"),
-    todo("Changement de variable", "Analyse"),
-    todo("Équations différentielles linéaires", "Analyse"),
-    todo("Développements limités", "Analyse"),
-  ];
-}
-
-function chaptersAlgebre() {
-  return [
-    todo("Espaces vectoriels", "Algèbre linéaire"),
-    todo("Applications linéaires", "Algèbre linéaire"),
-    todo("Matrices : opérations", "Algèbre linéaire"),
-    todo("Systèmes linéaires, pivot de Gauss", "Algèbre linéaire"),
-    todo("Déterminants", "Algèbre linéaire"),
-    todo("Diagonalisation, valeurs propres", "Algèbre linéaire"),
-    todo("Produits scalaires en dimension n", "Algèbre linéaire"),
-  ];
-}
-
-function chaptersProbasPostBac() {
-  return [
-    todo("Espaces probabilisés", "Probabilités"),
-    todo("Variables aléatoires discrètes", "Probabilités"),
-    todo("Variables aléatoires continues", "Probabilités"),
-    todo("Lois usuelles (Poisson, exponentielle...)", "Probabilités"),
-    todo("Théorèmes limites (loi des grands nombres, TCL)", "Probabilités"),
-    todo("Tests statistiques", "Statistiques"),
-  ];
-}
+// ─── Curriculum ──────────────────────────────────────────────────
+const CURRICULUM = [
+  {
+    id: 'college', name: 'Collège',
+    levels: [
+      { id: '6e',  name: '6e',  chapters: [
+        todo("Nombres entiers : lecture et écriture", "Nombres et calcul"),
+        todo("Nombres décimaux : lecture, comparaison", "Nombres et calcul"),
+        todo("Addition, soustraction, multiplication", "Nombres et calcul"),
+        todo("Division euclidienne", "Nombres et calcul"),
+        todo("Fractions : sens et premières représentations", "Nombres et calcul"),
+        todo("Proportionnalité (sensibilisation)", "Organisation des données"),
+        todo("Droites perpendiculaires et parallèles", "Géométrie"),
+        todo("Cercle, médiatrice", "Géométrie"),
+        todo("Triangles et quadrilatères : reconnaissance", "Géométrie"),
+        todo("Symétrie axiale", "Géométrie"),
+        todo("Périmètre et aire", "Grandeurs et mesures"),
+        todo("Lecture de tableaux et de graphiques", "Organisation des données"),
+      ]},
+      { id: '5e',  name: '5e',  chapters: chapters5e() },
+      { id: '4e',  name: '4e',  chapters: [
+        todo("Nombres relatifs : multiplication et division", "Nombres et calcul"),
+        todo("Fractions : opérations avancées", "Nombres et calcul"),
+        todo("Puissances et notation scientifique", "Nombres et calcul"),
+        todo("Calcul littéral : développement", "Calcul littéral"),
+        todo("Équations du 1er degré", "Calcul littéral"),
+        todo("Théorème de Pythagore", "Géométrie"),
+        todo("Théorème de Thalès (configuration de base)", "Géométrie"),
+        todo("Cosinus dans le triangle rectangle", "Géométrie"),
+        todo("Translations", "Géométrie"),
+        todo("Proportionnalité avancée", "Organisation des données"),
+        todo("Statistiques : moyenne", "Organisation des données"),
+        todo("Probabilités (introduction)", "Organisation des données"),
+      ]},
+      { id: '3e',  name: '3e',  chapters: [
+        todo("Arithmétique : PGCD, fractions irréductibles", "Nombres et calcul"),
+        todo("Racines carrées", "Nombres et calcul"),
+        todo("Calcul littéral : factorisation, identités remarquables", "Calcul littéral"),
+        todo("Équations produits", "Calcul littéral"),
+        todo("Inéquations du 1er degré", "Calcul littéral"),
+        todo("Systèmes d'équations", "Calcul littéral"),
+        todo("Théorème de Thalès et réciproque", "Géométrie"),
+        todo("Trigonométrie : sin, cos, tan", "Géométrie"),
+        todo("Géométrie dans l'espace (volumes)", "Géométrie"),
+        todo("Homothéties", "Géométrie"),
+        todo("Fonctions linéaires et affines", "Fonctions"),
+        todo("Statistiques : médiane, étendue", "Organisation des données"),
+        todo("Probabilités : événements", "Organisation des données"),
+      ]},
+    ],
+  },
+  {
+    id: 'lycee', name: 'Lycée',
+    levels: [
+      { id: '2nde', name: '2nde', chapters: [
+        todo("Ensembles de nombres ℕ, ℤ, 𝔻, ℚ, ℝ", "Nombres et calculs"),
+        todo("Calcul numérique et algébrique", "Nombres et calculs"),
+        todo("Inéquations et intervalles", "Nombres et calculs"),
+        todo("Fonctions : généralités", "Fonctions"),
+        todo("Fonction affine, équations de droites", "Fonctions"),
+        todo("Fonction carré, racine carrée, cube", "Fonctions"),
+        todo("Fonction inverse", "Fonctions"),
+        todo("Vecteurs : définition, somme, colinéarité", "Géométrie"),
+        todo("Géométrie repérée", "Géométrie"),
+        todo("Statistiques : moyenne, médiane, écart-type", "Statistiques"),
+        todo("Probabilités : modélisation", "Probabilités"),
+        todo("Algorithmique et programmation Python", "Algorithmique"),
+      ]},
+      { id: '1ere', name: '1ère', chapters: [
+        todo("Suites numériques (arithmétique, géométrique)", "Suites"),
+        todo("Limites de suites (intuition)", "Suites"),
+        todo("Dérivation : nombre dérivé, fonction dérivée", "Analyse"),
+        todo("Études de fonctions, extremums", "Analyse"),
+        todo("Fonction exponentielle", "Analyse"),
+        todo("Polynômes du second degré", "Analyse"),
+        todo("Trigonométrie : cercle trigo, formules", "Géométrie"),
+        todo("Vecteurs : produit scalaire", "Géométrie"),
+        todo("Probabilités conditionnelles, indépendance", "Probabilités"),
+        todo("Variables aléatoires, espérance, variance", "Probabilités"),
+        todo("Loi binomiale", "Probabilités"),
+      ]},
+      { id: 'tle', name: 'Terminale', chapters: [
+        todo("Limites de fonctions", "Analyse"),
+        todo("Continuité, théorème des valeurs intermédiaires", "Analyse"),
+        todo("Compléments sur la dérivation (composées)", "Analyse"),
+        todo("Fonction logarithme", "Analyse"),
+        todo("Primitives", "Analyse"),
+        todo("Intégrales", "Analyse"),
+        todo("Suites : raisonnement par récurrence", "Suites"),
+        todo("Limites de suites (formel)", "Suites"),
+        todo("Géométrie dans l'espace : vecteurs, droites, plans", "Géométrie"),
+        todo("Produit scalaire dans l'espace", "Géométrie"),
+        todo("Lois de probabilité à densité", "Probabilités"),
+        todo("Loi normale", "Probabilités"),
+        todo("Échantillonnage et estimation", "Probabilités"),
+      ]},
+    ],
+  },
+  {
+    id: 'postbac', name: 'Post-bac',
+    levels: [
+      { id: 'analyse', name: 'Analyse', chapters: [
+        todo("Suites : convergence formelle", "Suites"),
+        todo("Séries numériques", "Séries"),
+        todo("Fonctions de plusieurs variables", "Analyse"),
+        todo("Intégration par parties", "Analyse"),
+        todo("Changement de variable", "Analyse"),
+        todo("Équations différentielles linéaires", "Analyse"),
+        todo("Développements limités", "Analyse"),
+      ]},
+      { id: 'algebre', name: 'Algèbre linéaire', chapters: [
+        todo("Espaces vectoriels", "Algèbre linéaire"),
+        todo("Applications linéaires", "Algèbre linéaire"),
+        todo("Matrices : opérations", "Algèbre linéaire"),
+        todo("Systèmes linéaires, pivot de Gauss", "Algèbre linéaire"),
+        todo("Déterminants", "Algèbre linéaire"),
+        todo("Diagonalisation, valeurs propres", "Algèbre linéaire"),
+        todo("Produits scalaires en dimension n", "Algèbre linéaire"),
+      ]},
+      { id: 'probas', name: 'Probabilités', chapters: [
+        todo("Espaces probabilisés", "Probabilités"),
+        todo("Variables aléatoires discrètes", "Probabilités"),
+        todo("Variables aléatoires continues", "Probabilités"),
+        todo("Lois usuelles (Poisson, exponentielle...)", "Probabilités"),
+        todo("Théorèmes limites (loi des grands nombres, TCL)", "Probabilités"),
+        todo("Tests statistiques", "Statistiques"),
+      ]},
+    ],
+  },
+];
 
 // ─── Contenu pédagogique : 5e à fond ─────────────────────────────
-function chapters5eFull() {
+function chapters5e() {
   return [
     {
       title: "Nombres décimaux",
@@ -2256,7 +768,6 @@ function chapters5eFull() {
         ${lc.tip("Astuce", `<p>Pour multiplier par 10, 100, 1000 : on décale la virgule de 1, 2 ou 3 rangs vers la droite. <code>3,57 × 100 = 357</code>.</p>`)}
       `,
     },
-
     {
       title: "Multiples, diviseurs, divisibilité",
       category: "Nombres et calcul",
@@ -2296,7 +807,6 @@ function chapters5eFull() {
         ${lc.warn("Cas particuliers", `<p><strong>1 n'est pas premier</strong> (il n'a qu'un seul diviseur). <strong>2 est le seul nombre premier pair.</strong></p>`)}
       `,
     },
-
     {
       title: "Fractions : sens et comparaison",
       category: "Nombres et calcul",
@@ -2331,7 +841,6 @@ function chapters5eFull() {
         ${lc.tip("Comparer à 1", `<p>Une fraction est <strong>plus grande que 1</strong> si son numérateur est plus grand que son dénominateur (ex : <code>7/5</code>). Elle est <strong>plus petite que 1</strong> sinon (ex : <code>3/4</code>). Pratique pour vérifier rapidement.</p>`)}
       `,
     },
-
     {
       title: "Fractions : addition et soustraction",
       category: "Nombres et calcul",
@@ -2364,7 +873,6 @@ function chapters5eFull() {
           <p>On peut aussi écrire <code>11/4 = 2,75</code>.</p>`)}
       `,
     },
-
     {
       title: "Fractions : multiplication",
       category: "Nombres et calcul",
@@ -2393,7 +901,6 @@ function chapters5eFull() {
         ${lc.warn("Ordre des mots", `<p>« Les 2/3 de 60 » et « 60 fois 2/3 » donnent le <em>même</em> calcul : <code>2/3 × 60 = 40</code>. La multiplication est commutative.</p>`)}
       `,
     },
-
     {
       title: "Nombres relatifs : sens et repérage",
       category: "Nombres et calcul",
@@ -2430,7 +937,6 @@ function chapters5eFull() {
         ${lc.tip("Visuel", `<p>Sur la droite graduée, le plus grand nombre est celui qui est <strong>le plus à droite</strong>. <code>−3</code> est à droite de <code>−8</code>, donc <code>−3 > −8</code>.</p>`)}
       `,
     },
-
     {
       title: "Nombres relatifs : addition et soustraction",
       category: "Nombres et calcul",
@@ -2467,7 +973,6 @@ function chapters5eFull() {
         ${lc.example("Simplifier 6 − (−4) + (−2)", `<p><code>= 6 + 4 − 2 = 8</code>.</p>`)}
       `,
     },
-
     {
       title: "Priorités opératoires",
       category: "Nombres et calcul",
@@ -2505,7 +1010,6 @@ function chapters5eFull() {
           <li>Addition : <code>1/2 + 1/12 = 6/12 + 1/12 = 7/12</code>.</li></ol>`)}
       `,
     },
-
     {
       title: "Proportionnalité",
       category: "Organisation des données",
@@ -2545,7 +1049,6 @@ function chapters5eFull() {
           <p>Distance réelle = <code>4 × 200 = 800 cm = 8 m</code>.</p>`)}
       `,
     },
-
     {
       title: "Pourcentages",
       category: "Organisation des données",
@@ -2584,7 +1087,6 @@ function chapters5eFull() {
           <p>Au total : <code>(648,90 / 600 − 1) × 100 ≈ 8,15%</code>, et non 8% (les pourcentages ne s'additionnent pas).</p>`)}
       `,
     },
-
     {
       title: "Calcul littéral : expressions et tests",
       category: "Calcul littéral",
@@ -2625,7 +1127,6 @@ function chapters5eFull() {
         ${lc.warn("Ne pas mélanger", `<p>On <strong>ne peut pas</strong> additionner <code>3x</code> et <code>2</code> : ce ne sont pas des termes de même nature. <code>3x + 2</code> reste <code>3x + 2</code>.</p>`)}
       `,
     },
-
     {
       title: "Symétrie centrale",
       category: "Géométrie",
@@ -2663,7 +1164,6 @@ function chapters5eFull() {
           <p>Test rapide : si une lettre garde la même apparence en la regardant à l'envers (rotation 180°), elle a un centre de symétrie. <code>S</code>, <code>N</code>, <code>Z</code>, <code>O</code>, <code>X</code>, <code>I</code>, <code>H</code> ont un centre de symétrie. <code>A</code>, <code>M</code>, <code>T</code> n'en ont pas.</p>`)}
       `,
     },
-
     {
       title: "Triangles : construction et propriétés",
       category: "Géométrie",
@@ -2710,7 +1210,6 @@ function chapters5eFull() {
         ${lc.tip("Méthode pratique", `<p>Pour vérifier ton triangle, mesure les trois côtés au final : tu dois retrouver les longueurs demandées (à 1 mm près).</p>`)}
       `,
     },
-
     {
       title: "Parallélogrammes",
       category: "Géométrie",
@@ -2753,138 +1252,26 @@ function chapters5eFull() {
           <p>Attention : la <strong>hauteur</strong> est la distance entre la base et le côté opposé, mesurée perpendiculairement (et non la longueur du côté oblique).</p>`)}
       `,
     },
-
   ];
 }
 
-// ─── Vue Apprentissage : rendering ──────────────────────────────
-function renderLearnSidebar() {
-  const sidebar = $('#learn-sidebar');
-  sidebar.innerHTML = '';
-  for (const group of CURRICULUM) {
-    const groupDiv = el('div', { class: 'level-group' });
-    groupDiv.appendChild(el('h4', {}, group.name));
-    for (const level of group.levels) {
-      const isActive = learnState.levelId === level.id;
-      const levelBtn = el('button', {
-        class: 'level-btn' + (isActive ? ' active' : ''),
-        onclick: () => { learnState.levelId = level.id; learnState.chapterId = null; renderLearn(); }
-      }, level.name);
-      groupDiv.appendChild(levelBtn);
-      // Affiche les chapitres si ce niveau est actif
-      if (isActive) {
-        const chaptersDiv = el('div', { class: 'chapters' });
-        for (let i = 0; i < level.chapters.length; i++) {
-          const ch = level.chapters[i];
-          const chId = `${level.id}-${i}`;
-          const isChActive = learnState.chapterId === chId;
-          const isPlaceholder = !ch.content;
-          chaptersDiv.appendChild(el('button', {
-            class: 'chapter-btn' + (isChActive ? ' active' : '') + (isPlaceholder ? ' placeholder' : ''),
-            onclick: () => { learnState.chapterId = chId; renderLearn(); }
-          }, `${i + 1}. ${ch.title}`));
-        }
-        groupDiv.appendChild(chaptersDiv);
-      }
-    }
-    sidebar.appendChild(groupDiv);
-  }
+// ─── État + persistance ─────────────────────────────────────────
+const STATE_KEY = 'mathcours_v1';
+let state = { levelId: '5e', chapterId: null };
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed.levelId) state.levelId = parsed.levelId;
+    if (parsed.chapterId) state.chapterId = parsed.chapterId;
+  } catch (e) { /* ignore */ }
 }
 
-function renderLearnContent() {
-  const main = $('#learn-content');
-  main.innerHTML = '';
-  if (!learnState.levelId) {
-    main.appendChild(el('div', { class: 'lc-empty', html: `
-      <div class="big">📚</div>
-      <p>Bienvenue dans l'<strong>apprentissage scolaire</strong>.</p>
-      <p>Choisis un niveau dans la barre de gauche pour commencer. Le programme va du collège jusqu'au post-bac.</p>
-    `}));
-    return;
-  }
-  const level = findLevel(learnState.levelId);
-  if (!level) return;
-  if (!learnState.chapterId) {
-    // Page d'accueil du niveau : liste des chapitres
-    main.appendChild(el('div', { class: 'breadcrumb' }, level.name));
-    main.appendChild(el('h1', {}, `Programme de ${level.name}`));
-    const filled = level.chapters.filter(c => c.content).length;
-    main.appendChild(el('div', { class: 'chapter-meta' }, [
-      el('span', { class: 'pill' }, `${level.chapters.length} chapitres`),
-      el('span', { class: 'pill' }, `${filled} rédigés`),
-    ]));
-    main.appendChild(el('p', {},
-      filled === level.chapters.length
-        ? `Tous les chapitres sont rédigés. Clique sur un chapitre dans la barre de gauche pour le lire.`
-        : `Le contenu de ce niveau est en cours de rédaction. Les chapitres déjà disponibles sont en bleu, les autres en gris (à venir).`
-    ));
-    // Mini liste regroupée par catégorie
-    const byCat = {};
-    for (let i = 0; i < level.chapters.length; i++) {
-      const c = level.chapters[i];
-      if (!byCat[c.category]) byCat[c.category] = [];
-      byCat[c.category].push({ ...c, idx: i });
-    }
-    for (const cat of Object.keys(byCat)) {
-      main.appendChild(el('h2', {}, cat));
-      const ul = el('ul');
-      for (const c of byCat[cat]) {
-        const a = el('a', {
-          href: '#',
-          onclick: (e) => { e.preventDefault(); learnState.chapterId = `${level.id}-${c.idx}`; renderLearn(); }
-        }, `${c.idx + 1}. ${c.title}`);
-        if (!c.content) {
-          a.style.color = 'var(--text-3)';
-          a.style.fontStyle = 'italic';
-        }
-        const li = el('li');
-        li.appendChild(a);
-        if (!c.content) li.appendChild(document.createTextNode(' — à venir'));
-        ul.appendChild(li);
-      }
-      main.appendChild(ul);
-    }
-    return;
-  }
-  // Page d'un chapitre
-  const [, idxStr] = learnState.chapterId.split(/-(?=\d+$)/);
-  const idx = parseInt(idxStr, 10);
-  const chapter = level.chapters[idx];
-  if (!chapter) return;
-  main.appendChild(el('div', { class: 'breadcrumb' }, `${level.name} · ${chapter.category}`));
-  main.appendChild(el('h1', {}, chapter.title));
-  main.appendChild(el('div', { class: 'chapter-meta' }, [
-    el('span', { class: 'pill' }, `Chapitre ${idx + 1}`),
-    el('span', { class: 'pill' }, chapter.category),
-  ]));
-  if (!chapter.content) {
-    main.appendChild(el('div', { class: 'lc-empty', html: `
-      <div class="big">📝</div>
-      <p>Ce chapitre n'est <strong>pas encore rédigé</strong>.</p>
-      <p>Il sera ajouté lors d'une prochaine session — niveau par niveau, en commençant par les fondamentaux.</p>
-    `}));
-    return;
-  }
-  const article = el('div', { class: 'chapter-body' });
-  article.innerHTML = chapter.content;
-  main.appendChild(article);
-  // Navigation suivant/précédent
-  const nav = el('div', { style: 'display:flex;gap:10px;justify-content:space-between;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)' });
-  if (idx > 0) {
-    nav.appendChild(el('button', {
-      class: 'btn ghost',
-      onclick: () => { learnState.chapterId = `${level.id}-${idx - 1}`; renderLearn(); }
-    }, `← ${level.chapters[idx - 1].title}`));
-  } else {
-    nav.appendChild(el('div', {}));
-  }
-  if (idx < level.chapters.length - 1) {
-    nav.appendChild(el('button', {
-      class: 'btn',
-      onclick: () => { learnState.chapterId = `${level.id}-${idx + 1}`; renderLearn(); }
-    }, `${level.chapters[idx + 1].title} →`));
-  }
-  main.appendChild(nav);
+function saveState() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+  catch (e) { /* ignore quota */ }
 }
 
 function findLevel(id) {
@@ -2892,68 +1279,256 @@ function findLevel(id) {
   return null;
 }
 
-function renderLearn() {
-  renderLearnSidebar();
-  renderLearnContent();
-  // L'article n'a pas son propre scroll : c'est la fenêtre qui scrolle.
-  // scrollTop sur l'article était un no-op et laissait l'utilisateur en
-  // bas de page après un clic sur « Suivant ».
-  window.scrollTo({ top: 0, behavior: 'instant' });
+function levelStats(level) {
+  const filled = level.chapters.filter(c => c.content).length;
+  return { filled, total: level.chapters.length };
 }
 
-// ─── Tab switching ──────────────────────────────────────────────
-function showTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-  $('#view-city').hidden = (name !== 'city');
-  $('#view-learn').hidden = (name !== 'learn');
-  if (name === 'learn') {
-    // Pré-sélection : 5e par défaut puisque c'est le seul niveau rédigé pour l'instant.
-    if (!learnState.levelId) learnState.levelId = '5e';
-    renderLearn();
+// ─── Rendering ──────────────────────────────────────────────────
+function renderSidebar() {
+  const sidebar = $('#sidebar');
+  sidebar.innerHTML = '';
+  for (const group of CURRICULUM) {
+    const groupDiv = el('div', { class: 'group' });
+    groupDiv.appendChild(el('h4', {}, group.name));
+    for (const level of group.levels) {
+      const isActive = state.levelId === level.id;
+      const stats = levelStats(level);
+      const lvlBtn = el('button', {
+        class: 'lvl-btn' + (isActive ? ' active' : ''),
+        onclick: () => {
+          state.levelId = level.id;
+          state.chapterId = null;
+          saveState();
+          render();
+          closeSidebarMobile();
+        }
+      });
+      lvlBtn.appendChild(el('span', {}, level.name));
+      lvlBtn.appendChild(el('span', { class: 'count' }, `${stats.filled}/${stats.total}`));
+      groupDiv.appendChild(lvlBtn);
+      if (isActive) {
+        const chapsBox = el('div', { class: 'chapters' });
+        // Grouper par catégorie
+        let lastCat = null;
+        for (let i = 0; i < level.chapters.length; i++) {
+          const ch = level.chapters[i];
+          if (ch.category !== lastCat) {
+            chapsBox.appendChild(el('div', { class: 'chap-cat' }, ch.category));
+            lastCat = ch.category;
+          }
+          const chId = `${level.id}-${i}`;
+          const isChActive = state.chapterId === chId;
+          chapsBox.appendChild(el('button', {
+            class: 'chap-btn' + (isChActive ? ' active' : '') + (ch.content ? '' : ' placeholder'),
+            onclick: () => {
+              state.chapterId = chId;
+              saveState();
+              render();
+              closeSidebarMobile();
+            }
+          }, `${i + 1}. ${ch.title}`));
+        }
+        groupDiv.appendChild(chapsBox);
+      }
+    }
+    sidebar.appendChild(groupDiv);
   }
 }
 
-// ─── Boot ────────────────────────────────────────────────────────
+function renderBreadcrumb() {
+  const bc = $('#breadcrumb');
+  bc.innerHTML = '';
+  if (!state.levelId) return;
+  const level = findLevel(state.levelId);
+  if (!level) return;
+  bc.appendChild(el('span', { class: 'crumb' + (state.chapterId ? '' : ' current') }, level.name));
+  if (state.chapterId) {
+    const idx = parseChapterIdx(state.chapterId);
+    const ch = level.chapters[idx];
+    if (ch) {
+      bc.appendChild(el('span', { class: 'sep' }, '›'));
+      bc.appendChild(el('span', { class: 'crumb current' }, ch.title));
+    }
+  }
+}
+
+function parseChapterIdx(chapterId) {
+  // chapterId = `${level.id}-${i}` ; on extrait l'index final.
+  const m = chapterId.match(/-(\d+)$/);
+  return m ? parseInt(m[1], 10) : -1;
+}
+
+function renderContent() {
+  const main = $('#content');
+  main.innerHTML = '';
+  if (!state.levelId) {
+    renderHome(main);
+    return;
+  }
+  const level = findLevel(state.levelId);
+  if (!level) { renderHome(main); return; }
+  if (!state.chapterId) {
+    renderLevelIndex(main, level);
+    return;
+  }
+  const idx = parseChapterIdx(state.chapterId);
+  const chapter = level.chapters[idx];
+  if (!chapter) { renderLevelIndex(main, level); return; }
+  renderChapter(main, level, chapter, idx);
+}
+
+function renderHome(main) {
+  main.appendChild(el('div', { class: 'breadcrumb' }, 'Accueil'));
+  main.appendChild(el('h1', {}, 'Cours de maths'));
+  main.appendChild(el('p', {}, "Choisis un niveau pour commencer. Le programme couvre du collège (6e) au post-bac (analyse, algèbre, probas)."));
+  for (const group of CURRICULUM) {
+    main.appendChild(el('h2', {}, group.name));
+    const grid = el('div', { class: 'levels-grid' });
+    for (const level of group.levels) {
+      const stats = levelStats(level);
+      const card = el('button', {
+        class: 'lvl-card',
+        onclick: () => { state.levelId = level.id; state.chapterId = null; saveState(); render(); }
+      });
+      card.appendChild(el('div', { class: 'lvl-name' }, level.name));
+      const info = el('div', { class: 'lvl-info' });
+      if (stats.filled === stats.total) {
+        info.appendChild(el('span', { class: 'filled' }, `✓ ${stats.total} chapitres rédigés`));
+      } else if (stats.filled > 0) {
+        info.appendChild(el('span', {}, `${stats.filled}/${stats.total} chapitres rédigés`));
+      } else {
+        info.appendChild(el('span', {}, `${stats.total} chapitres (à venir)`));
+      }
+      card.appendChild(info);
+      grid.appendChild(card);
+    }
+    main.appendChild(grid);
+  }
+}
+
+function renderLevelIndex(main, level) {
+  const stats = levelStats(level);
+  main.appendChild(el('div', { class: 'breadcrumb' }, level.name));
+  main.appendChild(el('h1', {}, `Programme de ${level.name}`));
+  const meta = el('div', { class: 'meta' });
+  meta.appendChild(el('span', { class: 'pill' }, `${stats.total} chapitres`));
+  if (stats.filled === stats.total) {
+    meta.appendChild(el('span', { class: 'pill', style: 'background:var(--success-soft);color:var(--success-text)' }, `✓ Tous rédigés`));
+  } else if (stats.filled > 0) {
+    meta.appendChild(el('span', { class: 'pill' }, `${stats.filled} rédigés`));
+    meta.appendChild(el('span', { class: 'pill placeholder' }, `${stats.total - stats.filled} à venir`));
+  } else {
+    meta.appendChild(el('span', { class: 'pill placeholder' }, `Contenu à venir`));
+  }
+  main.appendChild(meta);
+  // Description courte
+  if (stats.filled === 0) {
+    main.appendChild(el('p', {}, "Les chapitres de ce niveau sont structurés (titres + catégories visibles dans la barre latérale) mais leur contenu sera ajouté lors d'une prochaine session de rédaction."));
+  } else if (stats.filled < stats.total) {
+    main.appendChild(el('p', {}, "Les chapitres déjà rédigés sont en bleu, les autres en gris (placeholders à venir)."));
+  } else {
+    main.appendChild(el('p', {}, "Tous les chapitres du programme sont disponibles. Choisis-en un pour commencer."));
+  }
+  // Liste groupée par catégorie
+  const byCat = {};
+  for (let i = 0; i < level.chapters.length; i++) {
+    const c = level.chapters[i];
+    if (!byCat[c.category]) byCat[c.category] = [];
+    byCat[c.category].push({ ...c, idx: i });
+  }
+  for (const cat of Object.keys(byCat)) {
+    const section = el('div', { class: 'cat-section' });
+    section.appendChild(el('h2', {}, cat));
+    const list = el('div', { class: 'chap-list' });
+    for (const c of byCat[cat]) {
+      const item = el('button', {
+        class: 'chap-item' + (c.content ? '' : ' placeholder'),
+        onclick: () => {
+          state.chapterId = `${level.id}-${c.idx}`;
+          saveState();
+          render();
+        }
+      });
+      item.appendChild(el('div', { class: 'num' }, String(c.idx + 1)));
+      item.appendChild(el('span', {}, c.title));
+      if (!c.content) item.appendChild(el('span', { class: 'badge-todo' }, 'À venir'));
+      list.appendChild(item);
+    }
+    section.appendChild(list);
+    main.appendChild(section);
+  }
+}
+
+function renderChapter(main, level, chapter, idx) {
+  main.appendChild(el('div', { class: 'breadcrumb' }, `${level.name} · ${chapter.category}`));
+  main.appendChild(el('h1', {}, chapter.title));
+  const meta = el('div', { class: 'meta' });
+  meta.appendChild(el('span', { class: 'pill' }, `Chapitre ${idx + 1}`));
+  meta.appendChild(el('span', { class: 'pill' }, chapter.category));
+  main.appendChild(meta);
+  if (!chapter.content) {
+    main.appendChild(el('div', { class: 'empty-state', html: `
+      <div class="big">📝</div>
+      <p>Ce chapitre n'est <strong>pas encore rédigé</strong>.</p>
+      <p>Il sera ajouté lors d'une prochaine session — niveau par niveau, en commençant par les fondamentaux.</p>
+      <p style="margin-top:20px"><button onclick="state.chapterId=null;saveState();render();" class="nav-btn">Retour au sommaire</button></p>
+    `}));
+    return;
+  }
+  const body = el('div');
+  body.innerHTML = chapter.content;
+  main.appendChild(body);
+  // Navigation chapitre suivant / précédent
+  const nav = el('div', { class: 'chap-nav' });
+  if (idx > 0) {
+    const prev = level.chapters[idx - 1];
+    const b = el('button', {
+      class: 'nav-btn',
+      onclick: () => { state.chapterId = `${level.id}-${idx - 1}`; saveState(); render(); }
+    });
+    b.appendChild(el('span', { class: 'small' }, '← Précédent'));
+    b.appendChild(el('span', {}, prev.title));
+    nav.appendChild(b);
+  } else {
+    nav.appendChild(el('div', {}));
+  }
+  if (idx < level.chapters.length - 1) {
+    const next = level.chapters[idx + 1];
+    const b = el('button', {
+      class: 'nav-btn next',
+      onclick: () => { state.chapterId = `${level.id}-${idx + 1}`; saveState(); render(); }
+    });
+    b.appendChild(el('span', { class: 'small' }, 'Suivant →'));
+    b.appendChild(el('span', {}, next.title));
+    nav.appendChild(b);
+  }
+  main.appendChild(nav);
+}
+
+function render() {
+  renderSidebar();
+  renderBreadcrumb();
+  renderContent();
+  window.scrollTo({ top: 0 });
+}
+
+// ─── Mobile menu ────────────────────────────────────────────────
+function openSidebarMobile() {
+  $('#sidebar').classList.add('open');
+  $('#backdrop').classList.add('show');
+}
+function closeSidebarMobile() {
+  $('#sidebar').classList.remove('open');
+  $('#backdrop').classList.remove('show');
+}
+
+// ─── Boot ───────────────────────────────────────────────────────
 function boot() {
-  state = loadState();
-  bumpStreakIfNewDay();
-  const earned = applyIdle();
-  if (earned > 0.5) toast(`💤 Pendant ton absence : +${fmtNum(earned)} 🪙`);
-  saveState();
-  renderHUD();
-  renderCity();
-
-  setInterval(() => { applyIdle(); renderHUD(); }, 5000);
-  setInterval(saveState, 15000);
-  window.addEventListener('beforeunload', saveState);
-
-  $('#btn-reset').addEventListener('click', () => {
-    if (confirm('Réinitialiser ta cité ? Toute ta progression sera perdue.')) {
-      localStorage.removeItem(STATE_KEY);
-      location.reload();
-    }
-  });
-
-  $('#btn-test').addEventListener('click', openTestPanel);
-  document.addEventListener('keydown', (e) => {
-    if (e.shiftKey && (e.key === 'T' || e.key === 't') && !e.ctrlKey && !e.metaKey
-        && document.activeElement.tagName !== 'INPUT') {
-      e.preventDefault();
-      openTestPanel();
-    }
-  });
-
-  $('#modal-bg').addEventListener('click', (e) => {
-    if (e.target.id === 'modal-bg') closeModal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && $('#modal-bg').classList.contains('show')) closeModal();
-  });
-
-  // Tabs
-  document.querySelectorAll('.tab').forEach(t => {
-    t.addEventListener('click', () => showTab(t.dataset.tab));
-  });
+  loadState();
+  render();
+  $('#menu-btn').addEventListener('click', openSidebarMobile);
+  $('#backdrop').addEventListener('click', closeSidebarMobile);
 }
 
 boot();
