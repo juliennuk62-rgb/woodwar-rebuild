@@ -7122,6 +7122,67 @@ EXERCISES['6e-0'] = [
       };
     },
   },
+  {
+    title: 'Arrondir à la dizaine sur la droite [figure]',
+    generate() {
+      const baseDiz = exRand(40, 99);            // dizaine "min" entre 400 et 990
+      const xMin = baseDiz * 10, xMax = (baseDiz + 2) * 10;  // intervalle [N0; N0+20]
+      const n = exRand(xMin + 1, xMax - 1);
+      const target = Math.round(n / 10) * 10;
+      const startX = exPick([xMin, xMax]);  // commencer sur une borne
+      // Construit les graduations à chaque entier
+      const tickPoints = [], tickShapes = [];
+      for (let v = xMin; v <= xMax; v++) {
+        tickPoints.push({ name: `t${v}a`, x: v, y: 2.8, hidden: true });
+        tickPoints.push({ name: `t${v}b`, x: v, y: v % 10 === 0 ? 3.4 : 3.2, hidden: true });
+        tickShapes.push({ type: 'segment', from: `t${v}a`, to: `t${v}b`, style: { color: 'fixed' } });
+      }
+      // Étiquettes des dizaines
+      const labelPoints = [
+        { name: 'L0', x: xMin, y: 2.5, label: String(xMin), color: 'fixed' },
+        { name: 'Lmid', x: xMin + 10, y: 2.5, label: String(xMin + 10), color: 'fixed' },
+        { name: 'L1', x: xMax, y: 2.5, label: String(xMax), color: 'fixed' },
+      ];
+      return {
+        inputType: 'figure',
+        question: `Place le curseur <code>P</code> sur la dizaine la plus proche de <code>${n}</code> (arrondi).`,
+        figure: {
+          width: 480, height: 160,
+          viewBox: { xMin: xMin - 1, xMax: xMax + 1, yMin: 2, yMax: 4 },
+          grid: false, snap: 0, flipY: true,
+          points: [
+            { name: 'A', x: n, y: 3.1, label: String(n), color: 'fixed' },
+            ...labelPoints,
+            ...tickPoints,
+            {
+              name: 'P', x: startX, y: 3.1, label: 'P',
+              color: 'user', draggable: true,
+              constrain: (x) => ({ x: Math.max(xMin, Math.min(xMax, Math.round(x / 10) * 10)), y: 3.1 }),
+            },
+          ],
+          shapes: [
+            { type: 'segment', from: 'L0', to: 'L1', style: { color: 'fixed' } },
+            ...tickShapes,
+          ],
+          info: (state) => `Curseur P sur la dizaine ${state.points.P.x}`,
+        },
+        target: { P: { x: target, y: 3.1 } },
+        validate: (state) => {
+          const P = state.points.P;
+          if (Math.abs(P.x - target) < 0.5) return { ok: true };
+          return { ok: false, hint: `Le chiffre des unités de ${n} est ${n % 10} : ${n % 10 >= 5 ? 'on arrondit au-dessus' : 'on arrondit en-dessous'} → ${target}.` };
+        },
+        formatAnswer: () => String(target),
+        steps: [
+          `On regarde le chiffre des <strong>unités</strong> de ${n} : <code>${n % 10}</code>.`,
+          `${n % 10 >= 5
+            ? `Comme <code>${n % 10} ≥ 5</code>, on arrondit à la dizaine du <strong>dessus</strong>.`
+            : `Comme <code>${n % 10} &lt; 5</code>, on arrondit à la dizaine du <strong>dessous</strong>.`}`,
+          `Résultat : <code>${target}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['6e-1'] = [
@@ -7239,6 +7300,90 @@ EXERCISES['6e-1'] = [
           `Une part vaut <code>1/10 = 0,1</code>.`,
           `<code>${k}</code> parts valent <code>${k} × 0,1 = 0,${k}</code>.`,
           `Abscisse cherchée : <code>${e} + 0,${k} = ${n.toFixed(1)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Place 3,12 et 3,2 sur la droite [figure]',
+    generate() {
+      // Tirer la partie entière commune
+      const E = exRand(2, 7);
+      // Tirer un décimal "centièmes" et un décimal "dixièmes" — vérifier qu'ils sont distincts
+      let aD, bD;
+      do {
+        aD = exRand(11, 89);             // a = E + aD/100
+        bD = exRand(1, 9);                // b = E + bD/10
+      } while (Math.abs(aD/100 - bD/10) < 0.02);
+      const aVal = E + aD / 100;
+      const bVal = E + bD / 10;
+      const aLabel = aVal.toFixed(2).replace('.', ',');
+      const bLabel = bVal.toFixed(1).replace('.', ',');
+      // Axe entre E et E+1, zoom centièmes
+      const x0 = E, x1 = E + 1;
+      // Graduations principales (dixièmes) + secondaires (centièmes)
+      const tickPoints = [], tickShapes = [];
+      for (let k = 0; k <= 100; k++) {
+        const tx = x0 + k / 100;
+        const isMajor = k % 10 === 0;
+        tickPoints.push({ name: `t${k}a`, x: tx, y: 2.95, hidden: true });
+        tickPoints.push({ name: `t${k}b`, x: tx, y: isMajor ? 3.15 : 3.05, hidden: true });
+        tickShapes.push({ type: 'segment', from: `t${k}a`, to: `t${k}b`, style: { color: 'fixed' } });
+      }
+      // Étiquettes des dixièmes
+      const labelPoints = [];
+      for (let k = 0; k <= 10; k++) {
+        labelPoints.push({
+          name: `lab${k}`, x: x0 + k / 10, y: 2.7,
+          label: (E + k/10).toFixed(1).replace('.', ','),
+          color: 'fixed',
+        });
+      }
+      return {
+        inputType: 'figure',
+        question: `Place les points <code>A</code> et <code>B</code> sur la droite graduée :<br>• <code>A</code> à l'abscisse <code>${aLabel}</code><br>• <code>B</code> à l'abscisse <code>${bLabel}</code>`,
+        figure: {
+          width: 540, height: 180,
+          viewBox: { xMin: x0 - 0.05, xMax: x1 + 0.05, yMin: 2.4, yMax: 4 },
+          grid: false, snap: 0, flipY: true,
+          points: [
+            ...labelPoints,
+            ...tickPoints,
+            { name: 'O', x: x0, y: 3, hidden: true },
+            { name: 'I', x: x1, y: 3, hidden: true },
+            {
+              name: 'A', x: x0 + 0.5, y: 3.5, label: 'A',
+              color: 'user', draggable: true,
+              constrain: (x) => ({ x: Math.max(x0, Math.min(x1, x)), y: 3.5 }),
+            },
+            {
+              name: 'B', x: x0 + 0.5, y: 3.8, label: 'B',
+              color: 'user', draggable: true,
+              constrain: (x) => ({ x: Math.max(x0, Math.min(x1, x)), y: 3.8 }),
+            },
+          ],
+          shapes: [
+            { type: 'segment', from: 'O', to: 'I', style: { color: 'fixed' } },
+          ],
+          info: (state) => {
+            const A = state.points.A.x.toFixed(2).replace('.', ',');
+            const B = state.points.B.x.toFixed(2).replace('.', ',');
+            return `A à ${A}   |   B à ${B}`;
+          },
+        },
+        target: { A: { x: aVal, y: 3.5 }, B: { x: bVal, y: 3.8 } },
+        validate: (state) => {
+          const okA = Math.abs(state.points.A.x - aVal) < 0.012;
+          const okB = Math.abs(state.points.B.x - bVal) < 0.012;
+          if (okA && okB) return { ok: true };
+          if (!okA && !okB) return { ok: false, hint: `A doit être à ${aLabel} et B à ${bLabel}.` };
+          if (!okA) return { ok: false, hint: `B est bien placé. Mais A doit être à ${aLabel} (pas ${state.points.A.x.toFixed(2).replace('.', ',')}).` };
+          return { ok: false, hint: `A est bien placé. Mais B doit être à ${bLabel} (pas ${state.points.B.x.toFixed(2).replace('.', ',')}).` };
+        },
+        steps: [
+          `Pour ${aLabel} : c'est ${E} virgule ${aD < 10 ? '0' + aD : aD} = ${E} + ${aD}/100, donc à ${aD} centièmes après ${E}.`,
+          `Pour ${bLabel} : c'est ${E} virgule ${bD} = ${E} + ${bD}/10 = ${E} + ${bD * 10}/100, donc à ${bD * 10} centièmes après ${E}.`,
+          `Le piège classique : on pourrait croire que ${aLabel} > ${bLabel} parce que les deux chiffres après la virgule sont plus grands. Mais ${aLabel} = ${E},${aD < 10 ? '0' + aD : aD} et ${bLabel} = ${E},${bD}0 → on compare donc ${aD} vs ${bD * 10}.`,
         ],
       };
     },
@@ -7428,6 +7573,69 @@ EXERCISES['6e-3'] = [
         steps: [
           `On teste 2, 3, 5, 7… dans l'ordre.`,
           `<code>${c.n} ÷ ${c.div} = ${c.n / c.div}</code> donne un quotient entier, donc <code>${c.div}</code> divise <code>${c.n}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Quotient sur la droite des multiples [figure]',
+    generate() {
+      const b = exRand(3, 7);
+      const q = exRand(3, 7);
+      const r = exRand(0, b - 1);
+      const a = b * q + r;
+      const xMax = b * (q + 2);
+      // Graduations à chaque multiple de b
+      const tickPoints = [], tickShapes = [];
+      const labelPoints = [];
+      for (let k = 0; k <= q + 2; k++) {
+        const tx = b * k;
+        tickPoints.push({ name: `t${k}a`, x: tx, y: 2.85, hidden: true });
+        tickPoints.push({ name: `t${k}b`, x: tx, y: 3.15, hidden: true });
+        tickShapes.push({ type: 'segment', from: `t${k}a`, to: `t${k}b`, style: { color: 'fixed' } });
+        labelPoints.push({
+          name: `lab${k}`, x: tx, y: 2.5,
+          label: String(tx), color: 'fixed',
+        });
+      }
+      return {
+        inputType: 'figure',
+        question: `Place le curseur <code>P</code> sur le <strong>plus grand multiple de ${b}</strong> qui ne dépasse pas <code>${a}</code>.<br>(Le quotient de <code>${a} ÷ ${b}</code> sera la valeur de <code>P</code> divisée par ${b}.)`,
+        figure: {
+          width: 540, height: 180,
+          viewBox: { xMin: -1, xMax: xMax + 1, yMin: 2, yMax: 4 },
+          grid: false, snap: 0, flipY: true,
+          points: [
+            ...labelPoints,
+            ...tickPoints,
+            { name: 'O', x: 0, y: 3, hidden: true },
+            { name: 'M', x: xMax, y: 3, hidden: true },
+            { name: 'A', x: a, y: 3.4, label: String(a), color: 'fixed' },
+            {
+              name: 'P', x: 0, y: 3, label: 'P',
+              color: 'user', draggable: true,
+              constrain: (x) => ({ x: Math.max(0, Math.min(xMax, Math.round(x / b) * b)), y: 3 }),
+            },
+          ],
+          shapes: [
+            { type: 'segment', from: 'O', to: 'M', style: { color: 'fixed' } },
+            ...tickShapes,
+          ],
+          info: (state) => `P sur ${state.points.P.x} = ${b} × ${state.points.P.x / b}`,
+        },
+        target: { P: { x: b * q, y: 3 } },
+        validate: (state) => {
+          const P = state.points.P;
+          if (Math.abs(P.x - b * q) < 0.5) return { ok: true };
+          if (P.x > a) return { ok: false, hint: `${P.x} > ${a}, donc ${P.x} dépasse ${a}. Recule d'une graduation.` };
+          if (P.x + b <= a) return { ok: false, hint: `${P.x + b} ≤ ${a}, on peut donc faire mieux. Avance d'une graduation.` };
+          return { ok: false };
+        },
+        formatAnswer: () => `P sur ${b * q} (donc quotient = ${q}, reste = ${r})`,
+        steps: [
+          `On cherche le plus grand multiple de ${b} qui ne dépasse pas ${a}.`,
+          `Multiples de ${b} : ${[...Array(q + 2)].map((_, k) => b * k).join(', ')}…`,
+          `Le plus grand ≤ ${a} est <code>${b} × ${q} = ${b * q}</code>. Donc <code>${a} = ${b} × ${q} + ${r}</code> : quotient ${q}, reste ${r}.`,
         ],
       };
     },
@@ -7700,6 +7908,59 @@ EXERCISES['6e-5'] = [
       };
     },
   },
+  {
+    title: 'Place 3 points proportionnels [figure]',
+    generate() {
+      const k = exPick([1, 1.5, 2]);
+      const xs = [1, 2, 3];
+      const targets = xs.map(x => ({ x, y: k * x }));
+      return {
+        inputType: 'figure',
+        question: `Le prix d'un stylo est <strong>${k} €</strong>. Place les points <code>P1</code>, <code>P2</code>, <code>P3</code> pour qu'ils représentent le prix de 1, 2 et 3 stylos.<br>(Tu ne peux bouger que verticalement.)`,
+        figure: {
+          width: 360, height: 320,
+          viewBox: { xMin: -1, xMax: 5, yMin: -1, yMax: 8 },
+          grid: true, gridStep: 1, snap: 0.5, flipY: true, showAxes: true,
+          points: [
+            { name: 'O', x: 0, y: 0, label: 'O', color: 'fixed' },
+            {
+              name: 'P1', x: 1, y: 4, label: 'P1', color: 'user', draggable: true,
+              constrain: (x, y) => ({ x: 1, y: Math.max(0, Math.min(7, y)) }),
+            },
+            {
+              name: 'P2', x: 2, y: 4, label: 'P2', color: 'user', draggable: true,
+              constrain: (x, y) => ({ x: 2, y: Math.max(0, Math.min(7, y)) }),
+            },
+            {
+              name: 'P3', x: 3, y: 4, label: 'P3', color: 'user', draggable: true,
+              constrain: (x, y) => ({ x: 3, y: Math.max(0, Math.min(7, y)) }),
+            },
+          ],
+          shapes: [],
+          info: (state) => {
+            const P1 = state.points.P1, P2 = state.points.P2, P3 = state.points.P3;
+            return `P1(1 ; ${P1.y})  P2(2 ; ${P2.y})  P3(3 ; ${P3.y})`;
+          },
+        },
+        target: { P1: targets[0], P2: targets[1], P3: targets[2] },
+        validate: (state) => {
+          const P1 = state.points.P1, P2 = state.points.P2, P3 = state.points.P3;
+          const ok1 = Math.abs(P1.y - k) < 0.3;
+          const ok2 = Math.abs(P2.y - 2 * k) < 0.3;
+          const ok3 = Math.abs(P3.y - 3 * k) < 0.3;
+          if (ok1 && ok2 && ok3) return { ok: true };
+          if (!ok1) return { ok: false, hint: `1 stylo coûte ${k} €, donc P1 doit être à la hauteur ${k}.` };
+          if (!ok2) return { ok: false, hint: `2 stylos coûtent ${2 * k} €, donc P2 doit être à la hauteur ${2 * k}.` };
+          return { ok: false, hint: `3 stylos coûtent ${3 * k} €, donc P3 doit être à la hauteur ${3 * k}.` };
+        },
+        steps: [
+          `1 stylo coûte ${k} €. La situation est <strong>proportionnelle</strong> : prix = nombre × ${k}.`,
+          `Pour 2 stylos : <code>2 × ${k} = ${2 * k}</code> €. Pour 3 stylos : <code>3 × ${k} = ${3 * k}</code> €.`,
+          `Les 3 points P1(1; ${k}), P2(2; ${2 * k}), P3(3; ${3 * k}) sont alignés avec O : la droite passe par 0.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['6e-9'] = [
@@ -7934,6 +8195,75 @@ EXERCISES['6e-14'] = [
       };
     },
   },
+  {
+    title: 'Construis un rectangle d\'aire cible [figure]',
+    generate() {
+      const baseAB = 4;
+      const targetH = exPick([1, 2, 3, 4, 5]);
+      const targetArea = baseAB * targetH;
+      const ax = 1, ay = 1;
+      const bx = ax + baseAB, by = ay;
+      // Positions initiales : C et D mauvaises (hauteur = 1, mais pas la cible si target ≠ 1)
+      const startH = targetH === 1 ? 2 : 1;
+      const cStart = { x: bx, y: ay + startH };
+      const dStart = { x: ax, y: ay + startH };
+      return {
+        inputType: 'figure',
+        question: `Le segment <code>[AB]</code> a pour longueur <code>${baseAB} cm</code> (côté du rectangle). Place les points <code>C</code> et <code>D</code> pour que le rectangle <code>ABCD</code> ait une <strong>aire de ${targetArea} cm²</strong>.`,
+        figure: {
+          width: 360, height: 280,
+          viewBox: { xMin: 0, xMax: 10, yMin: 0, yMax: 8 },
+          grid: true, gridStep: 1, snap: 0.5, flipY: true,
+          points: [
+            { name: 'A', x: ax, y: ay, label: 'A', color: 'fixed' },
+            { name: 'B', x: bx, y: by, label: 'B', color: 'fixed' },
+            { name: 'C', x: cStart.x, y: cStart.y, label: 'C', color: 'user', draggable: true },
+            { name: 'D', x: dStart.x, y: dStart.y, label: 'D', color: 'user', draggable: true },
+          ],
+          shapes: [
+            { type: 'polygon', points: ['A', 'B', 'C', 'D'], style: { color: 'user' } },
+          ],
+          info: (state) => {
+            const { A, B, C, D } = state.points;
+            const AB = Math.hypot(B.x - A.x, B.y - A.y);
+            const BC = Math.hypot(C.x - B.x, C.y - B.y);
+            // Si rectangle, aire = AB × BC ; sinon, on utilise la formule du lacet
+            const area = geom.aire([A, B, C, D]);
+            return `AB = ${AB.toFixed(1)}  BC = ${BC.toFixed(1)}  Aire ≈ ${area.toFixed(1)} cm²  (cible : ${targetArea})`;
+          },
+        },
+        target: { C: { x: bx, y: ay + targetH }, D: { x: ax, y: ay + targetH } },
+        validate: (state) => {
+          const { A, B, C, D } = state.points;
+          const okPerpB = geom.perpendiculaires(A, B, B, C, 4);
+          const okPerpC = geom.perpendiculaires(B, C, C, D, 4);
+          const okBC = geom.longueurEgale(B, C, D.y - A.y < 0 ? -1 : Math.hypot(C.x - B.x, C.y - B.y), 0.4);
+          // Plus simple : vérifier rectangle (4 angles droits + côtés opposés égaux) puis aire
+          const ABlen = Math.hypot(B.x - A.x, B.y - A.y);
+          const BClen = Math.hypot(C.x - B.x, C.y - B.y);
+          const CDlen = Math.hypot(D.x - C.x, D.y - C.y);
+          const DAlen = Math.hypot(A.x - D.x, A.y - D.y);
+          const isRect = okPerpB && okPerpC
+            && Math.abs(ABlen - CDlen) < 0.4
+            && Math.abs(BClen - DAlen) < 0.4;
+          const area = geom.aire([A, B, C, D]);
+          if (isRect && Math.abs(area - targetArea) < 0.5) return { ok: true };
+          if (!isRect) {
+            return { ok: false, hint: 'Le quadrilatère ABCD n\'est pas un rectangle (vérifie que tous les angles sont droits).' };
+          }
+          if (area < targetArea) {
+            return { ok: false, hint: `L'aire actuelle est ${area.toFixed(1)} cm² (cible : ${targetArea}). Augmente la hauteur.` };
+          }
+          return { ok: false, hint: `L'aire actuelle est ${area.toFixed(1)} cm² (cible : ${targetArea}). Réduis la hauteur.` };
+        },
+        steps: [
+          `Aire d'un rectangle : <code>A = L × l</code>.`,
+          `Avec <code>AB = ${baseAB} cm</code> comme longueur, on cherche la largeur l telle que <code>${baseAB} × l = ${targetArea}</code>.`,
+          `Donc <code>l = ${targetArea} / ${baseAB} = ${targetH} cm</code> : C et D doivent être à <code>${targetH} cm</code> au-dessus de B et A.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['6e-6'] = [
@@ -8120,6 +8450,46 @@ EXERCISES['6e-7'] = [
       };
     },
   },
+  {
+    title: 'Place un point dans un repère [figure]',
+    generate() {
+      const tx = exRand(1, 8);
+      const ty = exRand(1, 6);
+      const startX = exPick([0, 9]);
+      const startY = exPick([0, 7]);
+      return {
+        inputType: 'figure',
+        question: `Place le point <code>M</code> aux coordonnées <code>(${tx} ; ${ty})</code> dans le repère.`,
+        figure: {
+          width: 360, height: 320,
+          viewBox: { xMin: -1, xMax: 10, yMin: -1, yMax: 8 },
+          grid: true, gridStep: 1, snap: 0.5, flipY: true, showAxes: true,
+          points: [
+            { name: 'O', x: 0, y: 0, label: 'O', color: 'fixed' },
+            { name: 'M', x: startX, y: startY, label: 'M', color: 'user', draggable: true },
+          ],
+          shapes: [],
+          info: (state) => `M(${state.points.M.x} ; ${state.points.M.y})`,
+        },
+        target: { M: { x: tx, y: ty } },
+        validate: (state) => {
+          const M = state.points.M;
+          if (Math.abs(M.x - tx) < 0.3 && Math.abs(M.y - ty) < 0.3) return { ok: true };
+          if (Math.abs(M.x - tx) >= 0.3 && Math.abs(M.y - ty) >= 0.3) {
+            return { ok: false, hint: `M doit être en (${tx} ; ${ty}). Tu es en (${M.x} ; ${M.y}).` };
+          }
+          if (Math.abs(M.x - tx) >= 0.3) {
+            return { ok: false, hint: `L'<strong>abscisse</strong> de M doit être ${tx}, pas ${M.x}.` };
+          }
+          return { ok: false, hint: `L'<strong>ordonnée</strong> de M doit être ${ty}, pas ${M.y}.` };
+        },
+        steps: [
+          `Dans un repère <code>(O, x, y)</code>, on lit l'<strong>abscisse</strong> en premier (sur l'axe horizontal), puis l'<strong>ordonnée</strong> (sur l'axe vertical).`,
+          `Pour M(${tx} ; ${ty}) : on avance de <code>${tx}</code> sur l'axe horizontal, puis de <code>${ty}</code> sur l'axe vertical.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['6e-8'] = [
@@ -8206,6 +8576,63 @@ EXERCISES['6e-8'] = [
         answer: c.ans ? 0 : 1,
         steps: [
           c.why,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Trace la perpendiculaire à (d) passant par P [figure]',
+    generate() {
+      const py = exRand(5, 7);
+      const px = exRand(3, 7);
+      const startQx = px + exPick([2, -2, 3, -3]);  // commence "à côté" (faux exprès)
+      const startQy = py - 2;
+      return {
+        inputType: 'figure',
+        question: `Place le point <code>Q</code> pour que la droite <code>(PQ)</code> soit <strong>perpendiculaire</strong> à la droite (d).`,
+        figure: {
+          width: 360, height: 280,
+          viewBox: { xMin: 0, xMax: 10, yMin: 0, yMax: 8 },
+          grid: true, gridStep: 1, snap: 0.25, flipY: true,
+          points: [
+            { name: 'D1', x: 0.5, y: 2, hidden: true },
+            { name: 'D2', x: 9.5, y: 2, hidden: true },
+            { name: 'P', x: px, y: py, label: 'P', color: 'fixed' },
+            { name: 'Q', x: startQx, y: startQy, label: 'Q', color: 'user', draggable: true },
+          ],
+          shapes: [
+            { type: 'line', from: 'D1', to: 'D2', style: { color: 'fixed' } },
+            { type: 'segment', from: 'P', to: 'Q', style: { color: 'user' } },
+          ],
+          info: (state) => {
+            const P = state.points.P, Q = state.points.Q;
+            const D1 = state.points.D1, D2 = state.points.D2;
+            const m = geom.angleDeg(P, Q, D2);  // hack : pas exactement l'angle entre (PQ) et (d)
+            const u = { x: Q.x - P.x, y: Q.y - P.y };
+            const v = { x: D2.x - D1.x, y: D2.y - D1.y };
+            const nu = Math.hypot(u.x, u.y), nv = Math.hypot(v.x, v.y);
+            if (nu < 0.1) return 'Q trop proche de P';
+            const cos = (u.x * v.x + u.y * v.y) / (nu * nv);
+            const ang = Math.acos(Math.max(-1, Math.min(1, Math.abs(cos)))) * 180 / Math.PI;
+            return `Angle entre (PQ) et (d) : ${(90 - ang).toFixed(1)}°  (cible : 90°)`;
+          },
+        },
+        validate: (state) => {
+          const P = state.points.P, Q = state.points.Q;
+          const D1 = state.points.D1, D2 = state.points.D2;
+          if (Math.hypot(Q.x - P.x, Q.y - P.y) < 0.4) {
+            return { ok: false, hint: 'Q est trop proche de P. Éloigne-le pour bien définir la droite (PQ).' };
+          }
+          if (geom.perpendiculaires(P, Q, D1, D2, 4)) return { ok: true };
+          // Hint : Q devrait avoir la même abscisse que P (puisque (d) est horizontale ici)
+          if (Math.abs(Q.x - P.x) < 0.4) return { ok: true };  // déjà vertical, double check
+          return { ok: false, hint: `Pour que (PQ) soit perpendiculaire à (d) (horizontale), Q doit avoir la même abscisse que P (x = ${P.x}).` };
+        },
+        formatAnswer: () => `Q doit avoir l'abscisse ${px}`,
+        steps: [
+          `(d) est horizontale. Une droite perpendiculaire à (d) est <strong>verticale</strong>.`,
+          `Donc <code>Q</code> doit avoir la <strong>même abscisse</strong> que <code>P</code> (<code>x = ${px}</code>).`,
+          `Tu peux placer Q à n'importe quelle hauteur, du moment que <code>x_Q = x_P</code>.`,
         ],
       };
     },
@@ -8763,6 +9190,66 @@ EXERCISES['6e-13'] = [
         steps: [
           `La symétrie axiale = effet miroir par rapport à une droite.`,
           `La symétrie centrale = demi-tour (180°) autour d'un <strong>point</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Place le symétrique par rapport à un point [figure]',
+    generate() {
+      const ox = 5, oy = 4;
+      const dx = exRand(-3, 3) || 2;
+      const dy = exRand(-2, 2) || -1;
+      const ax = ox + dx, ay = oy + dy;
+      const target = { x: ox - dx, y: oy - dy };
+      const startM = { x: ax + 1, y: ay + 1 };  // volontairement faux
+      return {
+        inputType: 'figure',
+        question: `Place le point <code>M</code> pour qu'il soit le <strong>symétrique</strong> de <code>A</code> par rapport au <strong>point</strong> <code>O</code>.`,
+        figure: {
+          width: 360, height: 280,
+          viewBox: { xMin: 0, xMax: 10, yMin: 0, yMax: 8 },
+          grid: true, gridStep: 1, snap: 0.5, flipY: true,
+          points: [
+            { name: 'O', x: ox, y: oy, label: 'O', color: 'fixed' },
+            { name: 'A', x: ax, y: ay, label: 'A', color: 'fixed' },
+            { name: 'M', x: startM.x, y: startM.y, label: 'M', color: 'user', draggable: true },
+          ],
+          shapes: [
+            { type: 'segment', from: 'A', to: 'M', style: { color: 'guide' } },
+          ],
+          info: (state) => {
+            const O = state.points.O, A = state.points.A, M = state.points.M;
+            const mid = { x: (A.x + M.x) / 2, y: (A.y + M.y) / 2 };
+            const d = Math.hypot(mid.x - O.x, mid.y - O.y);
+            return d < 0.2
+              ? `O est bien le milieu de [AM] !`
+              : `Milieu de [AM] : (${mid.x.toFixed(1)} ; ${mid.y.toFixed(1)}) — il devrait être en O(${O.x} ; ${O.y}).`;
+          },
+        },
+        target: { M: target },
+        validate: (state) => {
+          const O = state.points.O, A = state.points.A, M = state.points.M;
+          if (geom.symetriqueParRapportA(M, O, A, 0.4)) return { ok: true };
+          if (geom.pointsConfondus(M, A, 0.4)) {
+            return { ok: false, hint: 'M ne doit pas être confondu avec A : c\'est l\'image de A après un demi-tour autour de O.' };
+          }
+          // Vérifier l'alignement A, O, M
+          if (!geom.colineaires(A, O, M, 0.4)) {
+            return { ok: false, hint: 'Les points A, O et M doivent être <strong>alignés</strong>.' };
+          }
+          // Vérifier OA = OM
+          const OA = Math.hypot(A.x - O.x, A.y - O.y);
+          const OM = Math.hypot(M.x - O.x, M.y - O.y);
+          if (Math.abs(OA - OM) > 0.4) {
+            return { ok: false, hint: `O doit être le <strong>milieu</strong> de [AM] : OA = OM. Actuellement OA = ${OA.toFixed(1)} et OM = ${OM.toFixed(1)}.` };
+          }
+          return { ok: false };
+        },
+        steps: [
+          `Le symétrique de A par rapport au <strong>point</strong> O est le point M tel que <strong>O est le milieu de [AM]</strong>.`,
+          `On peut le voir comme un <strong>demi-tour</strong> de 180° autour de O : on prolonge [AO] de la même longueur de l'autre côté.`,
+          `<code>A(${ax} ; ${ay})</code>, <code>O(${ox} ; ${oy})</code>, donc <code>M(${target.x} ; ${target.y})</code> (formule : M = 2O − A).`,
         ],
       };
     },
