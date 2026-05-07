@@ -2893,7 +2893,10 @@ function findLevel(id) {
 function renderLearn() {
   renderLearnSidebar();
   renderLearnContent();
-  $('#learn-content').scrollTop = 0;
+  // L'article n'a pas son propre scroll : c'est la fenêtre qui scrolle.
+  // scrollTop sur l'article était un no-op et laissait l'utilisateur en
+  // bas de page après un clic sur « Suivant ».
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 // ─── Tab switching ──────────────────────────────────────────────
@@ -2901,11 +2904,9 @@ function showTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   $('#view-city').hidden = (name !== 'city');
   $('#view-learn').hidden = (name !== 'learn');
-  if (name === 'learn' && !learnState.levelId) {
-    // Pré-sélection : 5e par défaut puisque c'est le seul niveau rédigé pour l'instant
-    learnState.levelId = '5e';
-    renderLearn();
-  } else if (name === 'learn') {
+  if (name === 'learn') {
+    // Pré-sélection : 5e par défaut puisque c'est le seul niveau rédigé pour l'instant.
+    if (!learnState.levelId) learnState.levelId = '5e';
     renderLearn();
   }
 }
