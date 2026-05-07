@@ -14536,13 +14536,182 @@ EXERCISES['1ere-11'] = [
 ];
 
 // ─── Templates d'exercices : Terminale ──────────────────────────
+EXERCISES['tle-0'] = [
+  {
+    title: 'Limite à l\'infini d\'un polynôme',
+    generate() {
+      const a = exPick([2, -3, 5, -1]);
+      return {
+        question: `<code>lim<sub>x→+∞</sub> (${a}x³)</code> ?`,
+        inputType: 'mcq',
+        options: ['+∞', '−∞', '0', 'pas de limite'],
+        answer: a > 0 ? 0 : 1,
+        steps: [
+          `Le terme dominant est <code>${a}x³</code>.`,
+          a > 0 ? `Coefficient positif et puissance impaire → +∞.` : `Coefficient négatif et puissance impaire → −∞.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite d\'un quotient',
+    generate() {
+      return {
+        question: `<code>lim<sub>x→+∞</sub> (3x² + 2)/(x² + 1)</code> ?`,
+        inputType: 'number',
+        answer: 3,
+        tolerance: 0.001,
+        steps: [
+          `On factorise par les termes dominants au numérateur et dénominateur.`,
+          `<code>(3x²(1 + 2/(3x²))) / (x²(1 + 1/x²)) → 3</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite finie',
+    generate() {
+      return {
+        question: `<code>lim<sub>x→0</sub> sin(x)/x</code> ?`,
+        inputType: 'number',
+        answer: 1,
+        tolerance: 0.001,
+        steps: [
+          `Limite remarquable : <code>lim<sub>x→0</sub> sin(x)/x = 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Asymptote horizontale',
+    generate() {
+      return {
+        question: `Si <code>lim<sub>x→+∞</sub> f(x) = 5</code>, alors la courbe de f a pour asymptote :`,
+        inputType: 'mcq',
+        options: [
+          'la droite y = 5 en +∞',
+          'la droite x = 5',
+          'aucune asymptote',
+          'la droite y = 0',
+        ],
+        answer: 0,
+        steps: [
+          `Limite finie ℓ en +∞ ⇒ asymptote horizontale d'équation <code>y = ℓ</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Forme indéterminée',
+    generate() {
+      const c = exPick([
+        '+∞ − ∞', '0 × ∞', '∞/∞', '0/0',
+      ]);
+      return {
+        question: `<code>${c}</code> est :`,
+        inputType: 'mcq',
+        options: ['une forme déterminée', 'une forme indéterminée', 'toujours nulle', 'toujours infinie'],
+        answer: 1,
+        steps: [
+          `Les formes indéterminées sont : <code>+∞ − ∞, 0 × ∞, ∞/∞, 0/0, 1<sup>∞</sup>, ∞⁰, 0⁰</code>.`,
+          `Il faut transformer pour lever l'indétermination.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-1'] = [
+  {
+    title: 'Théorème des valeurs intermédiaires',
+    generate() {
+      return {
+        question: `Si <code>f</code> est continue sur <code>[a; b]</code> et <code>f(a) × f(b) &lt; 0</code>, alors :`,
+        inputType: 'mcq',
+        options: [
+          'f admet un maximum sur (a; b)',
+          'f s\'annule au moins une fois sur (a; b)',
+          'f est constante',
+          'f est strictement monotone',
+        ],
+        answer: 1,
+        steps: [
+          `TVI (corollaire) : f continue sur [a;b] et f(a) × f(b) &lt; 0 ⇒ ∃ c ∈ (a;b) tel que f(c) = 0.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Continuité ⇒ image d\'un intervalle',
+    generate() {
+      return {
+        question: `Si <code>f</code> est continue sur <code>[a; b]</code>, alors <code>f([a; b])</code> est :`,
+        inputType: 'mcq',
+        options: ['un intervalle', 'un point', 'une union d\'intervalles', 'l\'ensemble vide'],
+        answer: 0,
+        steps: [
+          `TVI : l'image d'un intervalle par une fonction continue est un intervalle.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Existence d\'une solution',
+    generate() {
+      return {
+        question: `<code>f(x) = x³ + x − 1</code> est continue sur ℝ, <code>f(0) = −1</code>, <code>f(1) = 1</code>. Combien de solutions a <code>f(x) = 0</code> sur <code>[0; 1]</code> ?`,
+        inputType: 'mcq',
+        options: ['0', '1', '2', '3'],
+        answer: 1,
+        steps: [
+          `f continue sur [0;1] et change de signe → au moins une solution (TVI).`,
+          `f' = 3x² + 1 > 0, donc f strictement croissante → solution unique.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Continuité d\'une somme',
+    generate() {
+      return {
+        question: `Si f et g sont continues sur ℝ, la fonction <code>f + g</code> est :`,
+        inputType: 'mcq',
+        options: ['continue sur ℝ', 'discontinue en 0', 'continue uniquement si f = g', 'rien de précis'],
+        answer: 0,
+        steps: [
+          `Somme, produit et composée de fonctions continues sont continues sur leur domaine.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Bijection',
+    generate() {
+      return {
+        question: `Si <code>f</code> est continue et strictement croissante sur <code>[a; b]</code>, alors :`,
+        inputType: 'mcq',
+        options: [
+          'f réalise une bijection de [a;b] sur [f(a); f(b)]',
+          'f peut prendre la même valeur deux fois',
+          'f n\'a pas de minimum',
+          'f n\'est pas dérivable',
+        ],
+        answer: 0,
+        steps: [
+          `Continue strictement monotone ⇒ bijection.`,
+          `Image : <code>[f(a); f(b)]</code> (puisque croissante).`,
+        ],
+      };
+    },
+  },
+];
+
 EXERCISES['tle-2'] = [
   {
     title: 'Dérivée d\'une composée e^u',
     generate() {
       const a = exRand(2, 5), b = exRand(-5, 5);
       const x = exRand(0, 2);
-      // f(x) = e^(ax+b) → f'(x) = a × e^(ax+b)
       const v = a * Math.exp(a * x + b);
       return {
         question: `Soit <code>f(x) = e<sup>${a}x ${b >= 0 ? '+ ' + b : '− ' + (-b)}</sup></code>. Calcule <code>f'(${x})</code> (au centième).`,
@@ -14553,6 +14722,67 @@ EXERCISES['tle-2'] = [
           `<code>(e^u)' = u' × e^u</code>. Ici <code>u = ${a}x ${b >= 0 ? '+ ' + b : '− ' + (-b)}</code>, <code>u' = ${a}</code>.`,
           `<code>f'(x) = ${a} × e<sup>${a}x ${b >= 0 ? '+ ' + b : '− ' + (-b)}</sup></code>.`,
           `<code>f'(${x}) ≈ ${v.toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Dérivée de ln(u)',
+    generate() {
+      const a = exRand(2, 5);
+      return {
+        question: `<code>f(x) = ln(${a}x + 1)</code>. Que vaut <code>f'(0)</code> ?`,
+        inputType: 'number',
+        answer: a,
+        steps: [
+          `<code>(ln u)' = u'/u</code>.`,
+          `<code>f'(x) = ${a}/(${a}x + 1)</code>, donc <code>f'(0) = ${a}/1 = ${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Dérivée d\'un produit',
+    generate() {
+      const a = exRand(2, 5);
+      return {
+        question: `<code>f(x) = x × e<sup>${a}x</sup></code>. Que vaut <code>f'(0)</code> ?`,
+        inputType: 'number',
+        answer: 1,
+        steps: [
+          `<code>(uv)' = u'v + uv'</code>.`,
+          `<code>f'(x) = e<sup>${a}x</sup> + x × ${a}e<sup>${a}x</sup></code>.`,
+          `<code>f'(0) = 1 + 0 = 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Dérivée du quotient',
+    generate() {
+      return {
+        question: `<code>f(x) = x/(x + 1)</code>. Que vaut <code>f'(0)</code> ?`,
+        inputType: 'number',
+        answer: 1,
+        steps: [
+          `<code>(u/v)' = (u'v − uv')/v²</code>.`,
+          `<code>f'(x) = (1 × (x+1) − x × 1)/(x+1)² = 1/(x+1)²</code>.`,
+          `<code>f'(0) = 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Composée g(u(x))',
+    generate() {
+      return {
+        question: `<code>f(x) = (3x + 1)<sup>4</sup></code>. Que vaut <code>f'(0)</code> ?`,
+        inputType: 'number',
+        answer: 12,
+        steps: [
+          `<code>(u<sup>n</sup>)' = n × u' × u<sup>n−1</sup></code>.`,
+          `<code>f'(x) = 4 × 3 × (3x + 1)³ = 12(3x+1)³</code>.`,
+          `<code>f'(0) = 12 × 1 = 12</code>.`,
         ],
       };
     },
@@ -14576,6 +14806,69 @@ EXERCISES['tle-3'] = [
       };
     },
   },
+  {
+    title: 'ln(1) et ln(e)',
+    generate() {
+      const c = exPick([
+        { e: 'ln(1)', v: 0 }, { e: 'ln(e)', v: 1 },
+        { e: 'ln(e²)', v: 2 }, { e: 'ln(1/e)', v: -1 },
+      ]);
+      return {
+        question: `Calcule : <code>${c.e}</code>.`,
+        inputType: 'number',
+        answer: c.v,
+        steps: [
+          `<code>ln(1) = 0</code>, <code>ln(e) = 1</code>.`,
+          `<code>ln(eⁿ) = n</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Propriété ln(ab)',
+    generate() {
+      return {
+        question: `<code>ln(6) = ln(2) + ln(?)</code>. Que vaut le ? ?`,
+        inputType: 'number',
+        answer: 3,
+        steps: [
+          `<code>ln(ab) = ln(a) + ln(b)</code>.`,
+          `<code>6 = 2 × 3</code>, donc <code>ln(6) = ln(2) + ln(3)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Dérivée de ln(x)',
+    generate() {
+      const x = exRand(2, 8);
+      return {
+        question: `<code>f(x) = ln(x)</code>. Que vaut <code>f'(${x})</code> ? (forme <code>num/den</code>)`,
+        inputType: 'fraction',
+        answer: 1 / x,
+        formatAnswer: () => `1/${x}`,
+        steps: [
+          `<code>(ln x)' = 1/x</code>.`,
+          `<code>f'(${x}) = 1/${x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite de ln en +∞',
+    generate() {
+      return {
+        question: `<code>lim<sub>x→+∞</sub> ln(x)</code> ?`,
+        inputType: 'mcq',
+        options: ['+∞', '−∞', '0', '1'],
+        answer: 0,
+        steps: [
+          `<code>ln</code> est strictement croissante et non bornée.`,
+          `<code>lim<sub>x→+∞</sub> ln(x) = +∞</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['tle-4'] = [
@@ -14584,8 +14877,6 @@ EXERCISES['tle-4'] = [
     generate() {
       const a = exRand(2, 6);
       const n = exRand(2, 4);
-      // Primitive de ax^n est a/(n+1) × x^(n+1) → coefficient = a/(n+1)
-      // Pour avoir un résultat propre, on choisit a multiple de n+1
       const aa = a * (n + 1);
       return {
         question: `Trouve une primitive de <code>${aa}x<sup>${n}</sup></code>. Donne le coefficient de <code>x<sup>${n + 1}</sup></code>.`,
@@ -14598,15 +14889,80 @@ EXERCISES['tle-4'] = [
       };
     },
   },
+  {
+    title: 'Primitive de e^x',
+    generate() {
+      const a = exRand(2, 6);
+      return {
+        question: `Une primitive de <code>${a}e<sup>x</sup></code> est :`,
+        inputType: 'mcq',
+        options: [
+          `${a}e<sup>x</sup>`,
+          `e<sup>x</sup>/${a}`,
+          `${a}xe<sup>x</sup>`,
+          `${a}/(x e<sup>x</sup>)`,
+        ],
+        answer: 0,
+        steps: [
+          `<code>(e<sup>x</sup>)' = e<sup>x</sup></code>, donc primitive de <code>e<sup>x</sup></code> est <code>e<sup>x</sup></code>.`,
+          `Primitive de <code>${a}e<sup>x</sup></code> : <code>${a}e<sup>x</sup></code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Primitive de 1/x',
+    generate() {
+      return {
+        question: `Une primitive de <code>1/x</code> sur <code>(0; +∞)</code> est :`,
+        inputType: 'mcq',
+        options: ['ln(x)', 'ln(|x|)', '1/x²', '−1/x²'],
+        answer: 0,
+        steps: [
+          `Sur <code>(0; +∞)</code>, une primitive de <code>1/x</code> est <code>ln(x)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Constante d\'intégration',
+    generate() {
+      const x = exRand(1, 5);
+      return {
+        question: `<code>F</code> primitive de <code>f(x) = 2x</code> avec <code>F(${x}) = 0</code>. Calcule <code>F(0)</code>.`,
+        inputType: 'number',
+        answer: -x * x,
+        steps: [
+          `<code>F(x) = x² + C</code>.`,
+          `<code>F(${x}) = ${x * x} + C = 0</code>, donc <code>C = ${-x * x}</code>.`,
+          `<code>F(0) = 0 + ${-x * x} = ${-x * x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Primitive de cos',
+    generate() {
+      const a = exRand(2, 5);
+      return {
+        question: `Une primitive de <code>${a}cos(x)</code> est :`,
+        inputType: 'mcq',
+        options: [`${a}sin(x)`, `−${a}sin(x)`, `${a}cos(x)`, `${a}x sin(x)`],
+        answer: 0,
+        steps: [
+          `<code>(sin x)' = cos x</code>, donc primitive de <code>cos x</code> est <code>sin x</code>.`,
+          `Primitive de <code>${a}cos(x)</code> : <code>${a}sin(x)</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['tle-5'] = [
   {
     title: 'Intégrale d\'un polynôme',
     generate() {
-      const a = exRand(2, 5);
       const b = exRand(0, 5);
-      // ∫₀^a (2x + b) dx = a² + b·a
       const top = exRand(2, 5);
       const result = top ** 2 + b * top;
       return {
@@ -14617,6 +14973,656 @@ EXERCISES['tle-5'] = [
         steps: [
           `Primitive de <code>2x + ${b}</code> : <code>x² + ${b}x</code>.`,
           `<code>[x² + ${b}x]₀<sup>${top}</sup> = ${top}² + ${b} × ${top} = ${top ** 2} + ${b * top} = ${result}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Linéarité de l\'intégrale',
+    generate() {
+      return {
+        question: `<code>∫₀¹ f = 3</code>, <code>∫₀¹ g = 5</code>. Calcule <code>∫₀¹ (2f + g)</code>.`,
+        inputType: 'number',
+        answer: 11,
+        steps: [
+          `Linéarité : <code>∫(2f + g) = 2∫f + ∫g = 2 × 3 + 5 = 11</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Relation de Chasles',
+    generate() {
+      return {
+        question: `<code>∫₀² f = 4</code>, <code>∫₂⁵ f = 7</code>. Calcule <code>∫₀⁵ f</code>.`,
+        inputType: 'number',
+        answer: 11,
+        steps: [
+          `Chasles : <code>∫₀⁵ f = ∫₀² f + ∫₂⁵ f = 4 + 7 = 11</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Intégrale et aire',
+    generate() {
+      return {
+        question: `<code>∫₀² 3 dx</code> ?`,
+        inputType: 'number',
+        answer: 6,
+        steps: [
+          `<code>∫₀² 3 dx = 3 × (2 − 0) = 6</code>.`,
+          `(C'est l'aire d'un rectangle 2 × 3.)`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Valeur moyenne',
+    generate() {
+      const a = exRand(2, 5);
+      const b = exRand(a + 2, a + 6);
+      return {
+        question: `Valeur moyenne de <code>f(x) = x</code> sur <code>[${a}; ${b}]</code> ?`,
+        inputType: 'number',
+        answer: (a + b) / 2,
+        tolerance: 0.001,
+        steps: [
+          `<code>μ = (1/(b−a)) × ∫_a^b f(x) dx</code>.`,
+          `Pour <code>f(x) = x</code> : <code>μ = (a + b)/2 = ${(a + b) / 2}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-6'] = [
+  {
+    title: 'Récurrence : initialisation',
+    generate() {
+      return {
+        question: `Pour démontrer par récurrence sur ℕ, l'<strong>initialisation</strong> consiste à :`,
+        inputType: 'mcq',
+        options: [
+          'Vérifier P(0)',
+          'Supposer P(n) vraie',
+          'Conclure pour tout n',
+          'Démontrer P(n) ⇒ P(n+1)',
+        ],
+        answer: 0,
+        steps: [
+          `Initialisation : on vérifie que P(0) (ou la valeur de départ) est vraie.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Récurrence : hérédité',
+    generate() {
+      return {
+        question: `L'étape d'<strong>hérédité</strong> consiste à montrer que :`,
+        inputType: 'mcq',
+        options: [
+          'P(0) ⇒ P(1)',
+          'Si P(n) est vraie, alors P(n+1) est vraie',
+          'P(n) est toujours vraie',
+          'P(n+1) ⇒ P(n)',
+        ],
+        answer: 1,
+        steps: [
+          `Hérédité : pour tout n, on suppose P(n) (HR) et on en déduit P(n+1).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Somme des n premiers entiers',
+    generate() {
+      const n = exRand(5, 12);
+      return {
+        question: `<code>1 + 2 + ... + ${n} = ?</code>`,
+        inputType: 'number',
+        answer: (n * (n + 1)) / 2,
+        steps: [
+          `Démontrée par récurrence : <code>S_n = n(n+1)/2</code>.`,
+          `<code>S_${n} = ${n} × ${n + 1}/2 = ${(n * (n + 1)) / 2}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Somme géométrique',
+    generate() {
+      const c = exPick([
+        { q: 2, n: 4 }, { q: 3, n: 3 }, { q: 2, n: 5 },
+      ]);
+      const ans = (c.q ** (c.n + 1) - 1) / (c.q - 1);
+      return {
+        question: `<code>1 + ${c.q} + ${c.q}² + ... + ${c.q}<sup>${c.n}</sup> = ?</code>`,
+        inputType: 'number',
+        answer: ans,
+        steps: [
+          `Formule : <code>(${c.q}<sup>${c.n + 1}</sup> − 1) / (${c.q} − 1) = ${ans}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Récurrence : conclusion',
+    generate() {
+      return {
+        question: `Quand peut-on conclure qu'une propriété est vraie pour tout <code>n ∈ ℕ</code> ?`,
+        inputType: 'mcq',
+        options: [
+          'Quand on a vérifié P(0) seul',
+          'Quand on a fait l\'hérédité seule',
+          'Quand on a fait initialisation ET hérédité',
+          'Jamais',
+        ],
+        answer: 2,
+        steps: [
+          `Initialisation seule ne suffit pas (P(0) vraie, mais après ?).`,
+          `Hérédité seule ne suffit pas (P(n) ⇒ P(n+1), mais P(0) peut être faux).`,
+          `Les deux ensemble : démonstration valide.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-7'] = [
+  {
+    title: 'Limite de q^n (q > 1)',
+    generate() {
+      const q = exPick([2, 3, 5, 1.5]);
+      return {
+        question: `<code>lim<sub>n→+∞</sub> ${q}<sup>n</sup></code> ?`,
+        inputType: 'mcq',
+        options: ['+∞', '0', '1', '−∞'],
+        answer: 0,
+        steps: [
+          `<code>${q} > 1</code>, donc <code>${q}<sup>n</sup> → +∞</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite de q^n (|q| < 1)',
+    generate() {
+      const q = exPick([0.5, 0.3, 0.9, -0.5]);
+      return {
+        question: `<code>lim<sub>n→+∞</sub> ${q}<sup>n</sup></code> ?`,
+        inputType: 'number',
+        answer: 0,
+        tolerance: 0.001,
+        steps: [
+          `<code>|${q}| &lt; 1</code>, donc <code>${q}<sup>n</sup> → 0</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Théorème des gendarmes',
+    generate() {
+      return {
+        question: `Si <code>u_n ≤ v_n ≤ w_n</code> et <code>u_n → 5</code>, <code>w_n → 5</code>, alors <code>v_n →</code> ?`,
+        inputType: 'number',
+        answer: 5,
+        steps: [
+          `Théorème des gendarmes : <code>v_n</code> coincée entre deux suites convergeant vers 5 → converge aussi vers 5.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Suite croissante majorée',
+    generate() {
+      return {
+        question: `Une suite croissante et majorée :`,
+        inputType: 'mcq',
+        options: ['diverge', 'converge', 'oscille', 'tend vers +∞'],
+        answer: 1,
+        steps: [
+          `Théorème de la limite monotone : croissante + majorée ⇒ converge.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite par opérations',
+    generate() {
+      return {
+        question: `<code>u_n → 3</code>, <code>v_n → 5</code>. Que vaut <code>lim u_n + v_n</code> ?`,
+        inputType: 'number',
+        answer: 8,
+        steps: [
+          `Limite d'une somme : <code>lim(u_n + v_n) = lim u_n + lim v_n = 3 + 5 = 8</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-8'] = [
+  {
+    title: 'Coordonnées d\'un vecteur AB dans l\'espace',
+    generate() {
+      const xA = exRand(-3, 3), yA = exRand(-3, 3), zA = exRand(-3, 3);
+      const xB = exRand(-3, 3), yB = exRand(-3, 3), zB = exRand(-3, 3);
+      return {
+        question: `<code>A(${xA}; ${yA}; ${zA})</code> et <code>B(${xB}; ${yB}; ${zB})</code>. Première coordonnée de <code>AB→</code> ?`,
+        inputType: 'number',
+        answer: xB - xA,
+        steps: [
+          `<code>AB→ = (x_B − x_A; y_B − y_A; z_B − z_A)</code>.`,
+          `Première coord : <code>${xB} − ${xA} = ${xB - xA}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Norme d\'un vecteur 3D',
+    generate() {
+      const c = exPick([
+        { v: [1, 2, 2], n: 3 }, { v: [2, 3, 6], n: 7 },
+        { v: [1, 4, 8], n: 9 }, { v: [2, 6, 9], n: 11 },
+      ]);
+      return {
+        question: `Norme de <code>u→(${c.v[0]}; ${c.v[1]}; ${c.v[2]})</code> ?`,
+        inputType: 'number',
+        answer: c.n,
+        steps: [
+          `<code>||u|| = √(x² + y² + z²) = √(${c.v[0] ** 2} + ${c.v[1] ** 2} + ${c.v[2] ** 2}) = √${c.v[0]**2 + c.v[1]**2 + c.v[2]**2} = ${c.n}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Coplanarité',
+    generate() {
+      return {
+        question: `Trois vecteurs <code>u→</code>, <code>v→</code>, <code>w→</code> sont coplanaires si :`,
+        inputType: 'mcq',
+        options: [
+          'Aucun n\'est nul',
+          'L\'un est combinaison linéaire des deux autres',
+          'Ils sont tous égaux',
+          'Leurs normes sont égales',
+        ],
+        answer: 1,
+        steps: [
+          `<code>u→</code>, <code>v→</code>, <code>w→</code> coplanaires ⇔ <code>w = αu + βv</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Équation de plan : vecteur normal',
+    generate() {
+      const a = exRand(1, 5), b = exRand(1, 5), c = exRand(1, 5);
+      return {
+        question: `Plan d'équation <code>${a}x + ${b}y + ${c}z = 0</code>. Première coordonnée d'un vecteur normal ?`,
+        inputType: 'number',
+        answer: a,
+        steps: [
+          `Pour <code>ax + by + cz + d = 0</code>, vecteur normal : <code>(a; b; c)</code>.`,
+          `Première coord : <code>${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Représentation paramétrique d\'une droite',
+    generate() {
+      return {
+        question: `Une droite passant par <code>A(1; 2; 3)</code> de vecteur directeur <code>u→(1; 0; 1)</code> a pour représentation paramétrique :`,
+        inputType: 'mcq',
+        options: [
+          'x = 1 + t, y = 2, z = 3 + t',
+          'x = t, y = t, z = t',
+          'x = 1, y = 2, z = 3',
+          'x + y + z = 6',
+        ],
+        answer: 0,
+        steps: [
+          `<code>(x; y; z) = A + t × u→</code>, donc <code>x = 1 + t</code>, <code>y = 2 + 0t = 2</code>, <code>z = 3 + t</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-9'] = [
+  {
+    title: 'Produit scalaire 3D',
+    generate() {
+      const x1 = exRand(-3, 3) || 2, y1 = exRand(-3, 3) || 1, z1 = exRand(-3, 3) || 3;
+      const x2 = exRand(-3, 3) || 1, y2 = exRand(-3, 3) || -1, z2 = exRand(-3, 3) || 2;
+      return {
+        question: `<code>u→(${x1}; ${y1}; ${z1}) · v→(${x2}; ${y2}; ${z2})</code> ?`,
+        inputType: 'number',
+        answer: x1 * x2 + y1 * y2 + z1 * z2,
+        steps: [
+          `<code>u · v = x x' + y y' + z z' = ${x1 * x2} + ${y1 * y2} + ${z1 * z2} = ${x1 * x2 + y1 * y2 + z1 * z2}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Orthogonalité 3D',
+    generate() {
+      const c = exPick([
+        { u: [1, 0, 0], v: [0, 1, 0], orth: true },
+        { u: [1, 1, 0], v: [-1, 1, 0], orth: true },
+        { u: [1, 2, 3], v: [4, 5, 6], orth: false },
+      ]);
+      return {
+        question: `<code>u→(${c.u.join('; ')})</code> et <code>v→(${c.v.join('; ')})</code> sont-ils orthogonaux ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.orth ? 0 : 1,
+        steps: [
+          `<code>u · v = ${c.u[0] * c.v[0] + c.u[1] * c.v[1] + c.u[2] * c.v[2]}</code>.`,
+          c.orth ? `= 0 ⇒ orthogonaux.` : `≠ 0 ⇒ non orthogonaux.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Calcul d\'angle (cas particulier)',
+    generate() {
+      return {
+        question: `<code>u→(1; 0; 0)</code> et <code>v→(1; 1; 0)</code>. Que vaut <code>cos(u, v)</code> ? (forme <code>num/den</code>)`,
+        inputType: 'fraction',
+        answer: 1 / Math.sqrt(2),
+        formatAnswer: () => `1/√2`,
+        steps: [
+          `<code>u · v = 1</code>, <code>||u|| = 1</code>, <code>||v|| = √2</code>.`,
+          `<code>cos = 1 / (1 × √2) = 1/√2</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Distance d\'un point à un plan',
+    generate() {
+      return {
+        question: `Plan : <code>x + y + z = 0</code>. Distance du point <code>A(1; 1; 1)</code> au plan ?`,
+        inputType: 'number',
+        answer: Math.sqrt(3),
+        tolerance: 0.05,
+        steps: [
+          `<code>d = |1 + 1 + 1| / √(1² + 1² + 1²) = 3/√3 = √3</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Plan défini par 3 points',
+    generate() {
+      return {
+        question: `Pour qu'un plan soit défini de manière unique, il faut au minimum :`,
+        inputType: 'mcq',
+        options: [
+          '2 points distincts',
+          '3 points alignés',
+          '3 points non alignés',
+          '4 points',
+        ],
+        answer: 2,
+        steps: [
+          `3 points <strong>non alignés</strong> définissent un unique plan.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-10'] = [
+  {
+    title: 'Loi uniforme : probabilité',
+    generate() {
+      const a = exRand(0, 5);
+      const b = exRand(a + 2, a + 8);
+      const c = exRand(a, b - 1);
+      const d = exRand(c + 1, b);
+      return {
+        question: `<code>X ~ U([${a}; ${b}])</code>. Calcule <code>P(${c} ≤ X ≤ ${d})</code> (au centième).`,
+        inputType: 'number',
+        answer: (d - c) / (b - a),
+        tolerance: 0.005,
+        steps: [
+          `Pour la loi uniforme : <code>P(c ≤ X ≤ d) = (d − c)/(b − a)</code>.`,
+          `<code>= (${d} − ${c})/(${b} − ${a}) = ${((d - c) / (b - a)).toFixed(3)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Espérance loi uniforme',
+    generate() {
+      const a = exRand(0, 5);
+      const b = exRand(a + 2, a + 8);
+      return {
+        question: `<code>X ~ U([${a}; ${b}])</code>. Quelle est <code>E(X)</code> ?`,
+        inputType: 'number',
+        answer: (a + b) / 2,
+        tolerance: 0.001,
+        steps: [
+          `<code>E(X) = (a + b)/2 = (${a} + ${b})/2 = ${(a + b) / 2}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Loi exponentielle : probabilité',
+    generate() {
+      const lambda = exPick([0.5, 1, 2]);
+      const t = exRand(1, 3);
+      const p = 1 - Math.exp(-lambda * t);
+      return {
+        question: `<code>X</code> suit une loi exponentielle de paramètre <code>λ = ${lambda}</code>. Calcule <code>P(X ≤ ${t})</code> (au centième).`,
+        inputType: 'number',
+        answer: Math.round(p * 100) / 100,
+        tolerance: 0.005,
+        steps: [
+          `<code>P(X ≤ t) = 1 − e<sup>−λt</sup> = 1 − e<sup>−${lambda * t}</sup></code>.`,
+          `<code>≈ ${p.toFixed(3)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Densité',
+    generate() {
+      return {
+        question: `Une fonction <code>f</code> est une densité de probabilité sur <code>[a; b]</code> si :`,
+        inputType: 'mcq',
+        options: [
+          'f ≥ 0 et ∫_a^b f = 1',
+          'f > 0 partout',
+          '∫_a^b f &lt; 1',
+          'f est constante',
+        ],
+        answer: 0,
+        steps: [
+          `Densité ⇔ <code>f ≥ 0</code> ET <code>∫_a^b f(x) dx = 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Espérance d\'une loi exponentielle',
+    generate() {
+      const lambda = exPick([0.5, 1, 2, 4]);
+      return {
+        question: `<code>X</code> suit une loi exponentielle de paramètre <code>λ = ${lambda}</code>. Calcule <code>E(X)</code>.`,
+        inputType: 'number',
+        answer: 1 / lambda,
+        tolerance: 0.001,
+        steps: [
+          `<code>E(X) = 1/λ = 1/${lambda} = ${1 / lambda}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-11'] = [
+  {
+    title: 'Loi normale centrée réduite',
+    generate() {
+      return {
+        question: `Si <code>X ~ N(0; 1)</code>, quelle est l'espérance ?`,
+        inputType: 'number',
+        answer: 0,
+        steps: [
+          `Loi normale centrée : <code>E(X) = 0</code> et <code>σ(X) = 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Probabilité ≥ μ',
+    generate() {
+      return {
+        question: `<code>X ~ N(μ; σ²)</code>. Que vaut <code>P(X ≥ μ)</code> ?`,
+        inputType: 'number',
+        answer: 0.5,
+        tolerance: 0.001,
+        steps: [
+          `La loi normale est symétrique autour de μ.`,
+          `<code>P(X ≥ μ) = 1/2 = 0,5</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Intervalle 1σ',
+    generate() {
+      return {
+        question: `<code>X ~ N(μ; σ²)</code>. Approximativement, quelle est la probabilité <code>P(μ − σ ≤ X ≤ μ + σ)</code> ?`,
+        inputType: 'mcq',
+        options: ['0,68', '0,95', '0,997', '0,5'],
+        answer: 0,
+        steps: [
+          `Règle des 68-95-99,7 : 1σ → 68 %, 2σ → 95 %, 3σ → 99,7 %.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Intervalle 2σ',
+    generate() {
+      return {
+        question: `<code>P(μ − 2σ ≤ X ≤ μ + 2σ)</code> ≈ ?`,
+        inputType: 'mcq',
+        options: ['0,68', '0,95', '0,997', '0,5'],
+        answer: 1,
+        steps: [
+          `Règle 95 % : 2σ couvre environ 95 % des valeurs.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Standardisation',
+    generate() {
+      return {
+        question: `Si <code>X ~ N(μ; σ²)</code>, alors la variable centrée réduite est :`,
+        inputType: 'mcq',
+        options: [
+          '(X − μ)/σ',
+          'X/σ',
+          'X − μ',
+          'σX + μ',
+        ],
+        answer: 0,
+        steps: [
+          `Standardisation : <code>Z = (X − μ)/σ ~ N(0; 1)</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-12'] = [
+  {
+    title: 'Intervalle de fluctuation',
+    generate() {
+      return {
+        question: `L'intervalle de fluctuation asymptotique au seuil 95 % d'une fréquence avec <code>n = 100</code> et <code>p = 0,5</code> est <code>[p − 1,96·σ ; p + 1,96·σ]</code>. Que vaut σ ?`,
+        inputType: 'number',
+        answer: Math.sqrt(0.5 * 0.5 / 100),
+        tolerance: 0.005,
+        steps: [
+          `<code>σ = √(p(1−p)/n) = √(0,5 × 0,5 / 100) = √0,0025 = 0,05</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Estimateur',
+    generate() {
+      return {
+        question: `Un échantillon de taille n donne <code>X̄ = 12,3</code>. C'est un estimateur de :`,
+        inputType: 'mcq',
+        options: ['l\'espérance μ', 'l\'écart-type σ', 'la variance', 'la médiane'],
+        answer: 0,
+        steps: [
+          `La moyenne empirique <code>X̄</code> est un estimateur sans biais de l'espérance <code>μ</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Taille d\'échantillon',
+    generate() {
+      return {
+        question: `Pour avoir une amplitude d'intervalle de confiance ≤ 0,1 (au seuil 95 %), il faut au minimum :`,
+        inputType: 'mcq',
+        options: ['n ≥ 100', 'n ≥ 400', 'n ≥ 1000', 'n ≥ 10000'],
+        answer: 1,
+        steps: [
+          `Amplitude approximative : <code>2/√n ≤ 0,1</code>, donc <code>√n ≥ 20</code>, <code>n ≥ 400</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Loi des grands nombres',
+    generate() {
+      return {
+        question: `D'après la loi (faible) des grands nombres, lorsque <code>n → ∞</code>, la moyenne empirique <code>X̄_n</code> :`,
+        inputType: 'mcq',
+        options: [
+          'tend vers l\'espérance μ',
+          'tend vers 0',
+          'oscille indéfiniment',
+          'devient infinie',
+        ],
+        answer: 0,
+        steps: [
+          `LGN : <code>X̄_n → μ</code> quand <code>n → ∞</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Pourcentage couvert',
+    generate() {
+      return {
+        question: `Au seuil de confiance 95 %, on s'attend à ce que la vraie moyenne soit dans l'intervalle obtenu :`,
+        inputType: 'mcq',
+        options: [
+          '95 % du temps en moyenne',
+          'Toujours',
+          '50 % du temps',
+          'Jamais',
+        ],
+        answer: 0,
+        steps: [
+          `Sur de très nombreux échantillons, environ 95 % des intervalles contiennent la vraie valeur.`,
         ],
       };
     },
@@ -14642,6 +15648,68 @@ EXERCISES['tle-13'] = [
       };
     },
   },
+  {
+    title: 'Symétrie des coefficients',
+    generate() {
+      const c = exPick([
+        { n: 8, k: 3, ans: 56 },
+        { n: 7, k: 2, ans: 21 },
+        { n: 9, k: 4, ans: 126 },
+      ]);
+      return {
+        question: `<code>C(${c.n}, ${c.k}) = C(${c.n}, ${c.n - c.k})</code>. Que valent-ils ?`,
+        inputType: 'number',
+        answer: c.ans,
+        steps: [
+          `Symétrie : <code>C(n, k) = C(n, n−k)</code>.`,
+          `<code>C(${c.n}, ${c.k}) = ${c.ans}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Triangle de Pascal',
+    generate() {
+      return {
+        question: `Relation de Pascal : <code>C(n, k) + C(n, k+1) = ?</code>`,
+        inputType: 'mcq',
+        options: ['C(n+1, k+1)', 'C(n+1, k)', 'C(n, k+2)', 'C(n−1, k)'],
+        answer: 0,
+        steps: [
+          `Triangle de Pascal : <code>C(n, k) + C(n, k+1) = C(n+1, k+1)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'C(n, 0) et C(n, n)',
+    generate() {
+      const n = exRand(3, 8);
+      return {
+        question: `Que vaut <code>C(${n}, 0)</code> ?`,
+        inputType: 'number',
+        answer: 1,
+        steps: [
+          `<code>C(n, 0) = C(n, n) = 1</code> pour tout n.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Somme des coefficients',
+    generate() {
+      const n = exRand(2, 6);
+      return {
+        question: `Que vaut <code>C(${n}, 0) + C(${n}, 1) + ... + C(${n}, ${n})</code> ?`,
+        inputType: 'number',
+        answer: 2 ** n,
+        steps: [
+          `<code>Σ_{k=0}^{n} C(n, k) = 2<sup>n</sup></code>.`,
+          `Pour n = ${n} : <code>2<sup>${n}</sup> = ${2 ** n}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['tle-14'] = [
@@ -14651,7 +15719,6 @@ EXERCISES['tle-14'] = [
       const a = exRand(-3, 3) || 2;
       const C = exRand(2, 5);
       const x = exRand(1, 3);
-      // y(x) = C × e^(ax)
       const y = C * Math.exp(a * x);
       return {
         question: `Solution de <code>y' = ${a}y</code> avec <code>y(0) = ${C}</code>. Calcule <code>y(${x})</code> (au centième).`,
@@ -14661,6 +15728,239 @@ EXERCISES['tle-14'] = [
         steps: [
           `Solution générale : <code>y(t) = K × e^{${a}t}</code>. Avec <code>y(0) = ${C}</code> : <code>K = ${C}</code>.`,
           `<code>y(${x}) = ${C} × e^{${a * x}} ≈ ${y.toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Solution générale y\' = ky',
+    generate() {
+      const k = exRand(2, 5);
+      return {
+        question: `Solutions générales de <code>y' = ${k}y</code> ?`,
+        inputType: 'mcq',
+        options: [
+          `y(t) = C × e<sup>${k}t</sup>`,
+          `y(t) = ${k}t + C`,
+          `y(t) = C × ${k}<sup>t</sup>`,
+          `y(t) = C × t<sup>${k}</sup>`,
+        ],
+        answer: 0,
+        steps: [
+          `Solution générale de <code>y' = ay</code> : <code>y(t) = C e<sup>at</sup></code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Constante d\'intégration',
+    generate() {
+      const a = exRand(2, 4);
+      const y0 = exRand(1, 5);
+      return {
+        question: `<code>y' = ${a}y</code> avec <code>y(0) = ${y0}</code>. Quelle est la constante <code>C</code> dans <code>y(t) = C e<sup>${a}t</sup></code> ?`,
+        inputType: 'number',
+        answer: y0,
+        steps: [
+          `<code>y(0) = C × e<sup>0</sup> = C</code>.`,
+          `Donc <code>C = y(0) = ${y0}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'EDO du type y\' = ay + b',
+    generate() {
+      const a = exRand(2, 4);
+      const b = exRand(2, 8);
+      return {
+        question: `Solutions générales de <code>y' = ${a}y + ${b}</code> ?`,
+        inputType: 'mcq',
+        options: [
+          `y(t) = C e<sup>${a}t</sup> − ${b}/${a}`,
+          `y(t) = C e<sup>${a}t</sup> + ${b}/${a}`,
+          `y(t) = C e<sup>−${a}t</sup>`,
+          `y(t) = ${a}t + ${b}`,
+        ],
+        answer: 0,
+        steps: [
+          `Solution particulière constante : <code>y' = 0</code>, donc <code>0 = ay + b ⇒ y = −b/a</code>.`,
+          `Solution générale : <code>y(t) = C e<sup>at</sup> − b/a</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Application : croissance',
+    generate() {
+      return {
+        question: `Une population P vérifie <code>P'(t) = 0,1 × P(t)</code> avec <code>P(0) = 100</code>. Quelle est la population après 10 ans ? (au plus proche)`,
+        inputType: 'number',
+        answer: Math.round(100 * Math.exp(1)),
+        tolerance: 5,
+        steps: [
+          `<code>P(t) = 100 × e<sup>0,1t</sup></code>.`,
+          `<code>P(10) = 100 × e<sup>1</sup> = 100e ≈ ${(100 * Math.exp(1)).toFixed(0)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-15'] = [
+  {
+    title: 'Convexité et f\'\'',
+    generate() {
+      return {
+        question: `Si <code>f''(x) ≥ 0</code> sur un intervalle <code>I</code>, alors <code>f</code> est :`,
+        inputType: 'mcq',
+        options: ['concave sur I', 'convexe sur I', 'croissante sur I', 'décroissante sur I'],
+        answer: 1,
+        steps: [
+          `<code>f'' ≥ 0</code> ⇒ f convexe (la courbe est au-dessus de ses tangentes).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Point d\'inflexion',
+    generate() {
+      return {
+        question: `Un point d'inflexion est un point où :`,
+        inputType: 'mcq',
+        options: [
+          'f\'\' s\'annule en changeant de signe',
+          'f s\'annule',
+          'f\'\' = 0 sans changement de signe',
+          'f\' = 0',
+        ],
+        answer: 0,
+        steps: [
+          `Inflexion : f'' s'annule <strong>en changeant de signe</strong>. La courbe change de convexité.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'x² convexe',
+    generate() {
+      return {
+        question: `<code>f(x) = x²</code>. La fonction est :`,
+        inputType: 'mcq',
+        options: ['convexe sur ℝ', 'concave sur ℝ', 'convexe puis concave', 'concave puis convexe'],
+        answer: 0,
+        steps: [
+          `<code>f''(x) = 2 ≥ 0</code> sur ℝ ⇒ <strong>convexe</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'x³ inflexion',
+    generate() {
+      return {
+        question: `<code>f(x) = x³</code>. En quel point a-t-elle un point d'inflexion ?`,
+        inputType: 'number',
+        answer: 0,
+        steps: [
+          `<code>f'(x) = 3x²</code>, <code>f''(x) = 6x</code>.`,
+          `<code>f''(0) = 0</code> et f'' change de signe en 0 → inflexion en 0.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Tangente et convexité',
+    generate() {
+      return {
+        question: `Si <code>f</code> est convexe sur <code>I</code>, sa courbe est :`,
+        inputType: 'mcq',
+        options: [
+          'au-dessus de chacune de ses tangentes',
+          'au-dessous de chacune de ses tangentes',
+          'tangente à toutes les droites',
+          'rectiligne',
+        ],
+        answer: 0,
+        steps: [
+          `Convexité ⇔ courbe <strong>au-dessus</strong> de toutes ses tangentes (ou tangente sur l'intervalle).`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['tle-16'] = [
+  {
+    title: 'Espérance d\'une somme',
+    generate() {
+      const a = exRand(2, 6);
+      const b = exRand(2, 6);
+      return {
+        question: `<code>E(X) = ${a}</code> et <code>E(Y) = ${b}</code>. Que vaut <code>E(X + Y)</code> ?`,
+        inputType: 'number',
+        answer: a + b,
+        steps: [
+          `Linéarité (toujours vraie) : <code>E(X + Y) = E(X) + E(Y) = ${a} + ${b} = ${a + b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variance d\'une somme indépendante',
+    generate() {
+      const v1 = exRand(2, 6);
+      const v2 = exRand(2, 6);
+      return {
+        question: `<code>X</code> et <code>Y</code> sont <strong>indépendantes</strong>, <code>V(X) = ${v1}</code>, <code>V(Y) = ${v2}</code>. Que vaut <code>V(X + Y)</code> ?`,
+        inputType: 'number',
+        answer: v1 + v2,
+        steps: [
+          `Indépendance ⇒ <code>V(X + Y) = V(X) + V(Y) = ${v1} + ${v2} = ${v1 + v2}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Inégalité de Bienaymé-Tchebychev',
+    generate() {
+      return {
+        question: `D'après l'inégalité de Bienaymé-Tchebychev, <code>P(|X − μ| ≥ kσ) ≤</code> ?`,
+        inputType: 'mcq',
+        options: ['1/k', '1/k²', 'k²', '1 − 1/k²'],
+        answer: 1,
+        steps: [
+          `Bienaymé-Tchebychev : <code>P(|X − E(X)| ≥ kσ) ≤ 1/k²</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Concentration : moyenne empirique',
+    generate() {
+      return {
+        question: `<code>X̄_n = (X_1 + ... + X_n)/n</code>, où les X_i sont iid d'espérance μ. Que vaut <code>E(X̄_n)</code> ?`,
+        inputType: 'mcq',
+        options: ['μ', 'μ/n', 'nμ', '0'],
+        answer: 0,
+        steps: [
+          `<code>E(X̄_n) = (E(X_1) + ... + E(X_n))/n = nμ/n = μ</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variance de la moyenne',
+    generate() {
+      const v = exRand(4, 16);
+      const n = exPick([4, 9, 16, 25]);
+      return {
+        question: `<code>V(X_i) = ${v}</code> (iid), n = <code>${n}</code>. Que vaut <code>V(X̄_n)</code> ?`,
+        inputType: 'number',
+        answer: v / n,
+        tolerance: 0.001,
+        steps: [
+          `<code>V(X̄_n) = V(X_i) / n = ${v}/${n} = ${v / n}</code>.`,
         ],
       };
     },
