@@ -1232,6 +1232,18 @@ function chaptersAlgebre() {
           <li><code>dim ℝ_n[X] = n + 1</code>.</li>
           <li><code>dim M_{n,p}(ℝ) = np</code>.</li>
         </ul>`)}
+
+        <h2>7. Somme et somme directe</h2>
+        ${lc.def("Somme F + G", `<p>La <strong>somme</strong> de deux sous-espaces <code>F</code> et <code>G</code> de <code>E</code> est :</p>`)}
+        ${lc.formula("F + G = { u + v : u ∈ F, v ∈ G }")}
+        ${lc.def("Somme directe F ⊕ G", `<p>La somme est <strong>directe</strong> si tout élément de <code>F + G</code> s'écrit de manière <strong>unique</strong> sous la forme <code>u + v</code>. Caractérisation :</p>`)}
+        ${lc.formula("F ⊕ G ⇔ F ∩ G = {0}")}
+        ${lc.def("Sous-espaces supplémentaires", `<p><code>F</code> et <code>G</code> sont <strong>supplémentaires</strong> dans <code>E</code> si <code>E = F ⊕ G</code> (tout vecteur de E se décompose de manière unique en u + v).</p>`)}
+
+        <h2>8. Formule de Grassmann</h2>
+        ${lc.prop("Dimension d'une somme", `<p>Pour deux sous-espaces de dimension finie :</p>`)}
+        ${lc.formula("dim(F + G) = dim F + dim G − dim(F ∩ G)")}
+        ${lc.example("Application", `<p>Dans <code>ℝ³</code>, deux plans distincts <code>F</code> et <code>G</code> ont chacun <code>dim = 2</code>. Leur intersection est typiquement une droite (<code>dim 1</code>). Donc <code>dim(F + G) = 2 + 2 − 1 = 3 = dim ℝ³</code> : la somme remplit tout l'espace.</p>`)}
       `,
     },
 
@@ -1398,6 +1410,32 @@ function chaptersAlgebre() {
 
         <h2>6. Application : équations de plans</h2>
         ${lc.prop("Trois points alignés / coplanaires", `<p>Trois vecteurs de ℝ³ sont coplanaires si leur déterminant 3×3 est nul.</p>`)}
+
+        <h2>7. Comatrice et inverse par cofacteurs</h2>
+        ${lc.def("Cofacteur", `<p>Le <strong>cofacteur</strong> <code>(i, j)</code> de <code>A</code> est <code>Cᵢⱼ = (−1)^{i+j} × det(Aᵢⱼ)</code> où <code>Aᵢⱼ</code> est la sous-matrice de <code>A</code> sans la ligne <code>i</code> et la colonne <code>j</code>.</p>`)}
+        ${lc.def("Comatrice", `<p>La <strong>comatrice</strong> de <code>A</code>, notée <code>com(A)</code>, est la matrice des cofacteurs.</p>`)}
+        ${lc.formula("A⁻¹ = (1/det A) × ᵗcom(A) &nbsp;&nbsp; (si det A ≠ 0)")}
+        <p><code>ᵗcom(A)</code> = transposée de la comatrice.</p>
+
+        <h2>8. Formules de Cramer</h2>
+        ${lc.prop("Pour un système A·X = B avec A inversible", `<p>Soit <code>Aⱼ</code> la matrice obtenue en remplaçant la <code>j</code>-ème colonne de <code>A</code> par <code>B</code>. Alors la <code>j</code>-ème inconnue est :</p>`)}
+        ${lc.formula("xⱼ = det(Aⱼ) / det(A)")}
+        ${lc.example("Cramer 2×2", `<p>Soit <code>{ 2x + 3y = 7 ; 4x − y = 5 }</code>. Matrice <code>A = ((2,3);(4,−1))</code>, <code>det A = −2 − 12 = −14</code>.</p>
+          <ul><li><code>A_x = ((7,3);(5,−1))</code>, <code>det = −7 − 15 = −22</code>. Donc <code>x = −22/−14 = 11/7</code>.</li>
+          <li><code>A_y = ((2,7);(4,5))</code>, <code>det = 10 − 28 = −18</code>. Donc <code>y = −18/−14 = 9/7</code>.</li></ul>`)}
+
+        <h2>9. Caractérisation complète de l'inversibilité</h2>
+        ${lc.prop("Toutes ces conditions sont équivalentes (matrice carrée n×n)", `<ul>
+          <li><code>A</code> est inversible ;</li>
+          <li><code>det(A) ≠ 0</code> ;</li>
+          <li><code>rg(A) = n</code> ;</li>
+          <li><code>ker(A) = {0}</code> (seul le vecteur nul est dans le noyau) ;</li>
+          <li>Pour tout <code>B</code>, le système <code>AX = B</code> a <strong>une unique</strong> solution ;</li>
+          <li>0 n'est <strong>pas</strong> valeur propre de <code>A</code> ;</li>
+          <li>Les colonnes de <code>A</code> forment une famille libre (donc une base de ℝⁿ) ;</li>
+          <li>Les lignes de <code>A</code> forment une famille libre.</li>
+        </ul>`)}
+        ${lc.tip("Mémoriser", `<p>Cette équivalence est <em>le</em> théorème central de l'algèbre linéaire en dimension finie : tout (presque) se ramène à ces conditions.</p>`)}
       `,
     },
 
