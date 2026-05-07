@@ -634,6 +634,111 @@
     .ex-cta:hover { filter: brightness(1.05); transform: translateY(-1px); }
     .ex-cta:active { transform: translateY(0); }
 
+    .ds-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 12px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+      border: none;
+      border-radius: var(--r);
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: var(--shadow);
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .ds-cta:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    .ds-cta:active { transform: translateY(0); }
+    .ds-score-info {
+      font-size: 12.5px;
+      color: var(--text-2);
+      margin-top: 8px;
+    }
+    .ds-progress {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+    .ds-progress-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--bg-soft);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .ds-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+      transition: width 0.3s;
+    }
+    .ds-final-grade {
+      text-align: center;
+      padding: 28px 20px;
+      margin: 8px 0 16px;
+      background: linear-gradient(135deg, var(--primary-soft), #fef3c7);
+      border-radius: var(--r);
+    }
+    .ds-final-grade .grade-num {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .ds-final-grade .grade-denom {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-2);
+    }
+    .ds-final-grade .grade-mention {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--text-2);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .ds-final-stats {
+      display: flex; justify-content: space-around; gap: 16px;
+      margin: 12px 0 18px;
+      padding: 12px;
+      background: var(--bg-soft);
+      border-radius: var(--r-sm);
+      font-size: 13px;
+    }
+    .ds-final-stats .stat-num {
+      display: block;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .ds-recap {
+      margin-top: 14px;
+    }
+    .ds-recap-item {
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      border-radius: var(--r-sm);
+      border-left: 3px solid var(--border);
+      background: var(--bg-soft);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .ds-recap-item.ok { border-left-color: var(--success); }
+    .ds-recap-item.ko { border-left-color: var(--danger); }
+    .ds-recap-item .ds-recap-q { font-weight: 600; margin-bottom: 4px; }
+    .ds-recap-item .ds-recap-meta {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 4px;
+    }
+
     .ex-backdrop {
       position: fixed; inset: 0;
       background: rgba(17, 24, 39, 0.55);
@@ -6888,6 +6993,60 @@ EXERCISES['6e-0'] = [
       };
     },
   },
+  {
+    title: 'Combien de milliers ?',
+    generate() {
+      const n = exRand(2, 9) * 1000 + exRand(0, 999);
+      const m = Math.floor(n / 1000);
+      const r = n % 1000;
+      return {
+        question: `Combien de <strong>milliers</strong> contient le nombre <code>${n}</code> ?`,
+        inputType: 'number',
+        answer: m,
+        steps: [
+          `On lit <code>${n}</code> comme « ${m} mille ${r ? r : ''} ».`,
+          `Il y a donc <code>${m}</code> milliers (le reste, ${r}, ce sont les unités, dizaines et centaines).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Successeur d\'un entier',
+    generate() {
+      const ends = exPick([99, 999, 9999, 49, 199, 299]);
+      const base = exRand(1, 9);
+      const n = base * (ends + 1) + ends;
+      return {
+        question: `Quel est le <strong>successeur</strong> (l\'entier juste après) de <code>${n}</code> ?`,
+        inputType: 'number',
+        answer: n + 1,
+        steps: [
+          `Le successeur d'un entier <code>n</code> est <code>n + 1</code>.`,
+          `<code>${n} + 1 = ${n + 1}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Comparer trois entiers',
+    generate() {
+      const base = exRand(1, 9) * 10000 + exRand(0, 9) * 1000;
+      const variants = [base + 234, base + 243, base + 324];
+      const order = [...variants].sort(() => Math.random() - 0.5);
+      const max = Math.max(...variants);
+      return {
+        question: `Quel est le <strong>plus grand</strong> de ces trois nombres ?`,
+        inputType: 'mcq',
+        options: order.map(String),
+        answer: order.indexOf(max),
+        steps: [
+          `Les trois nombres ont le même nombre de chiffres : on compare chiffre à chiffre en partant de la gauche.`,
+          `Les trois premiers chiffres sont identiques. On regarde donc les centaines / dizaines / unités.`,
+          `Le plus grand est <code>${max}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['6e-1'] = [
@@ -9072,6 +9231,249 @@ function renderExerciseModal() {
   }, 50);
 }
 
+// ─── DS (Devoir Surveillé) ──────────────────────────────────────────
+// Mode noté : N questions d'affilée tirées des templates du chapitre,
+// pas de feedback intermédiaire, note /20 et corrigé détaillé à la fin.
+const DS_MIN_TEMPLATES = 5;
+const DS_QUESTION_COUNT = 5;
+const DS_SCORES_KEY = 'mathcours_ds_scores_v1';
+
+const dsState = { current: null, status: 'idle' };
+let dsScores = {};
+
+function loadDsScores() {
+  try { dsScores = JSON.parse(localStorage.getItem(DS_SCORES_KEY)) || {}; }
+  catch { dsScores = {}; }
+}
+function saveDsScores() {
+  try { localStorage.setItem(DS_SCORES_KEY, JSON.stringify(dsScores)); }
+  catch {}
+}
+
+function hasDS(levelId, idx) {
+  const list = EXERCISES[exKey(levelId, idx)];
+  return Array.isArray(list) && list.length >= DS_MIN_TEMPLATES;
+}
+
+function openDS(levelId, idx) {
+  const list = EXERCISES[exKey(levelId, idx)];
+  if (!list || list.length < DS_MIN_TEMPLATES) return;
+  // Pioche DS_QUESTION_COUNT templates distincts (mélange + slice)
+  const shuffled = [...list].sort(() => Math.random() - 0.5).slice(0, DS_QUESTION_COUNT);
+  const questions = shuffled.map(tmpl => ({
+    template: tmpl,
+    ...tmpl.generate(),
+    userAnswer: null,
+    mcqSelected: null,
+    correct: false,
+  }));
+  dsState.current = { levelId, idx, questions, currentIdx: 0, startTime: Date.now() };
+  dsState.status = 'in_progress';
+  $('#ex-backdrop').classList.add('show');
+  renderDsModal();
+}
+
+function closeDS() {
+  dsState.current = null;
+  dsState.status = 'idle';
+  $('#ex-backdrop').classList.remove('show');
+}
+
+function dsNextQuestion() {
+  const ds = dsState.current;
+  if (!ds || dsState.status !== 'in_progress') return;
+  const q = ds.questions[ds.currentIdx];
+  let userAns;
+  if (q.inputType === 'mcq') {
+    userAns = q.mcqSelected;
+    if (userAns == null) return;
+  } else {
+    const input = $('#ds-input');
+    userAns = input ? input.value.trim() : '';
+    if (!userAns) return;
+  }
+  q.userAnswer = userAns;
+  q.correct = exCheckAnswer(q, userAns);
+  if (ds.currentIdx < ds.questions.length - 1) {
+    ds.currentIdx++;
+    renderDsModal();
+  } else {
+    dsState.status = 'finished';
+    saveDsScore();
+    renderDsModal();
+  }
+}
+
+function saveDsScore() {
+  const ds = dsState.current;
+  const correctCount = ds.questions.filter(q => q.correct).length;
+  const note = Math.round((correctCount / ds.questions.length) * 20 * 10) / 10;
+  const key = exKey(ds.levelId, ds.idx);
+  const prev = dsScores[key] || { best: 0, last: 0, count: 0 };
+  dsScores[key] = {
+    best: Math.max(prev.best, note),
+    last: note,
+    count: prev.count + 1,
+  };
+  saveDsScores();
+}
+
+function dsMention(note) {
+  if (note >= 18) return 'Très bien';
+  if (note >= 14) return 'Bien';
+  if (note >= 12) return 'Assez bien';
+  if (note >= 10) return 'Passable';
+  if (note >= 8) return 'Insuffisant';
+  return 'À retravailler';
+}
+
+function dsFormatUserAnswer(q) {
+  if (q.userAnswer == null || q.userAnswer === '') return '—';
+  if (q.inputType === 'mcq') return q.options[q.userAnswer] || '—';
+  return String(q.userAnswer);
+}
+
+function dsFormatCorrection(q) {
+  if (q.inputType === 'mcq') return q.options[q.answer];
+  if (q.template && typeof q.template.formatAnswer === 'function') return q.template.formatAnswer(q);
+  if (typeof q.answer === 'number') return String(+q.answer.toPrecision(12));
+  return String(q.answer);
+}
+
+function renderDsModal() {
+  const modal = $('#ex-modal');
+  if (!modal) return;
+  modal.innerHTML = '';
+  const ds = dsState.current;
+  if (!ds) return;
+  const level = findLevel(ds.levelId);
+  const chapter = level.chapters[ds.idx];
+
+  modal.appendChild(el('div', { class: 'ex-meta' }, `📝 DS · ${level.name} · ${chapter.title}`));
+
+  if (dsState.status === 'in_progress') {
+    const total = ds.questions.length;
+    const cur = ds.currentIdx + 1;
+    const progress = el('div', { class: 'ds-progress' });
+    progress.appendChild(el('span', {}, `Question ${cur} / ${total}`));
+    const bar = el('div', { class: 'ds-progress-bar' });
+    bar.appendChild(el('div', { class: 'ds-progress-fill', style: `width:${100 * cur / total}%` }));
+    progress.appendChild(bar);
+    modal.appendChild(progress);
+
+    const q = ds.questions[ds.currentIdx];
+    modal.appendChild(el('h2', { id: 'ex-title' }, q.title));
+    modal.appendChild(el('div', { class: 'ex-question', html: q.question }));
+
+    if (q.inputType === 'mcq') {
+      const wrap = el('div', { class: 'ex-mcq' });
+      q.options.forEach((opt, i) => {
+        wrap.appendChild(el('button', {
+          class: 'ex-mcq-option' + (q.mcqSelected === i ? ' selected' : ''),
+          onclick: () => { q.mcqSelected = i; renderDsModal(); },
+          html: opt,
+        }));
+      });
+      modal.appendChild(wrap);
+    } else {
+      const wrap = el('div', { class: 'ex-input-wrap' });
+      const input = el('input', {
+        class: 'ex-input',
+        id: 'ds-input',
+        type: 'text',
+        inputmode: q.inputType === 'number' ? 'decimal' : 'text',
+        placeholder: q.placeholder || 'Ta réponse',
+        autocomplete: 'off',
+        spellcheck: 'false',
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); dsNextQuestion(); }
+      });
+      wrap.appendChild(input);
+      modal.appendChild(wrap);
+    }
+
+    const buttons = el('div', { class: 'ex-buttons' });
+    const isLast = ds.currentIdx === total - 1;
+    buttons.appendChild(el('button', { class: 'nav-btn next', onclick: dsNextQuestion },
+      isLast ? 'Terminer le DS' : 'Question suivante →'));
+    buttons.appendChild(el('button', {
+      class: 'nav-btn',
+      onclick: () => { if (confirm('Abandonner le DS ? Ta progression ne sera pas notée.')) closeDS(); },
+    }, 'Abandonner'));
+    modal.appendChild(buttons);
+
+    setTimeout(() => {
+      const input = $('#ds-input');
+      if (input) input.focus();
+    }, 50);
+    return;
+  }
+
+  // Statut « finished » : note, stats, récap.
+  const correctCount = ds.questions.filter(q => q.correct).length;
+  const total = ds.questions.length;
+  const note = Math.round((correctCount / total) * 20 * 10) / 10;
+
+  const grade = el('div', { class: 'ds-final-grade' });
+  const num = el('div', {});
+  num.appendChild(el('span', { class: 'grade-num' }, String(note)));
+  num.appendChild(el('span', { class: 'grade-denom' }, ' / 20'));
+  grade.appendChild(num);
+  grade.appendChild(el('div', { class: 'grade-mention' }, dsMention(note)));
+  modal.appendChild(grade);
+
+  const elapsed = Math.round((Date.now() - ds.startTime) / 1000);
+  const mins = Math.floor(elapsed / 60), secs = elapsed % 60;
+  const timeStr = mins ? `${mins}'${String(secs).padStart(2, '0')}` : `${secs}s`;
+
+  const stats = el('div', { class: 'ds-final-stats' });
+  const sCorr = el('div', {});
+  sCorr.appendChild(el('span', { class: 'stat-num' }, String(correctCount)));
+  sCorr.appendChild(el('div', {}, 'bonnes réponses'));
+  stats.appendChild(sCorr);
+  const sErr = el('div', {});
+  sErr.appendChild(el('span', { class: 'stat-num' }, String(total - correctCount)));
+  sErr.appendChild(el('div', {}, 'erreurs'));
+  stats.appendChild(sErr);
+  const sTime = el('div', {});
+  sTime.appendChild(el('span', { class: 'stat-num' }, timeStr));
+  sTime.appendChild(el('div', {}, 'temps'));
+  stats.appendChild(sTime);
+  modal.appendChild(stats);
+
+  const score = dsScores[exKey(ds.levelId, ds.idx)];
+  if (score && score.count >= 2) {
+    modal.appendChild(el('div', { class: 'ex-stats' },
+      `Meilleure note : ${score.best}/20 · ${score.count} DS faits sur ce chapitre.`));
+  }
+
+  const recap = el('div', { class: 'ds-recap' });
+  recap.appendChild(el('h3', {
+    style: 'font-size:13px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-2); margin:14px 0 10px',
+  }, 'Détail des questions'));
+  ds.questions.forEach((q, i) => {
+    const item = el('div', { class: 'ds-recap-item ' + (q.correct ? 'ok' : 'ko') });
+    item.appendChild(el('div', { class: 'ds-recap-q', html: `${q.correct ? '✓' : '✗'} Q${i + 1}. ${escAttr(q.title)}` }));
+    item.appendChild(el('div', { html: q.question }));
+    const meta = el('div', { class: 'ds-recap-meta' });
+    const yours = dsFormatUserAnswer(q);
+    if (q.correct) {
+      meta.innerHTML = `Ta réponse : <code>${escAttr(yours)}</code> ✓`;
+    } else {
+      meta.innerHTML = `Ta réponse : <code>${escAttr(yours)}</code> · Correction : <code>${escAttr(dsFormatCorrection(q))}</code>`;
+    }
+    item.appendChild(meta);
+    recap.appendChild(item);
+  });
+  modal.appendChild(recap);
+
+  const buttons = el('div', { class: 'ex-buttons' });
+  buttons.appendChild(el('button', { class: 'nav-btn next', onclick: () => openDS(ds.levelId, ds.idx) }, '🔁 Refaire un DS'));
+  buttons.appendChild(el('button', { class: 'nav-btn', onclick: closeDS }, 'Fermer'));
+  modal.appendChild(buttons);
+}
+
 const STATE_KEY = 'mathcours_v1';
 let state = { levelId: '5e', chapterId: null };
 let searchState = { query: '' };
@@ -9442,6 +9844,21 @@ function renderChapter(main, level, chapter, idx) {
       onclick: () => openExercise(level.id, idx),
     }, '💪 S\'entraîner sur ce chapitre'));
     main.appendChild(ctaWrap);
+
+    // Bouton « DS noté » : seulement si ≥ DS_MIN_TEMPLATES templates dispo.
+    if (hasDS(level.id, idx)) {
+      const dsWrap = el('p', { style: 'text-align:center; margin-top:0' });
+      dsWrap.appendChild(el('button', {
+        class: 'ds-cta',
+        onclick: () => openDS(level.id, idx),
+      }, `📝 Faire un DS noté (${DS_QUESTION_COUNT} questions)`));
+      main.appendChild(dsWrap);
+      const score = dsScores[exKey(level.id, idx)];
+      if (score) {
+        main.appendChild(el('p', { class: 'ds-score-info', style: 'text-align:center' },
+          `Meilleure note : ${score.best}/20 · Dernière : ${score.last}/20 · ${score.count} DS fait${score.count > 1 ? 's' : ''}`));
+      }
+    }
   }
 
   // Navigation chapitre suivant / précédent
@@ -9495,11 +9912,19 @@ function closeSidebarMobile() {
 // ─── Boot ───────────────────────────────────────────────────────
 function boot() {
   loadState();
+  loadDsScores();
   render();
   $('#menu-btn').addEventListener('click', openSidebarMobile);
   $('#backdrop').addEventListener('click', closeSidebarMobile);
   $('#ex-backdrop').addEventListener('click', (e) => {
-    if (e.target.id === 'ex-backdrop') closeExercise();
+    if (e.target.id !== 'ex-backdrop') return;
+    // Si un DS est en cours, on demande confirmation avant de fermer.
+    if (dsState.current) {
+      if (dsState.status === 'finished') closeDS();
+      else if (confirm('Abandonner le DS ? Ta progression ne sera pas notée.')) closeDS();
+      return;
+    }
+    closeExercise();
   });
   $('#home-btn').addEventListener('click', () => {
     state.levelId = null;
@@ -9527,9 +9952,17 @@ function boot() {
         input.select();
       }
     }
-    // Échap ferme le drawer mobile ou le modal d'exercice.
+    // Échap ferme le drawer mobile ou le modal d'exercice / DS.
     if (e.key === 'Escape') {
-      if ($('#ex-backdrop').classList.contains('show')) { closeExercise(); return; }
+      if ($('#ex-backdrop').classList.contains('show')) {
+        if (dsState.current) {
+          if (dsState.status === 'finished') closeDS();
+          else if (confirm('Abandonner le DS ? Ta progression ne sera pas notée.')) closeDS();
+        } else {
+          closeExercise();
+        }
+        return;
+      }
       if ($('#sidebar').classList.contains('open')) closeSidebarMobile();
     }
   });
