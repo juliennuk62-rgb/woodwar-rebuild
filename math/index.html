@@ -5192,6 +5192,14 @@ function chapters5e() {
           <li>Donc les 3/5 de 25 € font <strong>15 €</strong>.</li></ol>
           <p>On peut aussi voir ça comme : 1/5 de 25, c'est 5. Donc 3/5, c'est <code>3 × 5 = 15</code>.</p>`)}
         ${lc.warn("Ordre des mots", `<p>« Les 2/3 de 60 » et « 60 fois 2/3 » donnent le <em>même</em> calcul : <code>2/3 × 60 = 40</code>. La multiplication est commutative.</p>`)}
+
+        <h2>5. Division de fractions</h2>
+        ${lc.def("Inverse d'une fraction", `<p>L'<strong>inverse</strong> de la fraction <code>a/b</code> (avec <code>a, b ≠ 0</code>) est <code>b/a</code> : on permute numérateur et dénominateur. Le produit d'une fraction par son inverse vaut <strong>1</strong>.</p>`)}
+        ${lc.prop("Règle clé", `<p>Diviser par une fraction, c'est <strong>multiplier par son inverse</strong>.</p>`)}
+        ${lc.formula("a/b ÷ c/d &nbsp;=&nbsp; a/b × d/c &nbsp;=&nbsp; (a × d) / (b × c)")}
+        ${lc.example("Calculer 3/5 ÷ 2/7", `<ol><li>Inverse de <code>2/7</code> : <code>7/2</code>.</li>
+          <li><code>3/5 ÷ 2/7 = 3/5 × 7/2 = 21/10</code>.</li></ol>`)}
+        ${lc.example("Diviser par un entier", `<p><code>4/9 ÷ 2 = 4/9 × 1/2 = 4/18 = 2/9</code>.</p>`)}
       `,
     },
     {
@@ -5418,6 +5426,14 @@ function chapters5e() {
           <li>Termes constants : <code>5 − 1 = 4</code>.</li>
           <li>Résultat : <code>5x + 4</code>.</li></ol>`)}
         ${lc.warn("Ne pas mélanger", `<p>On <strong>ne peut pas</strong> additionner <code>3x</code> et <code>2</code> : ce ne sont pas des termes de même nature. <code>3x + 2</code> reste <code>3x + 2</code>.</p>`)}
+
+        <h2>5. Distributivité simple</h2>
+        ${lc.prop("Règle clé", `<p>Pour tous nombres <code>k, a, b</code> :</p>`)}
+        ${lc.formula("k × (a + b) = k × a + k × b<br>k × (a − b) = k × a − k × b")}
+        ${lc.tip("Image", `<p>On « distribue » le facteur <code>k</code> sur chaque terme de la parenthèse.</p>`)}
+        ${lc.example("Développer 3 × (x + 5)", `<p><code>3(x + 5) = 3 × x + 3 × 5 = 3x + 15</code>.</p>`)}
+        ${lc.example("Développer 4 × (2x − 7)", `<p><code>4(2x − 7) = 4 × 2x − 4 × 7 = 8x − 28</code>.</p>`)}
+        ${lc.warn("Sens inverse : factoriser", `<p>L'opération inverse s'appelle <strong>factoriser</strong> : <code>3x + 15 = 3(x + 5)</code>. On reconnaît le facteur commun <code>3</code> dans les deux termes et on le « met en facteur ».</p>`)}
       `,
     },
     {
@@ -5543,6 +5559,110 @@ function chapters5e() {
         ${lc.formula("Losange &nbsp;:&nbsp; A = (D × d) / 2  (D et d = diagonales)")}
         ${lc.example("Aire d'un parallélogramme", `<p>Base = 8 cm, hauteur = 5 cm. Aire = <code>8 × 5 = 40 cm²</code>.</p>
           <p>Attention : la <strong>hauteur</strong> est la distance entre la base et le côté opposé, mesurée perpendiculairement (et non la longueur du côté oblique).</p>`)}
+      `,
+    },
+
+    {
+      title: "Statistiques : moyenne, effectifs, fréquences",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Effectif et fréquence", `<ul>
+          <li>L'<strong>effectif</strong> d'une valeur est le nombre de fois où elle apparaît.</li>
+          <li>L'<strong>effectif total</strong> est la somme de tous les effectifs.</li>
+          <li>La <strong>fréquence</strong> d'une valeur est le rapport <code>(effectif) / (effectif total)</code>. Elle peut s'exprimer en pourcentage.</li>
+        </ul>`)}
+        ${lc.example("Couleurs préférées", `<p>Sur 25 élèves : 10 bleu, 8 rouge, 7 vert.</p>
+          <ul><li>Effectif total : 25.</li>
+          <li>Fréquence du « bleu » : <code>10/25 = 2/5 = 0,4 = 40 %</code>.</li>
+          <li>La somme des fréquences vaut toujours <strong>1</strong> (ou 100 %).</li></ul>`)}
+
+        <h2>2. La moyenne</h2>
+        ${lc.def("Moyenne", `<p>La <strong>moyenne</strong> d'une série de valeurs est la somme de toutes les valeurs divisée par leur nombre.</p>`)}
+        ${lc.formula("moyenne = (somme des valeurs) / (effectif total)")}
+        ${lc.example("Calculer la moyenne", `<p>Notes : 12, 14, 9, 15, 11, 13.</p>
+          <p>Somme : <code>12+14+9+15+11+13 = 74</code>. Moyenne : <code>74/6 ≈ 12,33</code>.</p>`)}
+
+        <h2>3. Moyenne pondérée</h2>
+        ${lc.prop("Quand des valeurs apparaissent plusieurs fois", `<p>On multiplie chaque valeur par son <strong>effectif</strong>, on additionne, puis on divise par l'effectif total.</p>`)}
+        ${lc.formula("moyenne = Σ (valeur × effectif) / (effectif total)")}
+        ${lc.example("Notes en série", `<p>Sur 20 élèves : 5 ont eu 12, 8 ont eu 14, 7 ont eu 16.</p>
+          <p>Somme : <code>5×12 + 8×14 + 7×16 = 60 + 112 + 112 = 284</code>. Moyenne : <code>284/20 = 14,2</code>.</p>`)}
+
+        <h2>4. Représentations graphiques</h2>
+        ${lc.prop("Les principaux diagrammes", `<ul>
+          <li><strong>Diagramme en bâtons</strong> : la hauteur de chaque bâton est proportionnelle à l'effectif.</li>
+          <li><strong>Diagramme circulaire</strong> : chaque secteur a un angle proportionnel à la fréquence (la totalité = 360°).</li>
+          <li><strong>Histogramme</strong> : pour des données regroupées par classes (intervalles).</li>
+        </ul>`)}
+        ${lc.example("Calculer un angle de secteur", `<p>Pour le « bleu » à 40 % : angle = <code>40 % × 360° = 144°</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Probabilités : vocabulaire",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Expérience aléatoire", `<p>Une <strong>expérience aléatoire</strong> est une expérience dont on ne peut pas prédire le résultat à l'avance, mais dont on connaît tous les résultats possibles.</p>
+          <p>Exemples : lancer une pièce, lancer un dé, tirer une carte au hasard.</p>`)}
+        ${lc.def("Issue", `<p>Une <strong>issue</strong> est l'un des résultats possibles. Lancer d'un dé : 6 issues (1, 2, 3, 4, 5, 6).</p>`)}
+        ${lc.def("Événement", `<p>Un <strong>événement</strong> est une partie des issues. « Obtenir un nombre pair » est l'événement {2, 4, 6}.</p>`)}
+
+        <h2>2. Probabilité d'un événement</h2>
+        ${lc.def("Probabilité", `<p>La <strong>probabilité</strong> d'un événement est un nombre entre <strong>0 et 1</strong> qui mesure ses chances de se réaliser.</p>
+          <ul><li>Probabilité <code>0</code> : événement impossible.</li>
+          <li>Probabilité <code>1</code> : événement certain.</li>
+          <li>Entre les deux : événement plus ou moins probable.</li></ul>`)}
+
+        <h2>3. Cas équiprobable</h2>
+        ${lc.prop("Quand toutes les issues ont les mêmes chances", `<p>Si chaque issue a la même probabilité de se produire (dé équilibré, pièce non truquée, tirage au hasard), on calcule :</p>`)}
+        ${lc.formula("P(A) = (nombre d'issues favorables) / (nombre total d'issues)")}
+        ${lc.example("Avec un dé équilibré", `<ul>
+          <li><code>P(« obtenir 6 ») = 1/6</code></li>
+          <li><code>P(« obtenir un pair ») = 3/6 = 1/2</code></li>
+          <li><code>P(« obtenir un multiple de 3 ») = 2/6 = 1/3</code> (les issues 3 et 6)</li>
+        </ul>`)}
+
+        <h2>4. Loi des grands nombres (intuition)</h2>
+        ${lc.tip("Plus on répète, plus on s'approche", `<p>Si on lance un dé 10 fois, on n'aura pas forcément un 6 sur 1/6 des lancers. Mais sur des milliers de lancers, la <strong>fréquence</strong> d'apparition du 6 va se rapprocher de <code>1/6 ≈ 16,7 %</code>. Plus le nombre d'expériences est grand, plus la fréquence se stabilise vers la probabilité théorique.</p>`)}
+        ${lc.warn("Le hasard n'a pas de mémoire", `<p>Si on obtient 5 fois pile de suite, le 6e lancer a toujours <code>1/2</code> de chance de donner pile. Les lancers sont indépendants. (Idée fausse classique : « ça doit tomber sur face maintenant ».)</p>`)}
+      `,
+    },
+
+    {
+      title: "Géométrie de l'espace : prisme et cylindre",
+      category: "Géométrie",
+      content: `
+        <h2>1. Le prisme droit</h2>
+        ${lc.def("Prisme droit", `<p>Un <strong>prisme droit</strong> est un solide formé de deux <strong>polygones identiques et parallèles</strong> appelés bases, reliés par des rectangles (les faces latérales).</p>
+          <p>Si les bases sont des triangles, c'est un prisme triangulaire ; si ce sont des hexagones, prisme hexagonal ; etc.</p>`)}
+
+        <h2>2. Le cylindre</h2>
+        ${lc.def("Cylindre droit", `<p>Un <strong>cylindre droit</strong> est l'analogue du prisme avec deux <strong>disques</strong> identiques parallèles comme bases, reliés par une surface latérale courbe.</p>
+          <p>Caractérisé par le <strong>rayon</strong> de sa base et sa <strong>hauteur</strong>.</p>`)}
+
+        <h2>3. Volume</h2>
+        ${lc.formula("V_{prisme} = (aire de la base) × hauteur")}
+        ${lc.formula("V_{cylindre} = π × r² × h")}
+        ${lc.example("Cylindre rayon 3 cm, hauteur 10 cm", `<p><code>V = π × 3² × 10 = 90π ≈ 282,7 cm³</code>.</p>`)}
+        ${lc.example("Prisme à base triangulaire", `<p>Base = triangle d'aire 6 cm². Hauteur du prisme = 8 cm.</p>
+          <p><code>V = 6 × 8 = 48 cm³</code>.</p>`)}
+
+        <h2>4. Patron</h2>
+        ${lc.prop("Comment construire un patron", `<ul>
+          <li><strong>Prisme droit</strong> : 2 polygones identiques (les bases) et autant de rectangles que de côtés du polygone. Largeur du rectangle = côté du polygone, longueur = hauteur du prisme.</li>
+          <li><strong>Cylindre</strong> : 2 disques identiques et un rectangle dont la longueur est le <strong>périmètre du cercle</strong> (<code>2πr</code>) et la largeur la hauteur du cylindre.</li>
+        </ul>`)}
+
+        <h2>5. Aire totale</h2>
+        ${lc.formula("Aire latérale d'un cylindre = 2 × π × r × h")}
+        ${lc.formula("Aire totale = aire latérale + 2 × aire de la base")}
+        ${lc.example("Aire totale d'un cylindre r=3, h=10", `<ol>
+          <li>Aire latérale : <code>2π × 3 × 10 = 60π ≈ 188,5 cm²</code>.</li>
+          <li>Aire des deux disques : <code>2 × π × 9 = 18π ≈ 56,5 cm²</code>.</li>
+          <li>Aire totale : <code>78π ≈ 245 cm²</code>.</li>
+        </ol>`)}
       `,
     },
   ];
