@@ -2711,6 +2711,12 @@ function chapters1ere() {
           <li><code>q = 1</code> : constante.</li>
           <li><code>q < 0</code> : signes alternés (ni croissante ni décroissante).</li>
         </ul>`)}
+
+        <h2>8. Inégalité de Bernoulli</h2>
+        ${lc.prop("Énoncé", `<p>Pour tout réel <code>x ≥ −1</code> et tout entier naturel <code>n</code> :</p>`)}
+        ${lc.formula("(1 + x)ⁿ ≥ 1 + n × x")}
+        ${lc.tip("Démonstration intuitive (par récurrence)", `<p>Pour <code>n = 0</code> : <code>1 ≥ 1</code> ✓. Pour passer de <code>n</code> à <code>n+1</code>, on multiplie par <code>(1 + x) ≥ 0</code> et on développe.</p>`)}
+        ${lc.example("Croissance d'une suite géométrique", `<p>Pour <code>q > 1</code>, on pose <code>q = 1 + x</code> avec <code>x > 0</code>. Alors <code>qⁿ ≥ 1 + nx</code>, qui tend vers <code>+∞</code>. Cela justifie pourquoi <code>(qⁿ)</code> diverge vers <code>+∞</code> quand <code>q > 1</code>.</p>`)}
       `,
     },
 
@@ -2855,6 +2861,20 @@ function chapters1ere() {
           <li><code>u' = 2x</code>, <code>v' = 1</code>.</li>
           <li><code>f'(x) = 2x × (x + 1) + x² × 1 = 2x² + 2x + x² = 3x² + 2x</code>.</li>
         </ol>`)}
+
+        <h2>8. Dérivées de fonctions composées simples</h2>
+        ${lc.prop("Cas (1/u)' et (√u)'", `<p>Pour une fonction <code>u</code> dérivable :</p>`)}
+        ${lc.formula("(1/u)' = −u' / u² &nbsp;&nbsp; (u ne s'annule pas)")}
+        ${lc.formula("(√u)' = u' / (2 × √u) &nbsp;&nbsp; (u > 0)")}
+        ${lc.example("Dériver f(x) = 1/(2x + 3)", `<ol>
+          <li><code>u = 2x + 3</code>, <code>u' = 2</code>.</li>
+          <li><code>f'(x) = −2/(2x + 3)²</code>.</li>
+        </ol>`)}
+        ${lc.example("Dériver f(x) = √(x² + 1)", `<ol>
+          <li><code>u = x² + 1</code>, <code>u' = 2x</code>.</li>
+          <li><code>f'(x) = 2x / (2 × √(x² + 1)) = x / √(x² + 1)</code>.</li>
+        </ol>`)}
+        ${lc.tip("Anticipation Tle", `<p>La règle générale de dérivation des composées <code>(g ∘ u)' = g'(u) × u'</code> sera vue en Terminale, mais ces deux cas particuliers (1/u, √u) sont au programme de 1ère.</p>`)}
       `,
     },
 
@@ -3067,6 +3087,11 @@ function chapters1ere() {
         ${lc.formula("u→ · v→ = ||u→|| × ||v→|| × cos(u→, v→)")}
         <p>où <code>(u→, v→)</code> désigne l'angle non orienté entre les deux vecteurs.</p>
 
+        <h3>Définition équivalente par projection orthogonale</h3>
+        ${lc.def("Projection", `<p>Soit <code>p→</code> le <strong>projeté orthogonal</strong> de <code>u→</code> sur la droite portée par <code>v→</code>. Alors :</p>`)}
+        ${lc.formula("u→ · v→ = p→ · v→ = (longueur algébrique de p→) × ||v→||")}
+        ${lc.tip("Lecture géométrique", `<p>Le produit scalaire mesure « combien <code>u→</code> va dans la direction de <code>v→</code> ». S'il est positif, les vecteurs pointent globalement dans le même sens ; négatif, sens contraires ; nul, perpendiculaires.</p>`)}
+
         <h2>2. Calcul en coordonnées</h2>
         ${lc.formula("Si u→(x ; y) et v→(x' ; y'), alors u→ · v→ = x×x' + y×y'")}
         ${lc.example("Calcul", `<p>Pour <code>u→(2 ; 3)</code> et <code>v→(1 ; 4)</code> :</p>
@@ -3251,6 +3276,18 @@ function chapters1ere() {
           <li><code>P(X = 2) = C(5, 2) × (1/6)² × (5/6)³</code></li>
           <li><code>= 10 × (1/36) × (125/216)</code></li>
           <li><code>= 1250 / 7776 ≈ 0,161</code> (environ 16,1 %).</li></ol>`)}
+
+        <h2>8. Symétrie des coefficients binomiaux</h2>
+        ${lc.formula("C(n, k) = C(n, n − k)")}
+        <p>Conséquence : <code>P(X = k) = P(X = n − k)</code> uniquement lorsque <code>p = 1/2</code> (loi symétrique). Pour <code>p ≠ 1/2</code>, la loi est dissymétrique.</p>
+
+        <h2>9. Échantillonnage binomial : intervalle de fluctuation</h2>
+        ${lc.def("Idée", `<p>Lorsqu'on répète <code>n</code> fois une expérience de Bernoulli de paramètre <code>p</code> et qu'on observe la fréquence empirique <code>F = X/n</code> (proportion de succès), on s'attend à ce que <code>F</code> soit proche de <code>p</code> avec une certaine variabilité.</p>`)}
+        ${lc.prop("Intervalle de fluctuation au seuil 95 % (programme 1ère)", `<p>Pour <code>n ≥ 25</code> et <code>0,2 ≤ p ≤ 0,8</code>, la fréquence <code>F</code> appartient à l'intervalle suivant avec une probabilité ≥ 95 % :</p>`)}
+        ${lc.formula("[ p − 1,96 × √(p(1−p)/n) ; p + 1,96 × √(p(1−p)/n) ]")}
+        ${lc.example("Pile ou face 100 fois", `<p>Avec <code>p = 0,5</code> et <code>n = 100</code> : <code>√(0,25/100) = 0,05</code>. Marge : <code>1,96 × 0,05 ≈ 0,098</code>.</p>
+          <p>Intervalle de fluctuation : <code>[0,402 ; 0,598]</code>. Si on observe une fréquence en dehors (par exemple 0,72), on peut soupçonner que la pièce n'est pas équilibrée.</p>`)}
+        ${lc.tip("Prise de décision", `<p>Si la fréquence observée tombe <strong>hors</strong> de l'IF au seuil 95 %, on rejette l'hypothèse de la valeur supposée de <code>p</code>. Le risque d'erreur (rejeter à tort) est de 5 %.</p>`)}
       `,
     },
   ];
@@ -3826,7 +3863,8 @@ function chapters2nde() {
           <p>Vérification : <code>0,7 + 0,3 = 1</code> ✓.</p>
           <p>Si on lance et qu'on regarde « obtenir face » : <code>P = 0,3</code>.</p>`)}
 
-        <h2>5. Réunion, intersection, contraire</h2>
+        <h2>5. Réunion, intersection, contraire <em>(anticipation lycée)</em></h2>
+        ${lc.tip("Pour aller plus loin", `<p>La formule générale de la réunion <code>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</code> est officiellement vue en 1ère. En 3e, on s'en tient aux probabilités d'événements simples.</p>`)}
         ${lc.formula("P(A ∪ B) = P(A) + P(B) − P(A ∩ B)")}
         ${lc.formula("Si A et B incompatibles : P(A ∪ B) = P(A) + P(B)")}
         ${lc.formula("P(Ā) = 1 − P(A)")}
@@ -4141,6 +4179,7 @@ function chapters3e() {
         ${lc.prop("Crochets", `<p>Sur la droite numérique, on hachure la zone des solutions.</p>
           <ul><li>Crochet <strong>fermé</strong> ([ ou ]) si la valeur est <em>incluse</em> (<code>≤</code> ou <code>≥</code>).</li>
           <li>Crochet <strong>ouvert</strong> (] ou [) si la valeur est <em>exclue</em> (<code><</code> ou <code>></code>).</li></ul>`)}
+        ${lc.tip("Notation des intervalles (anticipation 2nde)", `<p>L'écriture <code>]−∞ ; 3]</code> ou <code>]−1 ; +∞[</code> que l'on utilise ici est officiellement introduite en 2nde. En 3e, on peut s'en tenir à l'inégalité <code>x ≤ 3</code> ou <code>x > −1</code>.</p>`)}
         ${lc.example("Représenter x ≤ 3", `<p>On hachure tout ce qui est à gauche de 3, en incluant 3 (crochet fermé : <code>]</code> en 3).</p>
           <p>L'ensemble des solutions s'écrit <code>]−∞ ; 3]</code>.</p>`)}
         ${lc.example("Représenter x > −1", `<p>On hachure à droite de <code>−1</code>, sans inclure <code>−1</code> (crochet ouvert : <code>]</code> en <code>−1</code>).</p>
@@ -4272,7 +4311,8 @@ function chapters3e() {
           <ol><li><code>sin(α) = 3/5 = 0,6</code>.</li>
           <li><code>α = sin⁻¹(0,6) ≈ 36,87°</code>.</li></ol>`)}
 
-        <h2>6. Relations importantes</h2>
+        <h2>6. Relations importantes <em>(anticipation lycée)</em></h2>
+        ${lc.tip("Pour aller plus loin", `<p>L'identité <code>cos² + sin² = 1</code> et la définition de <code>tan</code> sont au programme officiel de 2nde. En 3e, on les présente comme outil de calcul, sans démonstration.</p>`)}
         ${lc.formula("cos²(α) + sin²(α) &nbsp;=&nbsp; 1")}
         ${lc.formula("tan(α) &nbsp;=&nbsp; sin(α) / cos(α)")}
         ${lc.tip("Conséquence", `<p>Si on connaît <code>cos(α)</code>, on peut retrouver <code>sin(α)</code> sans calculatrice :</p>
@@ -5906,6 +5946,7 @@ function chapters5e() {
           <ul><li><code>a</code> est le <strong>numérateur</strong> (en haut, ce qu'on prend).</li>
           <li><code>b</code> est le <strong>dénominateur</strong> (en bas, en combien on partage).</li></ul>`)}
         <p>Exemple : <code>3/4</code> signifie « 3 parts sur 4 », ou « <code>3 ÷ 4 = 0,75</code> ».</p>
+        ${lc.warn("Toutes les fractions ne sont pas décimales", `<p>Certaines fractions s'écrivent comme un nombre décimal exact : <code>3/4 = 0,75</code>, <code>1/2 = 0,5</code>, <code>1/8 = 0,125</code>. Mais d'autres ont un développement décimal <strong>infini</strong> (et qui se répète) : <code>1/3 = 0,333…</code>, <code>1/7 = 0,142857142857…</code>. Une fraction reste alors la <strong>seule</strong> écriture exacte.</p>`)}
 
         <h2>2. Fractions égales</h2>
         ${lc.prop("Règle fondamentale", `<p>On peut multiplier (ou diviser) le numérateur ET le dénominateur d'une fraction par un même nombre non nul sans changer sa valeur.</p>`)}
@@ -5951,7 +5992,7 @@ function chapters5e() {
         ${lc.example("Calculer 1/2 + 1/3", `<ol><li>Dénominateur commun : <code>2 × 3 = 6</code>.</li>
           <li><code>1/2 = 3/6</code> et <code>1/3 = 2/6</code>.</li>
           <li><code>3/6 + 2/6 = 5/6</code>.</li></ol>`)}
-        ${lc.example("Calculer 3/4 − 1/6", `<ol><li>Dénominateur commun : on peut prendre <code>4 × 6 = 24</code>, ou plus malin <code>12</code> (PPCM).</li>
+        ${lc.example("Calculer 3/4 − 1/6", `<ol><li>Dénominateur commun : on peut prendre <code>4 × 6 = 24</code>, ou plus malin <code>12</code>, le <strong>plus petit dénominateur commun</strong> à 4 et 6 (qui est le « PPCM », pour <em>plus petit commun multiple</em>).</li>
           <li>Avec 12 : <code>3/4 = 9/12</code> et <code>1/6 = 2/12</code>.</li>
           <li><code>9/12 − 2/12 = 7/12</code>.</li></ol>`)}
         ${lc.tip("Choisir un bon dénominateur", `<p>Si l'un des dénominateurs est un <strong>multiple</strong> de l'autre, prends le plus grand. Exemple : <code>1/3 + 1/6</code>. Comme <code>6 = 3 × 2</code>, on prend 6 : <code>1/3 = 2/6</code>, donc <code>2/6 + 1/6 = 3/6 = 1/2</code>.</p>`)}
