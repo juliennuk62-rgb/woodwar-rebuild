@@ -634,21 +634,7 @@ const CURRICULUM = [
     levels: [
       { id: '2nde', name: '2nde', chapters: chapters2nde() },
       { id: '1ere', name: '1ère', chapters: chapters1ere() },
-      { id: 'tle', name: 'Terminale', chapters: [
-        todo("Limites de fonctions", "Analyse"),
-        todo("Continuité, théorème des valeurs intermédiaires", "Analyse"),
-        todo("Compléments sur la dérivation (composées)", "Analyse"),
-        todo("Fonction logarithme", "Analyse"),
-        todo("Primitives", "Analyse"),
-        todo("Intégrales", "Analyse"),
-        todo("Suites : raisonnement par récurrence", "Suites"),
-        todo("Limites de suites (formel)", "Suites"),
-        todo("Géométrie dans l'espace : vecteurs, droites, plans", "Géométrie"),
-        todo("Produit scalaire dans l'espace", "Géométrie"),
-        todo("Lois de probabilité à densité", "Probabilités"),
-        todo("Loi normale", "Probabilités"),
-        todo("Échantillonnage et estimation", "Probabilités"),
-      ]},
+      { id: 'tle', name: 'Terminale', chapters: chaptersTle() },
     ],
   },
   {
@@ -683,6 +669,576 @@ const CURRICULUM = [
     ],
   },
 ];
+
+// ─── Contenu pédagogique : Terminale à fond ──────────────────────
+function chaptersTle() {
+  return [
+    {
+      title: "Limites de fonctions",
+      category: "Analyse",
+      content: `
+        <h2>1. Limite finie en l'infini</h2>
+        ${lc.def("Limite finie en +∞", `<p>On dit que <code>f(x)</code> tend vers <code>L</code> quand <code>x</code> tend vers <code>+∞</code> si <code>f(x)</code> se rapproche de plus en plus de <code>L</code> pour <code>x</code> arbitrairement grand.</p>
+          <p>Notation : <code>lim_{x → +∞} f(x) = L</code>.</p>
+          <p>Géométriquement, la droite <code>y = L</code> est une <strong>asymptote horizontale</strong> à la courbe.</p>`)}
+        ${lc.example("Limite usuelle", `<ul>
+          <li><code>lim_{x → +∞} 1/x = 0</code></li>
+          <li><code>lim_{x → +∞} 1/x² = 0</code></li>
+          <li><code>lim_{x → −∞} 1/x = 0</code></li>
+        </ul>`)}
+
+        <h2>2. Limite infinie en l'infini</h2>
+        ${lc.example("Limites usuelles", `<ul>
+          <li><code>lim_{x → +∞} x = +∞</code> ; <code>lim_{x → +∞} x² = +∞</code> ; <code>lim_{x → +∞} √x = +∞</code></li>
+          <li><code>lim_{x → −∞} x = −∞</code> ; <code>lim_{x → −∞} x² = +∞</code></li>
+        </ul>`)}
+
+        <h2>3. Limite infinie en un réel</h2>
+        ${lc.def("Asymptote verticale", `<p>Si <code>lim_{x → a} f(x) = +∞</code> ou <code>−∞</code>, la droite <code>x = a</code> est une <strong>asymptote verticale</strong>.</p>`)}
+        ${lc.example("Pour la fonction inverse", `<ul>
+          <li><code>lim_{x → 0⁺} 1/x = +∞</code></li>
+          <li><code>lim_{x → 0⁻} 1/x = −∞</code></li>
+        </ul>
+          <p>(<code>0⁺</code> = on s'approche de 0 par valeurs positives ; <code>0⁻</code> = par valeurs négatives.)</p>`)}
+
+        <h2>4. Opérations sur les limites</h2>
+        ${lc.prop("Règles standard", `<p>Si <code>lim f = L</code> et <code>lim g = L'</code> (limites finies) :</p>
+          <ul>
+            <li><code>lim (f + g) = L + L'</code></li>
+            <li><code>lim (f × g) = L × L'</code></li>
+            <li><code>lim (f / g) = L / L'</code> (si <code>L' ≠ 0</code>)</li>
+          </ul>`)}
+        ${lc.prop("Avec un infini", `<ul>
+          <li><code>(+∞) + (+∞) = +∞</code></li>
+          <li><code>(L > 0) × (+∞) = +∞</code></li>
+          <li><code>L / 0⁺ = ±∞</code> (selon signe de L)</li>
+          <li><code>L / (±∞) = 0</code></li>
+        </ul>`)}
+
+        <h2>5. Formes indéterminées</h2>
+        ${lc.warn("Quatre cas qu'il faut résoudre par calcul", `<p>Les expressions suivantes ne se calculent <strong>pas</strong> directement :</p>
+          <ul><li><code>(+∞) − (+∞)</code> ou <code>(+∞) + (−∞)</code></li>
+          <li><code>0 × (±∞)</code></li>
+          <li><code>(±∞) / (±∞)</code></li>
+          <li><code>0 / 0</code></li></ul>
+          <p>Pour les résoudre, on transforme l'expression : factorisation, multiplication par le conjugué, etc.</p>`)}
+        ${lc.example("Limite indéterminée", `<p>Calculer <code>lim_{x → +∞} (x² − x)</code>. Forme indéterminée <code>(+∞) − (+∞)</code>.</p>
+          <ol><li>On factorise par <code>x²</code> : <code>x² − x = x²(1 − 1/x)</code>.</li>
+          <li>Or <code>lim x² = +∞</code> et <code>lim (1 − 1/x) = 1</code>.</li>
+          <li>Donc <code>lim x²(1 − 1/x) = (+∞) × 1 = +∞</code>.</li></ol>`)}
+
+        <h2>6. Théorèmes de comparaison</h2>
+        ${lc.prop("Théorème des gendarmes", `<p>Si <code>g(x) ≤ f(x) ≤ h(x)</code> au voisinage de <code>a</code> (ou de <code>±∞</code>), et si <code>g</code> et <code>h</code> ont la même limite <code>L</code>, alors <code>f</code> aussi.</p>`)}
+        ${lc.prop("Comparaison à l'infini", `<ul>
+          <li>Si <code>f(x) ≥ g(x)</code> et <code>lim g = +∞</code>, alors <code>lim f = +∞</code>.</li>
+          <li>Si <code>f(x) ≤ g(x)</code> et <code>lim g = −∞</code>, alors <code>lim f = −∞</code>.</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Continuité, théorème des valeurs intermédiaires",
+      category: "Analyse",
+      content: `
+        <h2>1. Continuité en un point</h2>
+        ${lc.def("Continuité", `<p>Une fonction <code>f</code> est <strong>continue</strong> en <code>a</code> si :</p>`)}
+        ${lc.formula("lim_{x → a} f(x) = f(a)")}
+        <p>Intuitivement : la courbe ne fait pas de saut au point <code>a</code> ; on peut la tracer sans lever le crayon.</p>
+
+        <h2>2. Continuité sur un intervalle</h2>
+        ${lc.def("Sur un intervalle", `<p><code>f</code> est continue sur un intervalle <code>I</code> si elle est continue en chaque point de <code>I</code>.</p>`)}
+        ${lc.prop("Fonctions continues usuelles", `<ul>
+          <li>Les <strong>polynômes</strong> sont continus sur ℝ.</li>
+          <li>Les <strong>fonctions rationnelles</strong> (fractions de polynômes) sont continues sur leur ensemble de définition.</li>
+          <li><code>x → e^x</code>, <code>x → ln(x)</code>, <code>x → cos(x)</code>, <code>x → sin(x)</code>, <code>x → √x</code> sont continues sur leur ensemble de définition.</li>
+        </ul>`)}
+        ${lc.tip("Stabilité", `<p>La somme, le produit, le quotient (quand il est défini) et la composée de fonctions continues sont continus.</p>`)}
+
+        <h2>3. Théorème des valeurs intermédiaires (TVI)</h2>
+        ${lc.prop("TVI", `<p>Soit <code>f</code> continue sur un intervalle <code>[a ; b]</code>. Pour tout réel <code>k</code> compris entre <code>f(a)</code> et <code>f(b)</code>, l'équation <code>f(x) = k</code> admet <strong>au moins une solution</strong> dans <code>[a ; b]</code>.</p>`)}
+        ${lc.tip("Image visuelle", `<p>Si la courbe part d'un point bas et arrive à un point haut sans saut, elle traverse forcément toute hauteur intermédiaire.</p>`)}
+
+        <h2>4. Corollaire (TVI bijection)</h2>
+        ${lc.prop("Si f est de plus strictement monotone", `<p>Soit <code>f</code> continue ET strictement monotone sur <code>[a ; b]</code>. Pour tout <code>k</code> entre <code>f(a)</code> et <code>f(b)</code>, l'équation <code>f(x) = k</code> admet <strong>une unique solution</strong> dans <code>[a ; b]</code>.</p>`)}
+        ${lc.example("Application", `<p>Montrer que l'équation <code>x³ + x − 1 = 0</code> a une unique solution dans ℝ.</p>
+          <ol><li>Soit <code>f(x) = x³ + x − 1</code>. <code>f</code> est continue (polynôme).</li>
+          <li><code>f'(x) = 3x² + 1 > 0</code> : <code>f</code> est strictement croissante sur ℝ.</li>
+          <li><code>lim_{x → −∞} f = −∞</code> et <code>lim_{x → +∞} f = +∞</code>.</li>
+          <li>0 est compris entre <code>−∞</code> et <code>+∞</code>, donc l'équation <code>f(x) = 0</code> admet une <strong>unique</strong> solution.</li>
+          <li>Numériquement (par dichotomie), <code>x ≈ 0,68</code>.</li></ol>`)}
+
+        <h2>5. Méthode de dichotomie</h2>
+        ${lc.prop("Encadrer une solution", `<p>Pour approcher une solution de <code>f(x) = 0</code> dans <code>[a ; b]</code> :</p>
+          <ol><li>Calculer le milieu <code>m = (a + b)/2</code>.</li>
+          <li>Si <code>f(m) × f(a) < 0</code>, la solution est dans <code>[a ; m]</code>. Sinon, dans <code>[m ; b]</code>.</li>
+          <li>Recommencer sur le nouvel intervalle, jusqu'à la précision souhaitée.</li></ol>
+          <p>À chaque étape, l'amplitude de l'intervalle est divisée par 2.</p>`)}
+      `,
+    },
+
+    {
+      title: "Compléments sur la dérivation (composées)",
+      category: "Analyse",
+      content: `
+        <h2>1. Dérivée d'une fonction composée</h2>
+        ${lc.prop("Règle de la chaîne", `<p>Si <code>g</code> est dérivable en <code>f(x)</code> et <code>f</code> dérivable en <code>x</code> :</p>`)}
+        ${lc.formula("(g ∘ f)'(x) = g'(f(x)) × f'(x)")}
+        ${lc.tip("Idée", `<p>On dérive la « grande » fonction puis on multiplie par la dérivée du « contenu ».</p>`)}
+
+        <h2>2. Dérivées des composées usuelles</h2>
+        ${lc.formula("(u^n)' = n × u' × u^{n−1}")}
+        ${lc.formula("(√u)' = u' / (2√u) &nbsp;&nbsp; (u > 0)")}
+        ${lc.formula("(1/u)' = −u' / u²")}
+        ${lc.formula("(e^u)' = u' × e^u")}
+        ${lc.formula("(ln(u))' = u' / u &nbsp;&nbsp; (u > 0)")}
+        ${lc.formula("(cos(u))' = −u' × sin(u) &nbsp;&nbsp; (sin(u))' = u' × cos(u)")}
+
+        <h2>3. Exemples</h2>
+        ${lc.example("Dériver f(x) = (3x + 1)⁵", `<ol>
+          <li>Forme <code>u^n</code> avec <code>u = 3x + 1</code>, <code>n = 5</code>.</li>
+          <li><code>u' = 3</code>.</li>
+          <li><code>f'(x) = 5 × 3 × (3x + 1)⁴ = 15(3x + 1)⁴</code>.</li>
+        </ol>`)}
+        ${lc.example("Dériver f(x) = √(x² + 1)", `<ol>
+          <li><code>u = x² + 1</code>, <code>u' = 2x</code>.</li>
+          <li><code>f'(x) = 2x / (2√(x² + 1)) = x / √(x² + 1)</code>.</li>
+        </ol>`)}
+        ${lc.example("Dériver f(x) = e^{x² − 3}", `<ol>
+          <li><code>u = x² − 3</code>, <code>u' = 2x</code>.</li>
+          <li><code>f'(x) = 2x × e^{x² − 3}</code>.</li>
+        </ol>`)}
+        ${lc.example("Dériver f(x) = ln(2x + 5)", `<ol>
+          <li><code>u = 2x + 5</code>, <code>u' = 2</code>.</li>
+          <li><code>f'(x) = 2 / (2x + 5)</code>.</li>
+        </ol>`)}
+      `,
+    },
+
+    {
+      title: "Fonction logarithme népérien",
+      category: "Analyse",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Logarithme népérien", `<p>La fonction <strong>logarithme népérien</strong>, notée <code>ln</code>, est définie sur <code>]0 ; +∞[</code> comme la fonction réciproque de la fonction exponentielle.</p>`)}
+        ${lc.formula("e^{ln(x)} = x &nbsp;&nbsp; pour x > 0<br>ln(e^x) = x &nbsp;&nbsp; pour tout x")}
+        ${lc.example("Valeurs particulières", `<ul>
+          <li><code>ln(1) = 0</code> (car <code>e⁰ = 1</code>)</li>
+          <li><code>ln(e) = 1</code> (car <code>e¹ = e</code>)</li>
+          <li><code>ln(e²) = 2</code></li>
+        </ul>`)}
+
+        <h2>2. Propriétés algébriques</h2>
+        ${lc.formula("ln(a × b) = ln(a) + ln(b)")}
+        ${lc.formula("ln(a / b) = ln(a) − ln(b)")}
+        ${lc.formula("ln(1 / a) = −ln(a)")}
+        ${lc.formula("ln(a^n) = n × ln(a)")}
+        ${lc.formula("ln(√a) = (1/2) × ln(a)")}
+        <p>(toutes valables pour <code>a, b > 0</code>)</p>
+
+        <h2>3. Variations et limites</h2>
+        ${lc.prop("Dérivée", `<p>La fonction <code>ln</code> est dérivable sur <code>]0 ; +∞[</code> et :</p>`)}
+        ${lc.formula("ln'(x) = 1 / x")}
+        <p>Comme <code>1/x > 0</code> sur <code>]0 ; +∞[</code>, <code>ln</code> est <strong>strictement croissante</strong>.</p>
+        ${lc.prop("Limites", `<ul>
+          <li><code>lim_{x → +∞} ln(x) = +∞</code></li>
+          <li><code>lim_{x → 0⁺} ln(x) = −∞</code> (l'axe des ordonnées est asymptote)</li>
+        </ul>`)}
+
+        <h2>4. Équations et inéquations</h2>
+        ${lc.prop("Comme ln est strictement croissante", `<ul>
+          <li><code>ln(a) = ln(b) ⇔ a = b</code> (avec <code>a, b > 0</code>)</li>
+          <li><code>ln(a) < ln(b) ⇔ a < b</code></li>
+          <li><code>ln(x) = k ⇔ x = e^k</code></li>
+          <li><code>ln(x) > k ⇔ x > e^k</code></li>
+        </ul>`)}
+        ${lc.example("Résoudre ln(2x − 1) = 3", `<ol>
+          <li>Domaine : <code>2x − 1 > 0</code>, soit <code>x > 1/2</code>.</li>
+          <li>Équation : <code>2x − 1 = e³</code>, soit <code>x = (e³ + 1)/2 ≈ 10,54</code>.</li>
+          <li>Cohérent avec le domaine ✓.</li>
+        </ol>`)}
+
+        <h2>5. Croissance comparée</h2>
+        ${lc.prop("Le logarithme est plus lent que toute puissance", `<p>Quand <code>x → +∞</code>, le logarithme croît plus lentement que toute puissance positive de <code>x</code> :</p>`)}
+        ${lc.formula("lim_{x → +∞} ln(x) / x^n = 0 &nbsp;&nbsp; (pour tout n > 0)")}
+
+        <h2>6. Logarithme décimal</h2>
+        ${lc.def("log₁₀", `<p>Le <strong>logarithme décimal</strong>, noté <code>log</code>, est défini par <code>log(x) = ln(x) / ln(10)</code>.</p>
+          <p>Utile en sciences pour exprimer des quantités sur plusieurs ordres de grandeur (échelle de Richter, pH, décibels…).</p>`)}
+        ${lc.formula("log(10) = 1, log(100) = 2, log(1000) = 3, …")}
+      `,
+    },
+
+    {
+      title: "Primitives",
+      category: "Analyse",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Primitive", `<p>Soit <code>f</code> une fonction définie sur un intervalle <code>I</code>. Une <strong>primitive</strong> de <code>f</code> sur <code>I</code> est une fonction <code>F</code> dérivable sur <code>I</code> telle que :</p>`)}
+        ${lc.formula("F'(x) = f(x) &nbsp;&nbsp; pour tout x ∈ I")}
+        <p>Trouver une primitive, c'est <strong>l'opération inverse de dériver</strong>.</p>
+
+        <h2>2. Existence et unicité</h2>
+        ${lc.prop("Théorème", `<p>Toute fonction continue sur un intervalle admet une infinité de primitives. Si <code>F</code> et <code>G</code> sont deux primitives de <code>f</code>, alors <code>F − G</code> est constante.</p>`)}
+        ${lc.tip("Bref", `<p>Les primitives d'une fonction diffèrent d'une <strong>constante</strong>. On parle souvent de « la » primitive en sous-entendant « à constante près ».</p>`)}
+
+        <h2>3. Primitives usuelles</h2>
+        ${lc.formula("Primitives de a (constante) : F(x) = ax + C")}
+        ${lc.formula("Primitives de x : F(x) = x²/2 + C")}
+        ${lc.formula("Primitives de x^n (n ≠ −1) : F(x) = x^{n+1} / (n+1) + C")}
+        ${lc.formula("Primitives de 1/x : F(x) = ln(|x|) + C")}
+        ${lc.formula("Primitives de e^x : F(x) = e^x + C")}
+        ${lc.formula("Primitives de cos(x) : F(x) = sin(x) + C")}
+        ${lc.formula("Primitives de sin(x) : F(x) = −cos(x) + C")}
+        ${lc.formula("Primitives de 1/√x : F(x) = 2√x + C")}
+
+        <h2>4. Linéarité</h2>
+        ${lc.prop("Combinaisons linéaires", `<p>Si <code>F</code> est primitive de <code>f</code> et <code>G</code> primitive de <code>g</code>, alors <code>aF + bG</code> est primitive de <code>af + bg</code>.</p>`)}
+        ${lc.example("Primitives de 3x² + 4x − 1", `<ol>
+          <li>Primitive de <code>x²</code> : <code>x³/3</code>.</li>
+          <li>Primitive de <code>x</code> : <code>x²/2</code>.</li>
+          <li>Primitive de <code>1</code> : <code>x</code>.</li>
+          <li>Donc primitives : <code>F(x) = x³ + 2x² − x + C</code>.</li>
+        </ol>`)}
+
+        <h2>5. Trouver la primitive vérifiant une condition</h2>
+        ${lc.example("Avec condition initiale", `<p>Trouver la primitive de <code>f(x) = 2x</code> sur ℝ qui vaut 5 en 1.</p>
+          <ol><li>Primitives : <code>F(x) = x² + C</code>.</li>
+          <li>Condition : <code>F(1) = 5</code>, soit <code>1 + C = 5</code>, donc <code>C = 4</code>.</li>
+          <li>Réponse : <code>F(x) = x² + 4</code>.</li>
+        </ol>`)}
+
+        <h2>6. Primitives de fonctions composées</h2>
+        ${lc.formula("Primitive de u' × u^n (n ≠ −1) : u^{n+1} / (n+1) + C")}
+        ${lc.formula("Primitive de u' / u : ln(|u|) + C")}
+        ${lc.formula("Primitive de u' × e^u : e^u + C")}
+        ${lc.example("Primitive de 2x × e^{x²}", `<p>On reconnaît <code>u'×e^u</code> avec <code>u = x²</code>. Primitive : <code>e^{x²} + C</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Intégrales",
+      category: "Analyse",
+      content: `
+        <h2>1. Notion d'intégrale</h2>
+        ${lc.def("Intégrale d'une fonction continue positive", `<p>Soit <code>f</code> continue et positive sur <code>[a ; b]</code>. L'<strong>intégrale</strong> de <code>f</code> entre <code>a</code> et <code>b</code> est l'<strong>aire</strong>, en unités d'aire, du domaine sous la courbe entre <code>x = a</code> et <code>x = b</code>.</p>`)}
+        ${lc.formula("∫_a^b f(x) dx")}
+        ${lc.tip("Lecture", `<p>« <code>∫</code> » est un « S » allongé pour « somme ». L'intégrale est intuitivement une somme d'aires de rectangles très fins.</p>`)}
+
+        <h2>2. Lien fondamental avec les primitives</h2>
+        ${lc.prop("Théorème fondamental de l'analyse", `<p>Si <code>F</code> est une primitive de <code>f</code> sur <code>[a ; b]</code> :</p>`)}
+        ${lc.formula("∫_a^b f(x) dx = F(b) − F(a) = [F(x)]_a^b")}
+        ${lc.example("Calcul d'aire", `<p>Calculer <code>∫_0^2 x² dx</code>.</p>
+          <ol><li>Primitive de <code>x²</code> : <code>F(x) = x³/3</code>.</li>
+          <li><code>F(2) − F(0) = 8/3 − 0 = 8/3</code>.</li>
+          <li>Donc <code>∫_0^2 x² dx = 8/3 ≈ 2,67</code> unités d'aire.</li>
+        </ol>`)}
+
+        <h2>3. Propriétés</h2>
+        ${lc.formula("Linéarité : ∫_a^b (αf + βg) dx = α∫_a^b f dx + β∫_a^b g dx")}
+        ${lc.formula("Relation de Chasles : ∫_a^c f dx = ∫_a^b f dx + ∫_b^c f dx")}
+        ${lc.formula("Inversion des bornes : ∫_a^b f dx = −∫_b^a f dx")}
+        ${lc.formula("Intégrale nulle : ∫_a^a f dx = 0")}
+
+        <h2>4. Positivité et signe</h2>
+        ${lc.prop("Si f est négative", `<p>Si <code>f</code> est négative sur <code>[a ; b]</code> (avec <code>a < b</code>), alors <code>∫_a^b f dx ≤ 0</code>. L'aire est comptée <em>négativement</em>.</p>
+          <p>Pour avoir l'aire « géométrique » (positive), on prend <code>−∫_a^b f dx</code> ou on intègre <code>|f|</code>.</p>`)}
+
+        <h2>5. Valeur moyenne</h2>
+        ${lc.def("Valeur moyenne", `<p>La <strong>valeur moyenne</strong> de <code>f</code> sur <code>[a ; b]</code> est :</p>`)}
+        ${lc.formula("μ = (1 / (b − a)) × ∫_a^b f(x) dx")}
+        ${lc.example("Valeur moyenne de f(x) = x² sur [0 ; 3]", `<ol>
+          <li><code>∫_0^3 x² dx = [x³/3]_0^3 = 9</code>.</li>
+          <li><code>μ = 9 / (3 − 0) = 3</code>.</li>
+        </ol>`)}
+
+        <h2>6. Aire entre deux courbes</h2>
+        ${lc.prop("Si f ≥ g sur [a ; b]", `<p>L'aire du domaine compris entre les deux courbes est :</p>`)}
+        ${lc.formula("Aire = ∫_a^b (f(x) − g(x)) dx")}
+        ${lc.example("Aire entre y = x et y = x² sur [0 ; 1]", `<ol>
+          <li>Sur [0 ; 1], <code>x ≥ x²</code>.</li>
+          <li><code>∫_0^1 (x − x²) dx = [x²/2 − x³/3]_0^1 = 1/2 − 1/3 = 1/6</code>.</li>
+          <li>Aire = <code>1/6</code> u.a.</li>
+        </ol>`)}
+      `,
+    },
+
+    {
+      title: "Suites : raisonnement par récurrence",
+      category: "Suites",
+      content: `
+        <h2>1. Principe de récurrence</h2>
+        ${lc.def("Raisonnement par récurrence", `<p>Pour démontrer qu'une propriété <code>P(n)</code> est vraie pour tout entier <code>n ≥ n₀</code>, on procède en deux temps :</p>
+          <ol><li><strong>Initialisation</strong> : on vérifie <code>P(n₀)</code> (le cas de base).</li>
+          <li><strong>Hérédité</strong> : on suppose <code>P(n)</code> vraie pour un <code>n ≥ n₀</code> quelconque (« hypothèse de récurrence »), puis on démontre <code>P(n + 1)</code>.</li></ol>
+          <p><strong>Conclusion</strong> : par récurrence, <code>P(n)</code> est vraie pour tout <code>n ≥ n₀</code>.</p>`)}
+        ${lc.tip("Image", `<p>Comme une chaîne de dominos : si le premier tombe (initialisation) et que chaque domino fait tomber le suivant (hérédité), alors tous tombent.</p>`)}
+
+        <h2>2. Premier exemple : somme d'entiers</h2>
+        ${lc.example("Démontrer que 1 + 2 + … + n = n(n+1)/2", `<p>On note <code>P(n)</code> : « <code>1 + 2 + … + n = n(n+1)/2</code> ».</p>
+          <p><strong>Initialisation</strong> (n = 1) : à gauche, <code>1</code>. À droite, <code>1×2/2 = 1</code>. ✓ <code>P(1)</code> vraie.</p>
+          <p><strong>Hérédité</strong> : supposons <code>P(n)</code> vraie pour un <code>n ≥ 1</code>. Montrons <code>P(n + 1)</code>.</p>
+          <p><code>1 + 2 + … + n + (n+1) = n(n+1)/2 + (n+1)</code> (par hypothèse de récurrence)<br>
+          <code>= (n+1) × (n/2 + 1) = (n+1)(n+2)/2</code>. ✓</p>
+          <p><strong>Conclusion</strong> : <code>P(n)</code> est vraie pour tout <code>n ≥ 1</code>.</p>`)}
+
+        <h2>3. Exemple : suite géométrique encadrée</h2>
+        ${lc.example("Démontrer que 2^n ≥ n + 1 pour tout n ≥ 0", `<p><strong>Init</strong> (n = 0) : <code>2⁰ = 1</code>, <code>0 + 1 = 1</code>. <code>1 ≥ 1</code> ✓.</p>
+          <p><strong>Hérédité</strong> : supposons <code>2^n ≥ n + 1</code>.</p>
+          <p>Alors <code>2^{n+1} = 2 × 2^n ≥ 2(n + 1) = 2n + 2 ≥ n + 2</code> (car <code>n ≥ 0</code>).</p>
+          <p>Donc <code>P(n+1)</code> vraie. <strong>Conclusion</strong> : OK pour tout <code>n ≥ 0</code>.</p>`)}
+
+        <h2>4. Récurrence et suites définies par récurrence</h2>
+        ${lc.example("Suite u_{n+1} = √(uₙ + 6), u₀ = 0", `<p>Démontrer que <code>0 ≤ uₙ ≤ 3</code> pour tout <code>n</code>.</p>
+          <p><strong>Init</strong> : <code>u₀ = 0</code>, <code>0 ≤ 0 ≤ 3</code> ✓.</p>
+          <p><strong>Hérédité</strong> : supposons <code>0 ≤ uₙ ≤ 3</code>. Alors <code>6 ≤ uₙ + 6 ≤ 9</code>, donc <code>√6 ≤ u_{n+1} ≤ 3</code>. En particulier <code>0 ≤ u_{n+1} ≤ 3</code>.</p>
+          <p><strong>Conclusion</strong> : la suite est encadrée par 0 et 3.</p>`)}
+
+        <h2>5. Pièges</h2>
+        ${lc.warn("Ne pas oublier l'initialisation", `<p>Une démonstration sans initialisation peut « marcher » mais conclure quelque chose de faux. Par exemple, on peut hériter <code>1 = 0</code> mais l'initialisation n'a jamais été vérifiée. Toujours commencer par initialiser.</p>`)}
+        ${lc.warn("Bien utiliser l'hypothèse de récurrence", `<p>L'hérédité doit utiliser <code>P(n)</code> pour démontrer <code>P(n+1)</code>. Si on n'utilise pas <code>P(n)</code>, c'est qu'on n'a pas vraiment fait une récurrence (c'est une démonstration directe).</p>`)}
+      `,
+    },
+
+    {
+      title: "Limites de suites (formel)",
+      category: "Suites",
+      content: `
+        <h2>1. Définition formelle de la limite</h2>
+        ${lc.def("Convergence vers L", `<p>Une suite <code>(uₙ)</code> converge vers <code>L</code> si pour tout <code>ε > 0</code>, il existe un rang <code>N</code> à partir duquel <code>|uₙ − L| < ε</code>.</p>`)}
+        ${lc.tip("En clair", `<p>« Aussi proche de L qu'on veut, à condition d'aller assez loin. »</p>`)}
+
+        <h2>2. Limite infinie</h2>
+        ${lc.def("Divergence vers +∞", `<p><code>(uₙ)</code> diverge vers <code>+∞</code> si pour tout réel <code>A</code>, il existe un rang à partir duquel <code>uₙ ≥ A</code>.</p>`)}
+
+        <h2>3. Théorèmes sur les limites</h2>
+        ${lc.prop("Opérations standards", `<p>Si <code>lim uₙ = a</code> et <code>lim vₙ = b</code> :</p>
+          <ul><li><code>lim (uₙ + vₙ) = a + b</code></li>
+          <li><code>lim (uₙ × vₙ) = a × b</code></li>
+          <li><code>lim (uₙ / vₙ) = a/b</code> si <code>b ≠ 0</code></li></ul>`)}
+        ${lc.prop("Théorème des gendarmes", `<p>Si <code>vₙ ≤ uₙ ≤ wₙ</code> à partir d'un certain rang, et si <code>(vₙ)</code> et <code>(wₙ)</code> ont la même limite <code>L</code>, alors <code>(uₙ)</code> aussi.</p>`)}
+        ${lc.prop("Comparaison à l'infini", `<ul>
+          <li>Si <code>uₙ ≥ vₙ</code> et <code>lim vₙ = +∞</code>, alors <code>lim uₙ = +∞</code>.</li>
+          <li>Si <code>uₙ ≤ vₙ</code> et <code>lim vₙ = −∞</code>, alors <code>lim uₙ = −∞</code>.</li>
+        </ul>`)}
+
+        <h2>4. Théorème de la convergence monotone</h2>
+        ${lc.prop("Énoncé clé", `<p>Toute suite <strong>croissante et majorée</strong> converge. Toute suite <strong>décroissante et minorée</strong> converge.</p>`)}
+        ${lc.warn("Attention", `<p>Le théorème dit qu'il existe une limite, mais ne donne pas sa valeur. Il faut la calculer autrement (souvent en passant à la limite dans la relation de récurrence).</p>`)}
+        ${lc.example("Application", `<p>Soit <code>u₀ = 1</code> et <code>u_{n+1} = √(uₙ + 2)</code>.</p>
+          <ol><li>Par récurrence, on montre que <code>1 ≤ uₙ ≤ 2</code>.</li>
+          <li>On montre que <code>(uₙ)</code> est croissante (car <code>√(uₙ + 2) ≥ uₙ</code> quand <code>0 ≤ uₙ ≤ 2</code>).</li>
+          <li>Croissante et majorée par 2 → converge vers une limite <code>ℓ</code>.</li>
+          <li><code>ℓ = √(ℓ + 2)</code>, donc <code>ℓ² = ℓ + 2</code>, soit <code>ℓ² − ℓ − 2 = 0</code>. Solutions : 2 ou −1. Comme <code>ℓ ≥ 1</code>, <code>ℓ = 2</code>.</li></ol>`)}
+
+        <h2>5. Limites de suites géométriques</h2>
+        ${lc.prop("Selon la raison q", `<ul>
+          <li>Si <code>q > 1</code> : <code>lim qⁿ = +∞</code>.</li>
+          <li>Si <code>q = 1</code> : <code>lim qⁿ = 1</code>.</li>
+          <li>Si <code>−1 < q < 1</code> : <code>lim qⁿ = 0</code>.</li>
+          <li>Si <code>q ≤ −1</code> : pas de limite (oscillations).</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Géométrie dans l'espace : vecteurs, droites, plans",
+      category: "Géométrie",
+      content: `
+        <h2>1. Repérage dans l'espace</h2>
+        ${lc.def("Repère orthonormé", `<p>Un <strong>repère orthonormé</strong> de l'espace est défini par une origine <code>O</code> et trois axes <code>(Ox)</code>, <code>(Oy)</code>, <code>(Oz)</code> deux à deux perpendiculaires, avec la même unité de longueur.</p>
+          <p>Un point <code>M</code> est repéré par ses coordonnées <code>(x, y, z)</code>.</p>`)}
+
+        <h2>2. Vecteurs dans l'espace</h2>
+        ${lc.formula("AB→ a pour coordonnées (x_B − x_A ; y_B − y_A ; z_B − z_A)")}
+        ${lc.formula("Norme : ||u→|| = √(x² + y² + z²)")}
+        ${lc.formula("Distance : AB = √((x_B−x_A)² + (y_B−y_A)² + (z_B−z_A)²)")}
+
+        <h2>3. Vecteurs colinéaires et coplanaires</h2>
+        ${lc.def("Colinéarité", `<p>Deux vecteurs <code>u→</code> et <code>v→</code> sont <strong>colinéaires</strong> s'il existe un réel <code>k</code> tel que <code>v→ = k × u→</code> (ou si <code>u→ = 0→</code>).</p>`)}
+        ${lc.def("Coplanaires", `<p>Trois vecteurs sont <strong>coplanaires</strong> s'ils peuvent être placés dans un même plan, c'est-à-dire si l'un peut s'écrire comme combinaison linéaire des deux autres.</p>`)}
+
+        <h2>4. Droite dans l'espace</h2>
+        ${lc.def("Représentation paramétrique", `<p>Une droite <code>(D)</code> passant par <code>A(x_A, y_A, z_A)</code> et de vecteur directeur <code>u→(a ; b ; c)</code> est l'ensemble des points <code>M(x, y, z)</code> tels que :</p>`)}
+        ${lc.formula("x = x_A + a·t<br>y = y_A + b·t<br>z = z_A + c·t &nbsp;&nbsp; (t ∈ ℝ)")}
+        <p><code>t</code> est appelé le <strong>paramètre</strong>.</p>
+
+        <h2>5. Plan dans l'espace</h2>
+        ${lc.def("Plan défini par un point et deux vecteurs non colinéaires", `<p>Un plan est entièrement déterminé par un point <code>A</code> et deux vecteurs non colinéaires <code>u→</code> et <code>v→</code>.</p>`)}
+        ${lc.formula("Représentation paramétrique :<br>OM→ = OA→ + s × u→ + t × v→ &nbsp;(s, t ∈ ℝ)")}
+
+        <h2>6. Positions relatives</h2>
+        ${lc.prop("Deux droites dans l'espace", `<ul>
+          <li><strong>Confondues</strong> (même droite).</li>
+          <li><strong>Strictement parallèles</strong> (vecteurs directeurs colinéaires, mais ne se touchent pas).</li>
+          <li><strong>Sécantes</strong> (un point d'intersection unique).</li>
+          <li><strong>Non coplanaires</strong> (pas de point commun, et pas parallèles ; ne sont pas dans le même plan).</li>
+        </ul>`)}
+        ${lc.prop("Deux plans", `<ul>
+          <li>Confondus, parallèles strictement, ou sécants selon une droite.</li>
+        </ul>`)}
+        ${lc.prop("Une droite et un plan", `<ul>
+          <li>Droite incluse dans le plan, parallèle au plan, ou sécante (un point unique).</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Produit scalaire dans l'espace",
+      category: "Géométrie",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Produit scalaire", `<p>Le <strong>produit scalaire</strong> de deux vecteurs <code>u→</code> et <code>v→</code> de l'espace est défini comme dans le plan :</p>`)}
+        ${lc.formula("u→ · v→ = ||u→|| × ||v→|| × cos(u→, v→)")}
+
+        <h2>2. Calcul en coordonnées</h2>
+        ${lc.formula("Si u→(x ; y ; z) et v→(x' ; y' ; z') :<br>u→ · v→ = x×x' + y×y' + z×z'")}
+        ${lc.example("Calcul", `<p><code>u→(2 ; −1 ; 3)</code> et <code>v→(1 ; 4 ; 0)</code>.</p>
+          <p><code>u→ · v→ = 2×1 + (−1)×4 + 3×0 = 2 − 4 + 0 = −2</code>.</p>`)}
+
+        <h2>3. Lien avec la norme et la distance</h2>
+        ${lc.formula("u→ · u→ = ||u→||² = x² + y² + z²")}
+
+        <h2>4. Orthogonalité</h2>
+        ${lc.prop("Caractérisation", `<p>Deux vecteurs non nuls sont orthogonaux si et seulement si leur produit scalaire est nul.</p>`)}
+        ${lc.formula("u→ ⊥ v→ ⇔ u→ · v→ = 0")}
+        ${lc.example("Tester l'orthogonalité", `<p><code>u→(1 ; 2 ; −1)</code> et <code>v→(3 ; −1 ; 1)</code>. <code>u→ · v→ = 3 − 2 − 1 = 0</code> → orthogonaux.</p>`)}
+
+        <h2>5. Vecteur normal à un plan</h2>
+        ${lc.def("Vecteur normal", `<p>Un <strong>vecteur normal</strong> à un plan est un vecteur non nul orthogonal à tous les vecteurs du plan.</p>
+          <p>Pour qu'un vecteur soit normal à un plan, il suffit qu'il soit orthogonal à <strong>deux vecteurs non colinéaires</strong> du plan.</p>`)}
+
+        <h2>6. Équation cartésienne d'un plan</h2>
+        ${lc.prop("Théorème", `<p>Le plan passant par <code>A(x_A, y_A, z_A)</code> et de vecteur normal <code>n→(a ; b ; c)</code> a pour équation :</p>`)}
+        ${lc.formula("a(x − x_A) + b(y − y_A) + c(z − z_A) = 0")}
+        <p>Ce qui se réécrit sous la forme <strong>cartésienne</strong> :</p>
+        ${lc.formula("a·x + b·y + c·z + d = 0 &nbsp;&nbsp; (avec d = −(a·x_A + b·y_A + c·z_A))")}
+        ${lc.example("Trouver une équation", `<p>Plan passant par <code>A(1, 2, 3)</code>, de vecteur normal <code>n→(2 ; −1 ; 4)</code>.</p>
+          <ol><li><code>2(x − 1) − (y − 2) + 4(z − 3) = 0</code></li>
+          <li><code>2x − 2 − y + 2 + 4z − 12 = 0</code></li>
+          <li><code>2x − y + 4z − 12 = 0</code></li></ol>`)}
+
+        <h2>7. Distance d'un point à un plan</h2>
+        ${lc.formula("Plan : ax + by + cz + d = 0, point M(x_M, y_M, z_M).<br>Distance : |a·x_M + b·y_M + c·z_M + d| / √(a² + b² + c²)")}
+        ${lc.example("Distance", `<p>Distance du point <code>M(1, 0, 2)</code> au plan <code>x + 2y − z + 3 = 0</code>.</p>
+          <p><code>d = |1 + 0 − 2 + 3| / √(1 + 4 + 1) = 2 / √6 = 2√6/6 = √6/3</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Lois de probabilité à densité",
+      category: "Probabilités",
+      content: `
+        <h2>1. Variable aléatoire continue</h2>
+        ${lc.def("Variable continue", `<p>Une variable aléatoire <code>X</code> est <strong>continue</strong> si elle peut prendre n'importe quelle valeur dans un intervalle (ou ℝ tout entier), pas seulement des valeurs discrètes.</p>
+          <p>Exemple : la taille d'une personne, le temps d'attente à un guichet, la durée de vie d'une ampoule.</p>`)}
+
+        <h2>2. Densité de probabilité</h2>
+        ${lc.def("Fonction densité", `<p>Une fonction <code>f</code> est une <strong>densité de probabilité</strong> sur un intervalle <code>I</code> si :</p>
+          <ul><li><code>f</code> est continue (ou continue par morceaux) et positive sur <code>I</code> ;</li>
+          <li><code>∫_I f(x) dx = 1</code>.</li></ul>`)}
+        ${lc.prop("Probabilité d'un intervalle", `<p>Si <code>X</code> a pour densité <code>f</code> :</p>`)}
+        ${lc.formula("P(a ≤ X ≤ b) = ∫_a^b f(x) dx")}
+        ${lc.warn("Cas individuel", `<p>Pour une variable continue, <code>P(X = a) = 0</code> pour tout <code>a</code> ! Seule la probabilité d'un intervalle a un sens. <code>P(X ≤ a) = P(X < a)</code>.</p>`)}
+
+        <h2>3. Espérance d'une variable continue</h2>
+        ${lc.formula("E(X) = ∫_I x × f(x) dx")}
+
+        <h2>4. Loi uniforme</h2>
+        ${lc.def("Loi uniforme sur [a, b]", `<p>La loi uniforme sur <code>[a, b]</code> a pour densité :</p>`)}
+        ${lc.formula("f(x) = 1 / (b − a) &nbsp;&nbsp; pour x ∈ [a ; b]<br>f(x) = 0 &nbsp;&nbsp; sinon")}
+        ${lc.formula("E(X) = (a + b) / 2")}
+        ${lc.example("Loi uniforme sur [0 ; 10]", `<p>Densité : <code>f(x) = 1/10</code> sur <code>[0 ; 10]</code>.</p>
+          <p><code>P(2 ≤ X ≤ 5) = (5 − 2)/10 = 0,3</code>.</p>
+          <p><code>E(X) = 5</code>.</p>`)}
+
+        <h2>5. Loi exponentielle</h2>
+        ${lc.def("Loi exponentielle de paramètre λ", `<p>La loi exponentielle <code>ε(λ)</code> sur <code>[0 ; +∞[</code> a pour densité :</p>`)}
+        ${lc.formula("f(x) = λ × e^{−λx}")}
+        ${lc.formula("P(X ≤ a) = 1 − e^{−λa} &nbsp;&nbsp; (a ≥ 0)")}
+        ${lc.formula("E(X) = 1 / λ")}
+        ${lc.tip("Modélisation", `<p>La loi exponentielle modélise des durées : durée de vie, temps entre deux événements aléatoires (clients, particules…). Elle est <strong>sans mémoire</strong> : <code>P(X > s + t | X > s) = P(X > t)</code>.</p>`)}
+        ${lc.example("Durée de vie d'une ampoule", `<p>Durée de vie modélisée par une loi exponentielle d'espérance 5000 h. Donc <code>λ = 1/5000</code>.</p>
+          <p>Probabilité que l'ampoule dure moins de 1000 h : <code>P(X ≤ 1000) = 1 − e^{−1000/5000} = 1 − e^{−0,2} ≈ 0,181</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Loi normale",
+      category: "Probabilités",
+      content: `
+        <h2>1. Loi normale centrée réduite</h2>
+        ${lc.def("N(0, 1)", `<p>La <strong>loi normale centrée réduite</strong>, notée <code>N(0, 1)</code>, a pour densité sur ℝ :</p>`)}
+        ${lc.formula("φ(x) = (1 / √(2π)) × e^{−x²/2}")}
+        <p>Sa courbe est la fameuse « courbe en cloche », symétrique autour de 0.</p>
+        ${lc.prop("Propriétés", `<ul>
+          <li><code>E(X) = 0</code>, <code>V(X) = 1</code>, <code>σ(X) = 1</code>.</li>
+          <li>La courbe est symétrique : <code>φ(−x) = φ(x)</code>.</li>
+          <li><code>P(X ≤ 0) = 0,5</code> par symétrie.</li>
+        </ul>`)}
+
+        <h2>2. Loi normale générale</h2>
+        ${lc.def("N(μ, σ²)", `<p>Une variable suit la <strong>loi normale</strong> de paramètres <code>μ</code> (espérance) et <code>σ²</code> (variance) si :</p>
+          <p><code>X ~ N(μ, σ²)</code> ⇔ <code>(X − μ) / σ ~ N(0, 1)</code></p>
+          <p>(centrer-réduire la variable la transforme en N(0, 1).)</p>`)}
+
+        <h2>3. Règle des trois sigmas</h2>
+        ${lc.prop("À retenir", `<p>Pour une variable <code>X ~ N(μ, σ²)</code> :</p>
+          <ul>
+            <li><code>P(μ − σ ≤ X ≤ μ + σ) ≈ 0,68</code> (≈ 68 %)</li>
+            <li><code>P(μ − 2σ ≤ X ≤ μ + 2σ) ≈ 0,95</code> (≈ 95 %)</li>
+            <li><code>P(μ − 3σ ≤ X ≤ μ + 3σ) ≈ 0,997</code> (≈ 99,7 %)</li>
+          </ul>`)}
+        ${lc.tip("Interprétation", `<p>La quasi-totalité (99,7 %) des valeurs sont à moins de <code>3σ</code> de la moyenne. Les « écarts-types » sont l'unité naturelle pour mesurer l'écart à la moyenne.</p>`)}
+
+        <h2>4. Calcul à la calculatrice</h2>
+        ${lc.prop("Fonctions à utiliser", `<p>Sur les calculatrices :</p>
+          <ul><li><code>NormalCDF(a, b, μ, σ)</code> : calcule <code>P(a ≤ X ≤ b)</code>.</li>
+          <li><code>InvNorm(p, μ, σ)</code> : trouve <code>x</code> tel que <code>P(X ≤ x) = p</code>.</li></ul>`)}
+        ${lc.example("Application", `<p>Soit <code>X ~ N(100, 15²)</code>. Calculer <code>P(85 ≤ X ≤ 115)</code>.</p>
+          <p>On reconnaît <code>μ ± σ</code> avec <code>μ = 100</code> et <code>σ = 15</code>. Donc <code>P ≈ 0,68</code>.</p>
+          <p>Vérification calculatrice : <code>NormalCDF(85, 115, 100, 15) ≈ 0,6827</code> ✓.</p>`)}
+
+        <h2>5. Pourquoi cette loi est si importante</h2>
+        ${lc.tip("Théorème central limite (intuition)", `<p>De très nombreuses variables réelles suivent approximativement une loi normale : taille, poids, erreurs de mesure, scores standardisés. Le <strong>théorème central limite</strong> explique pourquoi : la somme (ou la moyenne) d'un grand nombre de variables aléatoires indépendantes suit approximativement une loi normale, quelle que soit la loi de chaque variable individuellement.</p>`)}
+      `,
+    },
+
+    {
+      title: "Échantillonnage et estimation",
+      category: "Probabilités",
+      content: `
+        <h2>1. Loi des grands nombres</h2>
+        ${lc.prop("Énoncé intuitif", `<p>Quand le nombre d'expériences augmente, la <strong>fréquence</strong> observée d'un événement se rapproche de sa <strong>probabilité théorique</strong>.</p>`)}
+        ${lc.example("Pile ou face", `<p>Sur 10 lancers d'une pièce équilibrée, on peut très bien obtenir 7 piles. Mais sur 10 000 lancers, la proportion se rapproche très près de 0,5.</p>`)}
+
+        <h2>2. Échantillon</h2>
+        ${lc.def("Échantillon", `<p>Un <strong>échantillon de taille n</strong> est obtenu en répétant <code>n</code> fois la même expérience aléatoire dans des conditions identiques.</p>`)}
+
+        <h2>3. Intervalle de fluctuation</h2>
+        ${lc.def("Intervalle de fluctuation", `<p>Pour une fréquence observée <code>f</code> dans un échantillon de taille <code>n</code> issu d'une population de proportion <code>p</code>, on attend que <code>f</code> soit « proche » de <code>p</code>.</p>
+          <p>Au seuil de 95 %, l'intervalle de fluctuation est :</p>`)}
+        ${lc.formula("[p − 1,96 × √(p(1−p)/n) ; p + 1,96 × √(p(1−p)/n)]")}
+        ${lc.tip("Approximation simplifiée", `<p>En première : <code>[p − 1/√n ; p + 1/√n]</code> donne un intervalle un peu plus large, mais plus simple à manipuler.</p>`)}
+
+        <h2>4. Intervalle de confiance</h2>
+        ${lc.def("Intervalle de confiance", `<p>L'<strong>intervalle de confiance</strong> au niveau 95 % d'une proportion inconnue <code>p</code>, à partir d'une fréquence observée <code>f</code> dans un échantillon de taille <code>n</code>, est :</p>`)}
+        ${lc.formula("[f − 1,96 × √(f(1−f)/n) ; f + 1,96 × √(f(1−f)/n)]")}
+        ${lc.tip("Différence", `<p>L'<strong>intervalle de fluctuation</strong> part de <code>p</code> connu et encadre <code>f</code> futur. L'<strong>intervalle de confiance</strong> part de <code>f</code> observé et encadre <code>p</code> inconnu.</p>`)}
+
+        <h2>5. Application : sondage</h2>
+        ${lc.example("Sondage politique", `<p>Sur 1000 personnes interrogées, 530 déclarent voter pour le candidat A. Estimer sa proportion réelle dans la population.</p>
+          <ol><li>Fréquence observée : <code>f = 530/1000 = 0,53</code>.</li>
+          <li>Marge d'erreur : <code>1,96 × √(0,53 × 0,47 / 1000) ≈ 1,96 × 0,0158 ≈ 0,031</code>.</li>
+          <li>Intervalle de confiance : <code>[0,499 ; 0,561]</code>.</li>
+          <li>Avec 95 % de confiance, le candidat A obtient entre 49,9 % et 56,1 %.</li></ol>`)}
+
+        <h2>6. Taille d'échantillon</h2>
+        ${lc.prop("Pour une marge donnée", `<p>Pour avoir une marge d'erreur d'au plus <code>m</code> au niveau 95 %, il faut que <code>n ≥ 1/m²</code> (en utilisant l'approximation simplifiée).</p>`)}
+        ${lc.example("Sondage à ±3 %", `<p>Pour une marge de 3 % (<code>m = 0,03</code>), il faut <code>n ≥ 1/0,0009 ≈ 1112</code> personnes.</p>`)}
+      `,
+    },
+  ];
+}
 
 // ─── Contenu pédagogique : 1ère à fond ───────────────────────────
 function chapters1ere() {
