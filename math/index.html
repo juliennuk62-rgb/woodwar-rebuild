@@ -13490,6 +13490,244 @@ EXERCISES['1ere-0'] = [
       };
     },
   },
+  {
+    title: 'Reconnaître une suite',
+    generate() {
+      const c = exPick([
+        { type: 'arithmétique', vals: '5, 8, 11, 14, 17' },
+        { type: 'géométrique', vals: '2, 6, 18, 54, 162' },
+        { type: 'arithmétique', vals: '10, 7, 4, 1, −2' },
+        { type: 'géométrique', vals: '3, 6, 12, 24, 48' },
+      ]);
+      return {
+        question: `La suite <code>${c.vals}</code> est :`,
+        inputType: 'mcq',
+        options: ['arithmétique', 'géométrique', 'ni l\'une ni l\'autre'],
+        answer: ['arithmétique', 'géométrique', 'ni l\'une ni l\'autre'].indexOf(c.type),
+        steps: [
+          c.type === 'arithmétique' ? `Différences constantes → arithmétique.` : `Quotients constants → géométrique.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Somme arithmétique',
+    generate() {
+      const u0 = exRand(1, 8);
+      const r = exRand(1, 4);
+      const n = exRand(5, 12);
+      const un = u0 + n * r;
+      const sum = ((n + 1) * (u0 + un)) / 2;
+      return {
+        question: `Suite arith. <code>u₀ = ${u0}</code>, <code>r = ${r}</code>. Calcule <code>S = u₀ + u₁ + ... + u_${n}</code>.`,
+        inputType: 'number',
+        answer: sum,
+        tolerance: 0.001,
+        steps: [
+          `<code>u_${n} = ${u0} + ${n} × ${r} = ${un}</code>.`,
+          `<code>S = (${n + 1})(u₀ + u_${n})/2 = ${n + 1} × ${u0 + un}/2 = ${sum}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Raison d\'une suite arithmétique',
+    generate() {
+      const u3 = exRand(5, 20);
+      const r = exRand(2, 6);
+      const u8 = u3 + 5 * r;
+      return {
+        question: `Suite arith. <code>u₃ = ${u3}</code>, <code>u₈ = ${u8}</code>. Quelle est la raison ?`,
+        inputType: 'number',
+        answer: r,
+        steps: [
+          `<code>u₈ − u₃ = 5r</code>, donc <code>r = (u₈ − u₃)/5 = ${u8 - u3}/5 = ${r}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['1ere-1'] = [
+  {
+    title: 'Limite d\'une suite géométrique',
+    generate() {
+      const c = exPick([
+        { q: 2, lim: '+∞' }, { q: 0.5, lim: '0' },
+        { q: 3, lim: '+∞' }, { q: 1/3, lim: '0' },
+        { q: -2, lim: 'pas de limite' },
+      ]);
+      return {
+        question: `Suite géométrique de raison <code>q = ${c.q}</code>. Quelle est sa limite quand <code>n → +∞</code> ?`,
+        inputType: 'mcq',
+        options: ['0', '+∞', '−∞', 'pas de limite'],
+        answer: ['0', '+∞', '−∞', 'pas de limite'].indexOf(c.lim),
+        steps: [
+          `Si <code>|q| &lt; 1</code> : limite = 0. Si <code>q > 1</code> : +∞. Si <code>q ≤ −1</code> : pas de limite.`,
+          `Ici <code>q = ${c.q}</code> → limite : <code>${c.lim}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite d\'une suite arithmétique',
+    generate() {
+      const r = exPick([2, -3, 5, -1, 4]);
+      const lim = r > 0 ? '+∞' : '−∞';
+      return {
+        question: `Suite arithmétique de raison <code>r = ${r}</code>. Limite quand <code>n → +∞</code> ?`,
+        inputType: 'mcq',
+        options: ['+∞', '−∞', '0', 'pas de limite'],
+        answer: r > 0 ? 0 : 1,
+        steps: [
+          `<code>u_n = u_0 + nr</code>, donc si <code>r > 0</code> → +∞ ; si <code>r &lt; 0</code> → −∞.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite de 1/n',
+    generate() {
+      return {
+        question: `Que vaut <code>lim<sub>n→+∞</sub> 1/n</code> ?`,
+        inputType: 'number',
+        answer: 0,
+        tolerance: 0.001,
+        steps: [
+          `Quand n grandit, 1/n se rapproche de 0.`,
+          `<code>lim<sub>n→+∞</sub> 1/n = 0</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Suite croissante / décroissante',
+    generate() {
+      const c = exPick([
+        { def: 'u_{n+1} − u_n > 0 pour tout n', sens: 'croissante' },
+        { def: 'u_{n+1} − u_n &lt; 0 pour tout n', sens: 'décroissante' },
+        { def: 'u_{n+1} = u_n pour tout n', sens: 'constante' },
+      ]);
+      return {
+        question: `Si <code>${c.def}</code>, la suite est :`,
+        inputType: 'mcq',
+        options: ['croissante', 'décroissante', 'constante'],
+        answer: ['croissante', 'décroissante', 'constante'].indexOf(c.sens),
+        steps: [
+          `Définition : <code>${c.def}</code> ⇒ ${c.sens}.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Suite majorée',
+    generate() {
+      return {
+        question: `Une suite est dite <strong>majorée</strong> si :`,
+        inputType: 'mcq',
+        options: [
+          'tous ses termes sont positifs',
+          'il existe M tel que u_n ≤ M pour tout n',
+          'elle est croissante',
+          'sa limite est finie',
+        ],
+        answer: 1,
+        steps: [
+          `Une suite est majorée s'il existe un nombre fixe <code>M</code> tel que <code>u_n ≤ M</code> pour tout n.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['1ere-2'] = [
+  {
+    title: 'Première étape d\'une récurrence',
+    generate() {
+      return {
+        question: `Pour démontrer par récurrence qu'une propriété <code>P(n)</code> est vraie pour tout <code>n ≥ 0</code>, la première étape est :`,
+        inputType: 'mcq',
+        options: [
+          'Initialisation : vérifier P(0)',
+          'Hérédité : supposer P(n) et montrer P(n+1)',
+          'Conclusion',
+          'Résoudre une équation',
+        ],
+        answer: 0,
+        steps: [
+          `Récurrence : 1) <strong>Initialisation</strong> P(0). 2) <strong>Hérédité</strong>. 3) Conclusion.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Hypothèse de récurrence',
+    generate() {
+      return {
+        question: `Dans une récurrence à l'étape <strong>hérédité</strong>, on suppose :`,
+        inputType: 'mcq',
+        options: [
+          'P(n+1) vraie',
+          'P(n) vraie',
+          'P(0) et P(1) vraies',
+          'P(n) fausse',
+        ],
+        answer: 1,
+        steps: [
+          `On suppose <code>P(n)</code> vraie (hypothèse de récurrence) et on en déduit <code>P(n+1)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Somme 1+2+...+n',
+    generate() {
+      const n = exRand(5, 12);
+      return {
+        question: `Calculer <code>1 + 2 + ... + ${n}</code> avec la formule <code>n(n+1)/2</code>.`,
+        inputType: 'number',
+        answer: (n * (n + 1)) / 2,
+        steps: [
+          `<code>S = ${n}(${n} + 1)/2 = ${n} × ${n + 1}/2 = ${(n * (n + 1)) / 2}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Conclusion d\'une récurrence',
+    generate() {
+      return {
+        question: `Quand peut-on conclure qu'une propriété <code>P(n)</code> est vraie pour tout <code>n ≥ 0</code> ?`,
+        inputType: 'mcq',
+        options: [
+          'Quand on a vérifié P(0), P(1), P(2)',
+          'Après initialisation et hérédité',
+          'Quand P(n) implique P(n+1)',
+          'Jamais',
+        ],
+        answer: 1,
+        steps: [
+          `Pour conclure, il faut <strong>les deux étapes</strong> : initialisation ET hérédité.`,
+          `L'une seule ne suffit pas.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Somme des carrés',
+    generate() {
+      const n = exRand(3, 7);
+      const sum = (n * (n + 1) * (2 * n + 1)) / 6;
+      return {
+        question: `On démontre par récurrence : <code>1² + 2² + ... + n² = n(n+1)(2n+1)/6</code>. Calcule pour <code>n = ${n}</code>.`,
+        inputType: 'number',
+        answer: sum,
+        steps: [
+          `<code>${n}(${n}+1)(2×${n}+1)/6 = ${n} × ${n + 1} × ${2 * n + 1} / 6 = ${sum}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['1ere-3'] = [
@@ -13497,7 +13735,6 @@ EXERCISES['1ere-3'] = [
     title: 'Dériver un polynôme',
     generate() {
       const a = exRand(2, 6), b = exRand(-9, 9), c = exRand(-12, 12);
-      // f(x) = ax² + bx + c → f'(x) = 2ax + b
       const x = exRand(1, 6);
       return {
         question: `Soit <code>f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '− ' + (-b)}x ${c >= 0 ? '+ ' + c : '− ' + (-c)}</code>. Calcule <code>f'(${x})</code>.`,
@@ -13510,6 +13747,244 @@ EXERCISES['1ere-3'] = [
       };
     },
   },
+  {
+    title: 'Dérivée de x³',
+    generate() {
+      const a = exRand(2, 6);
+      const x = exRand(2, 5);
+      return {
+        question: `Soit <code>f(x) = ${a}x³</code>. Calcule <code>f'(${x})</code>.`,
+        inputType: 'number',
+        answer: 3 * a * x * x,
+        steps: [
+          `<code>(x³)' = 3x²</code>, donc <code>f'(x) = ${3 * a}x²</code>.`,
+          `<code>f'(${x}) = ${3 * a} × ${x * x} = ${3 * a * x * x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Nombre dérivé : taux',
+    generate() {
+      const a = exRand(2, 5), b = exRand(-5, 5);
+      const x = exRand(1, 6);
+      const h = exRand(2, 5) / 10;
+      const fx = a * x * x + b;
+      const fxh = a * (x + h) * (x + h) + b;
+      const taux = (fxh - fx) / h;
+      return {
+        question: `<code>f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '− ' + (-b)}</code>. Calcule le taux <code>(f(${x + h}) − f(${x}))/${h}</code> (au dixième).`,
+        inputType: 'number',
+        answer: Math.round(taux * 10) / 10,
+        tolerance: 0.05,
+        steps: [
+          `<code>f(${x}) = ${fx}</code>, <code>f(${x + h}) = ${fxh.toFixed(2)}</code>.`,
+          `Taux : <code>${(fxh - fx).toFixed(3)}/${h} ≈ ${taux.toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Tangente : ordonnée à l\'origine',
+    generate() {
+      const a = exRand(2, 5);
+      const x0 = exRand(1, 5);
+      const fx = a * x0 * x0;
+      const fpx = 2 * a * x0;
+      const ord = fx - fpx * x0;
+      return {
+        question: `Tangente à <code>f(x) = ${a}x²</code> en <code>x₀ = ${x0}</code> : son équation est <code>y = ${fpx}x + b</code>. Donne b.`,
+        inputType: 'number',
+        answer: ord,
+        steps: [
+          `<code>y = f'(x₀)(x − x₀) + f(x₀) = ${fpx}(x − ${x0}) + ${fx}</code>.`,
+          `<code>= ${fpx}x − ${fpx * x0} + ${fx} = ${fpx}x ${ord >= 0 ? '+' : '−'} ${Math.abs(ord)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Dérivée d\'une somme',
+    generate() {
+      const a = exRand(2, 5), b = exRand(2, 6);
+      return {
+        question: `<code>f(x) = ${a}x² + ${b}x</code>. Que vaut <code>f'(0)</code> ?`,
+        inputType: 'number',
+        answer: b,
+        steps: [
+          `<code>f'(x) = ${2 * a}x + ${b}</code>.`,
+          `<code>f'(0) = ${b}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['1ere-4'] = [
+  {
+    title: 'Sens de variation',
+    generate() {
+      const a = exRand(1, 5);
+      return {
+        question: `<code>f(x) = ${a}x² − ${2 * a}x + 1</code>. Sur quel intervalle <code>f</code> est-elle <strong>croissante</strong> ?`,
+        inputType: 'mcq',
+        options: ['(−∞ ; 1)', '(1 ; +∞)', '(−∞ ; 0)', 'ℝ'],
+        answer: 1,
+        steps: [
+          `<code>f'(x) = ${2 * a}x − ${2 * a}</code>. Signe : positif quand <code>x > 1</code>.`,
+          `<code>f</code> est croissante sur <code>(1 ; +∞)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Extremum d\'un polynôme',
+    generate() {
+      const a = exRand(1, 4);
+      const b = exRand(2, 8);
+      const x0 = b / (2 * a);
+      const fx0 = a * x0 * x0 - b * x0 + 5;
+      return {
+        question: `<code>f(x) = ${a}x² − ${b}x + 5</code>. En quel <code>x</code> <code>f</code> atteint-elle son <strong>minimum</strong> ?`,
+        inputType: 'number',
+        answer: x0,
+        tolerance: 0.05,
+        steps: [
+          `<code>f'(x) = ${2 * a}x − ${b}</code>, qui s'annule en <code>x = ${b}/${2 * a} = ${x0}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Maximum local',
+    generate() {
+      return {
+        question: `Si <code>f'(x₀) = 0</code> et <code>f'</code> change de signe de + à − en <code>x₀</code>, alors <code>x₀</code> est :`,
+        inputType: 'mcq',
+        options: ['un minimum local', 'un maximum local', 'un point d\'inflexion', 'rien de tout ça'],
+        answer: 1,
+        steps: [
+          `f' passe de + à − ⇒ f croît puis décroît ⇒ <code>x₀</code> est un <strong>maximum local</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Tableau de variations',
+    generate() {
+      const a = exRand(1, 3);
+      return {
+        question: `<code>f(x) = −${a}x² + ${2 * a}x</code>. Que vaut le maximum de f ?`,
+        inputType: 'number',
+        answer: a,
+        steps: [
+          `<code>f'(x) = −${2 * a}x + ${2 * a}</code>, s'annule en <code>x = 1</code>.`,
+          `<code>f(1) = −${a} + ${2 * a} = ${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'f\' et signe de f',
+    generate() {
+      return {
+        question: `Si <code>f'(x) > 0</code> sur un intervalle <code>I</code>, alors :`,
+        inputType: 'mcq',
+        options: [
+          'f est positive sur I',
+          'f est croissante sur I',
+          'f est négative sur I',
+          'f est décroissante sur I',
+        ],
+        answer: 1,
+        steps: [
+          `<code>f' > 0</code> sur <code>I</code> ⇒ <code>f</code> est <strong>strictement croissante</strong> sur I.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['1ere-5'] = [
+  {
+    title: 'Calculer e^x',
+    generate() {
+      const c = exPick([
+        { x: 0, v: '1' }, { x: 1, v: 'e' },
+        { x: 2, v: 'e²' }, { x: -1, v: '1/e' },
+      ]);
+      return {
+        question: `Que vaut <code>e<sup>${c.x}</sup></code> ?`,
+        inputType: 'mcq',
+        options: ['0', '1', 'e', 'e²', '1/e'],
+        answer: ['0', '1', 'e', 'e²', '1/e'].indexOf(c.v),
+        steps: [
+          `<code>e<sup>0</sup> = 1</code>, <code>e<sup>1</sup> = e</code>, <code>e<sup>−1</sup> = 1/e</code>.`,
+          `Ici : <code>${c.v}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'e^x × e^y',
+    generate() {
+      const x = exRand(1, 5);
+      const y = exRand(1, 5);
+      return {
+        question: `Simplifie : <code>e<sup>${x}</sup> × e<sup>${y}</sup> = e<sup>k</sup></code>. Donne k.`,
+        inputType: 'number',
+        answer: x + y,
+        steps: [
+          `<code>e<sup>a</sup> × e<sup>b</sup> = e<sup>a+b</sup></code>.`,
+          `<code>k = ${x} + ${y} = ${x + y}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Dérivée de e^x',
+    generate() {
+      const a = exRand(2, 5);
+      return {
+        question: `<code>f(x) = ${a}e<sup>x</sup></code>. Que vaut <code>f'(0)</code> ?`,
+        inputType: 'number',
+        answer: a,
+        steps: [
+          `<code>(e<sup>x</sup>)' = e<sup>x</sup></code>, donc <code>f'(x) = ${a}e<sup>x</sup></code>.`,
+          `<code>f'(0) = ${a} × 1 = ${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite de e^x en +∞',
+    generate() {
+      return {
+        question: `Que vaut <code>lim<sub>x→+∞</sub> e<sup>x</sup></code> ?`,
+        inputType: 'mcq',
+        options: ['0', '+∞', '1', 'e'],
+        answer: 1,
+        steps: [
+          `<code>e<sup>x</sup></code> tend vers <code>+∞</code> quand <code>x → +∞</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite de e^x en -∞',
+    generate() {
+      return {
+        question: `Que vaut <code>lim<sub>x→−∞</sub> e<sup>x</sup></code> ?`,
+        inputType: 'number',
+        answer: 0,
+        tolerance: 0.001,
+        steps: [
+          `<code>e<sup>x</sup> = 1/e<sup>−x</sup></code> et <code>e<sup>−x</sup> → +∞</code>.`,
+          `Donc <code>e<sup>x</sup> → 0</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['1ere-6'] = [
@@ -13518,7 +13993,6 @@ EXERCISES['1ere-6'] = [
     generate() {
       const a = exPick([1, 2, 3]);
       const x1 = exRand(-5, 5), x2 = exRand(-5, 5);
-      // forme factorisée a(x − x1)(x − x2) = ax² − a(x1+x2)x + a*x1*x2
       const b = -a * (x1 + x2), c = a * x1 * x2;
       const D = b * b - 4 * a * c;
       return {
@@ -13527,6 +14001,76 @@ EXERCISES['1ere-6'] = [
         answer: D,
         steps: [
           `Δ = b² − 4ac = (${b})² − 4 × ${a} × (${c}) = ${b * b} − ${4 * a * c} = ${D}.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Nombre de racines',
+    generate() {
+      const D = exPick([-4, 0, 9, -1, 16, 25]);
+      const ans = D > 0 ? 2 : D === 0 ? 1 : 0;
+      return {
+        question: `Le discriminant d'un trinôme vaut <code>Δ = ${D}</code>. Combien de racines réelles ?`,
+        inputType: 'number',
+        answer: ans,
+        steps: [
+          D > 0 ? `Δ > 0 ⇒ 2 racines réelles distinctes.`
+          : D === 0 ? `Δ = 0 ⇒ 1 racine double.`
+          : `Δ &lt; 0 ⇒ aucune racine réelle.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Plus grande racine',
+    generate() {
+      const x1 = exRand(-3, 3);
+      const x2 = exRand(x1 + 1, x1 + 6);
+      return {
+        question: `Le trinôme <code>x² − ${x1 + x2}x + ${x1 * x2}</code> a pour racines ${x1} et ${x2}. Quelle est la plus grande ?`,
+        inputType: 'number',
+        answer: x2,
+        steps: [
+          `Forme factorisée : <code>(x − ${x1})(x − ${x2})</code>.`,
+          `Plus grande : <code>${x2}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Forme canonique : sommet',
+    generate() {
+      const a = exRand(1, 4);
+      const h = exRand(-3, 3);
+      const k = exRand(-5, 5);
+      return {
+        question: `<code>f(x) = ${a}(x − ${h})² + ${k}</code>. Quelle est l'<strong>abscisse du sommet</strong> ?`,
+        inputType: 'number',
+        answer: h,
+        steps: [
+          `Forme canonique <code>a(x − h)² + k</code> : sommet en <code>(h ; k)</code>.`,
+          `Abscisse : <code>${h}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Signe d\'un trinôme',
+    generate() {
+      return {
+        question: `Si <code>a > 0</code> et <code>Δ &lt; 0</code>, le trinôme <code>ax² + bx + c</code> est :`,
+        inputType: 'mcq',
+        options: [
+          'toujours positif',
+          'toujours négatif',
+          'positif puis négatif',
+          'change deux fois de signe',
+        ],
+        answer: 0,
+        steps: [
+          `Si Δ &lt; 0, le trinôme garde un signe constant.`,
+          `Si <code>a > 0</code>, ce signe est positif.`,
         ],
       };
     },
@@ -13559,6 +14103,73 @@ EXERCISES['1ere-7'] = [
       };
     },
   },
+  {
+    title: 'Identité fondamentale',
+    generate() {
+      const c = exPick([
+        { sin: '3/5', cos: '4/5' }, { sin: '5/13', cos: '12/13' },
+      ]);
+      return {
+        question: `Si <code>sin(x) = ${c.sin}</code> avec <code>x ∈ [0; π/2]</code>, que vaut <code>cos(x)</code> ?`,
+        inputType: 'fraction',
+        answer: eval(c.cos),
+        formatAnswer: () => c.cos,
+        steps: [
+          `<code>sin² + cos² = 1</code>, donc <code>cos² = 1 − sin²</code>.`,
+          `<code>cos(x) = ${c.cos}</code> (positif sur [0; π/2]).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Périodicité',
+    generate() {
+      return {
+        question: `La fonction <code>cos</code> a pour période :`,
+        inputType: 'mcq',
+        options: ['π', '2π', 'π/2', '4π'],
+        answer: 1,
+        steps: [
+          `<code>cos(x + 2π) = cos(x)</code> pour tout x.`,
+          `Période : <code>2π</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Parité de cos',
+    generate() {
+      return {
+        question: `La fonction <code>cos</code> est :`,
+        inputType: 'mcq',
+        options: ['paire', 'impaire', 'ni paire ni impaire'],
+        answer: 0,
+        steps: [
+          `<code>cos(−x) = cos(x)</code> pour tout x.`,
+          `Donc cos est <strong>paire</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Conversion radian → degré',
+    generate() {
+      const c = exPick([
+        { rad: 'π', deg: 180 }, { rad: 'π/2', deg: 90 },
+        { rad: 'π/3', deg: 60 }, { rad: 'π/4', deg: 45 },
+        { rad: 'π/6', deg: 30 }, { rad: '2π', deg: 360 },
+      ]);
+      return {
+        question: `Convertis <code>${c.rad}</code> rad en degrés.`,
+        inputType: 'number',
+        answer: c.deg,
+        steps: [
+          `<code>π</code> rad = <code>180°</code>.`,
+          `<code>${c.rad}</code> rad = <code>${c.deg}°</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['1ere-8'] = [
@@ -13573,6 +14184,258 @@ EXERCISES['1ere-8'] = [
         answer: x1 * x2 + y1 * y2,
         steps: [
           `<code>u→ · v→ = x×x' + y×y' = ${x1} × ${x2} + ${y1} × ${y2} = ${x1 * x2} + ${y1 * y2} = ${x1 * x2 + y1 * y2}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Vecteurs orthogonaux',
+    generate() {
+      const c = exPick([
+        { u: [1, 2], v: [-2, 1], orth: true },
+        { u: [3, 4], v: [-4, 3], orth: true },
+        { u: [1, 1], v: [2, 3], orth: false },
+        { u: [2, -1], v: [1, 2], orth: true },
+      ]);
+      return {
+        question: `<code>u→(${c.u[0]}; ${c.u[1]})</code> et <code>v→(${c.v[0]}; ${c.v[1]})</code> sont-ils orthogonaux ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.orth ? 0 : 1,
+        steps: [
+          `Test : <code>u→ · v→ = ${c.u[0] * c.v[0] + c.u[1] * c.v[1]}</code>.`,
+          c.orth ? `= 0 ⇒ orthogonaux.` : `≠ 0 ⇒ pas orthogonaux.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Norme par produit scalaire',
+    generate() {
+      const c = exPick([
+        { v: [3, 4], n: 5 }, { v: [5, 12], n: 13 },
+        { v: [6, 8], n: 10 }, { v: [-3, 4], n: 5 },
+      ]);
+      return {
+        question: `<code>u→(${c.v[0]}; ${c.v[1]})</code>. Calcule <code>||u→||</code> via <code>√(u→ · u→)</code>.`,
+        inputType: 'number',
+        answer: c.n,
+        steps: [
+          `<code>u→ · u→ = ${c.v[0]}² + ${c.v[1]}² = ${c.v[0] * c.v[0] + c.v[1] * c.v[1]}</code>.`,
+          `<code>||u→|| = √${c.v[0] * c.v[0] + c.v[1] * c.v[1]} = ${c.n}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Produit scalaire géométrique',
+    generate() {
+      const u = exRand(2, 8);
+      const v = exRand(2, 8);
+      return {
+        question: `<code>||u→|| = ${u}</code>, <code>||v→|| = ${v}</code>, et l'angle entre eux fait <code>0°</code>. Calcule <code>u→ · v→</code>.`,
+        inputType: 'number',
+        answer: u * v,
+        steps: [
+          `<code>u→ · v→ = ||u|| × ||v|| × cos(angle)</code>.`,
+          `<code>cos(0°) = 1</code>, donc <code>u→ · v→ = ${u} × ${v} × 1 = ${u * v}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Identité de polarisation',
+    generate() {
+      return {
+        question: `L'identité <code>u→ · v→ = (||u→ + v→||² − ||u→||² − ||v→||²) / 2</code> est :`,
+        inputType: 'mcq',
+        options: ['vraie', 'fausse', 'parfois vraie', 'sans signification'],
+        answer: 0,
+        steps: [
+          `Cette identité (forme polaire) est toujours vraie pour le produit scalaire.`,
+          `Elle découle du développement de <code>||u + v||²</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['1ere-9'] = [
+  {
+    title: 'Probabilité conditionnelle',
+    generate() {
+      const c = exPick([
+        { pAB: 0.3, pB: 0.6, ans: 0.5 },
+        { pAB: 0.2, pB: 0.5, ans: 0.4 },
+        { pAB: 0.15, pB: 0.3, ans: 0.5 },
+      ]);
+      return {
+        question: `<code>P(A ∩ B) = ${c.pAB}</code>, <code>P(B) = ${c.pB}</code>. Calcule <code>P(A | B)</code>.`,
+        inputType: 'number',
+        answer: c.ans,
+        tolerance: 0.001,
+        steps: [
+          `<code>P(A | B) = P(A ∩ B) / P(B) = ${c.pAB} / ${c.pB} = ${c.ans}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Indépendance d\'événements',
+    generate() {
+      return {
+        question: `A et B sont indépendants si :`,
+        inputType: 'mcq',
+        options: [
+          'P(A ∩ B) = 0',
+          'P(A ∩ B) = P(A) + P(B)',
+          'P(A ∩ B) = P(A) × P(B)',
+          'P(A | B) = 0',
+        ],
+        answer: 2,
+        steps: [
+          `Définition : A et B indépendants ⇔ <code>P(A ∩ B) = P(A) × P(B)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Formule des probabilités totales',
+    generate() {
+      return {
+        question: `<code>P(B|A) = 0,8</code>, <code>P(B|Ā) = 0,3</code>, <code>P(A) = 0,4</code>. Calcule <code>P(B)</code>.`,
+        inputType: 'number',
+        answer: 0.8 * 0.4 + 0.3 * 0.6,
+        tolerance: 0.001,
+        steps: [
+          `<code>P(B) = P(B|A) × P(A) + P(B|Ā) × P(Ā)</code>.`,
+          `<code>= 0,8 × 0,4 + 0,3 × 0,6 = 0,32 + 0,18 = 0,5</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'P(A ∩ B) avec indépendance',
+    generate() {
+      const c = exPick([
+        { a: 0.4, b: 0.5, ans: 0.2 },
+        { a: 0.3, b: 0.6, ans: 0.18 },
+        { a: 0.5, b: 0.5, ans: 0.25 },
+      ]);
+      return {
+        question: `A et B indépendants. <code>P(A) = ${c.a}</code>, <code>P(B) = ${c.b}</code>. Calcule <code>P(A ∩ B)</code>.`,
+        inputType: 'number',
+        answer: c.ans,
+        tolerance: 0.001,
+        steps: [
+          `Indépendance : <code>P(A ∩ B) = P(A) × P(B) = ${c.a} × ${c.b} = ${c.ans}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Arbre pondéré',
+    generate() {
+      return {
+        question: `Tirage avec remise. P(rouge) = 0,3 à chaque tirage. Probabilité de tirer 2 rouges en 2 tirages ?`,
+        inputType: 'number',
+        answer: 0.09,
+        tolerance: 0.001,
+        steps: [
+          `Indépendance des tirages : <code>P(RR) = 0,3 × 0,3 = 0,09</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['1ere-10'] = [
+  {
+    title: 'Espérance d\'une VA discrète',
+    generate() {
+      const c = exPick([
+        { vals: [0, 1, 2], probs: [0.5, 0.3, 0.2], E: 0.7 },
+        { vals: [1, 2, 3], probs: [0.2, 0.5, 0.3], E: 2.1 },
+        { vals: [-1, 0, 1], probs: [0.25, 0.5, 0.25], E: 0 },
+      ]);
+      const tableau = c.vals.map((v, i) => `${v}:${c.probs[i]}`).join(' ; ');
+      return {
+        question: `<code>X</code> prend les valeurs <code>${tableau}</code>. Calcule <code>E(X)</code>.`,
+        inputType: 'number',
+        answer: c.E,
+        tolerance: 0.01,
+        steps: [
+          `<code>E(X) = Σ x_i × p_i = ${c.vals.map((v, i) => `${v} × ${c.probs[i]}`).join(' + ')}</code>.`,
+          `<code>= ${c.E}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variance d\'une VA',
+    generate() {
+      const c = exPick([
+        { vals: [0, 1], probs: [0.5, 0.5], V: 0.25 },
+        { vals: [-1, 1], probs: [0.5, 0.5], V: 1 },
+      ]);
+      return {
+        question: `<code>X</code> prend ${c.vals.join(' ou ')} avec probabilité ${c.probs[0]}. Calcule <code>V(X)</code>.`,
+        inputType: 'number',
+        answer: c.V,
+        tolerance: 0.001,
+        steps: [
+          `<code>E(X) = ${c.vals.map((v, i) => v * c.probs[i]).reduce((a, b) => a + b, 0)}</code>.`,
+          `<code>V(X) = E(X²) − E(X)² = ${c.V}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Écart-type',
+    generate() {
+      const c = exPick([
+        { v: 9, sigma: 3 }, { v: 16, sigma: 4 },
+        { v: 25, sigma: 5 }, { v: 4, sigma: 2 },
+      ]);
+      return {
+        question: `<code>V(X) = ${c.v}</code>. Calcule l'<strong>écart-type</strong> <code>σ(X)</code>.`,
+        inputType: 'number',
+        answer: c.sigma,
+        steps: [
+          `<code>σ(X) = √V(X) = √${c.v} = ${c.sigma}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Linéarité de l\'espérance',
+    generate() {
+      const a = exRand(2, 5);
+      const b = exRand(1, 8);
+      const ex = exRand(2, 6);
+      return {
+        question: `<code>E(X) = ${ex}</code>. Calcule <code>E(${a}X + ${b})</code>.`,
+        inputType: 'number',
+        answer: a * ex + b,
+        steps: [
+          `<code>E(aX + b) = a × E(X) + b</code>.`,
+          `<code>= ${a} × ${ex} + ${b} = ${a * ex + b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variance et constante',
+    generate() {
+      const a = exRand(2, 5);
+      const v = exRand(2, 8);
+      return {
+        question: `<code>V(X) = ${v}</code>. Calcule <code>V(${a}X + 7)</code>.`,
+        inputType: 'number',
+        answer: a * a * v,
+        steps: [
+          `<code>V(aX + b) = a² × V(X)</code> (b ne change rien).`,
+          `<code>= ${a}² × ${v} = ${a * a * v}</code>.`,
         ],
       };
     },
@@ -13609,6 +14472,63 @@ EXERCISES['1ere-11'] = [
         tolerance: 0.01,
         steps: [
           `<code>V(X) = np(1−p) = ${n} × ${p} × ${1 - p} = ${v}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Loi binomiale : P(X = k)',
+    generate() {
+      const c = exPick([
+        { n: 4, p: 0.5, k: 2, ans: 0.375 },
+        { n: 5, p: 0.5, k: 3, ans: 10/32 },
+        { n: 3, p: 0.5, k: 1, ans: 0.375 },
+      ]);
+      return {
+        question: `<code>X ~ ℬ(${c.n} ; ${c.p})</code>. Calcule <code>P(X = ${c.k})</code> (au millième).`,
+        inputType: 'number',
+        answer: Math.round(c.ans * 1000) / 1000,
+        tolerance: 0.005,
+        steps: [
+          `<code>P(X=k) = C(n,k) × p<sup>k</sup> × (1−p)<sup>n−k</sup></code>.`,
+          `<code>= ${c.ans.toFixed(4)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Coefficient binomial',
+    generate() {
+      const c = exPick([
+        { n: 5, k: 2, v: 10 }, { n: 6, k: 3, v: 20 },
+        { n: 7, k: 2, v: 21 }, { n: 8, k: 4, v: 70 },
+      ]);
+      return {
+        question: `Calcule le coefficient binomial <code>C(${c.n}, ${c.k})</code>.`,
+        inputType: 'number',
+        answer: c.v,
+        steps: [
+          `<code>C(n, k) = n! / (k!(n−k)!)</code>.`,
+          `<code>C(${c.n}, ${c.k}) = ${c.v}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Écart-type loi binomiale',
+    generate() {
+      const c = exPick([
+        { n: 100, p: 0.5, s: 5 }, { n: 64, p: 0.5, s: 4 },
+        { n: 100, p: 0.36, s: 4.8 },
+      ]);
+      return {
+        question: `<code>X ~ ℬ(${c.n} ; ${c.p})</code>. Calcule <code>σ(X)</code> (au dixième).`,
+        inputType: 'number',
+        answer: c.s,
+        tolerance: 0.05,
+        steps: [
+          `<code>V(X) = np(1−p) = ${c.n * c.p * (1 - c.p)}</code>.`,
+          `<code>σ(X) = √V(X) ≈ ${c.s}</code>.`,
         ],
       };
     },
