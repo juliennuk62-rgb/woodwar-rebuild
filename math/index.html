@@ -4490,13 +4490,20 @@ function chapters6e() {
         ${lc.def("Divisible", `<p>Si le reste vaut 0, on dit que <code>a</code> est <strong>divisible</strong> par <code>b</code>, ou que <code>b</code> est un <strong>diviseur</strong> de <code>a</code>.</p>
           <p>Exemple : <code>20 = 4 × 5 + 0</code>, donc 20 est divisible par 4 (et aussi par 5).</p>`)}
 
-        <h2>5. Critères de divisibilité (les plus simples)</h2>
-        ${lc.prop("À retenir en 6e", `<ul>
+        <h2>5. Critères de divisibilité</h2>
+        ${lc.prop("Critères à mémoriser", `<ul>
           <li><strong>Par 2</strong> : le nombre se termine par 0, 2, 4, 6 ou 8 (les nombres pairs).</li>
           <li><strong>Par 5</strong> : le nombre se termine par 0 ou 5.</li>
           <li><strong>Par 10</strong> : le nombre se termine par 0.</li>
+          <li><strong>Par 3</strong> : la <em>somme des chiffres</em> est divisible par 3.</li>
+          <li><strong>Par 9</strong> : la <em>somme des chiffres</em> est divisible par 9.</li>
+          <li><strong>Par 4</strong> : les deux derniers chiffres forment un nombre divisible par 4.</li>
         </ul>`)}
-        ${lc.example("Tester 1 230", `<ul><li>Se termine par 0 → divisible par 2, par 5 et par 10.</li></ul>`)}
+        ${lc.example("Tester 1 230", `<ul><li>Se termine par 0 → divisible par 2, par 5 et par 10.</li>
+          <li>Somme des chiffres : <code>1 + 2 + 3 + 0 = 6</code>. <code>6</code> est divisible par 3 (mais pas par 9), donc 1 230 est divisible par 3 mais pas par 9.</li></ul>`)}
+        ${lc.example("Tester 5 184 par 9", `<p>Somme : <code>5 + 1 + 8 + 4 = 18</code>. <code>18 = 9 × 2</code>, donc 5 184 est divisible par 9.</p>
+          <p>Vérification : <code>5184 ÷ 9 = 576</code> ✓.</p>`)}
+        ${lc.tip("Astuce", `<p>Si un nombre est divisible par 9, il est forcément divisible par 3 (puisque 9 = 3 × 3). La réciproque est fausse : 6 est divisible par 3, pas par 9.</p>`)}
 
         <h2>6. Multiples et diviseurs</h2>
         ${lc.def("Multiple", `<p>Un nombre est un <strong>multiple</strong> d'un autre s'il s'obtient en le multipliant par un entier. Les multiples de 7 sont : 0, 7, 14, 21, 28, 35, 42…</p>`)}
@@ -4596,6 +4603,45 @@ function chapters6e() {
     },
 
     {
+      title: "Volumes : cube et pavé droit",
+      category: "Grandeurs et mesures",
+      content: `
+        <h2>1. Notion de volume</h2>
+        ${lc.def("Volume", `<p>Le <strong>volume</strong> d'un solide est la mesure de la <strong>place qu'il occupe dans l'espace</strong>. C'est l'analogue 3D de l'aire en 2D.</p>
+          <p>L'unité de base est le <strong>mètre cube</strong> (m³) : volume d'un cube de 1 m de côté.</p>`)}
+
+        <h2>2. Volume du cube</h2>
+        ${lc.prop("Formule", `<p>Pour un cube de côté <code>c</code> :</p>`)}
+        ${lc.formula("V = c × c × c = c³")}
+        ${lc.example("Cube de côté 4 cm", `<p><code>V = 4 × 4 × 4 = 64 cm³</code>.</p>`)}
+
+        <h2>3. Volume du pavé droit</h2>
+        ${lc.def("Pavé droit", `<p>Un <strong>pavé droit</strong> (ou parallélépipède rectangle) est un solide dont les 6 faces sont des rectangles. Il est défini par sa <strong>longueur</strong> L, sa <strong>largeur</strong> l et sa <strong>hauteur</strong> h.</p>`)}
+        ${lc.formula("V = L × l × h")}
+        ${lc.example("Boîte 8 × 5 × 3 cm", `<p><code>V = 8 × 5 × 3 = 120 cm³</code>.</p>`)}
+        ${lc.tip("Astuce", `<p>L'ordre de multiplication n'a pas d'importance : <code>L × l × h = h × l × L</code>. Le volume reste le même.</p>`)}
+
+        <h2>4. Unités de volume</h2>
+        ${lc.prop("Conversions", `<p>Pour passer d'une unité de volume à une autre, on multiplie ou divise par <strong>1000</strong> à chaque palier (et non par 10 comme pour les longueurs).</p>
+          <ul><li><code>1 m³ = 1 000 dm³ = 1 000 000 cm³</code></li>
+          <li><code>1 dm³ = 1 000 cm³ = 1 000 000 mm³</code></li></ul>`)}
+        ${lc.tip("Pourquoi 1000 ?", `<p>Parce que <code>1 m = 10 dm</code>, donc <code>1 m³ = 10 dm × 10 dm × 10 dm = 1 000 dm³</code>.</p>`)}
+
+        <h2>5. Lien volume / contenance</h2>
+        ${lc.formula("1 dm³ = 1 L &nbsp;&nbsp; 1 cm³ = 1 mL")}
+        <p>Cela permet de relier le volume d'un récipient à sa contenance en eau.</p>
+        ${lc.example("Combien de litres dans un aquarium 50 × 30 × 40 cm ?", `<ol>
+          <li>Volume : <code>50 × 30 × 40 = 60 000 cm³</code>.</li>
+          <li>Conversion : <code>60 000 cm³ = 60 dm³ = 60 L</code>.</li>
+        </ol>`)}
+
+        <h2>6. Patron du cube et du pavé</h2>
+        ${lc.def("Patron", `<p>Un <strong>patron</strong> d'un solide est une figure plane qu'on peut plier pour reconstituer le solide.</p>
+          <p>Un cube a un patron formé de <strong>6 carrés identiques</strong> ; un pavé droit a un patron de <strong>6 rectangles</strong> (3 paires de rectangles identiques face à face).</p>`)}
+      `,
+    },
+
+    {
       title: "Lecture de tableaux et de graphiques",
       category: "Organisation des données",
       content: `
@@ -4671,6 +4717,57 @@ function chapters6e() {
         ${lc.prop("Propriété 2", `<p>Si deux droites sont <strong>parallèles</strong>, et qu'une 3e droite est perpendiculaire à l'une, elle est aussi perpendiculaire à l'autre.</p>`)}
         ${lc.formula("(d₁) ∥ (d₂) &nbsp;et&nbsp; (d) ⊥ (d₁) &nbsp;⇒&nbsp; (d) ⊥ (d₂)")}
         ${lc.warn("Attention", `<p>Deux droites qui ne se touchent <strong>pas sur la feuille</strong> ne sont pas forcément parallèles : elles peuvent se rejoindre plus loin si on les prolonge. Pour être sûr qu'elles sont parallèles, il faut une justification (par exemple par les propriétés ci-dessus).</p>`)}
+      `,
+    },
+
+    {
+      title: "Angles : mesure et construction",
+      category: "Géométrie",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Angle", `<p>Un <strong>angle</strong> est l'écartement entre deux demi-droites ayant le même point d'origine (le <strong>sommet</strong>).</p>
+          <p>On note un angle avec trois lettres, en plaçant le sommet au milieu : par exemple <code>BAC</code> ou <code>∠BAC</code>, où A est le sommet.</p>`)}
+
+        <h2>2. Les types d'angles</h2>
+        ${lc.prop("Selon la mesure", `<ul>
+          <li><strong>Angle nul</strong> : 0°.</li>
+          <li><strong>Angle aigu</strong> : entre 0° et 90° (strictement).</li>
+          <li><strong>Angle droit</strong> : exactement 90°.</li>
+          <li><strong>Angle obtus</strong> : entre 90° et 180° (strictement).</li>
+          <li><strong>Angle plat</strong> : exactement 180°.</li>
+          <li><strong>Angle plein</strong> : 360°.</li>
+        </ul>`)}
+
+        <h2>3. Mesurer un angle au rapporteur</h2>
+        ${lc.prop("Méthode", `<ol>
+          <li>Placer le centre du rapporteur sur le sommet de l'angle.</li>
+          <li>Aligner la graduation 0 avec une des deux demi-droites.</li>
+          <li>Lire la graduation où passe l'autre demi-droite.</li>
+        </ol>`)}
+        ${lc.warn("Les deux graduations", `<p>Le rapporteur porte deux graduations (montante et descendante). Il faut suivre celle qui démarre à 0 sur la demi-droite alignée. Vérifie ensuite par cohérence : un angle aigu doit donner moins de 90°, un angle obtus plus de 90°.</p>`)}
+
+        <h2>4. Construire un angle</h2>
+        ${lc.prop("Méthode", `<ol>
+          <li>Tracer une demi-droite [Ax) et noter A le sommet.</li>
+          <li>Placer le centre du rapporteur en A, en alignant 0 sur [Ax).</li>
+          <li>Marquer un point B au-dessus de la graduation correspondant à la mesure voulue.</li>
+          <li>Tracer la demi-droite [AB).</li>
+        </ol>`)}
+
+        <h2>5. Angles complémentaires et supplémentaires</h2>
+        ${lc.def("Angles complémentaires", `<p>Deux angles sont <strong>complémentaires</strong> si leur somme vaut <code>90°</code>.</p>
+          <p>Exemple : 30° et 60° sont complémentaires.</p>`)}
+        ${lc.def("Angles supplémentaires", `<p>Deux angles sont <strong>supplémentaires</strong> si leur somme vaut <code>180°</code>.</p>
+          <p>Exemple : 110° et 70° sont supplémentaires.</p>`)}
+        ${lc.tip("Astuce mnémotechnique", `<p>« Complémentaires comme dans Compas (90°) ; Supplémentaires comme dans Stop (180°). »</p>`)}
+
+        <h2>6. Bissectrice d'un angle</h2>
+        ${lc.def("Bissectrice", `<p>La <strong>bissectrice</strong> d'un angle est la demi-droite issue du sommet qui partage l'angle en <strong>deux angles égaux</strong>.</p>`)}
+        ${lc.prop("Construction au compas", `<ol>
+          <li>Tracer un arc de cercle centré au sommet, qui coupe les deux demi-droites en deux points.</li>
+          <li>De chacun de ces points, tracer un arc de même rayon. Ils se croisent en un point.</li>
+          <li>Tracer la demi-droite issue du sommet et passant par ce point d'intersection : c'est la bissectrice.</li>
+        </ol>`)}
       `,
     },
 
@@ -4823,6 +4920,50 @@ function chapters6e() {
           <li><strong>Cercle</strong> : une infinité d'axes (toute droite passant par le centre).</li>
         </ul>`)}
         ${lc.warn("À ne pas confondre", `<p>Le <strong>rectangle</strong> n'a <strong>pas</strong> ses diagonales comme axes de symétrie (sinon, le pli ne ferait pas coïncider les deux moitiés). Seules ses médianes le sont.</p>`)}
+      `,
+    },
+
+    {
+      title: "Symétrie centrale",
+      category: "Géométrie",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Symétrique d'un point par rapport à un point", `<p>Le <strong>symétrique</strong> d'un point A par rapport à un point O est le point A' tel que O est le <strong>milieu</strong> du segment [AA'].</p>
+          <p>O est appelé le <strong>centre de symétrie</strong>.</p>`)}
+        ${lc.tip("Image visuelle", `<p>Imagine que tu fais tourner la figure de <strong>180°</strong> (un demi-tour) autour du point O : tu obtiens son symétrique. Pas un effet miroir, mais une rotation.</p>`)}
+
+        <h2>2. Construire un symétrique</h2>
+        ${lc.prop("Méthode (règle graduée)", `<ol>
+          <li>Tracer la droite (AO).</li>
+          <li>Mesurer la distance OA.</li>
+          <li>Reporter la même distance de l'autre côté de O sur la droite.</li>
+          <li>Le point obtenu est A'.</li>
+        </ol>`)}
+
+        <h2>3. Conservation</h2>
+        ${lc.prop("Ce que conserve la symétrie centrale", `<ul>
+          <li>Les <strong>longueurs</strong> (un segment et son image ont même longueur).</li>
+          <li>Les <strong>angles</strong>.</li>
+          <li>Les <strong>aires</strong> et les <strong>périmètres</strong>.</li>
+          <li>Le <strong>parallélisme</strong>.</li>
+        </ul>
+          <p>Mais elle <strong>renverse</strong> le sens d'orientation (un sens horaire devient anti-horaire).</p>`)}
+
+        <h2>4. Centre de symétrie d'une figure</h2>
+        ${lc.def("Centre de symétrie", `<p>Une figure admet un <strong>centre de symétrie</strong> O si elle est confondue avec elle-même par la symétrie de centre O.</p>`)}
+        ${lc.prop("Centres usuels", `<ul>
+          <li><strong>Cercle</strong> : son centre.</li>
+          <li><strong>Rectangle, losange, carré</strong> : intersection des diagonales.</li>
+          <li><strong>Parallélogramme</strong> : intersection des diagonales.</li>
+          <li><strong>Triangle équilatéral</strong> : <em>aucun</em> centre de symétrie.</li>
+        </ul>`)}
+
+        <h2>5. Différence avec la symétrie axiale</h2>
+        ${lc.warn("Ne pas confondre", `<ul>
+          <li><strong>Symétrie axiale</strong> : par rapport à une <em>droite</em>. Effet miroir.</li>
+          <li><strong>Symétrie centrale</strong> : par rapport à un <em>point</em>. Demi-tour.</li>
+        </ul>
+          <p>Une lettre comme <strong>A</strong> a un axe de symétrie (vertical) mais pas de centre de symétrie. Une lettre comme <strong>S</strong> n'a pas d'axe mais a un centre de symétrie.</p>`)}
       `,
     },
 
