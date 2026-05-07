@@ -7213,6 +7213,442 @@ EXERCISES['6e-13'] = [
   },
 ];
 
+// ─── Templates d'exercices : 5e ─────────────────────────────────
+EXERCISES['5e-0'] = [
+  {
+    title: 'Comparer deux décimaux',
+    generate() {
+      const e = exRand(2, 9);
+      const aD = exRand(10, 99);
+      const bD = exRand(1, 9) * 10 + exRand(0, 9);
+      // pour ne pas avoir égalité
+      let a = e + aD/100, b = e + bD/100;
+      if (Math.abs(a - b) < 0.01) b += 0.05;
+      return {
+        question: `Quel nombre est le plus grand : <code>${a.toFixed(2)}</code> ou <code>${b.toFixed(2)}</code> ?`,
+        inputType: 'mcq',
+        options: [a.toFixed(2), b.toFixed(2)],
+        answer: a > b ? 0 : 1,
+        steps: [
+          `Parties entières égales (<code>${e}</code>), on compare la partie décimale chiffre à chiffre.`,
+          `Le plus grand est <code>${Math.max(a, b).toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-1'] = [
+  {
+    title: 'Critère de divisibilité par 3',
+    generate() {
+      const n = exRand(100, 9999);
+      const sum = String(n).split('').reduce((a, b) => a + +b, 0);
+      const ok = n % 3 === 0;
+      return {
+        question: `Le nombre <code>${n}</code> est-il divisible par <code>3</code> ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: ok ? 0 : 1,
+        steps: [
+          `Critère par 3 : la somme des chiffres doit être divisible par 3.`,
+          `Somme : <code>${String(n).split('').join(' + ')} = ${sum}</code>.`,
+          `${sum % 3 === 0 ? `${sum} est divisible par 3` : `${sum} n'est pas divisible par 3`}, donc <code>${n}</code> ${ok ? 'l\'est aussi' : 'ne l\'est pas non plus'}.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Division euclidienne',
+    generate() {
+      const b = exRand(4, 13);
+      const q = exRand(8, 60);
+      const r = exRand(0, b - 1);
+      const a = b * q + r;
+      return {
+        question: `Quel est le <strong>reste</strong> de la division euclidienne de <code>${a}</code> par <code>${b}</code> ?`,
+        inputType: 'number',
+        answer: r,
+        steps: [
+          `<code>${a} = ${b} × ${q} + ${r}</code> avec <code>0 ≤ ${r} &lt; ${b}</code>.`,
+          `Le reste est <code>${r}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-2'] = [
+  {
+    title: 'Fraction et division',
+    generate() {
+      const a = exRand(1, 9);
+      const b = exRand(2, 10);
+      // pour avoir une réponse simple (décimal exact)
+      const choices = [[1,2,0.5], [3,4,0.75], [1,4,0.25], [1,5,0.2], [1,10,0.1], [3,5,0.6], [7,2,3.5], [9,4,2.25]];
+      const [aa, bb, val] = exPick(choices);
+      return {
+        question: `Quelle est l'écriture décimale de la fraction <code>${aa}/${bb}</code> ?`,
+        inputType: 'number',
+        answer: val,
+        tolerance: 0.001,
+        steps: [
+          `Une fraction <code>a/b</code> est égale à <code>a ÷ b</code>.`,
+          `<code>${aa} ÷ ${bb} = ${val}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Comparer une fraction à 1',
+    generate() {
+      const choices = [[3,4],[5,4],[7,7],[2,3],[8,5],[3,7]];
+      const [a, b] = exPick(choices);
+      const cmp = a < b ? '< 1' : a > b ? '> 1' : '= 1';
+      const opts = ['< 1', '> 1', '= 1'];
+      return {
+        question: `Comment se compare <code>${a}/${b}</code> à <code>1</code> ?`,
+        inputType: 'mcq',
+        options: opts,
+        answer: opts.indexOf(cmp),
+        steps: [
+          `Si numérateur < dénominateur : fraction < 1. Si =, fraction = 1. Si >, fraction > 1.`,
+          `Ici <code>${a} ${a < b ? '<' : a > b ? '>' : '='} ${b}</code>, donc <code>${a}/${b} ${cmp}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-3'] = [
+  {
+    title: 'Addition de fractions (même dénominateur)',
+    generate() {
+      const d = exRand(3, 9);
+      const a = exRand(1, d - 1);
+      const b = exRand(1, d - a);
+      return {
+        question: `Calcule : <code>${a}/${d} + ${b}/${d}</code>. Donne la réponse sous forme <code>num/den</code>.`,
+        inputType: 'fraction',
+        answer: (a + b) / d,
+        formatAnswer: () => `${a + b}/${d}`,
+        steps: [
+          `Même dénominateur : on additionne les numérateurs.`,
+          `<code>${a}/${d} + ${b}/${d} = ${a + b}/${d}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Addition de fractions (dénominateurs différents)',
+    generate() {
+      const d1 = exPick([2, 3, 4]);
+      const d2 = exPick([3, 5, 6]);
+      const a = exRand(1, d1 - 1);
+      const b = exRand(1, d2 - 1);
+      const D = d1 * d2;
+      const A = a * d2, B = b * d1;
+      return {
+        question: `Calcule : <code>${a}/${d1} + ${b}/${d2}</code>. Donne la réponse sous forme <code>num/den</code> (au dénominateur ${D}).`,
+        inputType: 'fraction',
+        answer: (A + B) / D,
+        formatAnswer: () => `${A + B}/${D}`,
+        steps: [
+          `Dénominateur commun : <code>${d1} × ${d2} = ${D}</code>.`,
+          `<code>${a}/${d1} = ${A}/${D}</code> et <code>${b}/${d2} = ${B}/${D}</code>.`,
+          `Somme : <code>${A}/${D} + ${B}/${D} = ${A + B}/${D}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-4'] = [
+  {
+    title: 'Multiplication de fractions',
+    generate() {
+      const a = exRand(1, 5), b = exRand(2, 7);
+      const c = exRand(1, 5), d = exRand(2, 7);
+      return {
+        question: `Calcule : <code>${a}/${b} × ${c}/${d}</code>. Donne la réponse sous forme <code>num/den</code>.`,
+        inputType: 'fraction',
+        answer: (a * c) / (b * d),
+        formatAnswer: () => `${a * c}/${b * d}`,
+        steps: [
+          `Numérateurs entre eux, dénominateurs entre eux :`,
+          `<code>${a}/${b} × ${c}/${d} = ${a * c}/${b * d}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fraction d\'une quantité',
+    generate() {
+      const den = exPick([2, 3, 4, 5]);
+      const num = exRand(1, den - 1);
+      const total = den * exRand(3, 12);
+      return {
+        question: `Combien font les <code>${num}/${den}</code> de <code>${total}</code> ?`,
+        inputType: 'number',
+        answer: (num * total) / den,
+        steps: [
+          `<code>${num}/${den} × ${total} = (${num} × ${total}) / ${den}</code>.`,
+          `<code>= ${num * total} / ${den} = ${(num * total) / den}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-5'] = [
+  {
+    title: 'Comparer deux nombres relatifs',
+    generate() {
+      const a = exRand(-15, 15);
+      let b;
+      do { b = exRand(-15, 15); } while (b === a);
+      return {
+        question: `Quel nombre est le plus grand : <code>${a}</code> ou <code>${b}</code> ?`,
+        inputType: 'mcq',
+        options: [String(a), String(b)],
+        answer: a > b ? 0 : 1,
+        steps: [
+          `Sur la droite graduée, le plus grand est le plus à droite.`,
+          `Pour deux négatifs : le plus grand est celui avec la plus petite distance à zéro.`,
+          `Le plus grand est <code>${Math.max(a, b)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-6'] = [
+  {
+    title: 'Addition de relatifs',
+    generate() {
+      const a = exRand(-12, 12), b = exRand(-12, 12);
+      return {
+        question: `Calcule : <code>(${a}) + (${b})</code>`,
+        inputType: 'number',
+        answer: a + b,
+        steps: [
+          a * b > 0
+            ? `Même signe : on additionne les distances et on garde le signe.`
+            : `Signes différents : on soustrait les distances et on prend le signe du plus grand.`,
+          `<code>(${a}) + (${b}) = ${a + b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Soustraction de relatifs',
+    generate() {
+      const a = exRand(-12, 12), b = exRand(-12, 12);
+      return {
+        question: `Calcule : <code>(${a}) − (${b})</code>`,
+        inputType: 'number',
+        answer: a - b,
+        steps: [
+          `Soustraire un nombre = additionner son opposé.`,
+          `<code>(${a}) − (${b}) = (${a}) + (${-b}) = ${a - b}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-7'] = [
+  {
+    title: 'Priorités opératoires',
+    generate() {
+      const types = [
+        () => { const a = exRand(2,9), b = exRand(2,9), c = exRand(2,9); return { q: `${a} + ${b} × ${c}`, ans: a + b*c, hint: `Multiplication d'abord : ${b} × ${c} = ${b*c}.` }; },
+        () => { const a = exRand(2,9), b = exRand(2,9), c = exRand(2,9); return { q: `(${a} + ${b}) × ${c}`, ans: (a+b)*c, hint: `Parenthèses d'abord : ${a} + ${b} = ${a+b}.` }; },
+        () => { const a = exRand(20,40), b = exRand(2,9), c = exRand(2,9); return { q: `${a} − ${b} × ${c}`, ans: a - b*c, hint: `Multiplication d'abord : ${b} × ${c} = ${b*c}.` }; },
+      ];
+      const t = exPick(types)();
+      return {
+        question: `Calcule : <code>${t.q}</code>`,
+        inputType: 'number',
+        answer: t.ans,
+        steps: [t.hint, `Résultat : <code>${t.ans}</code>.`],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-8'] = [
+  {
+    title: 'Tableau proportionnel ?',
+    generate() {
+      const isProp = exRand(0, 1) === 1;
+      const k = exRand(2, 6);
+      const a = exRand(2, 9), b = exRand(2, 9), c = exRand(2, 9);
+      const ya = a * k, yb = b * k, yc = isProp ? c * k : c * k + exRand(1, 5);
+      return {
+        question: `Le tableau suivant est-il proportionnel ?<br><code>${a} → ${ya} ; ${b} → ${yb} ; ${c} → ${yc}</code>`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: isProp ? 0 : 1,
+        steps: [
+          `Calculer les rapports : <code>${ya}/${a} = ${ya/a}</code>, <code>${yb}/${b} = ${yb/b}</code>, <code>${yc}/${c} = ${(yc/c).toFixed(2)}</code>.`,
+          isProp ? `Tous les rapports sont égaux à ${k}, c'est donc proportionnel.` : `Les rapports sont différents, ce n'est pas proportionnel.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-9'] = [
+  {
+    title: 'Calculer p% de n',
+    generate() {
+      const p = exPick([10, 20, 25, 50, 75, 5, 15]);
+      const n = exPick([20, 40, 60, 80, 100, 200]);
+      return {
+        question: `Calcule : <code>${p}% de ${n}</code>`,
+        inputType: 'number',
+        answer: (p * n) / 100,
+        tolerance: 0.001,
+        steps: [
+          `<code>${p}% = ${p}/100</code>.`,
+          `<code>${p}% de ${n} = (${p} × ${n}) / 100 = ${(p * n) / 100}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Augmentation en pourcentage',
+    generate() {
+      const p = exPick([10, 20, 25, 50, 5, 15]);
+      const n = exPick([40, 60, 80, 100, 200]);
+      return {
+        question: `Un produit coûte <code>${n} €</code>. Son prix augmente de <code>${p}%</code>. Quel est le nouveau prix (en €) ?`,
+        inputType: 'number',
+        answer: n + (p * n) / 100,
+        tolerance: 0.01,
+        steps: [
+          `Augmentation : <code>${p}% de ${n}€ = ${(p * n) / 100}€</code>.`,
+          `Nouveau prix : <code>${n} + ${(p * n) / 100} = ${n + (p * n) / 100} €</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-10'] = [
+  {
+    title: 'Valeur d\'une expression littérale',
+    generate() {
+      const a = exRand(1, 9);
+      const b = exRand(1, 15);
+      const x = exRand(2, 8);
+      return {
+        question: `Calcule la valeur de <code>${a}x + ${b}</code> pour <code>x = ${x}</code>.`,
+        inputType: 'number',
+        answer: a * x + b,
+        steps: [
+          `Remplacer x par ${x} : <code>${a} × ${x} + ${b}</code>.`,
+          `<code>= ${a * x} + ${b} = ${a * x + b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Tester une égalité',
+    generate() {
+      const a = exRand(2, 6);
+      const b = exRand(1, 10);
+      const x = exRand(2, 8);
+      const ans = a * x + b;
+      const test = exRand(0, 1) === 1 ? ans : ans + exRand(1, 5);
+      return {
+        question: `L'égalité <code>${a}x + ${b} = ${test}</code> est-elle vraie pour <code>x = ${x}</code> ?`,
+        inputType: 'mcq',
+        options: ['Vraie', 'Fausse'],
+        answer: test === ans ? 0 : 1,
+        steps: [
+          `Membre de gauche : <code>${a} × ${x} + ${b} = ${ans}</code>.`,
+          `Membre de droite : <code>${test}</code>.`,
+          test === ans ? `${ans} = ${test}, donc l'égalité est vraie.` : `${ans} ≠ ${test}, donc l'égalité est fausse.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-14'] = [
+  {
+    title: 'Calculer une moyenne',
+    generate() {
+      const n = exRand(4, 6);
+      const vals = Array.from({length: n}, () => exRand(8, 18));
+      const sum = vals.reduce((a, b) => a + b, 0);
+      const mean = sum / n;
+      return {
+        question: `Calcule la moyenne de la série : <code>${vals.join(', ')}</code>. Arrondi au dixième si nécessaire.`,
+        inputType: 'number',
+        answer: Math.round(mean * 10) / 10,
+        tolerance: 0.05,
+        steps: [
+          `Somme : <code>${vals.join(' + ')} = ${sum}</code>.`,
+          `Moyenne : <code>${sum} / ${n} = ${mean.toFixed(3)}</code>.`,
+          `Arrondi au dixième : <code>${(Math.round(mean * 10) / 10).toFixed(1)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-15'] = [
+  {
+    title: 'Probabilité avec un dé',
+    generate() {
+      const ev = exPick([
+        { txt: 'obtenir un 6', count: 1 },
+        { txt: 'obtenir un nombre pair', count: 3 },
+        { txt: 'obtenir un nombre supérieur à 4', count: 2 },
+        { txt: 'obtenir un multiple de 3', count: 2 },
+      ]);
+      // simplify
+      const g = (a, b) => b ? g(b, a%b) : a;
+      const k = g(ev.count, 6);
+      const num = ev.count / k, den = 6 / k;
+      return {
+        question: `On lance un dé équilibré. Quelle est la probabilité de <em>${ev.txt}</em> ?`,
+        inputType: 'fraction',
+        answer: ev.count / 6,
+        formatAnswer: () => `${num}/${den}`,
+        steps: [
+          `Issues favorables : <code>${ev.count}</code>. Issues totales : <code>6</code>.`,
+          `<code>P = ${ev.count}/6 = ${num}/${den}</code> (après simplification).`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['5e-16'] = [
+  {
+    title: 'Volume d\'un cylindre',
+    generate() {
+      const r = exRand(2, 8);
+      const h = exRand(3, 15);
+      const V = Math.PI * r * r * h;
+      return {
+        question: `Volume d'un cylindre de rayon <code>${r} cm</code> et hauteur <code>${h} cm</code> ? (arrondi au dixième de cm³)`,
+        inputType: 'number',
+        answer: Math.round(V * 10) / 10,
+        tolerance: 0.5,
+        steps: [
+          `Formule : <code>V = π × r² × h</code>.`,
+          `<code>V = π × ${r}² × ${h} = ${r * r * h}π ≈ ${V.toFixed(2)} cm³</code>.`,
+        ],
+      };
+    },
+  },
+];
+
 const exState = { current: null, selectedMcq: null, sessionStats: { tried: 0, correct: 0 } };
 const exRand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const exPick = arr => arr[Math.floor(Math.random() * arr.length)];
