@@ -9343,13 +9343,6 @@ function dsFormatUserAnswer(q) {
   return String(q.userAnswer);
 }
 
-function dsFormatCorrection(q) {
-  if (q.inputType === 'mcq') return q.options[q.answer];
-  if (q.template && typeof q.template.formatAnswer === 'function') return q.template.formatAnswer(q);
-  if (typeof q.answer === 'number') return String(+q.answer.toPrecision(12));
-  return String(q.answer);
-}
-
 function renderDsModal() {
   const modal = $('#ex-modal');
   if (!modal) return;
@@ -9471,7 +9464,7 @@ function renderDsModal() {
     if (q.correct) {
       meta.innerHTML = `Ta réponse : <code>${escAttr(yours)}</code> ✓`;
     } else {
-      meta.innerHTML = `Ta réponse : <code>${escAttr(yours)}</code> · Correction : <code>${escAttr(dsFormatCorrection(q))}</code>`;
+      meta.innerHTML = `Ta réponse : <code>${escAttr(yours)}</code> · Correction : <code>${escAttr(exFormatAnswer(q))}</code>`;
     }
     item.appendChild(meta);
     recap.appendChild(item);
