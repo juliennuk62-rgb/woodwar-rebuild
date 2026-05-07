@@ -2700,6 +2700,27 @@ function chapters2nde() {
           <p>Réduire de <code>p%</code> = multiplier par <code>1 − p/100</code>.</p>
           <p>Le <strong>coefficient multiplicateur global</strong> de plusieurs évolutions successives est le <em>produit</em> des coefficients (et non leur somme).</p>`)}
         ${lc.example("Évolutions successives", `<p>Une valeur subit +20 % puis −10 %. Coefficient global : <code>1,2 × 0,9 = 1,08</code>. C'est donc une augmentation globale de <code>8 %</code>.</p>`)}
+
+        <h2>7. Équation-produit nul</h2>
+        ${lc.prop("Règle clé", `<p>Un produit de facteurs est nul si et seulement si l'un au moins de ses facteurs est nul.</p>`)}
+        ${lc.formula("A × B = 0 &nbsp;⇔&nbsp; A = 0 &nbsp;ou&nbsp; B = 0")}
+        ${lc.example("Résoudre (x − 3)(2x + 5) = 0", `<ol>
+          <li>Le produit est nul si <code>x − 3 = 0</code> ou <code>2x + 5 = 0</code>.</li>
+          <li>Première : <code>x = 3</code>. Deuxième : <code>x = −5/2</code>.</li>
+          <li>Solutions : <code>S = {−5/2, 3}</code>.</li>
+        </ol>`)}
+        ${lc.example("Résoudre x² − 25 = 0", `<ol>
+          <li>Factoriser (identité remarquable) : <code>(x − 5)(x + 5) = 0</code>.</li>
+          <li>Solutions : <code>x = 5</code> ou <code>x = −5</code>.</li>
+        </ol>`)}
+        ${lc.warn("Comparaison à zéro indispensable", `<p>La règle <em>A × B = 0</em> nécessite d'avoir <strong>0</strong> à droite. <code>(x − 1)(x + 2) = 6</code> ne se résout pas en disant « <code>x − 1 = 6</code> ou <code>x + 2 = 6</code> ». Il faut d'abord ramener à 0.</p>`)}
+
+        <h2>8. Tableau de signes d'un facteur ax + b</h2>
+        ${lc.prop("Signe de ax + b", `<ul>
+          <li>Si <code>a > 0</code> : <code>ax + b</code> est négatif sur <code>]−∞ ; −b/a[</code>, nul en <code>−b/a</code>, positif sur <code>]−b/a ; +∞[</code>.</li>
+          <li>Si <code>a < 0</code> : c'est l'inverse (positif puis nul puis négatif).</li>
+        </ul>`)}
+        ${lc.example("Étudier le signe de 2x − 6", `<p>Racine : <code>2x − 6 = 0 → x = 3</code>. <code>a = 2 > 0</code>. Donc négatif sur <code>]−∞ ; 3[</code>, positif sur <code>]3 ; +∞[</code>.</p>`)}
       `,
     },
 
@@ -2863,6 +2884,19 @@ function chapters2nde() {
           <ol><li>Résoudre <code>2x + 1 = −x + 7</code> → <code>3x = 6</code> → <code>x = 2</code>.</li>
           <li>Donc <code>y = 2 × 2 + 1 = 5</code>.</li>
           <li>Point d'intersection : <strong>(2, 5)</strong>.</li></ol>`)}
+
+        <h2>7. Équation cartésienne d'une droite</h2>
+        ${lc.def("Forme cartésienne", `<p>Toute droite du plan admet une équation de la forme :</p>`)}
+        ${lc.formula("ax + by + c = 0 &nbsp;&nbsp; (avec (a, b) ≠ (0, 0))")}
+        <p>Cette forme englobe <em>toutes</em> les droites, y compris les <strong>droites verticales</strong> (cas <code>b = 0</code>, donnant <code>x = −c/a</code>) qu'on ne peut pas écrire <code>y = mx + p</code>.</p>
+        ${lc.example("De y = 2x + 3 à la forme cartésienne", `<p><code>y = 2x + 3</code> ⇔ <code>2x − y + 3 = 0</code>. Donc <code>a = 2, b = −1, c = 3</code>.</p>`)}
+
+        <h2>8. Vecteur directeur d'une droite</h2>
+        ${lc.def("Vecteur directeur", `<p>Un <strong>vecteur directeur</strong> d'une droite est un vecteur non nul dont la direction est celle de la droite.</p>`)}
+        ${lc.prop("À partir de l'équation cartésienne", `<p>Si l'équation est <code>ax + by + c = 0</code>, alors <code>u→(−b ; a)</code> est un vecteur directeur.</p>`)}
+        ${lc.example("Vecteur directeur", `<p>Pour <code>2x − y + 3 = 0</code> (avec <code>a = 2, b = −1</code>) : un vecteur directeur est <code>u→(1 ; 2)</code>.</p>
+          <p>Vérification graphique : la pente vaut <code>2/1 = 2</code>, ce qui correspond bien à la forme <code>y = 2x + 3</code> ✓.</p>`)}
+        ${lc.tip("Lien avec colinéarité", `<p>Deux droites sont parallèles si et seulement si leurs vecteurs directeurs sont colinéaires.</p>`)}
       `,
     },
 
@@ -3029,6 +3063,14 @@ function chapters2nde() {
           <li><code>CD→ = (8−2 ; 7−1) = (6 ; 6)</code>.</li>
           <li>Déterminant : <code>3 × 6 − 6 × 3 = 18 − 18 = 0</code> → colinéaires.</li>
           <li>Donc <code>(AB) ∥ (CD)</code>.</li></ol>`)}
+
+        <h2>8. Équation d'un cercle</h2>
+        ${lc.prop("Cercle de centre Ω et de rayon r", `<p>Un point <code>M(x, y)</code> appartient au cercle de centre <code>Ω(a, b)</code> et de rayon <code>r</code> si et seulement si <code>ΩM = r</code>, soit <code>ΩM² = r²</code>. En utilisant la formule de distance :</p>`)}
+        ${lc.formula("(x − a)² + (y − b)² = r²")}
+        ${lc.example("Cercle de centre (3, −1) et de rayon 5", `<p>Équation : <code>(x − 3)² + (y + 1)² = 25</code>.</p>`)}
+        ${lc.example("Tester si un point est sur le cercle", `<p>Le point <code>M(6, 3)</code> est-il sur ce cercle ?</p>
+          <p><code>(6 − 3)² + (3 + 1)² = 9 + 16 = 25</code> ✓ → oui, M est sur le cercle.</p>`)}
+        ${lc.tip("Cas particulier : cercle centré en O", `<p>Si le centre est l'origine, l'équation devient simplement <code>x² + y² = r²</code>.</p>`)}
       `,
     },
 
