@@ -836,14 +836,14 @@ function chapters2nde() {
 
         <h2>5. Tableau de signes (introduction)</h2>
         ${lc.prop("Pour étudier le signe d'un produit ou d'un quotient", `<p>On dresse un tableau dont les colonnes sont les valeurs où chaque facteur s'annule. Pour chaque ligne (facteur), on note le signe.</p>`)}
-        ${lc.example("Signe de (x − 1)(x + 2)", `<p>Les facteurs s'annulent en <code>1</code> et <code>−2</code>.</p>
+        ${lc.example("Signe de (x − 1)(x + 2)", `<p>Les facteurs s'annulent en <code>1</code> et <code>−2</code>. On découpe ℝ en trois intervalles et on étudie le signe de chaque facteur sur chacun :</p>
           <table>
-            <tr><th>x</th><th>−∞</th><th>−2</th><th>1</th><th>+∞</th></tr>
-            <tr><td>x − 1</td><td colspan="2">−</td><td colspan="2">+</td></tr>
-            <tr><td>x + 2</td><td>−</td><td colspan="3">+</td></tr>
-            <tr><td>(x−1)(x+2)</td><td>+</td><td>−</td><td>+</td><td></td></tr>
+            <tr><th>Intervalle</th><th>]−∞ ; −2[</th><th>]−2 ; 1[</th><th>]1 ; +∞[</th></tr>
+            <tr><td>x − 1</td><td>−</td><td>−</td><td>+</td></tr>
+            <tr><td>x + 2</td><td>−</td><td>+</td><td>+</td></tr>
+            <tr><td>(x − 1)(x + 2)</td><td>+</td><td>−</td><td>+</td></tr>
           </table>
-          <p>Donc <code>(x − 1)(x + 2) ≥ 0</code> sur <code>]−∞ ; −2] ∪ [1 ; +∞[</code>.</p>`)}
+          <p>Donc <code>(x − 1)(x + 2) ≥ 0</code> sur <code>]−∞ ; −2] ∪ [1 ; +∞[</code> (en ajoutant les bornes où le produit s'annule).</p>`)}
       `,
     },
 
