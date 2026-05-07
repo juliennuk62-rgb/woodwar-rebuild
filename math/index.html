@@ -7982,6 +7982,310 @@ EXERCISES['4e-12'] = [
   },
 ];
 
+// ─── Templates d'exercices : 3e ─────────────────────────────────
+EXERCISES['3e-0'] = [
+  {
+    title: 'PGCD par l\'algorithme d\'Euclide',
+    generate() {
+      const k = exRand(2, 12);
+      const m = exRand(2, 9);
+      const n = exRand(m + 1, m + 8);
+      // pour avoir un PGCD = k précisément, on prend ka et kb avec gcd(a,b)=1
+      const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+      const aa = m, bb = n;
+      const g = gcd(aa, bb);
+      const A = (aa / g) * k, B = (bb / g) * k;
+      return {
+        question: `Calcule <code>PGCD(${A}, ${B})</code> par l'algorithme d'Euclide.`,
+        inputType: 'number',
+        answer: k,
+        steps: [
+          `Divisions successives : on remplace (a, b) par (b, reste).`,
+          `Le dernier reste non nul est le PGCD.`,
+          `Résultat : <code>${k}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-1'] = [
+  {
+    title: 'Simplifier une racine',
+    generate() {
+      const choices = [[18, 3, 2], [50, 5, 2], [72, 6, 2], [12, 2, 3], [27, 3, 3], [45, 3, 5], [98, 7, 2], [128, 8, 2]];
+      const [n, k, r] = exPick(choices);
+      return {
+        question: `Simplifie <code>√${n}</code> sous la forme <code>k√r</code>. Donne le coefficient k.`,
+        inputType: 'number',
+        answer: k,
+        steps: [
+          `On cherche le plus grand carré qui divise ${n}.`,
+          `<code>${n} = ${k * k} × ${r}</code>.`,
+          `<code>√${n} = √${k * k} × √${r} = ${k}√${r}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-2'] = [
+  {
+    title: 'Identité remarquable : (a + b)²',
+    generate() {
+      const a = exRand(1, 6);
+      const b = exRand(1, 9);
+      return {
+        question: `Développe <code>(${a}x + ${b})²</code>. Quel est le coefficient de <code>x</code> ?`,
+        inputType: 'number',
+        answer: 2 * a * b,
+        steps: [
+          `Identité : <code>(u + v)² = u² + 2uv + v²</code>.`,
+          `Avec <code>u = ${a}x</code> et <code>v = ${b}</code> : coefficient de x = <code>2 × ${a} × ${b} = ${2 * a * b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Factoriser une différence de carrés',
+    generate() {
+      const a = exRand(2, 9);
+      const b = exRand(1, 12);
+      return {
+        question: `Factoriser <code>${a * a}x² − ${b * b}</code>. Donne la valeur de p tel que la factorisation soit <code>(${a}x + p)(${a}x − p)</code>.`,
+        inputType: 'number',
+        answer: b,
+        steps: [
+          `On reconnaît <code>u² − v²</code> avec <code>u = ${a}x</code> et <code>v = ${b}</code>.`,
+          `<code>${a * a}x² − ${b * b} = (${a}x + ${b})(${a}x − ${b})</code>. Donc p = <code>${b}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-3'] = [
+  {
+    title: 'Équation produit',
+    generate() {
+      const a = exRand(2, 8);
+      const b = exRand(-9, 9) || 3;
+      // (x − a)(x + b) = 0 → solutions a et −b
+      return {
+        question: `Résous : <code>(x − ${a})(x + ${b}) = 0</code>. Quelle est la plus grande solution ?`,
+        inputType: 'number',
+        answer: Math.max(a, -b),
+        steps: [
+          `Un produit est nul ⇔ un facteur est nul.`,
+          `<code>x − ${a} = 0</code> donne <code>x = ${a}</code>.`,
+          `<code>x + ${b} = 0</code> donne <code>x = ${-b}</code>.`,
+          `Plus grande solution : <code>${Math.max(a, -b)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-4'] = [
+  {
+    title: 'Inéquation du 1er degré',
+    generate() {
+      const a = exPick([2, 3, 4, 5]);
+      const b = exRand(-10, 10);
+      const c = exRand(-10, 10);
+      const cmp = exPick(['≤', '≥']);
+      // ax + b cmp c → x cmp (c-b)/a
+      const sol = (c - b) / a;
+      return {
+        question: `Résous : <code>${a}x + ${b} ${cmp} ${c}</code>. Donne la valeur seuil de x.`,
+        inputType: 'number',
+        answer: sol,
+        tolerance: 0.01,
+        steps: [
+          `Soustraire ${b} : <code>${a}x ${cmp} ${c - b}</code>.`,
+          `Diviser par ${a} (positif, sens conservé) : <code>x ${cmp} ${sol}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-5'] = [
+  {
+    title: 'Système d\'équations 2x2',
+    generate() {
+      const x = exRand(1, 8);
+      const y = exRand(1, 8);
+      const a = exRand(1, 5), b = exRand(1, 5);
+      const c = exRand(1, 5), d = exRand(1, 5);
+      const r1 = a * x + b * y;
+      const r2 = c * x + d * y;
+      // unique si ad-bc != 0
+      if (a * d - b * c === 0) return this.generate();
+      return {
+        question: `Résous le système : <code>${a}x + ${b}y = ${r1} ; ${c}x + ${d}y = ${r2}</code>. Donne la valeur de x.`,
+        inputType: 'number',
+        answer: x,
+        steps: [
+          `Par combinaison ou substitution.`,
+          `On trouve <code>x = ${x}</code> et <code>y = ${y}</code>.`,
+          `Vérification : <code>${a} × ${x} + ${b} × ${y} = ${r1}</code> ✓.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-7'] = [
+  {
+    title: 'Trigonométrie : calculer un angle',
+    generate() {
+      const angles = [30, 45, 60];
+      const angle = exPick(angles);
+      const cosVals = { 30: '√3/2', 45: '√2/2', 60: '1/2' };
+      const sinVals = { 30: '1/2', 45: '√2/2', 60: '√3/2' };
+      const fn = exPick(['cos', 'sin']);
+      const opts = ['30°', '45°', '60°'];
+      const expected = `${angle}°`;
+      const valTxt = fn === 'cos' ? cosVals[angle] : sinVals[angle];
+      return {
+        question: `Quel angle vérifie <code>${fn}(α) = ${valTxt}</code> (parmi 30°, 45°, 60°) ?`,
+        inputType: 'mcq',
+        options: opts,
+        answer: opts.indexOf(expected),
+        steps: [
+          `Valeurs particulières : cos(30°)=√3/2, cos(45°)=√2/2, cos(60°)=1/2.`,
+          `(et inversement pour sin)`,
+          `Réponse : <code>${expected}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-8'] = [
+  {
+    title: 'Volume d\'une boule',
+    generate() {
+      const r = exRand(2, 8);
+      const V = (4 / 3) * Math.PI * r ** 3;
+      return {
+        question: `Volume d'une boule de rayon <code>${r} cm</code> ? (arrondi au cm³)`,
+        inputType: 'number',
+        answer: Math.round(V),
+        tolerance: 1,
+        steps: [
+          `Formule : <code>V = (4/3) × π × r³</code>.`,
+          `<code>V = (4/3) × π × ${r}³ = (4/3) × π × ${r ** 3} ≈ ${V.toFixed(2)} cm³</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Section d\'un cône',
+    generate() {
+      const R = exRand(4, 12);
+      const H = exRand(R + 2, 18);
+      const h = exRand(1, H - 1);
+      const k = h / H;
+      const r = Math.round(R * k * 10) / 10;
+      return {
+        question: `Cône de rayon <code>${R} cm</code> et hauteur <code>${H} cm</code>. Section parallèle à la base à <code>${h} cm</code> du sommet : quel est le rayon obtenu ? (au dixième)`,
+        inputType: 'number',
+        answer: r,
+        tolerance: 0.1,
+        steps: [
+          `Coefficient de réduction : <code>k = ${h}/${H} = ${k.toFixed(3)}</code>.`,
+          `Nouveau rayon : <code>${R} × ${k.toFixed(3)} ≈ ${r}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-10'] = [
+  {
+    title: 'Fonction affine : image',
+    generate() {
+      const a = exRand(-5, 5) || 2;
+      const b = exRand(-10, 10);
+      const x = exRand(-5, 8);
+      return {
+        question: `Soit <code>f(x) = ${a}x ${b >= 0 ? '+ ' + b : '− ' + (-b)}</code>. Calcule <code>f(${x})</code>.`,
+        inputType: 'number',
+        answer: a * x + b,
+        steps: [
+          `Remplacer x par ${x} : <code>${a} × ${x} ${b >= 0 ? '+' : '−'} ${Math.abs(b)} = ${a * x} ${b >= 0 ? '+' : '−'} ${Math.abs(b)} = ${a * x + b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fonction affine : antécédent',
+    generate() {
+      const a = exPick([2, 3, 4, 5]);
+      const x = exRand(2, 12);
+      const b = exRand(-10, 10);
+      const y = a * x + b;
+      return {
+        question: `Soit <code>f(x) = ${a}x ${b >= 0 ? '+ ' + b : '− ' + (-b)}</code>. Trouve l'antécédent de <code>${y}</code>.`,
+        inputType: 'number',
+        answer: x,
+        steps: [
+          `Résoudre <code>${a}x ${b >= 0 ? '+ ' + b : '− ' + (-b)} = ${y}</code>.`,
+          `<code>${a}x = ${y - b}</code>, donc <code>x = ${x}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-11'] = [
+  {
+    title: 'Médiane (effectif pair)',
+    generate() {
+      const n = exPick([6, 8]);
+      const vals = Array.from({length: n}, () => exRand(8, 18)).sort((a, b) => a - b);
+      const mid = (vals[n / 2 - 1] + vals[n / 2]) / 2;
+      return {
+        question: `Médiane de la série triée : <code>${vals.join(', ')}</code> ?`,
+        inputType: 'number',
+        answer: mid,
+        tolerance: 0.01,
+        steps: [
+          `Effectif pair (${n}). Médiane = moyenne des 2 valeurs centrales.`,
+          `<code>(${vals[n / 2 - 1]} + ${vals[n / 2]})/2 = ${mid}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-12'] = [
+  {
+    title: 'Probabilité d\'une réunion',
+    generate() {
+      // dé : pair (3), multiple de 3 (2), intersection {6} (1)
+      const opts = [
+        { txt: 'pair OU multiple de 3', pA: 3, pB: 2, pAB: 1, ans: '4/6 = 2/3' },
+        { txt: 'pair OU pair', pA: 3, pB: 3, pAB: 3, ans: '3/6 = 1/2' },
+      ];
+      const e = opts[0];
+      return {
+        question: `On lance un dé équilibré. Probabilité d'obtenir un nombre <em>${e.txt}</em> ? (forme <code>num/den</code> simplifiée)`,
+        inputType: 'fraction',
+        answer: (e.pA + e.pB - e.pAB) / 6,
+        formatAnswer: () => '2/3',
+        steps: [
+          `<code>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</code>.`,
+          `<code>P = ${e.pA}/6 + ${e.pB}/6 − ${e.pAB}/6 = ${e.pA + e.pB - e.pAB}/6</code>.`,
+          `Simplification : <code>2/3</code>.`,
+        ],
+      };
+    },
+  },
+];
+
 const exState = { current: null, selectedMcq: null, sessionStats: { tried: 0, correct: 0 } };
 const exRand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const exPick = arr => arr[Math.floor(Math.random() * arr.length)];
