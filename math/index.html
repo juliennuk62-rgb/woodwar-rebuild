@@ -597,20 +597,7 @@ const CURRICULUM = [
   {
     id: 'college', name: 'Collège',
     levels: [
-      { id: '6e',  name: '6e',  chapters: [
-        todo("Nombres entiers : lecture et écriture", "Nombres et calcul"),
-        todo("Nombres décimaux : lecture, comparaison", "Nombres et calcul"),
-        todo("Addition, soustraction, multiplication", "Nombres et calcul"),
-        todo("Division euclidienne", "Nombres et calcul"),
-        todo("Fractions : sens et premières représentations", "Nombres et calcul"),
-        todo("Proportionnalité (sensibilisation)", "Organisation des données"),
-        todo("Droites perpendiculaires et parallèles", "Géométrie"),
-        todo("Cercle, médiatrice", "Géométrie"),
-        todo("Triangles et quadrilatères : reconnaissance", "Géométrie"),
-        todo("Symétrie axiale", "Géométrie"),
-        todo("Périmètre et aire", "Grandeurs et mesures"),
-        todo("Lecture de tableaux et de graphiques", "Organisation des données"),
-      ]},
+      { id: '6e',  name: '6e',  chapters: chapters6e() },
       { id: '5e',  name: '5e',  chapters: chapters5e() },
       { id: '4e',  name: '4e',  chapters: [
         todo("Nombres relatifs : multiplication et division", "Nombres et calcul"),
@@ -722,6 +709,550 @@ const CURRICULUM = [
     ],
   },
 ];
+
+// ─── Contenu pédagogique : 6e à fond ─────────────────────────────
+function chapters6e() {
+  return [
+    {
+      title: "Nombres entiers : lecture et écriture",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Les chiffres et les nombres</h2>
+        <p>Il y a <strong>10 chiffres</strong> : <code>0, 1, 2, 3, 4, 5, 6, 7, 8, 9</code>. Avec ces 10 chiffres, on peut écrire <strong>tous les nombres entiers</strong> : 7, 42, 1853, 1 000 000, etc.</p>
+        ${lc.tip("Différence chiffre / nombre", `<p>Comme avec l'alphabet : 26 lettres permettent d'écrire des millions de mots. De même, 10 chiffres permettent d'écrire une infinité de nombres.</p>`)}
+
+        <h2>2. Le tableau de position</h2>
+        <p>Chaque chiffre d'un nombre a une <strong>valeur</strong> qui dépend de sa <strong>position</strong>.</p>
+        ${lc.formula("milliards · millions · milliers · unités<br>c d u &nbsp;·&nbsp; c d u &nbsp;·&nbsp; c d u &nbsp;·&nbsp; c d u")}
+        <p>(c = centaines, d = dizaines, u = unités)</p>
+        ${lc.example("Décomposer 4 526", `<ol>
+          <li><code>4</code> est le chiffre des <strong>milliers</strong> : il vaut <code>4 × 1000 = 4000</code>.</li>
+          <li><code>5</code> est le chiffre des <strong>centaines</strong> : <code>5 × 100 = 500</code>.</li>
+          <li><code>2</code> est le chiffre des <strong>dizaines</strong> : <code>2 × 10 = 20</code>.</li>
+          <li><code>6</code> est le chiffre des <strong>unités</strong> : <code>6 × 1 = 6</code>.</li>
+        </ol><p>Donc <code>4 526 = 4000 + 500 + 20 + 6</code>.</p>`)}
+        ${lc.warn("Chiffre vs nombre dans un nombre", `<p>Dans 4 526, le <strong>chiffre</strong> des centaines est <code>5</code>, mais le <strong>nombre</strong> de centaines est <code>45</code> (car 4 526 contient 45 paquets de 100). Question piège classique !</p>`)}
+
+        <h2>3. Lire et écrire un grand nombre</h2>
+        ${lc.prop("Méthode", `<ol><li>On regroupe les chiffres par <strong>tranches de 3</strong> en partant de la droite (espaces, pas virgules : la virgule, c'est pour les décimaux).</li>
+          <li>Chaque tranche se lit comme un nombre à 3 chiffres, suivi de son rang (mille, million, milliard).</li></ol>`)}
+        ${lc.example("Lire 32 458 100", `<p>Tranches : <code>32 | 458 | 100</code>.</p>
+          <p>Lecture : <strong>« trente-deux millions, quatre cent cinquante-huit mille, cent »</strong>.</p>`)}
+        ${lc.warn("Pièges d'orthographe", `<ul><li><code>vingt</code> et <code>cent</code> prennent un « s » s'ils sont multipliés ET non suivis d'un autre nombre : « quatre-vingts », mais « quatre-vingt-deux ».</li>
+          <li><code>mille</code> est <strong>invariable</strong> : « deux mille » (pas de s).</li>
+          <li>« millions » et « milliards » sont des noms communs et prennent un s : « deux millions ».</li></ul>`)}
+
+        <h2>4. Comparer et ranger des entiers</h2>
+        ${lc.prop("Méthode", `<ol><li>On compare d'abord le <strong>nombre de chiffres</strong> : celui qui en a le plus est le plus grand.</li>
+          <li>S'ils ont le même nombre de chiffres, on compare <strong>chiffre à chiffre</strong> en partant de la gauche.</li></ol>`)}
+        ${lc.example("Ranger 478, 1205, 89, 1199 dans l'ordre croissant", `<ol>
+          <li>Nombre de chiffres : 89 (2), 478 (3), 1205 et 1199 (4).</li>
+          <li>Donc <code>89 < 478 < ...</code> (les deux derniers à comparer).</li>
+          <li>Pour 1205 vs 1199 : même nombre de chiffres. On compare : 1=1, 2>1 → <code>1205 > 1199</code>.</li>
+        </ol><p>Résultat : <code>89 < 478 < 1199 < 1205</code>.</p>`)}
+
+        <h2>5. Encadrer et arrondir</h2>
+        ${lc.def("Encadrement", `<p><strong>Encadrer</strong> un nombre, c'est trouver deux valeurs entre lesquelles il se situe.</p>`)}
+        ${lc.example("Encadrer 487 à la dizaine", `<p>487 est entre 480 et 490. On écrit : <code>480 < 487 < 490</code>.</p>`)}
+        ${lc.def("Arrondir", `<p><strong>Arrondir</strong>, c'est choisir la valeur la plus proche selon une précision donnée. Si le chiffre suivant est ≥ 5, on arrondit au-dessus ; sinon, en-dessous.</p>`)}
+        ${lc.example("Arrondir 487 à la dizaine", `<p>Chiffre des unités : 7. Comme 7 ≥ 5, on arrondit au-dessus : <code>487 ≈ 490</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Nombres décimaux : lecture, comparaison",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Qu'est-ce qu'un nombre décimal ?</h2>
+        <p>Un nombre <strong>décimal</strong> est un nombre qui peut s'écrire avec une <em>virgule</em>. Il a deux parties :</p>
+        <ul>
+          <li>la <strong>partie entière</strong> (à gauche de la virgule) ;</li>
+          <li>la <strong>partie décimale</strong> (à droite de la virgule).</li>
+        </ul>
+        ${lc.example("Le nombre 7,52", `<p>Partie entière : <code>7</code>. Partie décimale : <code>52</code>. On lit : « sept virgule cinquante-deux » ou « sept et cinquante-deux centièmes ».</p>`)}
+
+        <h2>2. Le tableau de position</h2>
+        <p>À droite de la virgule, on retrouve des positions, mais pour des fractions de l'unité :</p>
+        ${lc.formula("dixièmes (1/10 = 0,1) · centièmes (1/100 = 0,01) · millièmes (1/1000 = 0,001)")}
+        ${lc.example("Décomposer 12,375", `<ol>
+          <li><code>1</code> dans les dizaines : <code>10</code>.</li>
+          <li><code>2</code> dans les unités : <code>2</code>.</li>
+          <li><code>3</code> dans les dixièmes : <code>0,3</code>.</li>
+          <li><code>7</code> dans les centièmes : <code>0,07</code>.</li>
+          <li><code>5</code> dans les millièmes : <code>0,005</code>.</li>
+        </ol><p>Total : <code>10 + 2 + 0,3 + 0,07 + 0,005 = 12,375</code> ✓</p>`)}
+
+        <h2>3. Plusieurs écritures pour un même nombre</h2>
+        ${lc.prop("Zéros inutiles", `<p>À droite de la partie décimale, ajouter ou enlever des zéros ne change <strong>rien</strong> au nombre.</p>`)}
+        ${lc.example("Égalités", `<p><code>3,5 = 3,50 = 3,500</code>. Trois écritures du même nombre.</p>
+          <p>De même, à gauche de la partie entière, les zéros sont inutiles : <code>07,2 = 7,2</code>.</p>`)}
+        ${lc.warn("Mais pas au milieu !", `<p>Les zéros à l'intérieur changent tout : <code>3,05 ≠ 3,5</code>. Le 0 dans 3,05 sert à dire « rien dans les dixièmes, 5 dans les centièmes ».</p>`)}
+
+        <h2>4. Comparer deux décimaux</h2>
+        ${lc.prop("Méthode", `<ol><li>Compare d'abord les <strong>parties entières</strong>. La plus grande gagne.</li>
+          <li>Si elles sont égales, compare chiffre par chiffre <strong>après la virgule</strong>, de gauche à droite (dixièmes, puis centièmes…).</li></ol>`)}
+        ${lc.example("Comparer 3,12 et 3,2", `<p>Parties entières : <code>3 = 3</code>, on continue.</p>
+          <p>Dixièmes : 3,12 a un <code>1</code>, 3,2 a un <code>2</code>. Comme <code>2 > 1</code>, on a <code>3,2 > 3,12</code>.</p>`)}
+        ${lc.warn("Erreur classique", `<p>Beaucoup d'élèves pensent que <code>3,12 > 3,2</code> parce que « 12 > 2 ». C'est faux ! Pour s'en convaincre, on peut compléter avec un zéro : <code>3,2 = 3,20</code>, et là on voit bien que <code>3,20 > 3,12</code>.</p>`)}
+
+        <h2>5. Quelques décimaux particuliers</h2>
+        ${lc.prop("Fractions usuelles ↔ décimaux", `<ul>
+          <li><code>1/2 = 0,5</code> (la moitié)</li>
+          <li><code>1/4 = 0,25</code> (le quart)</li>
+          <li><code>3/4 = 0,75</code> (les trois quarts)</li>
+          <li><code>1/10 = 0,1</code></li>
+          <li><code>1/100 = 0,01</code></li>
+        </ul>`)}
+        ${lc.tip("Bon à savoir", `<p>Tous les nombres ne sont pas des décimaux. Par exemple <code>1/3 = 0,333333...</code> ne s'arrête jamais : ce n'est pas un nombre décimal. (Mais on peut quand même l'arrondir : <code>1/3 ≈ 0,33</code>.)</p>`)}
+      `,
+    },
+
+    {
+      title: "Addition, soustraction, multiplication",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Termes utilisés", `<ul>
+          <li>Le résultat d'une <strong>addition</strong> est une <strong>somme</strong> ; les nombres additionnés sont les <strong>termes</strong>. <code>5 + 3 = 8</code> : « 8 est la somme de 5 et 3 ».</li>
+          <li>Le résultat d'une <strong>soustraction</strong> est une <strong>différence</strong>. <code>9 − 4 = 5</code>.</li>
+          <li>Le résultat d'une <strong>multiplication</strong> est un <strong>produit</strong> ; les nombres multipliés sont les <strong>facteurs</strong>. <code>6 × 7 = 42</code> : « 42 est le produit de 6 et 7 ».</li>
+        </ul>`)}
+
+        <h2>2. Addition et soustraction posées</h2>
+        ${lc.prop("Méthode", `<p>On aligne les chiffres en colonnes en partant de la droite (unités sous unités, dizaines sous dizaines…). Pour des décimaux, on aligne les <strong>virgules</strong>.</p>`)}
+        ${lc.example("Calculer 247 + 38", `<p>Aligner :</p>
+          <p><code>&nbsp;247&nbsp;</code><br><code>+&nbsp;38&nbsp;</code><br><code>━━━━</code><br><code>&nbsp;285</code></p>
+          <p>Détail : <code>7 + 8 = 15</code>, on écrit 5 et on retient 1. <code>4 + 3 + 1 = 8</code>. Reste 2.</p>`)}
+
+        <h2>3. Calcul mental : astuces utiles</h2>
+        ${lc.tip("Multiplier par 10, 100, 1000", `<p>On <strong>décale</strong> la virgule (ou on ajoute des zéros pour un entier) :</p>
+          <ul><li><code>27 × 10 = 270</code></li>
+          <li><code>27 × 100 = 2 700</code></li>
+          <li><code>3,5 × 10 = 35</code></li>
+          <li><code>3,5 × 100 = 350</code></li></ul>`)}
+        ${lc.tip("Multiplier par 9", `<p>Multiplier par 10 puis enlever le nombre. <code>9 × 7 = 70 − 7 = 63</code>.</p>`)}
+        ${lc.tip("Multiplier par 11 (un chiffre)", `<p>Pour <code>n × 11</code> avec <code>n</code> à un chiffre, le résultat est juste <code>nn</code>. <code>4 × 11 = 44</code>, <code>7 × 11 = 77</code>.</p>`)}
+
+        <h2>4. Multiplication posée</h2>
+        ${lc.example("Calculer 27 × 13", `<ol>
+          <li>On multiplie par les unités de 13 : <code>27 × 3 = 81</code>.</li>
+          <li>On multiplie par les dizaines de 13 : <code>27 × 10 = 270</code>. (On décale d'un cran à gauche.)</li>
+          <li>On additionne : <code>81 + 270 = 351</code>.</li>
+        </ol><p>Donc <code>27 × 13 = 351</code>.</p>`)}
+
+        <h2>5. Ordre de grandeur</h2>
+        ${lc.def("Ordre de grandeur", `<p>L'<strong>ordre de grandeur</strong> d'un calcul, c'est une estimation rapide qu'on peut faire de tête en arrondissant les nombres.</p>`)}
+        ${lc.example("Ordre de grandeur de 487 × 21", `<p>On arrondit : <code>487 ≈ 500</code> et <code>21 ≈ 20</code>. Donc <code>500 × 20 = 10 000</code>.</p>
+          <p>Le vrai résultat (<code>10 227</code>) est cohérent. Si on avait trouvé 1 022, on saurait qu'il y a une erreur (ordre de grandeur 10 fois trop petit).</p>`)}
+        ${lc.tip("Pourquoi c'est utile", `<p>Vérifier l'ordre de grandeur après chaque calcul permet d'<strong>attraper les grosses erreurs</strong> (virgule mal placée, oubli d'un zéro…).</p>`)}
+      `,
+    },
+
+    {
+      title: "Division euclidienne",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Division euclidienne", `<p>Diviser un nombre <code>a</code> (le <strong>dividende</strong>) par un nombre <code>b</code> non nul (le <strong>diviseur</strong>), c'est trouver deux entiers : un <strong>quotient</strong> <code>q</code> et un <strong>reste</strong> <code>r</code>.</p>`)}
+        ${lc.formula("a = b × q + r &nbsp;&nbsp; avec &nbsp;&nbsp; 0 ≤ r < b")}
+        <p>L'expression « avec <code>0 ≤ r < b</code> » est essentielle : le reste est toujours <strong>positif et plus petit que le diviseur</strong>.</p>
+
+        <h2>2. Trouver le quotient et le reste</h2>
+        ${lc.prop("Méthode mentale", `<p>On cherche le <strong>plus grand multiple du diviseur</strong> qui ne dépasse pas le dividende. Ce multiple est <code>b × q</code>. Le reste, c'est ce qu'il manque pour atteindre <code>a</code>.</p>`)}
+        ${lc.example("Diviser 47 par 6", `<ol>
+          <li>Multiples de 6 : 6, 12, 18, 24, 30, 36, 42, 48...</li>
+          <li>Le plus grand qui ne dépasse pas 47 : <code>42 = 6 × 7</code>. Donc <code>q = 7</code>.</li>
+          <li>Reste : <code>47 − 42 = 5</code>. Donc <code>r = 5</code>.</li>
+          <li>Vérification : <code>5 < 6</code> ✓.</li>
+        </ol><p>On écrit : <code>47 = 6 × 7 + 5</code>.</p>`)}
+
+        <h2>3. Division posée</h2>
+        ${lc.example("Poser 254 ÷ 4", `<ol>
+          <li>On divise les chiffres de gauche à droite : 25 contient combien de fois 4 ? 6 fois (6 × 4 = 24), reste 1.</li>
+          <li>On abaisse le 4 : on a 14. Combien de fois 4 dans 14 ? 3 fois (3 × 4 = 12), reste 2.</li>
+          <li>Quotient : <code>63</code>. Reste : <code>2</code>.</li>
+        </ol><p>Vérification : <code>4 × 63 + 2 = 252 + 2 = 254</code> ✓</p>`)}
+
+        <h2>4. Division qui « tombe juste »</h2>
+        ${lc.def("Divisible", `<p>Si le reste vaut 0, on dit que <code>a</code> est <strong>divisible</strong> par <code>b</code>, ou que <code>b</code> est un <strong>diviseur</strong> de <code>a</code>.</p>
+          <p>Exemple : <code>20 = 4 × 5 + 0</code>, donc 20 est divisible par 4 (et aussi par 5).</p>`)}
+
+        <h2>5. Critères de divisibilité (les plus simples)</h2>
+        ${lc.prop("À retenir en 6e", `<ul>
+          <li><strong>Par 2</strong> : le nombre se termine par 0, 2, 4, 6 ou 8 (les nombres pairs).</li>
+          <li><strong>Par 5</strong> : le nombre se termine par 0 ou 5.</li>
+          <li><strong>Par 10</strong> : le nombre se termine par 0.</li>
+        </ul>`)}
+        ${lc.example("Tester 1 230", `<ul><li>Se termine par 0 → divisible par 2, par 5 et par 10.</li></ul>`)}
+
+        <h2>6. Multiples et diviseurs</h2>
+        ${lc.def("Multiple", `<p>Un nombre est un <strong>multiple</strong> d'un autre s'il s'obtient en le multipliant par un entier. Les multiples de 7 sont : 0, 7, 14, 21, 28, 35, 42…</p>`)}
+        ${lc.tip("Lien", `<p>« 35 est un multiple de 7 » <strong>=</strong> « 7 est un diviseur de 35 » <strong>=</strong> « 35 est divisible par 7 ». Trois façons de dire la même chose.</p>`)}
+      `,
+    },
+
+    {
+      title: "Fractions : sens et premières représentations",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Une fraction, ça représente quoi ?</h2>
+        <p>Imagine une pizza partagée en <strong>4 parts égales</strong>. Si tu en manges <strong>3</strong>, tu as mangé les <code>3/4</code> de la pizza.</p>
+        ${lc.def("Fraction", `<p>Une <strong>fraction</strong> s'écrit <code>a/b</code> où :</p>
+          <ul><li><code>a</code> est le <strong>numérateur</strong> (nombre de parts qu'on prend) ;</li>
+          <li><code>b</code> est le <strong>dénominateur</strong> (en combien de parts on a partagé).</li></ul>
+          <p>Le dénominateur ne peut <strong>jamais être 0</strong> : on ne peut pas partager en 0 parts.</p>`)}
+
+        <h2>2. Lire une fraction</h2>
+        ${lc.prop("Lecture", `<p>On lit en disant le numérateur, puis le dénominateur avec un suffixe spécial :</p>
+          <ul><li><code>1/2</code> = un <strong>demi</strong></li>
+          <li><code>1/3</code> = un <strong>tiers</strong></li>
+          <li><code>1/4</code> = un <strong>quart</strong></li>
+          <li><code>1/5</code> = un <strong>cinquième</strong></li>
+          <li><code>3/8</code> = trois <strong>huitièmes</strong></li>
+          <li><code>5/100</code> = cinq <strong>centièmes</strong></li></ul>`)}
+
+        <h2>3. Représenter une fraction</h2>
+        <p>On peut représenter une fraction de plusieurs façons :</p>
+        ${lc.example("Avec un disque", `<p>Diviser un disque en <code>b</code> parts égales et en colorier <code>a</code>. Pour <code>3/4</code>, on partage en 4 et on colorie 3 parts.</p>`)}
+        ${lc.example("Avec un segment gradué", `<p>Sur une droite graduée entre 0 et 1 partagée en 4 parts égales, le point d'abscisse <code>3/4</code> est à la 3e graduation.</p>
+          <p><code>0 — — — 1/4 — — — 2/4 — — — 3/4 — — — 1</code></p>`)}
+
+        <h2>4. Fraction = quotient</h2>
+        ${lc.prop("Lien essentiel", `<p>La fraction <code>a/b</code> est un autre nom pour le <strong>résultat de la division</strong> de <code>a</code> par <code>b</code>.</p>`)}
+        ${lc.formula("a/b &nbsp;=&nbsp; a ÷ b")}
+        ${lc.example("Calculer 3/4 en décimal", `<p><code>3/4 = 3 ÷ 4 = 0,75</code>.</p>`)}
+        ${lc.example("Calculer 7/2", `<p><code>7/2 = 7 ÷ 2 = 3,5</code>.</p>`)}
+
+        <h2>5. Comparer une fraction à 1</h2>
+        ${lc.prop("Règle utile", `<ul>
+          <li>Si <strong>numérateur < dénominateur</strong> → la fraction est <strong>plus petite que 1</strong>. Ex : <code>3/4 < 1</code>.</li>
+          <li>Si <strong>numérateur = dénominateur</strong> → la fraction <strong>vaut 1</strong>. Ex : <code>5/5 = 1</code>.</li>
+          <li>Si <strong>numérateur > dénominateur</strong> → la fraction est <strong>plus grande que 1</strong>. Ex : <code>7/4 > 1</code>.</li>
+        </ul>`)}
+        ${lc.tip("Vérification rapide", `<p>Pour <code>7/4</code> : « 7 quarts », c'est plus que « 4 quarts » (= 1 entier), donc <code>7/4 > 1</code>. Logique !</p>`)}
+
+        <h2>6. Décimaux ↔ fractions</h2>
+        ${lc.prop("Quelques équivalences à mémoriser", `<ul>
+          <li><code>0,5 = 1/2</code></li>
+          <li><code>0,25 = 1/4</code></li>
+          <li><code>0,75 = 3/4</code></li>
+          <li><code>0,1 = 1/10</code></li>
+          <li><code>0,01 = 1/100</code></li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Proportionnalité (sensibilisation)",
+      category: "Organisation des données",
+      content: `
+        <h2>1. C'est quoi, la proportionnalité ?</h2>
+        ${lc.def("Définition", `<p>Deux grandeurs sont <strong>proportionnelles</strong> si on passe de l'une à l'autre en multipliant <em>toujours par le même nombre</em>.</p>`)}
+        ${lc.example("Le prix des stylos", `<p>Si <code>1</code> stylo coûte <code>2 €</code>, alors :</p>
+          <ul><li>2 stylos coûtent <code>2 × 2 = 4 €</code></li>
+          <li>5 stylos coûtent <code>5 × 2 = 10 €</code></li>
+          <li>10 stylos coûtent <code>10 × 2 = 20 €</code></li></ul>
+          <p>On multiplie toujours par 2 : <strong>le prix est proportionnel au nombre de stylos</strong>.</p>`)}
+
+        <h2>2. Reconnaître une situation proportionnelle</h2>
+        ${lc.prop("Indices", `<p>C'est généralement proportionnel quand on parle :</p>
+          <ul><li>de prix à payer (à prix fixe par unité) ;</li>
+          <li>de distance parcourue à <em>vitesse constante</em> ;</li>
+          <li>d'ingrédients dans une recette (pour plus ou moins de personnes).</li></ul>`)}
+        ${lc.warn("Pas toujours proportionnel", `<p>L'âge d'une personne et sa taille ne sont <strong>pas</strong> proportionnels (sinon on grandirait toute notre vie au même rythme !). Le périmètre d'un carré est proportionnel à son côté, mais l'<strong>aire</strong> ne l'est pas.</p>`)}
+
+        <h2>3. Tableau de proportionnalité</h2>
+        <p>On présente souvent les données dans un tableau à deux lignes :</p>
+        ${lc.formula("Stylos : 1 &nbsp; 2 &nbsp; 5 &nbsp; 10<br>Prix : &nbsp;2 &nbsp; 4 &nbsp;10 &nbsp;20")}
+        <p>C'est un tableau de proportionnalité car on multiplie toujours par 2 pour passer de la ligne du haut à celle du bas.</p>
+        ${lc.def("Coefficient de proportionnalité", `<p>Le nombre par lequel on multiplie s'appelle le <strong>coefficient de proportionnalité</strong>. Ici, c'est <code>2</code> (le prix par stylo).</p>`)}
+
+        <h2>4. Calculer une valeur manquante</h2>
+        ${lc.example("Recette pour 8 personnes au lieu de 4", `<p>Recette pour 4 personnes : 200 g de farine. Et pour 8 personnes ?</p>
+          <ol><li>On passe de 4 à 8 en multipliant par 2.</li>
+          <li>Donc on multiplie aussi la farine par 2 : <code>200 × 2 = 400 g</code>.</li></ol>`)}
+        ${lc.example("Passer par l'unité", `<p>4 cahiers coûtent 12 €. Combien coûtent 7 cahiers ?</p>
+          <ol><li>1 cahier coûte : <code>12 ÷ 4 = 3 €</code>.</li>
+          <li>7 cahiers coûtent : <code>7 × 3 = 21 €</code>.</li></ol>`)}
+
+        <h2>5. Vérifier qu'un tableau est proportionnel</h2>
+        ${lc.example("Tableau proportionnel ?", `<p>3 stylos → 6 €, 5 stylos → 10 €, 7 stylos → 13 €.</p>
+          <ol><li>On calcule le rapport prix/quantité : <code>6/3 = 2</code>, <code>10/5 = 2</code>, <code>13/7 ≈ 1,86</code>.</li>
+          <li>Pas tous égaux → <strong>ce tableau n'est pas proportionnel</strong>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Droites perpendiculaires et parallèles",
+      category: "Géométrie",
+      content: `
+        <h2>1. Droites perpendiculaires</h2>
+        ${lc.def("Droites perpendiculaires", `<p>Deux droites sont <strong>perpendiculaires</strong> si elles se coupent en formant un <strong>angle droit</strong> (90°).</p>
+          <p>Notation : si <code>(d)</code> et <code>(d')</code> sont perpendiculaires, on écrit <code>(d) ⊥ (d')</code>.</p>`)}
+        ${lc.tip("Reconnaître l'angle droit", `<p>Avec une <strong>équerre</strong> : on place le coin droit de l'équerre au point d'intersection. Si les deux côtés s'alignent avec les deux droites, c'est un angle droit.</p>`)}
+
+        <h2>2. Tracer une droite perpendiculaire</h2>
+        ${lc.prop("Avec règle et équerre", `<ol>
+          <li>Placer le bord (coin droit) de l'équerre sur la droite donnée, en le faisant passer par le point.</li>
+          <li>Tracer le long de l'autre côté de l'équerre.</li>
+        </ol>`)}
+
+        <h2>3. Droites parallèles</h2>
+        ${lc.def("Droites parallèles", `<p>Deux droites sont <strong>parallèles</strong> si elles ne se coupent <strong>jamais</strong>, même prolongées à l'infini.</p>
+          <p>Notation : <code>(d) ∥ (d')</code>.</p>`)}
+        ${lc.tip("Image", `<p>Les rails d'un train, les bords d'une règle, les lignes d'un cahier… autant d'exemples de droites parallèles dans la vraie vie.</p>`)}
+
+        <h2>4. Tracer une droite parallèle</h2>
+        ${lc.prop("Avec règle et équerre", `<ol>
+          <li>Placer un côté de l'équerre le long de la droite donnée.</li>
+          <li>Glisser une règle contre l'autre côté de l'équerre, sans la bouger.</li>
+          <li>Faire glisser l'équerre le long de la règle jusqu'au point voulu.</li>
+          <li>Tracer le long du côté de l'équerre.</li>
+        </ol>`)}
+
+        <h2>5. Propriétés à retenir</h2>
+        ${lc.prop("Propriété 1", `<p>Si deux droites sont <strong>perpendiculaires à une même droite</strong>, alors elles sont <strong>parallèles</strong> entre elles.</p>`)}
+        ${lc.formula("(d₁) ⊥ (d) &nbsp;et&nbsp; (d₂) ⊥ (d) &nbsp;⇒&nbsp; (d₁) ∥ (d₂)")}
+        ${lc.prop("Propriété 2", `<p>Si deux droites sont <strong>parallèles</strong>, et qu'une 3e droite est perpendiculaire à l'une, elle est aussi perpendiculaire à l'autre.</p>`)}
+        ${lc.formula("(d₁) ∥ (d₂) &nbsp;et&nbsp; (d) ⊥ (d₁) &nbsp;⇒&nbsp; (d) ⊥ (d₂)")}
+        ${lc.warn("Attention", `<p>Deux droites qui ne se touchent <strong>pas sur la feuille</strong> ne sont pas forcément parallèles : elles peuvent se rejoindre plus loin si on les prolonge. Pour être sûr qu'elles sont parallèles, il faut une justification (par exemple par les propriétés ci-dessus).</p>`)}
+      `,
+    },
+
+    {
+      title: "Cercle, médiatrice",
+      category: "Géométrie",
+      content: `
+        <h2>1. Le cercle</h2>
+        ${lc.def("Cercle", `<p>Un <strong>cercle</strong> de centre <code>O</code> et de <strong>rayon</strong> <code>r</code> est l'ensemble de tous les points situés à la distance <code>r</code> de <code>O</code>.</p>`)}
+        ${lc.tip("Le cercle, c'est la ligne. Le disque, c'est l'intérieur.", `<p>On confond souvent les deux. Strictement parlant : le <strong>cercle</strong> est seulement la courbe ; le <strong>disque</strong>, c'est la zone intérieure.</p>`)}
+
+        <h2>2. Vocabulaire</h2>
+        ${lc.prop("Les éléments d'un cercle", `<ul>
+          <li><strong>Centre</strong> : le point fixe (souvent appelé <code>O</code>).</li>
+          <li><strong>Rayon</strong> : un segment qui relie le centre à un point du cercle. C'est aussi sa longueur.</li>
+          <li><strong>Diamètre</strong> : un segment qui relie deux points du cercle <em>en passant par le centre</em>. <strong>Diamètre = 2 × rayon</strong>.</li>
+          <li><strong>Corde</strong> : un segment qui relie deux points du cercle (sans forcément passer par le centre).</li>
+          <li><strong>Arc</strong> : une portion du cercle entre deux points.</li>
+        </ul>`)}
+        ${lc.formula("Diamètre &nbsp;=&nbsp; 2 × Rayon &nbsp;&nbsp;&nbsp; Rayon &nbsp;=&nbsp; Diamètre / 2")}
+
+        <h2>3. Tracer un cercle</h2>
+        ${lc.prop("Au compas", `<ol>
+          <li>Régler l'écartement du compas à la longueur du rayon (avec la règle).</li>
+          <li>Planter la pointe sèche au centre <code>O</code>.</li>
+          <li>Faire tourner le compas pour tracer le cercle.</li>
+        </ol>`)}
+
+        <h2>4. La médiatrice d'un segment</h2>
+        ${lc.def("Médiatrice", `<p>La <strong>médiatrice</strong> d'un segment <code>[AB]</code> est la droite qui :</p>
+          <ul><li>passe par le <strong>milieu</strong> de <code>[AB]</code>,</li>
+          <li>est <strong>perpendiculaire</strong> à <code>(AB)</code>.</li></ul>`)}
+
+        <h2>5. Caractérisation par les distances</h2>
+        ${lc.prop("Propriété fondamentale", `<p>Un point appartient à la médiatrice de <code>[AB]</code> si et seulement s'il est à <strong>égale distance</strong> de <code>A</code> et de <code>B</code>.</p>`)}
+        ${lc.formula("M ∈ médiatrice de [AB] &nbsp;⇔&nbsp; MA = MB")}
+
+        <h2>6. Construire la médiatrice</h2>
+        ${lc.prop("Au compas et à la règle (sans équerre)", `<ol>
+          <li>Tracer un arc de cercle centré sur <code>A</code>, de rayon assez grand (plus que la moitié de <code>AB</code>).</li>
+          <li>Sans changer l'écartement, tracer un arc centré sur <code>B</code>.</li>
+          <li>Les deux arcs se croisent en <strong>deux points</strong> (l'un au-dessus de <code>[AB]</code>, l'autre en-dessous).</li>
+          <li>Tracer la droite qui passe par ces deux points : c'est la médiatrice.</li>
+        </ol>`)}
+        ${lc.tip("Pourquoi ça marche ?", `<p>Les deux points construits sont à la même distance de <code>A</code> et de <code>B</code> (par construction des arcs). Ils sont donc sur la médiatrice (propriété 5). La droite qui les relie EST la médiatrice.</p>`)}
+      `,
+    },
+
+    {
+      title: "Triangles et quadrilatères : reconnaissance",
+      category: "Géométrie",
+      content: `
+        <h2>1. Triangles particuliers</h2>
+        ${lc.def("Triangle", `<p>Un <strong>triangle</strong> est une figure formée de 3 points (les <strong>sommets</strong>) reliés par 3 segments (les <strong>côtés</strong>).</p>`)}
+        ${lc.prop("Les principaux triangles", `<ul>
+          <li><strong>Triangle isocèle</strong> : 2 côtés de même longueur. (Et donc 2 angles égaux.)</li>
+          <li><strong>Triangle équilatéral</strong> : 3 côtés de même longueur. (Et 3 angles égaux à 60°.)</li>
+          <li><strong>Triangle rectangle</strong> : un angle droit. Le grand côté (opposé à l'angle droit) s'appelle l'<strong>hypoténuse</strong>.</li>
+          <li><strong>Triangle quelconque</strong> : aucune particularité.</li>
+        </ul>`)}
+        ${lc.tip("Combinaisons possibles", `<p>Un triangle peut être à la fois <strong>rectangle ET isocèle</strong> (angle droit + 2 côtés égaux). Mais pas équilatéral ET rectangle (impossible).</p>`)}
+
+        <h2>2. Quadrilatères particuliers</h2>
+        ${lc.def("Quadrilatère", `<p>Un <strong>quadrilatère</strong> est une figure à <strong>4 côtés</strong> (et 4 sommets).</p>`)}
+
+        <h3>Le carré</h3>
+        ${lc.prop("Propriétés", `<ul>
+          <li>4 côtés de <strong>même longueur</strong>.</li>
+          <li>4 angles <strong>droits</strong>.</li>
+          <li>Les deux <strong>diagonales</strong> sont de même longueur, perpendiculaires, et se coupent en leur milieu.</li>
+        </ul>`)}
+
+        <h3>Le rectangle</h3>
+        ${lc.prop("Propriétés", `<ul>
+          <li>4 angles <strong>droits</strong>.</li>
+          <li>Les côtés opposés sont parallèles et de même longueur.</li>
+          <li>Les diagonales sont de même longueur et se coupent en leur milieu.</li>
+        </ul>`)}
+
+        <h3>Le losange</h3>
+        ${lc.prop("Propriétés", `<ul>
+          <li>4 côtés de <strong>même longueur</strong>.</li>
+          <li>Les diagonales sont <strong>perpendiculaires</strong> et se coupent en leur milieu.</li>
+          <li>Les angles opposés sont égaux.</li>
+        </ul>`)}
+
+        <h3>Le parallélogramme</h3>
+        ${lc.prop("Propriétés", `<ul>
+          <li>Les côtés opposés sont <strong>parallèles deux à deux</strong>.</li>
+          <li>Les côtés opposés sont de même longueur.</li>
+          <li>Les angles opposés sont égaux.</li>
+          <li>Les diagonales se coupent en leur milieu.</li>
+        </ul>`)}
+
+        <h2>3. Hiérarchie</h2>
+        ${lc.tip("Qui contient qui", `<p>Le <strong>carré</strong> est le plus particulier : il est <em>à la fois</em> un rectangle ET un losange (et donc aussi un parallélogramme).</p>
+          <ul><li>Carré ⊂ Rectangle ⊂ Parallélogramme</li>
+          <li>Carré ⊂ Losange ⊂ Parallélogramme</li></ul>
+          <p>Tout carré est un rectangle, mais un rectangle n'est pas forcément un carré (sauf s'il est aussi un losange).</p>`)}
+
+        <h2>4. Reconnaître la nature d'un quadrilatère</h2>
+        ${lc.example("Méthode : on vérifie une propriété caractéristique", `<ol>
+          <li>4 angles droits + 4 côtés égaux → <strong>carré</strong></li>
+          <li>4 angles droits seulement → <strong>rectangle</strong></li>
+          <li>4 côtés égaux seulement → <strong>losange</strong></li>
+          <li>Côtés opposés parallèles seulement → <strong>parallélogramme</strong></li>
+        </ol>`)}
+      `,
+    },
+
+    {
+      title: "Symétrie axiale",
+      category: "Géométrie",
+      content: `
+        <h2>1. Symétrique d'un point</h2>
+        ${lc.def("Symétrie par rapport à une droite", `<p>Le <strong>symétrique</strong> d'un point <code>A</code> par rapport à une droite <code>(d)</code> est le point <code>A'</code> tel que :</p>
+          <ul><li><code>(d)</code> est <strong>perpendiculaire</strong> à <code>(AA')</code> ;</li>
+          <li><code>(d)</code> coupe <code>(AA')</code> en son <strong>milieu</strong>.</li></ul>
+          <p>La droite <code>(d)</code> s'appelle l'<strong>axe de symétrie</strong>.</p>`)}
+        ${lc.tip("Image du miroir", `<p>Imagine un miroir posé le long de <code>(d)</code> : <code>A'</code> est l'image de <code>A</code> dans le miroir. À la même distance, mais de l'autre côté.</p>`)}
+
+        <h2>2. Construire un symétrique</h2>
+        ${lc.prop("Méthode (équerre + règle graduée)", `<ol>
+          <li>Tracer la perpendiculaire à <code>(d)</code> passant par <code>A</code>.</li>
+          <li>Mesurer la distance entre <code>A</code> et l'axe.</li>
+          <li>Reporter cette distance de l'autre côté de l'axe, sur la même perpendiculaire.</li>
+          <li>Le point obtenu est <code>A'</code>.</li>
+        </ol>`)}
+        ${lc.prop("Méthode (au compas)", `<ol>
+          <li>Tracer un arc de cercle centré sur l'axe, de rayon assez grand pour qu'il coupe la perpendiculaire des deux côtés.</li>
+          <li>L'intersection avec la perpendiculaire de l'autre côté donne <code>A'</code>.</li>
+        </ol>`)}
+
+        <h2>3. Symétrique d'une figure</h2>
+        ${lc.prop("Conservation", `<p>La symétrie axiale <strong>conserve</strong> :</p>
+          <ul><li>les <strong>longueurs</strong> (un segment et son symétrique ont la même longueur),</li>
+          <li>les <strong>angles</strong>,</li>
+          <li>les <strong>aires</strong> et les <strong>périmètres</strong>,</li>
+          <li>le parallélisme et la perpendicularité.</li></ul>
+          <p>Mais elle <strong>inverse</strong> le sens (un sens horaire devient anti-horaire — comme dans un miroir).</p>`)}
+
+        <h2>4. Axe de symétrie d'une figure</h2>
+        ${lc.def("Axe de symétrie", `<p>Une figure admet un <strong>axe de symétrie</strong> si elle est confondue avec elle-même par cette symétrie.</p>`)}
+        ${lc.prop("Axes des figures usuelles", `<ul>
+          <li><strong>Carré</strong> : 4 axes (les 2 diagonales + les 2 médianes).</li>
+          <li><strong>Rectangle</strong> : 2 axes (les médianes — pas les diagonales !).</li>
+          <li><strong>Losange</strong> : 2 axes (les diagonales).</li>
+          <li><strong>Triangle équilatéral</strong> : 3 axes (les médiatrices de chaque côté).</li>
+          <li><strong>Triangle isocèle</strong> : 1 axe (la médiatrice de la base).</li>
+          <li><strong>Cercle</strong> : une infinité d'axes (toute droite passant par le centre).</li>
+        </ul>`)}
+        ${lc.warn("À ne pas confondre", `<p>Le <strong>rectangle</strong> n'a <strong>pas</strong> ses diagonales comme axes de symétrie (sinon, le pli ne ferait pas coïncider les deux moitiés). Seules ses médianes le sont.</p>`)}
+      `,
+    },
+
+    {
+      title: "Périmètre et aire",
+      category: "Grandeurs et mesures",
+      content: `
+        <h2>1. Périmètre vs aire</h2>
+        ${lc.def("Périmètre", `<p>Le <strong>périmètre</strong> d'une figure est la <strong>longueur de son contour</strong>. C'est une longueur, exprimée en m, cm, mm, etc.</p>`)}
+        ${lc.def("Aire", `<p>L'<strong>aire</strong> d'une figure est la mesure de la <strong>surface qu'elle occupe</strong>. C'est une grandeur, exprimée en m², cm², etc.</p>`)}
+        ${lc.warn("Ne pas confondre", `<p>Le <strong>périmètre</strong> dit « combien il faut de fil pour faire le tour ». L'<strong>aire</strong> dit « combien il faut de carrés pour remplir l'intérieur ». Ce sont deux choses différentes !</p>
+          <p>Deux figures de même périmètre peuvent avoir des aires différentes.</p>`)}
+
+        <h2>2. Périmètres usuels</h2>
+        ${lc.formula("Polygone &nbsp;:&nbsp; P = somme des longueurs des côtés")}
+        ${lc.formula("Carré (côté c) &nbsp;:&nbsp; P = 4 × c")}
+        ${lc.formula("Rectangle (longueur L, largeur l) &nbsp;:&nbsp; P = 2 × (L + l)")}
+        ${lc.formula("Cercle (rayon r) &nbsp;:&nbsp; P = 2 × π × r &nbsp;&nbsp; (avec π ≈ 3,14)")}
+        ${lc.example("Périmètre d'un rectangle de 8 cm × 5 cm", `<p><code>P = 2 × (8 + 5) = 2 × 13 = 26 cm</code>.</p>`)}
+        ${lc.example("Périmètre d'un cercle de rayon 4 cm", `<p><code>P = 2 × π × 4 = 8π ≈ 8 × 3,14 ≈ 25,12 cm</code>.</p>`)}
+
+        <h2>3. Aires usuelles</h2>
+        ${lc.formula("Carré (côté c) &nbsp;:&nbsp; A = c × c = c²")}
+        ${lc.formula("Rectangle (longueur L, largeur l) &nbsp;:&nbsp; A = L × l")}
+        ${lc.formula("Triangle (base b, hauteur h) &nbsp;:&nbsp; A = (b × h) / 2")}
+        ${lc.formula("Disque (rayon r) &nbsp;:&nbsp; A = π × r²")}
+        ${lc.example("Aire d'un carré de 6 cm de côté", `<p><code>A = 6 × 6 = 36 cm²</code>.</p>`)}
+        ${lc.example("Aire d'un triangle de base 8 cm et hauteur 5 cm", `<p><code>A = (8 × 5) / 2 = 40 / 2 = 20 cm²</code>.</p>`)}
+        ${lc.example("Aire d'un disque de rayon 3 cm", `<p><code>A = π × 3² = 9π ≈ 9 × 3,14 ≈ 28,26 cm²</code>.</p>`)}
+
+        <h2>4. Unités d'aire</h2>
+        ${lc.prop("Conversions", `<p>Pour passer d'une unité d'aire à une autre, on multiplie ou divise par <strong>100</strong> à chaque palier (et non par 10 comme pour les longueurs !).</p>
+          <ul><li><code>1 m² = 100 dm² = 10 000 cm² = 1 000 000 mm²</code></li>
+          <li><code>1 km² = 1 000 000 m²</code></li></ul>`)}
+        ${lc.tip("Pourquoi 100 ?", `<p>Parce que <code>1 m = 100 cm</code>, donc <code>1 m² = 1 m × 1 m = 100 cm × 100 cm = 10 000 cm²</code>.</p>`)}
+
+        <h2>5. Aires composées</h2>
+        ${lc.example("Aire d'une figure en L", `<p>Pour une figure compliquée, on la <strong>découpe</strong> en rectangles ou triangles simples, on calcule chaque aire, puis on additionne.</p>
+          <p>Si on doit retirer une partie (par exemple un trou), on calcule l'aire totale et on <strong>soustrait</strong> l'aire de la partie manquante.</p>`)}
+      `,
+    },
+
+    {
+      title: "Lecture de tableaux et de graphiques",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Tableau à double entrée</h2>
+        ${lc.def("Tableau à double entrée", `<p>Un tableau à double entrée a des <strong>lignes</strong> et des <strong>colonnes</strong>. Pour lire une valeur, on croise une ligne et une colonne.</p>`)}
+        ${lc.example("Météo", `<p>Tableau des températures (°C) :</p>
+          <p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Lun &nbsp; Mar &nbsp; Mer<br>Matin &nbsp;&nbsp; 12 &nbsp;&nbsp; 14 &nbsp;&nbsp; 11<br>Après-midi 18 &nbsp;&nbsp; 21 &nbsp;&nbsp; 17</code></p>
+          <p>Pour lire « la température du mardi après-midi », on croise la ligne « après-midi » et la colonne « Mar » : <strong>21 °C</strong>.</p>`)}
+
+        <h2>2. Diagramme en bâtons</h2>
+        ${lc.def("Diagramme en bâtons", `<p>Un <strong>diagramme en bâtons</strong> représente des données par des barres dont la <strong>hauteur</strong> est proportionnelle à la valeur.</p>`)}
+        ${lc.tip("Pour quoi c'est utile ?", `<p>Pour comparer rapidement plusieurs valeurs : on voit immédiatement la plus grande et la plus petite.</p>`)}
+
+        <h2>3. Diagramme circulaire (camembert)</h2>
+        ${lc.def("Diagramme circulaire", `<p>Un <strong>diagramme circulaire</strong> représente des données comme des parts d'un disque. Chaque part correspond à une <strong>fraction du tout</strong>.</p>`)}
+        ${lc.example("Sondage", `<p>Sur 200 personnes, 100 préfèrent le sport, 50 la musique, 50 le cinéma.</p>
+          <ul><li>Sport : 100/200 = 1/2 → <strong>moitié</strong> du disque (180°).</li>
+          <li>Musique : 50/200 = 1/4 → <strong>quart</strong> du disque (90°).</li>
+          <li>Cinéma : 50/200 = 1/4 → autre quart (90°).</li></ul>`)}
+
+        <h2>4. Graphique cartésien (lignes/courbes)</h2>
+        ${lc.def("Repère cartésien", `<p>On utilise deux <strong>axes perpendiculaires</strong> : l'axe horizontal (souvent le temps) et l'axe vertical (la valeur). Chaque point du graphique correspond à un couple <code>(x, y)</code>.</p>`)}
+        ${lc.tip("Pour quoi c'est utile ?", `<p>Pour montrer comment une grandeur évolue au cours du temps. On voit les hausses, les baisses, les pics.</p>`)}
+
+        <h2>5. Effectifs</h2>
+        ${lc.def("Effectif", `<p>L'<strong>effectif</strong> d'une catégorie, c'est le <strong>nombre</strong> d'éléments qu'elle contient.</p>`)}
+        ${lc.example("Couleurs préférées", `<p>Sur 30 élèves : 10 bleu, 8 rouge, 7 vert, 5 jaune.</p>
+          <ul><li>Effectif « bleu » : 10.</li>
+          <li>Effectif total : 30.</li></ul>`)}
+
+        <h2>6. Bien lire un graphique : checklist</h2>
+        ${lc.prop("Avant de lire", `<ol>
+          <li>Lire le <strong>titre</strong> : de quoi parle le graphique ?</li>
+          <li>Lire les <strong>légendes des axes</strong> : qu'est-ce qui est représenté en x et en y ? Quelle unité ?</li>
+          <li>Lire l'<strong>échelle</strong> : à quoi correspond une graduation ?</li>
+          <li>Faire la lecture en croisant les bonnes valeurs.</li>
+        </ol>`)}
+        ${lc.warn("Échelle trompeuse", `<p>Attention : un graphique peut être visuellement spectaculaire mais avec une échelle trompeuse (par exemple en zoomant entre 95 et 100 au lieu de 0 et 100). Toujours regarder l'<strong>échelle</strong>.</p>`)}
+      `,
+    },
+  ];
+}
 
 // ─── Contenu pédagogique : 5e à fond ─────────────────────────────
 function chapters5e() {
