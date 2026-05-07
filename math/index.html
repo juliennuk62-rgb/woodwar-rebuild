@@ -8644,13 +8644,14 @@ EXERCISES['1ere-11'] = [
     generate() {
       const n = exPick([10, 20, 25, 50]);
       const p = exPick([0.2, 0.4, 0.5, 0.1]);
+      const v = +(n * p * (1 - p)).toPrecision(12);
       return {
         question: `<code>X ~ ℬ(${n} ; ${p})</code>. Calcule <code>V(X)</code>.`,
         inputType: 'number',
-        answer: n * p * (1 - p),
+        answer: v,
         tolerance: 0.01,
         steps: [
-          `<code>V(X) = np(1−p) = ${n} × ${p} × ${1 - p} = ${n * p * (1 - p)}</code>.`,
+          `<code>V(X) = np(1−p) = ${n} × ${p} × ${1 - p} = ${v}</code>.`,
         ],
       };
     },
@@ -8971,6 +8972,10 @@ function revealSolution() {
 function exFormatAnswer(ex) {
   if (ex.inputType === 'mcq') return ex.options[ex.answer];
   if (ex.formatAnswer) return ex.formatAnswer(ex);
+  if (typeof ex.answer === 'number') {
+    // Nettoie les artefacts flottants (e.g. 1.8000000000000003 → 1.8)
+    return String(+ex.answer.toPrecision(12));
+  }
   return String(ex.answer);
 }
 
