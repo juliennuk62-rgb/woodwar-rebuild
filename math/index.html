@@ -14,7 +14,7 @@
       --bg-soft: #eef1f6;
       --text: #111827;
       --text-2: #4b5563;
-      --text-3: #9ca3af;
+      --text-3: #6b7280;
       --border: #e5e7eb;
       --border-strong: #d1d5db;
       --primary: #2563eb;
@@ -38,6 +38,13 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Focus visible pour navigation clavier (a11y). */
+    *:focus { outline: none; }
+    *:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
     html, body {
       min-height: 100%;
       background: var(--bg);
@@ -114,12 +121,83 @@
     aside.sidebar {
       background: var(--bg-elev);
       border-right: 1px solid var(--border);
-      padding: 20px 0;
+      padding: 0 0 20px;
       position: sticky;
       top: 64px;
       height: calc(100vh - 64px);
       overflow-y: auto;
       align-self: start;
+    }
+    .search-wrap {
+      position: sticky;
+      top: 0;
+      background: var(--bg-elev);
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--border);
+      z-index: 1;
+    }
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 32px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--r-sm);
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%236b7280' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") no-repeat 10px center;
+    }
+    .search-input::placeholder { color: var(--text-3); }
+    .search-input:focus { background-color: var(--bg-elev); }
+    .search-shortcut {
+      position: absolute;
+      right: 22px; top: 22px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-3);
+      background: var(--bg-soft);
+      padding: 2px 5px;
+      border-radius: 3px;
+      pointer-events: none;
+    }
+    .sidebar-content { padding-top: 16px; }
+    .search-results {
+      padding: 0 14px;
+    }
+    .search-result {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 8px 10px;
+      border-radius: var(--r-sm);
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.4;
+      margin-bottom: 2px;
+    }
+    .search-result:hover { background: var(--bg-soft); }
+    .search-result .result-level {
+      font-size: 10px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 1px;
+      display: block;
+    }
+    .search-result mark {
+      background: #fef08a;
+      color: var(--text);
+      padding: 0 1px;
+      border-radius: 2px;
+    }
+    .search-empty {
+      padding: 18px 14px;
+      color: var(--text-3);
+      font-size: 13px;
+      text-align: center;
     }
     .sidebar .group {
       padding: 0 14px 14px;
@@ -211,7 +289,7 @@
     .sidebar .chap-btn.placeholder.active { color: white; background: var(--primary); }
 
     /* ─── Content ────────────────────────────── */
-    article.content {
+    main.content {
       padding: 36px 48px 80px;
       max-width: 820px;
       line-height: 1.7;
@@ -553,7 +631,7 @@
       }
       .sidebar-backdrop.show { display: block; }
       .menu-btn { display: inline-flex; align-items: center; gap: 4px; }
-      article.content { padding: 24px 20px 60px; }
+      main.content { padding: 24px 20px 60px; }
     }
     @media (max-width: 600px) {
       header.app-header { padding: 10px 14px; }
@@ -569,7 +647,7 @@
 </head>
 <body>
   <header class="app-header">
-    <button class="menu-btn" id="menu-btn" aria-label="Ouvrir le menu">☰ Menu</button>
+    <button class="menu-btn" id="menu-btn" aria-label="Ouvrir le menu de navigation" aria-expanded="false" aria-controls="sidebar">☰ Menu</button>
     <div class="app-title">
       <span class="logo">∑</span>
       <span>Cours de maths</span>
@@ -578,8 +656,8 @@
   </header>
 
   <div class="layout">
-    <aside class="sidebar" id="sidebar"></aside>
-    <article class="content" id="content"></article>
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Navigation des chapitres"></aside>
+    <main class="content" id="content" role="main"></main>
   </div>
   <div class="sidebar-backdrop" id="backdrop"></div>
 
@@ -6272,6 +6350,7 @@ function chapters5e() {
 // ─── État + persistance ─────────────────────────────────────────
 const STATE_KEY = 'mathcours_v1';
 let state = { levelId: '5e', chapterId: null };
+let searchState = { query: '' };
 
 function loadState() {
   try {
@@ -6302,6 +6381,70 @@ function levelStats(level) {
 function renderSidebar() {
   const sidebar = $('#sidebar');
   sidebar.innerHTML = '';
+
+  // Barre de recherche en haut, sticky.
+  const searchWrap = el('div', { class: 'search-wrap' });
+  const searchInput = el('input', {
+    class: 'search-input',
+    type: 'search',
+    id: 'search-input',
+    placeholder: 'Rechercher un chapitre…',
+    'aria-label': 'Rechercher un chapitre',
+    autocomplete: 'off',
+    spellcheck: 'false',
+  });
+  const shortcutHint = el('span', { class: 'search-shortcut' },
+    navigator.platform && /Mac/i.test(navigator.platform) ? '⌘K' : 'Ctrl+K');
+  searchInput.addEventListener('input', (e) => {
+    searchState.query = e.target.value.trim().toLowerCase();
+    renderSidebarBody();
+  });
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { searchInput.value = ''; searchState.query = ''; renderSidebarBody(); searchInput.blur(); }
+  });
+  searchWrap.appendChild(searchInput);
+  searchWrap.appendChild(shortcutHint);
+  sidebar.appendChild(searchWrap);
+
+  // Corps : navigation classique OU résultats de recherche.
+  const body = el('div', { class: 'sidebar-content', id: 'sidebar-body' });
+  sidebar.appendChild(body);
+  renderSidebarBody();
+}
+
+function renderSidebarBody() {
+  const body = $('#sidebar-body');
+  if (!body) return;
+  body.innerHTML = '';
+
+  if (searchState.query) {
+    const results = searchChapters(searchState.query);
+    if (results.length === 0) {
+      body.appendChild(el('div', { class: 'search-empty' }, 'Aucun chapitre ne correspond.'));
+      return;
+    }
+    const resultsBox = el('div', { class: 'search-results' });
+    for (const r of results.slice(0, 30)) {
+      const btn = el('button', {
+        class: 'search-result',
+        onclick: () => {
+          state.levelId = r.levelId;
+          state.chapterId = `${r.levelId}-${r.idx}`;
+          searchState.query = '';
+          saveState();
+          render();
+          closeSidebarMobile();
+        }
+      });
+      btn.appendChild(el('span', { class: 'result-level' }, `${r.levelName} · ${r.category}`));
+      btn.appendChild(el('span', { html: highlightMatch(r.title, searchState.query) }));
+      resultsBox.appendChild(btn);
+    }
+    body.appendChild(resultsBox);
+    return;
+  }
+
+  // Vue par défaut : groupes / niveaux / chapitres.
   for (const group of CURRICULUM) {
     const groupDiv = el('div', { class: 'group' });
     groupDiv.appendChild(el('h4', {}, group.name));
@@ -6310,6 +6453,7 @@ function renderSidebar() {
       const stats = levelStats(level);
       const lvlBtn = el('button', {
         class: 'lvl-btn' + (isActive ? ' active' : ''),
+        'aria-current': isActive && !state.chapterId ? 'page' : null,
         onclick: () => {
           state.levelId = level.id;
           state.chapterId = null;
@@ -6323,7 +6467,6 @@ function renderSidebar() {
       groupDiv.appendChild(lvlBtn);
       if (isActive) {
         const chapsBox = el('div', { class: 'chapters' });
-        // Grouper par catégorie
         let lastCat = null;
         for (let i = 0; i < level.chapters.length; i++) {
           const ch = level.chapters[i];
@@ -6335,6 +6478,7 @@ function renderSidebar() {
           const isChActive = state.chapterId === chId;
           chapsBox.appendChild(el('button', {
             class: 'chap-btn' + (isChActive ? ' active' : '') + (ch.content ? '' : ' placeholder'),
+            'aria-current': isChActive ? 'page' : null,
             onclick: () => {
               state.chapterId = chId;
               saveState();
@@ -6346,8 +6490,44 @@ function renderSidebar() {
         groupDiv.appendChild(chapsBox);
       }
     }
-    sidebar.appendChild(groupDiv);
+    body.appendChild(groupDiv);
   }
+}
+
+// Index des chapitres pré-calculé (titre + catégorie + niveau) pour la recherche.
+const SEARCH_INDEX = (() => {
+  const idx = [];
+  for (const g of CURRICULUM) {
+    for (const lvl of g.levels) {
+      for (let i = 0; i < lvl.chapters.length; i++) {
+        const ch = lvl.chapters[i];
+        idx.push({
+          levelId: lvl.id, levelName: lvl.name, idx: i,
+          title: ch.title, category: ch.category,
+          haystack: (ch.title + ' ' + ch.category + ' ' + lvl.name).toLowerCase(),
+        });
+      }
+    }
+  }
+  return idx;
+})();
+
+function searchChapters(q) {
+  const tokens = q.split(/\s+/).filter(Boolean);
+  if (!tokens.length) return [];
+  return SEARCH_INDEX.filter(item => tokens.every(t => item.haystack.includes(t)));
+}
+
+function highlightMatch(text, q) {
+  const escape = s => s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const tokens = q.split(/\s+/).filter(Boolean);
+  if (!tokens.length) return escape(text);
+  let result = escape(text);
+  for (const t of tokens) {
+    const re = new RegExp('(' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+    result = result.replace(re, '<mark>$1</mark>');
+  }
+  return result;
 }
 
 function renderBreadcrumb() {
@@ -6492,7 +6672,7 @@ function renderChapter(main, level, chapter, idx) {
     // sur window, donc un handler inline plantait avec « state is not
     // defined ».
     backWrap.appendChild(el('button', {
-      class: 'nav-btn',
+      class: 'nav-btn next',
       onclick: () => { state.chapterId = null; saveState(); render(); }
     }, 'Retour au sommaire'));
     empty.appendChild(backWrap);
@@ -6540,10 +6720,14 @@ function render() {
 function openSidebarMobile() {
   $('#sidebar').classList.add('open');
   $('#backdrop').classList.add('show');
+  const btn = $('#menu-btn');
+  if (btn) btn.setAttribute('aria-expanded', 'true');
 }
 function closeSidebarMobile() {
   $('#sidebar').classList.remove('open');
   $('#backdrop').classList.remove('show');
+  const btn = $('#menu-btn');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
 }
 
 // ─── Boot ───────────────────────────────────────────────────────
@@ -6552,6 +6736,24 @@ function boot() {
   render();
   $('#menu-btn').addEventListener('click', openSidebarMobile);
   $('#backdrop').addEventListener('click', closeSidebarMobile);
+
+  // Raccourci global Cmd+K / Ctrl+K → focus la recherche.
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      const input = $('#search-input');
+      if (input) {
+        // Sur mobile, on ouvre d'abord le drawer.
+        if (window.innerWidth < 900) openSidebarMobile();
+        input.focus();
+        input.select();
+      }
+    }
+    // Échap ferme le drawer mobile s'il est ouvert.
+    if (e.key === 'Escape') {
+      if ($('#sidebar').classList.contains('open')) closeSidebarMobile();
+    }
+  });
 }
 
 boot();
