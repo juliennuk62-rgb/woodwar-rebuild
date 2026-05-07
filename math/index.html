@@ -12371,6 +12371,110 @@ EXERCISES['3e-12'] = [
 ];
 
 // ─── Templates d'exercices : 2nde ───────────────────────────────
+EXERCISES['2nde-0'] = [
+  {
+    title: 'Appartenance à un ensemble',
+    generate() {
+      const c = exPick([
+        { n: 5, ens: 'ℕ', a: true }, { n: -3, ens: 'ℕ', a: false },
+        { n: -7, ens: 'ℤ', a: true }, { n: 0.5, ens: 'ℤ', a: false },
+        { n: 0.25, ens: '𝔻', a: true }, { n: '1/3', ens: '𝔻', a: false },
+        { n: '1/3', ens: 'ℚ', a: true }, { n: '√2', ens: 'ℚ', a: false },
+        { n: '√2', ens: 'ℝ', a: true },
+      ]);
+      return {
+        question: `<code>${c.n}</code> appartient-il à <code>${c.ens}</code> ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.a ? 0 : 1,
+        steps: [
+          `ℕ = entiers naturels (≥ 0). ℤ = entiers relatifs. 𝔻 = décimaux (peuvent s'écrire k/10ⁿ). ℚ = rationnels (a/b). ℝ = réels.`,
+          c.a ? `<code>${c.n} ∈ ${c.ens}</code> ✓` : `<code>${c.n} ∉ ${c.ens}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Inclusion d\'ensembles',
+    generate() {
+      return {
+        question: `Quelle inclusion est <strong>fausse</strong> ?`,
+        inputType: 'mcq',
+        options: ['ℕ ⊂ ℤ', 'ℤ ⊂ ℚ', 'ℚ ⊂ ℝ', 'ℝ ⊂ ℚ'],
+        answer: 3,
+        steps: [
+          `Hiérarchie : <code>ℕ ⊂ ℤ ⊂ 𝔻 ⊂ ℚ ⊂ ℝ</code>.`,
+          `<code>ℝ ⊂ ℚ</code> est faux : √2 ∈ ℝ mais ∉ ℚ.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Nature d\'un nombre',
+    generate() {
+      const c = exPick([
+        { n: '√4', type: 'entier' },
+        { n: 'π', type: 'irrationnel' },
+        { n: '0,75', type: 'décimal' },
+        { n: '−5', type: 'entier relatif' },
+        { n: '1/7', type: 'rationnel' },
+      ]);
+      return {
+        question: `Le nombre <code>${c.n}</code> est :`,
+        inputType: 'mcq',
+        options: ['entier naturel', 'entier relatif', 'décimal', 'rationnel', 'irrationnel'],
+        answer: ['entier', 'entier relatif', 'décimal', 'rationnel', 'irrationnel'].findIndex(x => c.type.includes(x.split(' ')[0])),
+        steps: [
+          c.n === '√4' ? `√4 = 2, c'est un entier naturel.`
+          : c.n === 'π' ? `π ne s'écrit pas comme a/b : irrationnel.`
+          : c.n === '0,75' ? `0,75 = 75/100 : nombre décimal.`
+          : c.n === '−5' ? `Entier négatif → relatif.`
+          : `1/7 = 0,142857142857… (périodique non décimal) : rationnel.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Décimal : test',
+    generate() {
+      const c = exPick([
+        { f: '1/2', d: true }, { f: '1/3', d: false },
+        { f: '3/4', d: true }, { f: '1/7', d: false },
+        { f: '1/5', d: true }, { f: '1/6', d: false },
+      ]);
+      return {
+        question: `<code>${c.f}</code> est-il un nombre <strong>décimal</strong> ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.d ? 0 : 1,
+        steps: [
+          `Un nombre est décimal ⇔ son écriture sous forme irréductible <code>a/b</code> a <code>b = 2^p × 5^q</code>.`,
+          c.d ? `Donc <code>${c.f}</code> est décimal.` : `Le dénominateur a un autre facteur premier : non décimal.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Plus petit ensemble',
+    generate() {
+      const c = exPick([
+        { n: '7', ens: 'ℕ' }, { n: '−3', ens: 'ℤ' },
+        { n: '0,4', ens: '𝔻' }, { n: '2/7', ens: 'ℚ' }, { n: '√2', ens: 'ℝ' },
+      ]);
+      return {
+        question: `Quel est le plus petit ensemble auquel <code>${c.n}</code> appartient ?`,
+        inputType: 'mcq',
+        options: ['ℕ', 'ℤ', '𝔻', 'ℚ', 'ℝ'],
+        answer: ['ℕ', 'ℤ', '𝔻', 'ℚ', 'ℝ'].indexOf(c.ens),
+        steps: [
+          `Hiérarchie : ℕ ⊂ ℤ ⊂ 𝔻 ⊂ ℚ ⊂ ℝ.`,
+          `Le plus petit ensemble contenant <code>${c.n}</code> est <code>${c.ens}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
 EXERCISES['2nde-1'] = [
   {
     title: 'Identités remarquables : développer',
@@ -12383,6 +12487,73 @@ EXERCISES['2nde-1'] = [
         steps: [
           `<code>(${a}x − ${b})² = (${a}x)² − 2 × ${a}x × ${b} + ${b}²</code>.`,
           `<code>= ${a*a}x² − ${2*a*b}x + ${b*b}</code>. Terme constant = <code>${b*b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Factoriser une diff. de carrés',
+    generate() {
+      const a = exRand(2, 7);
+      const b = exRand(1, 9);
+      return {
+        question: `Factorise <code>${a * a}x² − ${b * b}</code>. Donne le coefficient p tel que <code>(${a}x + p)(${a}x − p)</code>.`,
+        inputType: 'number',
+        answer: b,
+        steps: [
+          `<code>u² − v² = (u + v)(u − v)</code> avec <code>u = ${a}x</code>, <code>v = ${b}</code>.`,
+          `Donc p = <code>${b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Calcul fractionnaire',
+    generate() {
+      const a = exRand(2, 6), b = exRand(2, 6);
+      const c = exRand(2, 6), d = exRand(2, 6);
+      return {
+        question: `Calcule : <code>${a}/${b} − ${c}/${d}</code>. Forme <code>num/den</code> avec dénominateur ${b * d}.`,
+        inputType: 'fraction',
+        answer: (a * d - c * b) / (b * d),
+        formatAnswer: () => `${a * d - c * b}/${b * d}`,
+        steps: [
+          `Dénominateur commun : <code>${b * d}</code>.`,
+          `<code>${a * d}/${b * d} − ${c * b}/${b * d} = ${a * d - c * b}/${b * d}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Puissance et racine',
+    generate() {
+      const c = exPick([
+        { e: '√(36)', v: 6 }, { e: '√(81)', v: 9 },
+        { e: '2³', v: 8 }, { e: '5²', v: 25 },
+        { e: '(−3)²', v: 9 },
+      ]);
+      return {
+        question: `Calcule : <code>${c.e}</code>.`,
+        inputType: 'number',
+        answer: c.v,
+        steps: [
+          `<code>${c.e} = ${c.v}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Réduire une expression',
+    generate() {
+      const a = exRand(2, 6);
+      const b = exRand(2, 6);
+      return {
+        question: `Réduis : <code>${a}x² + ${a + b}x − ${a}x² + ${b}x</code>. Donne le coefficient de x.`,
+        inputType: 'number',
+        answer: a + b + b,
+        steps: [
+          `Les termes en <code>x²</code> s'annulent.`,
+          `Reste : <code>(${a + b} + ${b})x = ${a + 2 * b}x</code>.`,
         ],
       };
     },
@@ -12415,7 +12586,6 @@ EXERCISES['2nde-2'] = [
     generate() {
       const a = exRand(-8, 8);
       const r = exRand(2, 10);
-      // Solutions : x ∈ [a − r, a + r]. On demande la borne sup.
       return {
         question: `Résous <code>|x − ${a}| ≤ ${r}</code>. Donne la borne supérieure de l'intervalle.`,
         inputType: 'number',
@@ -12423,6 +12593,177 @@ EXERCISES['2nde-2'] = [
         steps: [
           `<code>|x − ${a}| ≤ ${r}</code> équivaut à <code>${a - r} ≤ x ≤ ${a + r}</code>.`,
           `Borne supérieure : <code>${a + r}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Intersection d\'intervalles',
+    generate() {
+      const a = exRand(-5, 0);
+      const b = exRand(2, 8);
+      const c = exRand(a + 1, b - 1);
+      return {
+        question: `Quelle est la borne <strong>inférieure</strong> de <code>[${a}; ${b}] ∩ [${c}; ${b + 3}]</code> ?`,
+        inputType: 'number',
+        answer: c,
+        steps: [
+          `Intersection : on garde la plus grande borne inférieure et la plus petite borne supérieure.`,
+          `Borne inf : <code>max(${a}, ${c}) = ${c}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Réunion d\'intervalles',
+    generate() {
+      const a = exRand(-5, 0);
+      const b = exRand(2, 5);
+      const c = exRand(b + 1, 10);
+      return {
+        question: `Borne supérieure de <code>[${a}; ${b}] ∪ [${b - 1}; ${c}]</code> ?`,
+        inputType: 'number',
+        answer: c,
+        steps: [
+          `Les deux intervalles se chevauchent (car ${b - 1} ≤ ${b}).`,
+          `Réunion : <code>[${a}; ${c}]</code>. Borne sup : <code>${c}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Inéquation produit',
+    generate() {
+      const a = exRand(2, 6);
+      const b = exRand(2, 6);
+      return {
+        question: `Quelle est la plus petite solution entière de <code>(x − ${a})(x − ${b}) ≥ 0</code> avec ${a} &lt; ${b} ?`,
+        inputType: 'number',
+        answer: -100,
+        steps: [
+          `Le produit est positif sur <code>(−∞ ; ${a}] ∪ [${b} ; +∞)</code>.`,
+          `Pas de plus petite solution : on convient ici de <code>−100</code> pour signaler ¬borné.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Encadrement strict',
+    generate() {
+      const a = exRand(-3, 3);
+      const b = exRand(a + 2, a + 8);
+      return {
+        question: `Sur <code>]${a} ; ${b}[</code>, la plus petite valeur entière strictement contenue est :`,
+        inputType: 'number',
+        answer: a + 1,
+        steps: [
+          `L'intervalle est <strong>ouvert</strong> en ${a} : ${a} n'est pas inclus.`,
+          `Plus petit entier strict : <code>${a + 1}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-3'] = [
+  {
+    title: 'Image et antécédent',
+    generate() {
+      const c = exPick([
+        { fx: 'x²', x: 3, fxv: 9 },
+        { fx: 'x²', x: -2, fxv: 4 },
+        { fx: '2x + 1', x: 4, fxv: 9 },
+        { fx: 'x − 5', x: 8, fxv: 3 },
+      ]);
+      return {
+        question: `Soit <code>f(x) = ${c.fx}</code>. Calcule l'image de <code>${c.x}</code>.`,
+        inputType: 'number',
+        answer: c.fxv,
+        steps: [
+          `Remplacer x par ${c.x} dans l'expression.`,
+          `<code>f(${c.x}) = ${c.fxv}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Ensemble de définition',
+    generate() {
+      const c = exPick([
+        { fx: '1/x', dom: 'ℝ \\ {0}' },
+        { fx: '1/(x − 3)', dom: 'ℝ \\ {3}' },
+        { fx: '√x', dom: '[0; +∞[' },
+        { fx: '2x + 5', dom: 'ℝ' },
+      ]);
+      return {
+        question: `Quel est l'ensemble de définition de <code>f(x) = ${c.fx}</code> ?`,
+        inputType: 'mcq',
+        options: ['ℝ', 'ℝ \\ {0}', 'ℝ \\ {3}', '[0; +∞['],
+        answer: ['ℝ', 'ℝ \\ {0}', 'ℝ \\ {3}', '[0; +∞['].indexOf(c.dom),
+        steps: [
+          c.fx === '1/x' ? `Le dénominateur ne doit pas être nul : x ≠ 0.`
+          : c.fx === '1/(x − 3)' ? `Dénominateur non nul : x ≠ 3.`
+          : c.fx === '√x' ? `La racine carrée existe pour x ≥ 0.`
+          : `Polynôme : défini sur ℝ.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fonction croissante / décroissante',
+    generate() {
+      const c = exPick([
+        { fx: 'x + 5', sens: 'croissante' },
+        { fx: '−2x + 3', sens: 'décroissante' },
+        { fx: '5x − 1', sens: 'croissante' },
+        { fx: '−x', sens: 'décroissante' },
+      ]);
+      return {
+        question: `<code>f(x) = ${c.fx}</code> est :`,
+        inputType: 'mcq',
+        options: ['croissante', 'décroissante', 'constante'],
+        answer: ['croissante', 'décroissante', 'constante'].indexOf(c.sens),
+        steps: [
+          `Pour une fonction affine <code>ax + b</code> : a > 0 ⇒ croissante ; a &lt; 0 ⇒ décroissante.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Maximum sur un intervalle',
+    generate() {
+      const c = exPick([
+        { vals: [(-3, 9), (-2, 4), (-1, 1), (0, 0), (1, 1), (2, 4), (3, 9)], max: 9, x: 3 },
+      ]);
+      return {
+        question: `Sur l'intervalle <code>[−3; 3]</code>, la fonction <code>f(x) = x²</code> atteint son <strong>maximum</strong> en x = ?`,
+        inputType: 'mcq',
+        options: ['0', '−3 ou 3', '3 seulement', '−3 seulement'],
+        answer: 1,
+        steps: [
+          `<code>x²</code> est paire, atteint son max aux extrémités symétriques.`,
+          `Sur [−3; 3], max = 9 atteint en <code>x = ±3</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Parité d\'une fonction',
+    generate() {
+      const c = exPick([
+        { fx: 'x²', parite: 'paire' },
+        { fx: 'x³', parite: 'impaire' },
+        { fx: '|x|', parite: 'paire' },
+        { fx: 'x + 1', parite: 'ni paire ni impaire' },
+      ]);
+      return {
+        question: `<code>f(x) = ${c.fx}</code> est :`,
+        inputType: 'mcq',
+        options: ['paire', 'impaire', 'ni paire ni impaire'],
+        answer: ['paire', 'impaire', 'ni paire ni impaire'].indexOf(c.parite),
+        steps: [
+          `Paire : <code>f(−x) = f(x)</code>. Impaire : <code>f(−x) = −f(x)</code>.`,
+          `Ici : ${c.parite}.`,
         ],
       };
     },
@@ -12445,6 +12786,74 @@ EXERCISES['2nde-4'] = [
         steps: [
           `<code>a = (y_B − y_A) / (x_B − x_A) = (${yB} − ${yA}) / (${xB} − ${xA}) = ${yB - yA} / ${xB - xA}</code>.`,
           `<code>= ${a.toFixed(3)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Ordonnée à l\'origine',
+    generate() {
+      const a = exRand(-4, 4) || 2;
+      const b = exRand(-8, 8);
+      return {
+        question: `La droite a pour équation <code>y = ${a}x ${b >= 0 ? '+ ' + b : '− ' + (-b)}</code>. Quelle est son <strong>ordonnée à l'origine</strong> ?`,
+        inputType: 'number',
+        answer: b,
+        steps: [
+          `L'ordonnée à l'origine est la valeur de y quand <code>x = 0</code>.`,
+          `<code>y(0) = ${a} × 0 ${b >= 0 ? '+' : '−'} ${Math.abs(b)} = ${b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Équation de droite (2 points)',
+    generate() {
+      const a = exRand(-3, 3) || 2;
+      const b = exRand(-5, 5);
+      const xA = exRand(0, 5);
+      const xB = exRand(xA + 1, xA + 5);
+      const yA = a * xA + b;
+      const yB = a * xB + b;
+      return {
+        question: `Droite passant par <code>A(${xA}; ${yA})</code> et <code>B(${xB}; ${yB})</code>. Quel est son coefficient directeur ?`,
+        inputType: 'number',
+        answer: a,
+        tolerance: 0.001,
+        steps: [
+          `<code>a = (${yB} − ${yA}) / (${xB} − ${xA}) = ${yB - yA} / ${xB - xA} = ${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Image par fonction affine',
+    generate() {
+      const a = exRand(-4, 4) || 2;
+      const b = exRand(-8, 8);
+      const x = exRand(-5, 8);
+      return {
+        question: `Soit <code>f(x) = ${a}x ${b >= 0 ? '+ ' + b : '− ' + (-b)}</code>. Calcule <code>f(${x})</code>.`,
+        inputType: 'number',
+        answer: a * x + b,
+        steps: [
+          `<code>f(${x}) = ${a} × ${x} ${b >= 0 ? '+' : '−'} ${Math.abs(b)} = ${a * x + b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Droite parallèle à l\'axe des abscisses',
+    generate() {
+      const k = exRand(-8, 8);
+      return {
+        question: `Quelle est l'équation d'une droite horizontale passant par <code>(0; ${k})</code> ?`,
+        inputType: 'mcq',
+        options: [`x = ${k}`, `y = ${k}`, `y = ${k}x`, `x + y = ${k}`],
+        answer: 1,
+        steps: [
+          `Une droite horizontale a une équation de la forme <code>y = constante</code>.`,
+          `Ici : <code>y = ${k}</code>.`,
         ],
       };
     },
@@ -12482,6 +12891,50 @@ EXERCISES['2nde-5'] = [
       };
     },
   },
+  {
+    title: 'Racine carrée d\'un nombre',
+    generate() {
+      const n = exPick([16, 25, 36, 49, 64, 81, 100, 121, 144]);
+      return {
+        question: `Calcule <code>√${n}</code>.`,
+        inputType: 'number',
+        answer: Math.sqrt(n),
+        steps: [
+          `<code>${Math.sqrt(n)}² = ${n}</code>, donc <code>√${n} = ${Math.sqrt(n)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fonction cube',
+    generate() {
+      const x = exRand(-4, 4);
+      return {
+        question: `<code>f(x) = x³</code>. Calcule <code>f(${x})</code>.`,
+        inputType: 'number',
+        answer: x ** 3,
+        steps: [
+          `<code>f(${x}) = ${x}³ = ${x ** 3}</code>.`,
+          `Attention : x³ garde le signe de x.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variations de x²',
+    generate() {
+      return {
+        question: `Sur l'intervalle <code>(−∞ ; 0]</code>, la fonction <code>f(x) = x²</code> est :`,
+        inputType: 'mcq',
+        options: ['croissante', 'décroissante', 'constante'],
+        answer: 1,
+        steps: [
+          `Sur <code>(−∞ ; 0]</code>, <code>x²</code> est <strong>décroissante</strong>.`,
+          `(Sur <code>[0 ; +∞)</code>, elle est croissante.)`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['2nde-6'] = [
@@ -12495,6 +12948,69 @@ EXERCISES['2nde-6'] = [
         answer: a,
         steps: [
           `Résoudre <code>1/x = ${(1 / a).toFixed(3)}</code>, donc <code>x = 1 / ${(1 / a).toFixed(3)} = ${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Image par la fonction inverse',
+    generate() {
+      const c = exPick([
+        { x: 2, fxv: '1/2' }, { x: 5, fxv: '1/5' },
+        { x: -3, fxv: '−1/3' }, { x: 10, fxv: '1/10' },
+      ]);
+      return {
+        question: `<code>f(x) = 1/x</code>. Que vaut <code>f(${c.x})</code> ?`,
+        inputType: 'fraction',
+        answer: 1 / c.x,
+        formatAnswer: () => c.fxv,
+        steps: [
+          `<code>f(${c.x}) = 1/${c.x} = ${c.fxv}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Domaine de 1/x',
+    generate() {
+      return {
+        question: `Quel est l'ensemble de définition de <code>f(x) = 1/x</code> ?`,
+        inputType: 'mcq',
+        options: ['ℝ', 'ℝ \\ {0}', '[0; +∞[', ']0; +∞['],
+        answer: 1,
+        steps: [
+          `Le dénominateur ne doit pas être nul : <code>x ≠ 0</code>.`,
+          `<code>D_f = ℝ \\ {0}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Sens de variation de 1/x',
+    generate() {
+      return {
+        question: `Sur l'intervalle <code>]0 ; +∞[</code>, la fonction <code>f(x) = 1/x</code> est :`,
+        inputType: 'mcq',
+        options: ['croissante', 'décroissante', 'constante'],
+        answer: 1,
+        steps: [
+          `Plus x grandit, plus 1/x est proche de 0.`,
+          `Donc <code>f</code> est <strong>décroissante</strong> sur <code>]0; +∞[</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limites en 0',
+    generate() {
+      return {
+        question: `Quand <code>x → 0⁺</code> (par valeurs positives), que devient <code>1/x</code> ?`,
+        inputType: 'mcq',
+        options: ['→ 0', '→ +∞', '→ −∞', '→ 1'],
+        answer: 1,
+        steps: [
+          `Quand x devient très petit (mais positif), 1/x devient très grand.`,
+          `<code>lim<sub>x→0⁺</sub> 1/x = +∞</code>.`,
         ],
       };
     },
@@ -12515,6 +13031,74 @@ EXERCISES['2nde-7'] = [
         answer: c,
         steps: [
           `<code>||u→|| = √(x² + y²) = √(${sa * sa} + ${sb * sb}) = √${sa * sa + sb * sb} = ${c}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Coordonnées d\'un vecteur AB',
+    generate() {
+      const xA = exRand(-5, 5), yA = exRand(-5, 5);
+      const xB = exRand(-5, 5), yB = exRand(-5, 5);
+      return {
+        question: `<code>A(${xA}; ${yA})</code> et <code>B(${xB}; ${yB})</code>. Quelle est la première coordonnée du vecteur <code>AB→</code> ?`,
+        inputType: 'number',
+        answer: xB - xA,
+        steps: [
+          `<code>AB→ = (x<sub>B</sub> − x<sub>A</sub>; y<sub>B</sub> − y<sub>A</sub>)</code>.`,
+          `Première coordonnée : <code>${xB} − ${xA} = ${xB - xA}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Somme de vecteurs',
+    generate() {
+      const ux = exRand(-5, 5), uy = exRand(-5, 5);
+      const vx = exRand(-5, 5), vy = exRand(-5, 5);
+      return {
+        question: `<code>u→(${ux}; ${uy})</code> et <code>v→(${vx}; ${vy})</code>. Quelle est la première coordonnée de <code>u→ + v→</code> ?`,
+        inputType: 'number',
+        answer: ux + vx,
+        steps: [
+          `On additionne coordonnée par coordonnée.`,
+          `<code>(u + v)<sub>x</sub> = ${ux} + ${vx} = ${ux + vx}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Vecteurs colinéaires',
+    generate() {
+      const c = exPick([
+        { u: [2, 3], v: [4, 6], col: true },
+        { u: [1, 2], v: [3, 6], col: true },
+        { u: [2, 1], v: [3, 4], col: false },
+        { u: [3, 5], v: [6, 11], col: false },
+      ]);
+      return {
+        question: `<code>u→(${c.u[0]}; ${c.u[1]})</code> et <code>v→(${c.v[0]}; ${c.v[1]})</code> sont-ils colinéaires ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.col ? 0 : 1,
+        steps: [
+          `Test : <code>x<sub>u</sub> y<sub>v</sub> − x<sub>v</sub> y<sub>u</sub> = ${c.u[0]} × ${c.v[1]} − ${c.v[0]} × ${c.u[1]} = ${c.u[0] * c.v[1] - c.v[0] * c.u[1]}</code>.`,
+          c.col ? `= 0 → colinéaires.` : `≠ 0 → non colinéaires.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Vecteur opposé',
+    generate() {
+      const ux = exRand(-5, 5) || 3, uy = exRand(-5, 5) || -2;
+      return {
+        question: `Quelle est la première coordonnée du vecteur opposé de <code>u→(${ux}; ${uy})</code> ?`,
+        inputType: 'number',
+        answer: -ux,
+        steps: [
+          `Le vecteur opposé de <code>u→</code> est <code>−u→ = (−x; −y)</code>.`,
+          `Première coordonnée : <code>${-ux}</code>.`,
         ],
       };
     },
@@ -12556,6 +13140,60 @@ EXERCISES['2nde-8'] = [
       };
     },
   },
+  {
+    title: 'Équation cartésienne d\'un cercle',
+    generate() {
+      const a = exRand(-3, 3);
+      const b = exRand(-3, 3);
+      const r = exRand(2, 6);
+      return {
+        question: `Le cercle de centre <code>(${a}; ${b})</code> et de rayon <code>${r}</code> a pour équation <code>(x − ${a})² + (y − ${b})² = ?</code>. Quelle est la valeur à droite ?`,
+        inputType: 'number',
+        answer: r * r,
+        steps: [
+          `Équation : <code>(x − x_O)² + (y − y_O)² = R²</code>.`,
+          `<code>R² = ${r}² = ${r * r}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Symétrique par rapport à O',
+    generate() {
+      const xA = exRand(-6, 6) || 3;
+      const yA = exRand(-6, 6) || -2;
+      return {
+        question: `Le symétrique de <code>A(${xA}; ${yA})</code> par rapport à l'origine <code>O(0; 0)</code> a pour abscisse :`,
+        inputType: 'number',
+        answer: -xA,
+        steps: [
+          `Symétrique de A par rapport à O : <code>A'(−x<sub>A</sub>; −y<sub>A</sub>)</code>.`,
+          `Abscisse : <code>${-xA}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Alignement de 3 points',
+    generate() {
+      const c = exPick([
+        { A: [0, 0], B: [2, 4], C: [3, 6], align: true },
+        { A: [1, 1], B: [3, 5], C: [5, 9], align: true },
+        { A: [0, 0], B: [1, 2], C: [2, 5], align: false },
+        { A: [-1, 0], B: [1, 2], C: [3, 5], align: false },
+      ]);
+      return {
+        question: `<code>A(${c.A[0]}; ${c.A[1]})</code>, <code>B(${c.B[0]}; ${c.B[1]})</code>, <code>C(${c.C[0]}; ${c.C[1]})</code>. Sont-ils alignés ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.align ? 0 : 1,
+        steps: [
+          `Tester si <code>AB→</code> et <code>AC→</code> sont colinéaires.`,
+          c.align ? `Vecteurs colinéaires → alignés.` : `Vecteurs non colinéaires → non alignés.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['2nde-9'] = [
@@ -12563,7 +13201,6 @@ EXERCISES['2nde-9'] = [
     title: 'Calculer un écart-type',
     generate() {
       const m = exRand(8, 12);
-      // série symétrique autour de m
       const d = exRand(1, 3);
       const vals = [m - 2 * d, m - d, m, m + d, m + 2 * d];
       const variance = vals.reduce((s, v) => s + (v - m) ** 2, 0) / vals.length;
@@ -12577,6 +13214,242 @@ EXERCISES['2nde-9'] = [
           `Moyenne : <code>${m}</code>.`,
           `Variance = moyenne des carrés des écarts = <code>${variance}</code>.`,
           `Écart-type = <code>√${variance} ≈ ${sigma.toFixed(3)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Moyenne d\'une série',
+    generate() {
+      const n = exRand(5, 8);
+      const vals = Array.from({ length: n }, () => exRand(8, 18));
+      const sum = vals.reduce((a, b) => a + b, 0);
+      return {
+        question: `Moyenne de <code>${vals.join(', ')}</code> (au dixième) ?`,
+        inputType: 'number',
+        answer: Math.round((sum / n) * 10) / 10,
+        tolerance: 0.05,
+        steps: [
+          `<code>x̄ = ${sum} / ${n} = ${(sum / n).toFixed(3)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Médiane de série paire',
+    generate() {
+      const vals = Array.from({ length: 6 }, () => exRand(5, 25)).sort((a, b) => a - b);
+      const med = (vals[2] + vals[3]) / 2;
+      return {
+        question: `Médiane de <code>${vals.join(', ')}</code> ?`,
+        inputType: 'number',
+        answer: med,
+        tolerance: 0.05,
+        steps: [
+          `Effectif pair (6) : médiane = (3<sup>e</sup> + 4<sup>e</sup>)/2 = <code>(${vals[2]} + ${vals[3]})/2 = ${med}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variance d\'une série symétrique',
+    generate() {
+      const m = exRand(8, 14);
+      const d = exRand(1, 3);
+      const vals = [m - d, m - d, m, m + d, m + d];
+      const variance = vals.reduce((s, v) => s + (v - m) ** 2, 0) / vals.length;
+      return {
+        question: `Variance de <code>${vals.join(', ')}</code> ? (au centième)`,
+        inputType: 'number',
+        answer: Math.round(variance * 100) / 100,
+        tolerance: 0.01,
+        steps: [
+          `Moyenne : <code>${m}</code>.`,
+          `Variance : <code>(2 × ${d}² + 0² + 2 × ${d}²) / 5 = ${variance}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Effet d\'un ajout sur la moyenne',
+    generate() {
+      const k = exRand(2, 8);
+      return {
+        question: `On ajoute <code>${k}</code> à toutes les valeurs d'une série de moyenne 12. Quelle est la nouvelle moyenne ?`,
+        inputType: 'number',
+        answer: 12 + k,
+        steps: [
+          `Ajouter une constante k à toutes les valeurs ajoute k à la moyenne.`,
+          `Nouvelle moyenne : <code>12 + ${k} = ${12 + k}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-10'] = [
+  {
+    title: 'Probabilité d\'un événement',
+    generate() {
+      const total = exRand(8, 20);
+      const fav = exRand(2, total - 1);
+      const g = (a, b) => b ? g(b, a%b) : a;
+      const k = g(fav, total);
+      return {
+        question: `Une expérience a <code>${total}</code> issues équiprobables, <code>${fav}</code> sont favorables. Probabilité ? (forme <code>num/den</code> simplifiée)`,
+        inputType: 'fraction',
+        answer: fav / total,
+        formatAnswer: () => `${fav / k}/${total / k}`,
+        steps: [
+          `<code>P = ${fav}/${total} = ${fav / k}/${total / k}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Probabilité avec deux dés',
+    generate() {
+      return {
+        question: `On lance 2 dés équilibrés. Probabilité que la somme fasse 7 ? (forme <code>num/den</code> simplifiée)`,
+        inputType: 'fraction',
+        answer: 6/36,
+        formatAnswer: () => `1/6`,
+        steps: [
+          `Issues totales : 36. Sommes de 7 : (1,6), (2,5), (3,4), (4,3), (5,2), (6,1) = 6 cas.`,
+          `<code>P = 6/36 = 1/6</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Événement contraire',
+    generate() {
+      const c = exPick([
+        { p: '1/4', q: '3/4' }, { p: '2/5', q: '3/5' },
+        { p: '3/8', q: '5/8' }, { p: '1/6', q: '5/6' },
+      ]);
+      return {
+        question: `<code>P(A) = ${c.p}</code>. Que vaut <code>P(Ā)</code> ?`,
+        inputType: 'fraction',
+        answer: eval(c.q),
+        formatAnswer: () => c.q,
+        steps: [
+          `<code>P(Ā) = 1 − P(A) = 1 − ${c.p} = ${c.q}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Réunion (formule)',
+    generate() {
+      return {
+        question: `<code>P(A) = 0,5</code>, <code>P(B) = 0,4</code>, <code>P(A ∩ B) = 0,2</code>. Que vaut <code>P(A ∪ B)</code> ?`,
+        inputType: 'number',
+        answer: 0.7,
+        tolerance: 0.001,
+        steps: [
+          `<code>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</code>.`,
+          `<code>= 0,5 + 0,4 − 0,2 = 0,7</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Issue dans une expérience',
+    generate() {
+      return {
+        question: `On lance 1 pièce et 1 dé à 6 faces. Combien d'issues équiprobables ?`,
+        inputType: 'number',
+        answer: 12,
+        steps: [
+          `2 résultats pour la pièce × 6 pour le dé = <code>2 × 6 = 12</code> issues.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-11'] = [
+  {
+    title: 'Affectation Python',
+    generate() {
+      const a = exRand(2, 8);
+      const b = exRand(2, 8);
+      return {
+        question: `Que vaut <code>x</code> après ces instructions ?<br><code>x = ${a}</code><br><code>x = x + ${b}</code>`,
+        inputType: 'number',
+        answer: a + b,
+        steps: [
+          `Initialement <code>x = ${a}</code>.`,
+          `<code>x = x + ${b}</code> remplace x par <code>${a} + ${b} = ${a + b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Boucle for : somme',
+    generate() {
+      const n = exRand(3, 8);
+      const sum = (n * (n + 1)) / 2;
+      return {
+        question: `Que vaut <code>s</code> après ?<br><code>s = 0</code><br><code>for i in range(1, ${n + 1}):</code><br><code>&nbsp;&nbsp;s = s + i</code>`,
+        inputType: 'number',
+        answer: sum,
+        steps: [
+          `<code>range(1, ${n + 1})</code> = 1, 2, …, ${n}.`,
+          `<code>s = 1 + 2 + … + ${n} = ${sum}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Test if/else',
+    generate() {
+      const x = exRand(-5, 10);
+      const ans = x >= 0 ? x : -x;
+      return {
+        question: `Que renvoie cette fonction pour <code>x = ${x}</code> ?<br><code>def f(x):</code><br><code>&nbsp;&nbsp;if x &gt;= 0:</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;return x</code><br><code>&nbsp;&nbsp;else:</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;return -x</code>`,
+        inputType: 'number',
+        answer: ans,
+        steps: [
+          x >= 0 ? `${x} ≥ 0 → on prend le 1<sup>er</sup> return : <code>${x}</code>.`
+          : `${x} &lt; 0 → on prend le else : <code>−(${x}) = ${-x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Boucle while',
+    generate() {
+      const n = exRand(2, 6);
+      const ans = 2 ** n;
+      return {
+        question: `Que vaut <code>x</code> après ?<br><code>x = 1</code><br><code>for i in range(${n}):</code><br><code>&nbsp;&nbsp;x = x * 2</code>`,
+        inputType: 'number',
+        answer: ans,
+        steps: [
+          `À chaque tour, x est doublé. ${n} tours.`,
+          `<code>x = 1 × 2<sup>${n}</sup> = ${ans}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Liste : longueur',
+    generate() {
+      const c = exPick([
+        { l: '[2, 5, 7, 9]', n: 4 },
+        { l: '[1, 1, 2, 3, 5]', n: 5 },
+        { l: '[]', n: 0 },
+        { l: '["a", "b", "c"]', n: 3 },
+      ]);
+      return {
+        question: `Que vaut <code>len(${c.l})</code> ?`,
+        inputType: 'number',
+        answer: c.n,
+        steps: [
+          `<code>len</code> renvoie le nombre d'éléments.`,
+          `Réponse : <code>${c.n}</code>.`,
         ],
       };
     },
