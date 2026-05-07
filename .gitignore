@@ -1,0 +1,6 @@
+# Annales du Brevet — fichiers PDF locaux (~220 MB), pas versionnés.
+# Téléchargés depuis https://pi.ac3j.fr/brevet/ pour usage local.
+/brevets/
+
+# Dossier de travail / scratch (smoke tests Node, fichiers générés)
+/tmp/

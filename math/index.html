@@ -1088,6 +1088,12 @@ const CURRICULUM = [
       { id: 'probas', name: 'Probabilités', chapters: chaptersProbasPostBac() },
     ],
   },
+  {
+    id: 'ressources', name: 'Ressources',
+    levels: [
+      { id: 'annales', name: 'Annales DNB', chapters: chaptersAnnales() },
+    ],
+  },
 ];
 
 // ─── Contenu pédagogique : Post-bac Analyse ──────────────────────
@@ -6986,6 +6992,270 @@ function chapters5e() {
           <li>Aire des deux disques : <code>2 × π × 9 = 18π ≈ 56,5 cm²</code>.</li>
           <li>Aire totale : <code>78π ≈ 245 cm²</code>.</li>
         </ol>`)}
+      `,
+    },
+  ];
+}
+
+function chaptersAnnales() {
+  return [
+    {
+      title: "À propos des annales",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales du Brevet — Mathématiques</h2>
+        <p>Cette section donne accès à <strong>113 sujets</strong> du Diplôme National du Brevet en mathématiques, de <strong>2018 à 2026</strong>, classés par année.</p>
+        <p>Pour chaque sujet, un PDF s'ouvre dans un nouvel onglet. Les sujets couvrent toutes les sessions :</p>
+        <ul>
+          <li><strong>Métropole</strong> (France + Antilles + Guyane), souvent avec une session de remplacement</li>
+          <li><strong>Polynésie, Nouvelle-Calédonie, Asie, Amérique du Nord/Sud</strong> et autres centres étrangers</li>
+          <li><strong>Sujets zéro</strong> publiés par le ministère pour préparer la nouvelle épreuve</li>
+          <li><strong>Compilations annuelles</strong> avec corrigés détaillés (fichiers <code>BREVET20XX</code>)</li>
+        </ul>
+        <p>Source : <a href="https://pi.ac3j.fr/brevet/" target="_blank" rel="noopener">pi.ac3j.fr</a> (mathématicien et professeur).</p>
+        <p><em>Note technique :</em> les liens fonctionnent quand l'application est servie depuis la racine du dépôt (<code>woodwar-rebuild/</code>) — par exemple via <code>python -m http.server</code>. Si tu cliques sur un lien et qu'il ne s'ouvre pas, vérifie que le serveur tourne bien depuis ce répertoire.</p>
+      `,
+    },
+    {
+      title: "Annales 2026",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales 2026</h2>
+        <p>5 documents disponibles.</p>
+        <h3>Sujets zéro</h3>
+        <ul>
+        <li><a href="../brevets/2026/2026-generale-Metropole-Sujet-zero-A.pdf" target="_blank" rel="noopener">Série générale — Métropole (sujet zéro A)</a></li>
+        <li><a href="../brevets/2026/2026-generale-Metropole-Sujet-zero-B.pdf" target="_blank" rel="noopener">Série générale — Métropole (sujet zéro B)</a></li>
+        <li><a href="../brevets/2026/2026-professionnelle-Metropole-Sujet-zero-A.pdf" target="_blank" rel="noopener">Série pro — Métropole (sujet zéro A)</a></li>
+        <li><a href="../brevets/2026/2026-professionnelle-Metropole-Sujet-zero-B.pdf" target="_blank" rel="noopener">Série pro — Métropole (sujet zéro B)</a></li>
+        </ul>
+        <h3>Compilations &amp; corrigés</h3>
+        <ul>
+        <li><a href="../brevets/2026/2026-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2025",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales 2025</h2>
+        <p>14 documents disponibles.</p>
+        <h3>Sujets</h3>
+        <ul>
+        <li><a href="../brevets/2025/2025-generale-Amerique-du-Nord.pdf" target="_blank" rel="noopener">Série générale — Amérique du Nord</a></li>
+        <li><a href="../brevets/2025/2025-generale-Centre-AA.pdf" target="_blank" rel="noopener">Série générale — Centre AA</a></li>
+        <li><a href="../brevets/2025/2025-generale-Centres-Etrangers.pdf" target="_blank" rel="noopener">Série générale — Centres étrangers</a></li>
+        <li><a href="../brevets/2025/2025-generale-Metropole.pdf" target="_blank" rel="noopener">Série générale — Métropole</a></li>
+        <li><a href="../brevets/2025/2025-generale-Metropole-session-3.pdf" target="_blank" rel="noopener">Série générale — Métropole (session 3)</a></li>
+        <li><a href="../brevets/2025/2025-generale-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série générale — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2025/2025-generale-Polynesie.pdf" target="_blank" rel="noopener">Série générale — Polynésie</a></li>
+        <li><a href="../brevets/2025/2025-generale-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série générale — Polynésie (session 3)</a></li>
+        <li><a href="../brevets/2025/2025-professionnelle-Metropole.pdf" target="_blank" rel="noopener">Série pro — Métropole</a></li>
+        <li><a href="../brevets/2025/2025-professionnelle-Metropole-session-3.pdf" target="_blank" rel="noopener">Série pro — Métropole (session 3)</a></li>
+        <li><a href="../brevets/2025/2025-professionnelle-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série pro — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2025/2025-professionnelle-Polynesie.pdf" target="_blank" rel="noopener">Série pro — Polynésie</a></li>
+        </ul>
+        <h3>Compilations &amp; corrigés</h3>
+        <ul>
+        <li><a href="../brevets/2025/2025-compilation-annuelle.pdf" target="_blank" rel="noopener">Compilation annuelle (alternative)</a></li>
+        <li><a href="../brevets/2025/2025-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2024",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales 2024</h2>
+        <p>15 documents disponibles.</p>
+        <h3>Sujets</h3>
+        <ul>
+        <li><a href="../brevets/2024/2024-generale-Amerique-du-Nord.pdf" target="_blank" rel="noopener">Série générale — Amérique du Nord</a></li>
+        <li><a href="../brevets/2024/2024-generale-Asie.pdf" target="_blank" rel="noopener">Série générale — Asie</a></li>
+        <li><a href="../brevets/2024/2024-generale-Centre-AA.pdf" target="_blank" rel="noopener">Série générale — Centre AA</a></li>
+        <li><a href="../brevets/2024/2024-generale-Centres-Etrangers.pdf" target="_blank" rel="noopener">Série générale — Centres étrangers</a></li>
+        <li><a href="../brevets/2024/2024-generale-Metropole.pdf" target="_blank" rel="noopener">Série générale — Métropole</a></li>
+        <li><a href="../brevets/2024/2024-generale-Metropole-session-2.pdf" target="_blank" rel="noopener">Série générale — Métropole (session 2)</a></li>
+        <li><a href="../brevets/2024/2024-generale-Metropole-session-3.pdf" target="_blank" rel="noopener">Série générale — Métropole (session 3)</a></li>
+        <li><a href="../brevets/2024/2024-generale-Polynesie.pdf" target="_blank" rel="noopener">Série générale — Polynésie</a></li>
+        <li><a href="../brevets/2024/2024-generale-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série générale — Polynésie (session 3)</a></li>
+        <li><a href="../brevets/2024/2024-professionnelle-Metropole.pdf" target="_blank" rel="noopener">Série pro — Métropole</a></li>
+        <li><a href="../brevets/2024/2024-professionnelle-Metropole-session-3.pdf" target="_blank" rel="noopener">Série pro — Métropole (session 3)</a></li>
+        <li><a href="../brevets/2024/2024-professionnelle-Polynesie.pdf" target="_blank" rel="noopener">Série pro — Polynésie</a></li>
+        <li><a href="../brevets/2024/2024-professionnelle-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série pro — Polynésie (session 3)</a></li>
+        </ul>
+        <h3>Compilations &amp; corrigés</h3>
+        <ul>
+        <li><a href="../brevets/2024/2024-compilation-annuelle.pdf" target="_blank" rel="noopener">Compilation annuelle (alternative)</a></li>
+        <li><a href="../brevets/2024/2024-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2023",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales 2023</h2>
+        <p>15 documents disponibles.</p>
+        <h3>Sujets</h3>
+        <ul>
+        <li><a href="../brevets/2023/2023-generale-Amerique-du-Nord.pdf" target="_blank" rel="noopener">Série générale — Amérique du Nord</a></li>
+        <li><a href="../brevets/2023/2023-generale-Centre-AA.pdf" target="_blank" rel="noopener">Série générale — Centre AA</a></li>
+        <li><a href="../brevets/2023/2023-generale-Centres-Etrangers.pdf" target="_blank" rel="noopener">Série générale — Centres étrangers</a></li>
+        <li><a href="../brevets/2023/2023-generale-Metropole.pdf" target="_blank" rel="noopener">Série générale — Métropole</a></li>
+        <li><a href="../brevets/2023/2023-generale-Metropole-session-3.pdf" target="_blank" rel="noopener">Série générale — Métropole (session 3)</a></li>
+        <li><a href="../brevets/2023/2023-generale-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série générale — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2023/2023-generale-Polynesie.pdf" target="_blank" rel="noopener">Série générale — Polynésie</a></li>
+        <li><a href="../brevets/2023/2023-generale-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série générale — Polynésie (session 3)</a></li>
+        <li><a href="../brevets/2023/2023-professionnelle-Metropole.pdf" target="_blank" rel="noopener">Série pro — Métropole</a></li>
+        <li><a href="../brevets/2023/2023-professionnelle-Metropole-session-3.pdf" target="_blank" rel="noopener">Série pro — Métropole (session 3)</a></li>
+        <li><a href="../brevets/2023/2023-professionnelle-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série pro — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2023/2023-professionnelle-Polynesie.pdf" target="_blank" rel="noopener">Série pro — Polynésie</a></li>
+        <li><a href="../brevets/2023/2023-professionnelle-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série pro — Polynésie (session 3)</a></li>
+        </ul>
+        <h3>Compilations &amp; corrigés</h3>
+        <ul>
+        <li><a href="../brevets/2023/2023-compilation-annuelle.pdf" target="_blank" rel="noopener">Compilation annuelle (alternative)</a></li>
+        <li><a href="../brevets/2023/2023-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2022",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales 2022</h2>
+        <p>15 documents disponibles.</p>
+        <h3>Sujets</h3>
+        <ul>
+        <li><a href="../brevets/2022/2022-generale-Amerique-du-Nord.pdf" target="_blank" rel="noopener">Série générale — Amérique du Nord</a></li>
+        <li><a href="../brevets/2022/2022-generale-Asie.pdf" target="_blank" rel="noopener">Série générale — Asie</a></li>
+        <li><a href="../brevets/2022/2022-generale-Centre-AA.pdf" target="_blank" rel="noopener">Série générale — Centre AA</a></li>
+        <li><a href="../brevets/2022/2022-generale-Centres-Etrangers.pdf" target="_blank" rel="noopener">Série générale — Centres étrangers</a></li>
+        <li><a href="../brevets/2022/2022-generale-Metropole.pdf" target="_blank" rel="noopener">Série générale — Métropole</a></li>
+        <li><a href="../brevets/2022/2022-generale-Metropole-session-3.pdf" target="_blank" rel="noopener">Série générale — Métropole (session 3)</a></li>
+        <li><a href="../brevets/2022/2022-generale-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série générale — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2022/2022-generale-Polynesie.pdf" target="_blank" rel="noopener">Série générale — Polynésie</a></li>
+        <li><a href="../brevets/2022/2022-generale-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série générale — Polynésie (session 3)</a></li>
+        <li><a href="../brevets/2022/2022-professionnelle-Metropole.pdf" target="_blank" rel="noopener">Série pro — Métropole</a></li>
+        <li><a href="../brevets/2022/2022-professionnelle-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série pro — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2022/2022-professionnelle-Polynesie.pdf" target="_blank" rel="noopener">Série pro — Polynésie</a></li>
+        <li><a href="../brevets/2022/2022-professionnelle-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série pro — Polynésie (session 3)</a></li>
+        </ul>
+        <h3>Compilations &amp; corrigés</h3>
+        <ul>
+        <li><a href="../brevets/2022/2022-compilation-annuelle.pdf" target="_blank" rel="noopener">Compilation annuelle (alternative)</a></li>
+        <li><a href="../brevets/2022/2022-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2021",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales 2021</h2>
+        <p>11 documents disponibles.</p>
+        <h3>Sujets</h3>
+        <ul>
+        <li><a href="../brevets/2021/2021-generale-Amerique-du-Nord.pdf" target="_blank" rel="noopener">Série générale — Amérique du Nord</a></li>
+        <li><a href="../brevets/2021/2021-generale-Asie.pdf" target="_blank" rel="noopener">Série générale — Asie</a></li>
+        <li><a href="../brevets/2021/2021-generale-Centre-AA.pdf" target="_blank" rel="noopener">Série générale — Centre AA</a></li>
+        <li><a href="../brevets/2021/2021-generale-Centres-Etrangers.pdf" target="_blank" rel="noopener">Série générale — Centres étrangers</a></li>
+        <li><a href="../brevets/2021/2021-generale-Metropole.pdf" target="_blank" rel="noopener">Série générale — Métropole</a></li>
+        <li><a href="../brevets/2021/2021-generale-Metropole-session-3.pdf" target="_blank" rel="noopener">Série générale — Métropole (session 3)</a></li>
+        <li><a href="../brevets/2021/2021-generale-Nouvelle-Caledonie-session-3.pdf" target="_blank" rel="noopener">Série générale — Nouvelle Calédonie (session 3)</a></li>
+        <li><a href="../brevets/2021/2021-generale-Polynesie.pdf" target="_blank" rel="noopener">Série générale — Polynésie</a></li>
+        <li><a href="../brevets/2021/2021-professionnelle-Metropole.pdf" target="_blank" rel="noopener">Série pro — Métropole</a></li>
+        </ul>
+        <h3>Compilations &amp; corrigés</h3>
+        <ul>
+        <li><a href="../brevets/2021/2021-compilation-annuelle.pdf" target="_blank" rel="noopener">Compilation annuelle (alternative)</a></li>
+        <li><a href="../brevets/2021/2021-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2020",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales 2020</h2>
+        <p>11 documents disponibles.</p>
+        <h3>Sujets</h3>
+        <ul>
+        <li><a href="../brevets/2020/2020-generale-Amerique-du-Nord.pdf" target="_blank" rel="noopener">Série générale — Amérique du Nord</a></li>
+        <li><a href="../brevets/2020/2020-generale-Centres-Etrangers.pdf" target="_blank" rel="noopener">Série générale — Centres étrangers</a></li>
+        <li><a href="../brevets/2020/2020-generale-Metropole.pdf" target="_blank" rel="noopener">Série générale — Métropole</a></li>
+        <li><a href="../brevets/2020/2020-generale-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série générale — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2020/2020-generale-Nouvelle-Caledonie-bis.pdf" target="_blank" rel="noopener">Série générale — Nouvelle Calédonie (bis)</a></li>
+        <li><a href="../brevets/2020/2020-generale-Polynesie.pdf" target="_blank" rel="noopener">Série générale — Polynésie</a></li>
+        <li><a href="../brevets/2020/2020-professionnelle-Metropole.pdf" target="_blank" rel="noopener">Série pro — Métropole</a></li>
+        <li><a href="../brevets/2020/2020-professionnelle-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série pro — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2020/2020-professionnelle-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série pro — Polynésie (session 3)</a></li>
+        </ul>
+        <h3>Compilations &amp; corrigés</h3>
+        <ul>
+        <li><a href="../brevets/2020/2020-compilation-annuelle.pdf" target="_blank" rel="noopener">Compilation annuelle (alternative)</a></li>
+        <li><a href="../brevets/2020/2020-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2019",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales 2019</h2>
+        <p>13 documents disponibles.</p>
+        <h3>Sujets</h3>
+        <ul>
+        <li><a href="../brevets/2019/2019-generale-Amerique-du-Nord.pdf" target="_blank" rel="noopener">Série générale — Amérique du Nord</a></li>
+        <li><a href="../brevets/2019/2019-generale-Amerique-du-Sud.pdf" target="_blank" rel="noopener">Série générale — Amérique du Sud</a></li>
+        <li><a href="../brevets/2019/2019-generale-Asie.pdf" target="_blank" rel="noopener">Série générale — Asie</a></li>
+        <li><a href="../brevets/2019/2019-generale-Centres-Etrangers.pdf" target="_blank" rel="noopener">Série générale — Centres étrangers</a></li>
+        <li><a href="../brevets/2019/2019-generale-Metropole.pdf" target="_blank" rel="noopener">Série générale — Métropole</a></li>
+        <li><a href="../brevets/2019/2019-generale-Metropole-session-2.pdf" target="_blank" rel="noopener">Série générale — Métropole (session 2)</a></li>
+        <li><a href="../brevets/2019/2019-generale-Metropole-session-3.pdf" target="_blank" rel="noopener">Série générale — Métropole (session 3)</a></li>
+        <li><a href="../brevets/2019/2019-generale-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série générale — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2019/2019-generale-Polynesie.pdf" target="_blank" rel="noopener">Série générale — Polynésie</a></li>
+        <li><a href="../brevets/2019/2019-generale-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série générale — Polynésie (session 3)</a></li>
+        <li><a href="../brevets/2019/2019-professionnelle-Metropole.pdf" target="_blank" rel="noopener">Série pro — Métropole</a></li>
+        </ul>
+        <h3>Compilations &amp; corrigés</h3>
+        <ul>
+        <li><a href="../brevets/2019/2019-compilation-annuelle.pdf" target="_blank" rel="noopener">Compilation annuelle (alternative)</a></li>
+        <li><a href="../brevets/2019/2019-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2018",
+      category: "Annales du Brevet",
+      content: `
+        <h2>Annales 2018</h2>
+        <p>14 documents disponibles.</p>
+        <h3>Sujets</h3>
+        <ul>
+        <li><a href="../brevets/2018/2018-generale-Amerique-du-Nord.pdf" target="_blank" rel="noopener">Série générale — Amérique du Nord</a></li>
+        <li><a href="../brevets/2018/2018-generale-Centre-AA.pdf" target="_blank" rel="noopener">Série générale — Centre AA</a></li>
+        <li><a href="../brevets/2018/2018-generale-Centres-Etrangers.pdf" target="_blank" rel="noopener">Série générale — Centres étrangers</a></li>
+        <li><a href="../brevets/2018/2018-generale-Inde-Pondichery.pdf" target="_blank" rel="noopener">Série générale — Inde Pondichéry</a></li>
+        <li><a href="../brevets/2018/2018-generale-Metropole.pdf" target="_blank" rel="noopener">Série générale — Métropole</a></li>
+        <li><a href="../brevets/2018/2018-generale-Nouvelle-Caledonie.pdf" target="_blank" rel="noopener">Série générale — Nouvelle Calédonie</a></li>
+        <li><a href="../brevets/2018/2018-generale-Polynesie.pdf" target="_blank" rel="noopener">Série générale — Polynésie</a></li>
+        <li><a href="../brevets/2018/2018-generale-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série générale — Polynésie (session 3)</a></li>
+        <li><a href="../brevets/2018/2018-professionnelle-Metropole.pdf" target="_blank" rel="noopener">Série pro — Métropole</a></li>
+        <li><a href="../brevets/2018/2018-professionnelle-Polynesie.pdf" target="_blank" rel="noopener">Série pro — Polynésie</a></li>
+        <li><a href="../brevets/2018/2018-professionnelle-Polynesie-session-3.pdf" target="_blank" rel="noopener">Série pro — Polynésie (session 3)</a></li>
+        </ul>
+        <h3>Sujets zéro</h3>
+        <ul>
+        <li><a href="../brevets/2018/2018-generale-Sujet-zero.pdf" target="_blank" rel="noopener">Série générale — sujet zéro</a></li>
+        <li><a href="../brevets/2018/2018-professionnelle-Sujet-zero.pdf" target="_blank" rel="noopener">Série pro — sujet zéro</a></li>
+        </ul>
+        <h3>Compilations &amp; corrigés</h3>
+        <ul>
+        <li><a href="../brevets/2018/2018-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
       `,
     },
   ];
