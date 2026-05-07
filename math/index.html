@@ -764,6 +764,16 @@ function chaptersAnalyse() {
         <h2>7. Limites infinies</h2>
         ${lc.def("Divergence vers +∞", `<p><code>(uₙ)</code> tend vers <code>+∞</code> si :</p>`)}
         ${lc.formula("∀ A > 0, ∃ N, ∀ n ≥ N, uₙ > A")}
+
+        <h2>8. Théorème des gendarmes</h2>
+        ${lc.prop("Énoncé", `<p>Soient trois suites <code>(vₙ)</code>, <code>(uₙ)</code>, <code>(wₙ)</code> telles que <code>vₙ ≤ uₙ ≤ wₙ</code> à partir d'un certain rang, et telles que <code>(vₙ)</code> et <code>(wₙ)</code> convergent toutes deux vers la <strong>même limite L</strong>. Alors <code>(uₙ)</code> converge aussi vers <code>L</code>.</p>`)}
+        ${lc.example("Application", `<p>Étudier la limite de <code>uₙ = sin(n)/n</code>. On a <code>−1 ≤ sin(n) ≤ 1</code>, donc <code>−1/n ≤ uₙ ≤ 1/n</code>. Comme <code>−1/n → 0</code> et <code>1/n → 0</code>, par le théorème des gendarmes : <code>lim uₙ = 0</code>.</p>`)}
+
+        <h2>9. Théorème de Bolzano-Weierstrass</h2>
+        ${lc.prop("Énoncé", `<p>De <strong>toute suite bornée</strong> de réels, on peut extraire une <strong>sous-suite convergente</strong>.</p>`)}
+        ${lc.def("Sous-suite (suite extraite)", `<p>Une <strong>sous-suite</strong> de <code>(uₙ)</code> est de la forme <code>(u_{φ(n)})</code> où <code>φ : ℕ → ℕ</code> est strictement croissante. Par exemple, on extrait les termes de rang pair, ou ceux de rang carré.</p>`)}
+        ${lc.tip("Pourquoi c'est important", `<p>Bolzano-Weierstrass garantit l'existence d'au moins une <strong>valeur d'adhérence</strong> pour toute suite bornée. C'est un outil clef en analyse, notamment pour les démonstrations d'existence (théorème des bornes atteintes, point fixe…).</p>`)}
+        ${lc.example("Suite (−1)ⁿ", `<p>La suite <code>uₙ = (−1)ⁿ</code> est bornée mais ne converge pas. Pourtant, la sous-suite des rangs pairs <code>(u_{2n}) = (1, 1, 1, …)</code> converge vers 1 ; et celle des rangs impairs <code>(u_{2n+1}) = (−1, −1, …)</code> converge vers −1. Deux valeurs d'adhérence.</p>`)}
       `,
     },
 
@@ -848,6 +858,28 @@ function chaptersAnalyse() {
           <li><code>∂f/∂y = 2y − 6 = 0</code> → <code>y = 3</code>.</li>
           <li>Point critique : <code>(2, 3)</code>. <code>f(2, 3) = 4 + 9 − 8 − 18 = −13</code>.</li>
           <li>(C'est un minimum global puisque <code>f(x, y) = (x−2)² + (y−3)² − 13</code>.)</li></ol>`)}
+
+        <h2>7. Théorème de Schwarz</h2>
+        ${lc.prop("Énoncé", `<p>Soit <code>f</code> de classe <code>C²</code> sur un ouvert. Alors les <strong>dérivées croisées</strong> sont égales :</p>`)}
+        ${lc.formula("∂²f/∂x∂y = ∂²f/∂y∂x")}
+        <p>Autrement dit, l'ordre dans lequel on dérive partiellement n'a pas d'importance, à condition que les dérivées soient continues.</p>
+        ${lc.example("Vérification", `<p>Pour <code>f(x, y) = x³ y² + xy</code> :</p>
+          <ul><li><code>∂f/∂x = 3x²y² + y</code> ; en redérivant en y : <code>∂²f/∂y∂x = 6x²y + 1</code>.</li>
+          <li><code>∂f/∂y = 2x³y + x</code> ; en redérivant en x : <code>∂²f/∂x∂y = 6x²y + 1</code> ✓.</li></ul>`)}
+
+        <h2>8. Règle de la chaîne (intuition)</h2>
+        ${lc.prop("Énoncé", `<p>Si <code>f(x, y)</code> est différentiable et que <code>x = x(t)</code>, <code>y = y(t)</code>, alors :</p>`)}
+        ${lc.formula("df/dt = ∂f/∂x · x'(t) + ∂f/∂y · y'(t)")}
+        ${lc.tip("Application", `<p>Permet de calculer la dérivée d'une fonction le long d'une courbe paramétrée. C'est aussi le fondement du calcul de la dérivée directionnelle.</p>`)}
+
+        <h2>9. Hessienne (notion)</h2>
+        ${lc.def("Matrice hessienne", `<p>La <strong>hessienne</strong> de <code>f</code> au point <code>(a, b)</code> est la matrice 2×2 des dérivées secondes :</p>`)}
+        ${lc.formula("H(a, b) = [[∂²f/∂x², ∂²f/∂x∂y], [∂²f/∂y∂x, ∂²f/∂y²]]")}
+        ${lc.prop("Test au point critique", `<p>En un point critique <code>(a, b)</code> :</p>
+          <ul><li>Si <code>det(H) > 0</code> et <code>∂²f/∂x² > 0</code> : minimum local.</li>
+          <li>Si <code>det(H) > 0</code> et <code>∂²f/∂x² &lt; 0</code> : maximum local.</li>
+          <li>Si <code>det(H) &lt; 0</code> : <strong>point selle</strong>.</li>
+          <li>Si <code>det(H) = 0</code> : on ne peut pas conclure (test plus fin nécessaire).</li></ul>`)}
       `,
     },
 
@@ -964,6 +996,13 @@ function chaptersAnalyse() {
           <li>Résoudre l'<strong>équation homogène</strong> <code>y' + a(x)y = 0</code> : <code>y_h(x) = C × e^{−A(x)}</code> où <code>A</code> est une primitive de <code>a</code>.</li>
           <li>Chercher une solution particulière sous la forme <code>y_p(x) = C(x) × e^{−A(x)}</code> en faisant varier la constante.</li>
           <li>La solution générale est <code>y = y_h + y_p</code>.</li>
+        </ol>`)}
+        ${lc.example("Résoudre y' − y = e^{2x}", `<ol>
+          <li><strong>Homogène</strong> <code>y' − y = 0</code> → <code>y_h = C × e^x</code>.</li>
+          <li><strong>Variation de la constante</strong> : on cherche <code>y_p(x) = C(x) × e^x</code>. Alors <code>y_p' = C'(x) × e^x + C(x) × e^x</code>, et l'équation donne <code>C'(x) × e^x = e^{2x}</code>, soit <code>C'(x) = e^x</code>.</li>
+          <li>D'où <code>C(x) = e^x</code> (primitive simple).</li>
+          <li>Donc <code>y_p(x) = e^x × e^x = e^{2x}</code>.</li>
+          <li>Solution générale : <code>y(x) = C × e^x + e^{2x}</code>.</li>
         </ol>`)}
 
         <h2>6. Modélisation</h2>
