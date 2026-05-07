@@ -7649,6 +7649,339 @@ EXERCISES['5e-16'] = [
   },
 ];
 
+// ─── Templates d'exercices : 4e ─────────────────────────────────
+EXERCISES['4e-0'] = [
+  {
+    title: 'Multiplication de relatifs',
+    generate() {
+      const a = exRand(-10, 10) || 2;
+      const b = exRand(-10, 10) || 3;
+      return {
+        question: `Calcule : <code>(${a}) × (${b})</code>`,
+        inputType: 'number',
+        answer: a * b,
+        steps: [
+          a * b > 0 ? `Mêmes signes → résultat positif.` : a * b < 0 ? `Signes différents → résultat négatif.` : `L'un est nul.`,
+          `Distance : <code>${Math.abs(a)} × ${Math.abs(b)} = ${Math.abs(a * b)}</code>.`,
+          `<code>(${a}) × (${b}) = ${a * b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Suite de signes',
+    generate() {
+      const vals = [exRand(-5, 5) || 2, exRand(-5, 5) || 3, exRand(-5, 5) || -2];
+      const negs = vals.filter(v => v < 0).length;
+      const prod = vals.reduce((a, b) => a * b, 1);
+      return {
+        question: `Calcule : <code>(${vals[0]}) × (${vals[1]}) × (${vals[2]})</code>`,
+        inputType: 'number',
+        answer: prod,
+        steps: [
+          `Compter les facteurs négatifs : <code>${negs}</code>.`,
+          `${negs % 2 === 0 ? `Pair → résultat positif.` : `Impair → résultat négatif.`}`,
+          `<code>${vals.map(v => Math.abs(v)).join(' × ')} = ${vals.reduce((a, b) => Math.abs(a) * Math.abs(b), 1)}</code>. Résultat : <code>${prod}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-1'] = [
+  {
+    title: 'Division de fractions',
+    generate() {
+      const a = exRand(1, 6), b = exRand(2, 8);
+      const c = exRand(1, 6), d = exRand(2, 8);
+      return {
+        question: `Calcule : <code>${a}/${b} ÷ ${c}/${d}</code>. Donne sous forme <code>num/den</code>.`,
+        inputType: 'fraction',
+        answer: (a * d) / (b * c),
+        formatAnswer: () => `${a * d}/${b * c}`,
+        steps: [
+          `Diviser par une fraction = multiplier par son inverse.`,
+          `<code>${a}/${b} ÷ ${c}/${d} = ${a}/${b} × ${d}/${c} = ${a * d}/${b * c}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-2'] = [
+  {
+    title: 'Calculer une puissance',
+    generate() {
+      const a = exRand(2, 6);
+      const n = exRand(2, 5);
+      return {
+        question: `Calcule : <code>${a}<sup>${n}</sup></code>`,
+        inputType: 'number',
+        answer: a ** n,
+        steps: [
+          `<code>${a}<sup>${n}</sup> = ${Array(n).fill(a).join(' × ')} = ${a ** n}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Produit de puissances',
+    generate() {
+      const a = exRand(2, 5);
+      const m = exRand(2, 5), n = exRand(2, 5);
+      return {
+        question: `Simplifie sous la forme <code>${a}<sup>k</sup></code> : <code>${a}<sup>${m}</sup> × ${a}<sup>${n}</sup></code>. Donne k.`,
+        inputType: 'number',
+        answer: m + n,
+        steps: [
+          `Règle : <code>a<sup>m</sup> × a<sup>n</sup> = a<sup>m+n</sup></code>.`,
+          `<code>${a}<sup>${m}</sup> × ${a}<sup>${n}</sup> = ${a}<sup>${m + n}</sup></code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Notation scientifique',
+    generate() {
+      const a = (exRand(10, 99) / 10).toFixed(1);
+      const n = exRand(2, 5);
+      return {
+        question: `Écris <code>${a} × 10<sup>${n}</sup></code> sous forme décimale.`,
+        inputType: 'number',
+        answer: parseFloat(a) * 10 ** n,
+        tolerance: 0.01,
+        steps: [
+          `Multiplier par <code>10<sup>${n}</sup></code> = décaler la virgule de ${n} rangs vers la droite.`,
+          `Résultat : <code>${(parseFloat(a) * 10 ** n).toString()}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-3'] = [
+  {
+    title: 'Développement simple',
+    generate() {
+      const k = exRand(2, 9);
+      const a = exRand(1, 9);
+      const b = exRand(1, 12);
+      return {
+        question: `Développe <code>${k}(${a}x + ${b})</code>. Donne le coefficient de x.`,
+        inputType: 'number',
+        answer: k * a,
+        steps: [
+          `Distributivité : <code>${k}(${a}x + ${b}) = ${k} × ${a}x + ${k} × ${b}</code>.`,
+          `<code>= ${k * a}x + ${k * b}</code>. Le coefficient de x est <code>${k * a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Double distributivité (coefficient)',
+    generate() {
+      const a = exRand(1, 5), b = exRand(1, 8);
+      const c = exRand(1, 5), d = exRand(1, 8);
+      // (ax + b)(cx + d) → coeff de x = ad + bc
+      return {
+        question: `On développe <code>(${a}x + ${b})(${c}x + ${d})</code>. Quel est le coefficient de <code>x</code> ?`,
+        inputType: 'number',
+        answer: a * d + b * c,
+        steps: [
+          `<code>(${a}x + ${b})(${c}x + ${d}) = ${a*c}x² + ${a*d}x + ${b*c}x + ${b*d}</code>.`,
+          `Coefficient de x : <code>${a*d} + ${b*c} = ${a*d + b*c}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-4'] = [
+  {
+    title: 'Équation du 1er degré',
+    generate() {
+      const a = exPick([2, 3, 4, 5, 6, 7]);
+      const x = exRand(2, 12);
+      const b = exRand(-15, 15);
+      const c = a * x + b;
+      const bStr = b >= 0 ? `+ ${b}` : `− ${-b}`;
+      return {
+        question: `Résous : <code>${a}x ${bStr} = ${c}</code>. Donne la valeur de x.`,
+        inputType: 'number',
+        answer: x,
+        steps: [
+          `Isoler le terme en x : <code>${a}x = ${c} ${b >= 0 ? '−' : '+'} ${Math.abs(b)} = ${c - b}</code>.`,
+          `Diviser par ${a} : <code>x = ${c - b} / ${a} = ${x}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-5'] = [
+  {
+    title: 'Pythagore : calculer l\'hypoténuse',
+    generate() {
+      const triplets = [[3, 4, 5], [5, 12, 13], [6, 8, 10], [8, 15, 17], [9, 12, 15], [7, 24, 25]];
+      const [a, b, c] = exPick(triplets);
+      return {
+        question: `Triangle ABC rectangle en A. <code>AB = ${a}</code>, <code>AC = ${b}</code>. Calcule l'hypoténuse <code>BC</code>.`,
+        inputType: 'number',
+        answer: c,
+        steps: [
+          `Pythagore : <code>BC² = AB² + AC² = ${a}² + ${b}² = ${a*a} + ${b*b} = ${a*a + b*b}</code>.`,
+          `<code>BC = √${a*a + b*b} = ${c}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Pythagore : calculer un côté de l\'angle droit',
+    generate() {
+      const triplets = [[3, 4, 5], [5, 12, 13], [6, 8, 10], [8, 15, 17], [9, 12, 15], [7, 24, 25]];
+      const [a, b, c] = exPick(triplets);
+      return {
+        question: `Triangle ABC rectangle en A. <code>BC = ${c}</code> (hypoténuse), <code>AB = ${a}</code>. Calcule <code>AC</code>.`,
+        inputType: 'number',
+        answer: b,
+        steps: [
+          `Pythagore : <code>BC² = AB² + AC²</code>, donc <code>AC² = BC² − AB² = ${c*c} − ${a*a} = ${b*b}</code>.`,
+          `<code>AC = √${b*b} = ${b}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-6'] = [
+  {
+    title: 'Thalès : calculer une longueur',
+    generate() {
+      const k = exRand(2, 5);
+      const AM = exRand(2, 8);
+      const AN = exRand(2, 8);
+      const AB = AM * k;
+      const AC = AN * k;
+      // Calculer MN si BC est donné, ou inversement
+      const BC = exRand(5, 15);
+      const MN = BC / k;
+      return {
+        question: `Configuration de Thalès : <code>AM = ${AM}</code>, <code>AB = ${AB}</code>, <code>BC = ${BC}</code>, <code>(MN) ∥ (BC)</code>. Calcule <code>MN</code>.`,
+        inputType: 'number',
+        answer: MN,
+        tolerance: 0.01,
+        steps: [
+          `Thalès : <code>MN/BC = AM/AB</code>.`,
+          `<code>MN = BC × AM/AB = ${BC} × ${AM}/${AB} = ${MN}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-7'] = [
+  {
+    title: 'Cosinus : calculer un cosinus',
+    generate() {
+      const adj = exRand(3, 12);
+      const hyp = adj + exRand(2, 10);
+      return {
+        question: `Triangle rectangle. Adjacent à α = <code>${adj}</code>, hypoténuse = <code>${hyp}</code>. Donne <code>cos(α)</code> sous forme de fraction <code>num/den</code>.`,
+        inputType: 'fraction',
+        answer: adj / hyp,
+        formatAnswer: () => `${adj}/${hyp}`,
+        steps: [
+          `<code>cos(α) = adjacent / hypoténuse</code>.`,
+          `<code>cos(α) = ${adj}/${hyp}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-9'] = [
+  {
+    title: 'Vitesse à partir de distance et temps',
+    generate() {
+      const v = exPick([60, 80, 90, 100, 120]);
+      const t = exPick([2, 2.5, 3, 4]);
+      const d = v * t;
+      return {
+        question: `Une voiture parcourt <code>${d} km</code> en <code>${t} h</code>. Quelle est sa vitesse moyenne (en km/h) ?`,
+        inputType: 'number',
+        answer: v,
+        steps: [
+          `Formule : <code>v = d / t</code>.`,
+          `<code>v = ${d} / ${t} = ${v} km/h</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-10'] = [
+  {
+    title: 'Médiane d\'une série (effectif impair)',
+    generate() {
+      const n = exPick([5, 7, 9]);
+      const vals = Array.from({length: n}, () => exRand(8, 18)).sort((a, b) => a - b);
+      const med = vals[Math.floor(n / 2)];
+      return {
+        question: `Médiane de la série : <code>${vals.join(', ')}</code> ?`,
+        inputType: 'number',
+        answer: med,
+        steps: [
+          `Effectif impair (${n}). Position centrale : <code>(${n} + 1)/2 = ${(n + 1) / 2}</code>.`,
+          `Médiane = ${(n + 1) / 2}<sup>e</sup> valeur = <code>${med}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-11'] = [
+  {
+    title: 'Volume d\'une pyramide',
+    generate() {
+      const c = exRand(3, 10);
+      const h = exRand(3, 12);
+      const V = (c * c * h) / 3;
+      return {
+        question: `Volume d'une pyramide à base carrée de côté <code>${c} cm</code> et hauteur <code>${h} cm</code> ? (arrondi au dixième de cm³ si besoin)`,
+        inputType: 'number',
+        answer: Math.round(V * 10) / 10,
+        tolerance: 0.5,
+        steps: [
+          `Aire de la base : <code>${c}² = ${c * c} cm²</code>.`,
+          `Volume : <code>V = (1/3) × ${c * c} × ${h} = ${V.toFixed(2)} cm³</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-12'] = [
+  {
+    title: 'Probabilité d\'un événement',
+    generate() {
+      const total = exRand(5, 12);
+      const fav = exRand(1, total - 1);
+      const g = (a, b) => b ? g(b, a%b) : a;
+      const k = g(fav, total);
+      return {
+        question: `Une urne contient <code>${total}</code> boules numérotées de 1 à ${total}. On tire au hasard. Probabilité de tirer une boule de numéro ≤ ${fav} ? (forme <code>num/den</code> simplifiée)`,
+        inputType: 'fraction',
+        answer: fav / total,
+        formatAnswer: () => `${fav / k}/${total / k}`,
+        steps: [
+          `Issues favorables : ${fav} (boules 1, 2, …, ${fav}).`,
+          `<code>P = ${fav}/${total} = ${fav / k}/${total / k}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
 const exState = { current: null, selectedMcq: null, sessionStats: { tried: 0, correct: 0 } };
 const exRand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const exPick = arr => arr[Math.floor(Math.random() * arr.length)];
