@@ -919,6 +919,81 @@
       .content h1 { font-size: 26px; }
       .content h2 { font-size: 19px; }
     }
+
+    /* ─── Figures interactives ─────────────────────────────────── */
+    .ex-figure {
+      display: flex;
+      justify-content: center;
+      margin: 14px 0;
+    }
+    .fig-svg {
+      max-width: 100%;
+      height: auto;
+      background: #fafbfc;
+      border: 1px solid var(--border, #e5e7eb);
+      border-radius: 8px;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .fig-grid-line {
+      stroke: #e5e7eb;
+      stroke-width: 0.02;
+      vector-effect: non-scaling-stroke;
+    }
+    .fig-grid .fig-grid-line { stroke-width: 1; }
+    .fig-axis {
+      stroke: #9ca3af;
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke;
+    }
+    .fig-shape {
+      fill: none;
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+    .fig-shape-fixed { stroke: #475569; }
+    .fig-shape-user { stroke: #2563eb; }
+    .fig-shape-guide { stroke: #94a3b8; stroke-dasharray: 4 4; }
+    .fig-shape-highlight { stroke: #dc2626; stroke-width: 3; }
+    .fig-shape-success { stroke: #16a34a; stroke-width: 3; }
+    .fig-shape.dashed { stroke-dasharray: 4 4; }
+    polygon.fig-shape { fill: rgba(37, 99, 235, 0.08); }
+    .fig-point {
+      vector-effect: non-scaling-stroke;
+      stroke: #1e293b;
+      stroke-width: 1.5;
+    }
+    .fig-point-fixed { fill: #475569; }
+    .fig-point-user { fill: #2563eb; }
+    .fig-point-target { fill: #16a34a; }
+    .fig-point.draggable { cursor: grab; }
+    .fig-point.draggable:active { cursor: grabbing; }
+    .fig-hit { cursor: grab; }
+    .fig-hit:active { cursor: grabbing; }
+    .fig-label {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.5px;
+      font-weight: 600;
+      fill: #1e293b;
+      pointer-events: none;
+    }
+    .fig-info {
+      font-size: 13px;
+      color: var(--text-2, #475569);
+      text-align: center;
+      margin: 6px 0 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .fig-hint {
+      margin: 8px 0 0;
+      padding: 8px 12px;
+      background: #fef3c7;
+      border-left: 3px solid #f59e0b;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #78350f;
+    }
   </style>
 </head>
 <body>
@@ -18291,6 +18366,494 @@ EXERCISES['probas-6'] = [
   },
 ];
 
+// ─── Module geom : prédicats géométriques pour figures interactives ─
+// Toutes les fonctions opèrent sur des points {x, y} en coordonnées
+// logiques (le repère du viewBox SVG). Les tolérances par défaut visent
+// des figures de 0–12 unités (où 1 unité ≈ 25–30 px à l'écran).
+const geom = (() => {
+  const dist = (A, B) => Math.hypot(B.x - A.x, B.y - A.y);
+  const dot = (u, v) => u.x * v.x + u.y * v.y;
+  const cross = (u, v) => u.x * v.y - u.y * v.x;
+  const sub = (A, B) => ({ x: A.x - B.x, y: A.y - B.y });
+  const norm = (v) => Math.hypot(v.x, v.y);
+
+  const egal = (a, b, eps = 1e-6) => Math.abs(a - b) < eps;
+  const pointsConfondus = (A, B, eps = 0.3) => dist(A, B) < eps;
+
+  const colineaires = (A, B, C, eps = 0.3) => {
+    const ab = sub(B, A);
+    const n = norm(ab);
+    if (n < 1e-9) return pointsConfondus(B, C, eps);
+    return Math.abs(cross(ab, sub(C, A))) / n < eps;
+  };
+
+  const perpendiculaires = (A, B, C, D, epsDeg = 3) => {
+    const u = sub(B, A), v = sub(D, C);
+    const nu = norm(u), nv = norm(v);
+    if (nu < 1e-9 || nv < 1e-9) return false;
+    return Math.abs(dot(u, v)) / (nu * nv) < Math.sin(epsDeg * Math.PI / 180);
+  };
+
+  const paralleles = (A, B, C, D, epsDeg = 3) => {
+    const u = sub(B, A), v = sub(D, C);
+    const nu = norm(u), nv = norm(v);
+    if (nu < 1e-9 || nv < 1e-9) return false;
+    return Math.abs(cross(u, v)) / (nu * nv) < Math.sin(epsDeg * Math.PI / 180);
+  };
+
+  const equidistants = (M, A, B, eps = 0.3) =>
+    Math.abs(dist(M, A) - dist(M, B)) < eps;
+
+  const milieu = (M, A, B, eps = 0.3) => {
+    const mid = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+    return dist(M, mid) < eps;
+  };
+
+  // M' est le symétrique de B par rapport au point A
+  const symetriqueParRapportA = (M, A, B, eps = 0.3) => {
+    const target = { x: 2 * A.x - B.x, y: 2 * A.y - B.y };
+    return dist(M, target) < eps;
+  };
+
+  // M est le symétrique de B par rapport à la droite (PQ)
+  const symetriqueAxial = (M, B, P, Q, eps = 0.3) => {
+    const pq = sub(Q, P), pb = sub(B, P);
+    const npq2 = dot(pq, pq);
+    if (npq2 < 1e-12) return false;
+    const t = dot(pb, pq) / npq2;
+    const H = { x: P.x + t * pq.x, y: P.y + t * pq.y };
+    const target = { x: 2 * H.x - B.x, y: 2 * H.y - B.y };
+    return dist(M, target) < eps;
+  };
+
+  const surCercle = (M, O, r, eps = 0.3) =>
+    Math.abs(dist(M, O) - r) < eps;
+
+  // Mesure d'angle ∠ABC en degrés (entre 0 et 180)
+  const angleDeg = (A, B, C) => {
+    const u = sub(A, B), v = sub(C, B);
+    const nu = norm(u), nv = norm(v);
+    if (nu < 1e-9 || nv < 1e-9) return NaN;
+    const c = Math.max(-1, Math.min(1, dot(u, v) / (nu * nv)));
+    return Math.acos(c) * 180 / Math.PI;
+  };
+
+  const angleEgal = (A, B, C, theta, epsDeg = 3) => {
+    const m = angleDeg(A, B, C);
+    return !isNaN(m) && Math.abs(m - theta) < epsDeg;
+  };
+
+  const longueurEgale = (A, B, L, eps = 0.3) =>
+    Math.abs(dist(A, B) - L) < eps;
+
+  const perimetre = (pts) => {
+    let p = 0;
+    for (let i = 0; i < pts.length; i++) {
+      p += dist(pts[i], pts[(i + 1) % pts.length]);
+    }
+    return p;
+  };
+  const perimetreEgal = (pts, P, eps = 0.5) =>
+    Math.abs(perimetre(pts) - P) < eps;
+
+  const aire = (pts) => {
+    let s = 0;
+    for (let i = 0; i < pts.length; i++) {
+      const j = (i + 1) % pts.length;
+      s += pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+    }
+    return Math.abs(s) / 2;
+  };
+  const aireEgale = (pts, A, eps = 0.5) =>
+    Math.abs(aire(pts) - A) < eps;
+
+  const appartientSegment = (M, A, B, eps = 0.3) => {
+    if (!colineaires(A, B, M, eps)) return false;
+    const ab = sub(B, A), am = sub(M, A);
+    const ab2 = dot(ab, ab);
+    if (ab2 < 1e-12) return pointsConfondus(M, A, eps);
+    const t = dot(am, ab) / ab2;
+    const slack = eps / Math.max(norm(ab), 1e-9);
+    return t >= -slack && t <= 1 + slack;
+  };
+
+  // Projection orthogonale de P sur la droite (AB)
+  const projection = (P, A, B) => {
+    const ab = sub(B, A), ap = sub(P, A);
+    const ab2 = dot(ab, ab);
+    if (ab2 < 1e-12) return { x: A.x, y: A.y };
+    const t = dot(ap, ab) / ab2;
+    return { x: A.x + t * ab.x, y: A.y + t * ab.y };
+  };
+
+  return {
+    dist, dot, cross, sub, norm, projection, angleDeg, perimetre, aire,
+    egal, pointsConfondus, colineaires, perpendiculaires, paralleles,
+    equidistants, milieu, symetriqueParRapportA, symetriqueAxial,
+    surCercle, angleEgal, longueurEgale, perimetreEgal, aireEgale,
+    appartientSegment,
+  };
+})();
+
+// ─── Framework figure : SVG draggable points ───────────────────────
+// Crée une figure interactive dans un container HTML. Les points sont
+// stockés par nom dans fig.points et exposés via figure.getCoords().
+// Les shapes (segment, ligne, cercle, polygone) se recalculent à chaque
+// drag. Y est inversé par défaut (Y math vers le haut) pour que les
+// formules pédagogiques restent naturelles.
+const figure = (() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svgEl = (tag) => document.createElementNS(NS, tag);
+
+  function createFigure(container, opts) {
+    const o = Object.assign({
+      width: 360, height: 280,
+      viewBox: { xMin: 0, xMax: 12, yMin: 0, yMax: 9 },
+      grid: false, gridStep: 1,
+      snap: 0,
+      flipY: true,
+      showAxes: false,
+    }, opts || {});
+    const vb = o.viewBox;
+    const W = vb.xMax - vb.xMin, H = vb.yMax - vb.yMin;
+
+    const svg = svgEl('svg');
+    svg.setAttribute('class', 'fig-svg');
+    svg.setAttribute('viewBox', `${vb.xMin} ${vb.yMin} ${W} ${H}`);
+    svg.setAttribute('width', String(o.width));
+    svg.setAttribute('height', String(o.height));
+
+    const root = svgEl('g');
+    if (o.flipY) {
+      root.setAttribute('transform', `translate(0 ${vb.yMin + vb.yMax}) scale(1 -1)`);
+    }
+    svg.appendChild(root);
+
+    const gGrid = svgEl('g'); gGrid.setAttribute('class', 'fig-grid'); root.appendChild(gGrid);
+    const gShapes = svgEl('g'); gShapes.setAttribute('class', 'fig-shapes'); root.appendChild(gShapes);
+    const gLabels = svgEl('g'); gLabels.setAttribute('class', 'fig-labels'); root.appendChild(gLabels);
+    const gPoints = svgEl('g'); gPoints.setAttribute('class', 'fig-points'); root.appendChild(gPoints);
+
+    const fig = {
+      svg, root, gGrid, gShapes, gLabels, gPoints,
+      vb, opts: o,
+      points: {},
+      shapes: [],
+      callbacks: [],
+      _frame: null,
+      _dragging: null,
+    };
+
+    // Grille
+    if (o.grid) {
+      const stp = o.gridStep;
+      for (let x = Math.ceil(vb.xMin / stp) * stp; x <= vb.xMax + 1e-9; x += stp) {
+        const ln = svgEl('line');
+        ln.setAttribute('x1', x); ln.setAttribute('x2', x);
+        ln.setAttribute('y1', vb.yMin); ln.setAttribute('y2', vb.yMax);
+        ln.setAttribute('class', 'fig-grid-line');
+        ln.setAttribute('stroke-width', '0.02');
+        gGrid.appendChild(ln);
+      }
+      for (let y = Math.ceil(vb.yMin / stp) * stp; y <= vb.yMax + 1e-9; y += stp) {
+        const ln = svgEl('line');
+        ln.setAttribute('y1', y); ln.setAttribute('y2', y);
+        ln.setAttribute('x1', vb.xMin); ln.setAttribute('x2', vb.xMax);
+        ln.setAttribute('class', 'fig-grid-line');
+        ln.setAttribute('stroke-width', '0.02');
+        gGrid.appendChild(ln);
+      }
+    }
+    if (o.showAxes) {
+      const ax = svgEl('line');
+      ax.setAttribute('x1', vb.xMin); ax.setAttribute('x2', vb.xMax);
+      ax.setAttribute('y1', 0); ax.setAttribute('y2', 0);
+      ax.setAttribute('class', 'fig-axis');
+      ax.setAttribute('stroke-width', '0.04');
+      gGrid.appendChild(ax);
+      const ay = svgEl('line');
+      ay.setAttribute('x1', 0); ay.setAttribute('x2', 0);
+      ay.setAttribute('y1', vb.yMin); ay.setAttribute('y2', vb.yMax);
+      ay.setAttribute('class', 'fig-axis');
+      ay.setAttribute('stroke-width', '0.04');
+      gGrid.appendChild(ay);
+    }
+
+    container.appendChild(svg);
+    setupDrag(fig);
+    return fig;
+  }
+
+  function addPoint(fig, name, x, y, opts) {
+    const o = Object.assign({
+      draggable: false, color: 'fixed', label: null, hidden: false,
+      constrain: null, radius: 0.18,
+    }, opts || {});
+    const p = { name, x, y, ...o };
+
+    if (!o.hidden) {
+      const dot = svgEl('circle');
+      dot.setAttribute('class', 'fig-point fig-point-' + o.color + (o.draggable ? ' draggable' : ''));
+      dot.setAttribute('r', o.radius);
+      dot.setAttribute('cx', x);
+      dot.setAttribute('cy', y);
+      dot.setAttribute('stroke-width', '0.04');
+      p.el = dot;
+      fig.gPoints.appendChild(dot);
+
+      if (o.draggable) {
+        const hit = svgEl('circle');
+        hit.setAttribute('class', 'fig-hit');
+        hit.setAttribute('r', Math.max(o.radius * 3, 0.6));
+        hit.setAttribute('cx', x);
+        hit.setAttribute('cy', y);
+        hit.setAttribute('data-point', name);
+        hit.setAttribute('fill', 'transparent');
+        p.hit = hit;
+        fig.gPoints.appendChild(hit);
+      }
+
+      if (o.label !== null) {
+        const lbl = svgEl('text');
+        lbl.setAttribute('class', 'fig-label');
+        lbl.setAttribute('font-size', '0.5');
+        if (fig.opts.flipY) {
+          lbl.setAttribute('transform', `translate(${x + 0.25} ${y + 0.25}) scale(1 -1)`);
+          lbl.setAttribute('x', 0);
+          lbl.setAttribute('y', 0);
+        } else {
+          lbl.setAttribute('x', x + 0.25);
+          lbl.setAttribute('y', y - 0.25);
+        }
+        lbl.textContent = o.label;
+        p.labelEl = lbl;
+        fig.gLabels.appendChild(lbl);
+      }
+    }
+
+    fig.points[name] = p;
+    return p;
+  }
+
+  function addShape(fig, type, args, style) {
+    const sty = Object.assign({ color: 'user', dashed: false }, style || {});
+    let el = null;
+    let deps = [];
+    if (type === 'segment' || type === 'line') {
+      deps = [args.from, args.to];
+      el = svgEl('line');
+    } else if (type === 'circle') {
+      deps = [args.center, args.through].filter(Boolean);
+      el = svgEl('circle');
+    } else if (type === 'polygon') {
+      deps = args.points.slice();
+      el = svgEl('polygon');
+    }
+    if (el) {
+      el.setAttribute('class', 'fig-shape fig-shape-' + sty.color + (sty.dashed ? ' dashed' : ''));
+      el.setAttribute('stroke-width', '0.05');
+      fig.gShapes.appendChild(el);
+    }
+    const shape = { type, args, style: sty, el, deps };
+    fig.shapes.push(shape);
+    updateShape(fig, shape);
+    return shape;
+  }
+
+  function updateShape(fig, shape) {
+    const P = (n) => fig.points[n];
+    const { type, args, el } = shape;
+    if (!el) return;
+    if (type === 'segment') {
+      const A = P(args.from), B = P(args.to);
+      el.setAttribute('x1', A.x); el.setAttribute('y1', A.y);
+      el.setAttribute('x2', B.x); el.setAttribute('y2', B.y);
+    } else if (type === 'line') {
+      const A = P(args.from), B = P(args.to);
+      const vb = fig.vb;
+      const dx = B.x - A.x, dy = B.y - A.y;
+      if (Math.abs(dx) < 1e-9 && Math.abs(dy) < 1e-9) {
+        el.setAttribute('x1', A.x); el.setAttribute('y1', A.y);
+        el.setAttribute('x2', A.x); el.setAttribute('y2', A.y);
+      } else {
+        const ts = [];
+        if (Math.abs(dx) > 1e-9) {
+          ts.push((vb.xMin - A.x) / dx, (vb.xMax - A.x) / dx);
+        }
+        if (Math.abs(dy) > 1e-9) {
+          ts.push((vb.yMin - A.y) / dy, (vb.yMax - A.y) / dy);
+        }
+        ts.sort((a, b) => a - b);
+        const t1 = ts[0], t2 = ts[ts.length - 1];
+        el.setAttribute('x1', A.x + t1 * dx);
+        el.setAttribute('y1', A.y + t1 * dy);
+        el.setAttribute('x2', A.x + t2 * dx);
+        el.setAttribute('y2', A.y + t2 * dy);
+      }
+    } else if (type === 'circle') {
+      const O = P(args.center);
+      let r;
+      if (args.radius != null) r = args.radius;
+      else if (args.through) {
+        const M = P(args.through);
+        r = Math.hypot(M.x - O.x, M.y - O.y);
+      } else r = 1;
+      el.setAttribute('cx', O.x); el.setAttribute('cy', O.y);
+      el.setAttribute('r', r);
+    } else if (type === 'polygon') {
+      const pts = args.points.map(n => `${P(n).x},${P(n).y}`).join(' ');
+      el.setAttribute('points', pts);
+    }
+  }
+
+  function getCoords(fig, name) {
+    const p = fig.points[name];
+    return p ? { x: p.x, y: p.y } : null;
+  }
+
+  function getState(fig) {
+    const out = { points: {} };
+    for (const [n, p] of Object.entries(fig.points)) {
+      out.points[n] = { x: p.x, y: p.y };
+    }
+    return out;
+  }
+
+  function onUpdate(fig, cb) { fig.callbacks.push(cb); }
+
+  function setPointPosition(fig, name, x, y) {
+    const p = fig.points[name];
+    if (!p) return;
+    p.x = x; p.y = y;
+    if (p.el) { p.el.setAttribute('cx', x); p.el.setAttribute('cy', y); }
+    if (p.hit) { p.hit.setAttribute('cx', x); p.hit.setAttribute('cy', y); }
+    if (p.labelEl) {
+      if (fig.opts.flipY) {
+        p.labelEl.setAttribute('transform', `translate(${x + 0.25} ${y + 0.25}) scale(1 -1)`);
+      } else {
+        p.labelEl.setAttribute('x', x + 0.25); p.labelEl.setAttribute('y', y - 0.25);
+      }
+    }
+    for (const s of fig.shapes) {
+      if (s.deps.includes(name)) updateShape(fig, s);
+    }
+  }
+
+  function ptToLogical(fig, clientX, clientY) {
+    const m = fig.svg.getScreenCTM();
+    if (!m) return null;
+    const inv = m.inverse();
+    const pt = fig.svg.createSVGPoint();
+    pt.x = clientX; pt.y = clientY;
+    const lp = pt.matrixTransform(inv);
+    if (fig.opts.flipY) {
+      return { x: lp.x, y: (fig.vb.yMin + fig.vb.yMax) - lp.y };
+    }
+    return { x: lp.x, y: lp.y };
+  }
+
+  function setupDrag(fig) {
+    fig.svg.addEventListener('pointerdown', (e) => {
+      const t = e.target;
+      if (!t || !t.getAttribute) return;
+      const name = t.getAttribute('data-point');
+      if (!name) return;
+      const p = fig.points[name];
+      if (!p || !p.draggable) return;
+      const lp = ptToLogical(fig, e.clientX, e.clientY);
+      if (!lp) return;
+      try { t.setPointerCapture(e.pointerId); } catch (_) {}
+      fig._dragging = { name, pointerId: e.pointerId, dx: lp.x - p.x, dy: lp.y - p.y, target: t };
+      e.preventDefault();
+    });
+
+    fig.svg.addEventListener('pointermove', (e) => {
+      const d = fig._dragging;
+      if (!d || d.pointerId !== e.pointerId) return;
+      const lp = ptToLogical(fig, e.clientX, e.clientY);
+      if (!lp) return;
+      const p = fig.points[d.name];
+      let nx = lp.x - d.dx, ny = lp.y - d.dy;
+      if (p.constrain) {
+        const cp = p.constrain(nx, ny, fig);
+        nx = cp.x; ny = cp.y;
+      }
+      if (fig.opts.snap > 0) {
+        nx = Math.round(nx / fig.opts.snap) * fig.opts.snap;
+        ny = Math.round(ny / fig.opts.snap) * fig.opts.snap;
+      }
+      nx = Math.max(fig.vb.xMin, Math.min(fig.vb.xMax, nx));
+      ny = Math.max(fig.vb.yMin, Math.min(fig.vb.yMax, ny));
+      if (nx === p.x && ny === p.y) return;
+      p.x = nx; p.y = ny;
+      if (fig._frame) cancelAnimationFrame(fig._frame);
+      fig._frame = requestAnimationFrame(() => {
+        fig._frame = null;
+        if (p.el) { p.el.setAttribute('cx', p.x); p.el.setAttribute('cy', p.y); }
+        if (p.hit) { p.hit.setAttribute('cx', p.x); p.hit.setAttribute('cy', p.y); }
+        if (p.labelEl) {
+          if (fig.opts.flipY) {
+            p.labelEl.setAttribute('transform', `translate(${p.x + 0.25} ${p.y + 0.25}) scale(1 -1)`);
+          } else {
+            p.labelEl.setAttribute('x', p.x + 0.25); p.labelEl.setAttribute('y', p.y - 0.25);
+          }
+        }
+        for (const s of fig.shapes) {
+          if (s.deps.includes(p.name)) updateShape(fig, s);
+        }
+        const st = getState(fig);
+        for (const cb of fig.callbacks) {
+          try { cb(st, p.name); } catch (_) {}
+        }
+      });
+    });
+
+    const endDrag = (e) => {
+      const d = fig._dragging;
+      if (!d || (e.pointerId != null && d.pointerId !== e.pointerId)) return;
+      try { d.target && d.target.releasePointerCapture && d.target.releasePointerCapture(e.pointerId); } catch (_) {}
+      fig._dragging = null;
+    };
+    fig.svg.addEventListener('pointerup', endDrag);
+    fig.svg.addEventListener('pointercancel', endDrag);
+  }
+
+  function destroy(fig) {
+    if (!fig) return;
+    if (fig._frame) cancelAnimationFrame(fig._frame);
+    fig._frame = null;
+    fig._dragging = null;
+    if (fig.svg && fig.svg.parentNode) fig.svg.parentNode.removeChild(fig.svg);
+    fig.points = {};
+    fig.shapes = [];
+    fig.callbacks = [];
+  }
+
+  // Construit une figure à partir d'une description déclarative.
+  function build(container, spec) {
+    const fig = createFigure(container, spec);
+    if (Array.isArray(spec.points)) {
+      for (const p of spec.points) {
+        const { name, x, y, ...rest } = p;
+        addPoint(fig, name, x, y, rest);
+      }
+    }
+    if (Array.isArray(spec.shapes)) {
+      for (const s of spec.shapes) {
+        const { type, style, ...args } = s;
+        addShape(fig, type, args, style);
+      }
+    }
+    return fig;
+  }
+
+  return {
+    createFigure, addPoint, addShape, updateShape,
+    getCoords, getState, onUpdate, setPointPosition,
+    destroy, build,
+  };
+})();
+
 const exState = { current: null, selectedMcq: null, sessionStats: { tried: 0, correct: 0 } };
 const exRand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const exPick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -18327,6 +18890,10 @@ function openExercise(levelId, idx) {
 }
 
 function closeExercise() {
+  if (exState.current && exState.current._fig) {
+    figure.destroy(exState.current._fig);
+    exState.current._fig = null;
+  }
   exState.current = null;
   exState.selectedMcq = null;
   $('#ex-backdrop').classList.remove('show');
@@ -18334,6 +18901,10 @@ function closeExercise() {
 
 function newExercise() {
   if (!exState.current) return;
+  if (exState.current._fig) {
+    figure.destroy(exState.current._fig);
+    exState.current._fig = null;
+  }
   openExercise(exState.current.levelId, exState.current.idx);
 }
 
@@ -18361,6 +18932,15 @@ function exCheckAnswer(ex, userAns) {
     if (den === 0) return false;
     return Math.abs(num / den - ex.answer) < 1e-9;
   }
+  if (ex.inputType === 'figure') {
+    if (typeof ex.validate !== 'function') return false;
+    const r = ex.validate(userAns, ex);
+    if (typeof r === 'object' && r !== null) {
+      ex._lastHint = r.hint || null;
+      return !!r.ok;
+    }
+    return !!r;
+  }
   return false;
 }
 
@@ -18371,6 +18951,9 @@ function checkExercise() {
   if (ex.inputType === 'mcq') {
     userAns = exState.selectedMcq;
     if (userAns == null) return;
+  } else if (ex.inputType === 'figure') {
+    if (!ex._fig) return;
+    userAns = figure.getState(ex._fig);
   } else {
     const input = $('#ex-input');
     if (!input) return;
@@ -18378,6 +18961,7 @@ function checkExercise() {
     if (!userAns) return;
   }
   ex.userAnswer = userAns;
+  ex._lastHint = null;
   const ok = exCheckAnswer(ex, userAns);
   ex.status = ok ? 'correct' : 'wrong';
   exState.sessionStats.tried++;
@@ -18394,6 +18978,19 @@ function revealSolution() {
 function exFormatAnswer(ex) {
   if (ex.inputType === 'mcq') return ex.options[ex.answer];
   if (ex.formatAnswer) return ex.formatAnswer(ex);
+  if (ex.inputType === 'figure') {
+    if (ex.target && typeof ex.target === 'object') {
+      // Format compact des coords cibles : { A: {x:1, y:2} } → "A(1 ; 2)"
+      const parts = [];
+      for (const [n, c] of Object.entries(ex.target)) {
+        if (c && typeof c.x === 'number' && typeof c.y === 'number') {
+          parts.push(`${n}(${+c.x.toPrecision(6)} ; ${+c.y.toPrecision(6)})`);
+        }
+      }
+      if (parts.length) return parts.join(', ');
+    }
+    return 'voir la figure';
+  }
   if (typeof ex.answer === 'number') {
     // Nettoie les artefacts flottants (e.g. 1.8000000000000003 → 1.8)
     return String(+ex.answer.toPrecision(12));
@@ -18401,9 +18998,50 @@ function exFormatAnswer(ex) {
   return String(ex.answer);
 }
 
+// Monte une figure interactive dans la modale. Si la figure est déjà
+// instanciée (ex._fig), on la détruit et on la reconstruit pour rester
+// cohérent avec le pattern "innerHTML = ''" utilisé par renderExerciseModal.
+function mountFigure(parent, ex, opts) {
+  const o = opts || {};
+  if (ex._fig) { figure.destroy(ex._fig); ex._fig = null; }
+  const wrap = el('div', { class: 'ex-figure' });
+  parent.appendChild(wrap);
+  const spec = Object.assign({}, ex.figure);
+  if (o.readonly) {
+    // En lecture, on désactive le drag en remplaçant les points draggables
+    // par des points fixes (mais on garde leurs positions actuelles).
+    if (Array.isArray(spec.points)) {
+      spec.points = spec.points.map(p => Object.assign({}, p, { draggable: false }));
+    }
+  }
+  ex._fig = figure.build(wrap, spec);
+  // Restitue les positions de l'élève si on les a (status correct/wrong/revealed)
+  if (ex.userAnswer && ex.userAnswer.points) {
+    for (const [n, c] of Object.entries(ex.userAnswer.points)) {
+      if (ex._fig.points[n]) figure.setPointPosition(ex._fig, n, c.x, c.y);
+    }
+  }
+  // Bandeau d'info dynamique optionnel : ex.figure.info(state) → string
+  if (typeof ex.figure.info === 'function' && !o.readonly) {
+    const info = el('div', { class: 'fig-info' });
+    info.textContent = ex.figure.info(figure.getState(ex._fig));
+    wrap.appendChild(info);
+    figure.onUpdate(ex._fig, (st) => {
+      info.textContent = ex.figure.info(st);
+    });
+  }
+  return ex._fig;
+}
+
 function renderExerciseModal() {
   const modal = $('#ex-modal');
   if (!modal) return;
+  // Avant de réécrire le modal, détruire toute figure montée précédemment
+  // (le innerHTML = '' qui suit retire les nœuds DOM mais pas les listeners).
+  if (exState.current && exState.current._fig) {
+    figure.destroy(exState.current._fig);
+    exState.current._fig = null;
+  }
   modal.innerHTML = '';
   const ex = exState.current;
   if (!ex) return;
@@ -18426,6 +19064,8 @@ function renderExerciseModal() {
         }));
       });
       modal.appendChild(wrap);
+    } else if (ex.inputType === 'figure') {
+      mountFigure(modal, ex);
     } else {
       const wrap = el('div', { class: 'ex-input-wrap' });
       const input = el('input', {
@@ -18445,11 +19085,16 @@ function renderExerciseModal() {
       modal.appendChild(wrap);
     }
   } else {
-    // Affichage en lecture seule de la réponse de l'élève
-    const display = ex.inputType === 'mcq'
-      ? (ex.options[ex.userAnswer] || '—')
-      : (ex.userAnswer || '—');
-    modal.appendChild(el('div', { class: 'ex-readonly', html: display }));
+    if (ex.inputType === 'figure') {
+      // En statut correct/revealed, on remonte la figure en lecture (toujours
+      // affichée pour montrer la solution si on l'affiche en correction).
+      mountFigure(modal, ex, { readonly: true });
+    } else {
+      const display = ex.inputType === 'mcq'
+        ? (ex.options[ex.userAnswer] || '—')
+        : (ex.userAnswer || '—');
+      modal.appendChild(el('div', { class: 'ex-readonly', html: display }));
+    }
   }
 
   // Boutons
@@ -18467,7 +19112,11 @@ function renderExerciseModal() {
     modal.appendChild(el('div', { class: 'ex-feedback ok', html: '✅ <strong>Bonne réponse !</strong> Bien joué.' }));
   }
   if (ex.status === 'wrong') {
-    modal.appendChild(el('div', { class: 'ex-feedback ko', html: '❌ Ce n\'est pas tout à fait ça. Réessaie ou regarde la correction.' }));
+    const baseMsg = '❌ Ce n\'est pas tout à fait ça. Réessaie ou regarde la correction.';
+    modal.appendChild(el('div', { class: 'ex-feedback ko', html: baseMsg }));
+    if (ex._lastHint) {
+      modal.appendChild(el('div', { class: 'fig-hint', html: '💡 ' + ex._lastHint }));
+    }
   }
 
   if (ex.status === 'revealed' || ex.status === 'correct') {
@@ -18489,6 +19138,7 @@ function renderExerciseModal() {
   }
 
   setTimeout(() => {
+    if (ex.inputType === 'figure') return;
     const input = $('#ex-input');
     if (input && (ex.status === 'pending' || ex.status === 'wrong')) input.focus();
   }, 50);
@@ -18543,6 +19193,11 @@ function closeDS() {
   // Si on ferme après une note enregistrée, on re-render le chapitre pour
   // que le bloc « Meilleure note » sous le bouton DS se rafraîchisse.
   const wasFinished = dsState.status === 'finished';
+  if (dsState.current && Array.isArray(dsState.current.questions)) {
+    for (const q of dsState.current.questions) {
+      if (q._fig) { figure.destroy(q._fig); q._fig = null; }
+    }
+  }
   dsState.current = null;
   dsState.status = 'idle';
   $('#ex-backdrop').classList.remove('show');
@@ -18557,12 +19212,17 @@ function dsNextQuestion() {
   if (q.inputType === 'mcq') {
     userAns = q.mcqSelected;
     if (userAns == null) return;
+  } else if (q.inputType === 'figure') {
+    if (!q._fig) return;
+    userAns = figure.getState(q._fig);
   } else {
     const input = $('#ds-input');
     userAns = input ? input.value.trim() : '';
     if (!userAns) return;
   }
   q.userAnswer = userAns;
+  q.template = q.template || {};
+  // Pour le DS on synthétise un objet "ex-like" qui possède template+inputType+...
   q.correct = exCheckAnswer(q, userAns);
   if (ds.currentIdx < ds.questions.length - 1) {
     ds.currentIdx++;
@@ -18600,12 +19260,31 @@ function dsMention(note) {
 function dsFormatUserAnswer(q) {
   if (q.userAnswer == null || q.userAnswer === '') return '—';
   if (q.inputType === 'mcq') return q.options[q.userAnswer] || '—';
+  if (q.inputType === 'figure') {
+    if (q.userAnswer && q.userAnswer.points) {
+      const parts = [];
+      const targetNames = q.target ? Object.keys(q.target) : Object.keys(q.userAnswer.points);
+      for (const n of targetNames) {
+        const c = q.userAnswer.points[n];
+        if (c) parts.push(`${n}(${+c.x.toPrecision(4)} ; ${+c.y.toPrecision(4)})`);
+      }
+      return parts.join(', ') || '—';
+    }
+    return '—';
+  }
   return String(q.userAnswer);
 }
 
 function renderDsModal() {
   const modal = $('#ex-modal');
   if (!modal) return;
+  // Détruire les figures de la question précédente avant de réécrire le DOM
+  const prevDs = dsState.current;
+  if (prevDs && Array.isArray(prevDs.questions)) {
+    for (const q of prevDs.questions) {
+      if (q._fig) { figure.destroy(q._fig); q._fig = null; }
+    }
+  }
   modal.innerHTML = '';
   const ds = dsState.current;
   if (!ds) return;
@@ -18638,6 +19317,8 @@ function renderDsModal() {
         }));
       });
       modal.appendChild(wrap);
+    } else if (q.inputType === 'figure') {
+      mountFigure(modal, q);
     } else {
       const wrap = el('div', { class: 'ex-input-wrap' });
       const input = el('input', {
@@ -18667,6 +19348,7 @@ function renderDsModal() {
     modal.appendChild(buttons);
 
     setTimeout(() => {
+      if (q.inputType === 'figure') return;
       const input = $('#ds-input');
       if (input) input.focus();
     }, 50);
