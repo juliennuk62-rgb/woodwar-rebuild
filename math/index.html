@@ -1092,6 +1092,7 @@ const CURRICULUM = [
     id: 'ressources', name: 'Ressources',
     levels: [
       { id: 'annales', name: 'Annales DNB', chapters: chaptersAnnales() },
+      { id: 'bac', name: 'Annales Bac', chapters: chaptersBac() },
     ],
   },
 ];
@@ -7255,6 +7256,167 @@ function chaptersAnnales() {
         <h3>Compilations &amp; corrigés</h3>
         <ul>
         <li><a href="../brevets/2018/2018-corriges-compiles.pdf" target="_blank" rel="noopener">Corrigés compilés (officiel)</a></li>
+        </ul>
+      `,
+    },
+  ];
+}
+
+function chaptersBac() {
+  return [
+    {
+      title: "À propos des annales",
+      category: "Annales du Bac",
+      content: `
+        <h2>Annales du Bac — Spé Maths</h2>
+        <p>Cette section donne accès à <strong>138 fichiers</strong> du baccalauréat général en spécialité mathématiques, de <strong>2021 à 2025</strong>, classés par année.</p>
+        <p>Pour chaque session, on liste les sujets disponibles avec leur corrigé quand il existe (le site source met les sujets à disposition plus rapidement que les corrigés). Les centres couverts incluent :</p>
+        <ul>
+          <li><strong>Métropole</strong> (jours 1 et 2, plus session de remplacement)</li>
+          <li><strong>Polynésie, Nouvelle-Calédonie</strong></li>
+          <li><strong>Amérique du Nord, Amérique du Sud, Asie</strong></li>
+          <li><strong>Centres étrangers</strong> et autres (Liban, Suède…)</li>
+        </ul>
+        <p>Source : <a href="https://www.sujetdebac.fr/annales/specialites/spe-mathematiques/" target="_blank" rel="noopener">sujetdebac.fr</a>.</p>
+        <p><em>Note :</em> les années 2018–2020 (ancien Bac S, avant réforme) ne sont pas incluses ici. Pour ces sujets historiques, voir <a href="https://www.apmep.fr/Annales-Terminale-S" target="_blank" rel="noopener">les archives APMEP</a> (270 sujets, 1995–2020).</p>
+      `,
+    },
+    {
+      title: "Annales 2025",
+      category: "Annales du Bac",
+      content: `
+        <h2>Annales 2025</h2>
+        <p>19 sujets, 19 corrigés.</p>
+        <ul>
+        <li><strong>Amérique Nord 1</strong> : <a href="../bac/2025/2025-Amerique-Nord-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Amerique-Nord-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Nord 2</strong> : <a href="../bac/2025/2025-Amerique-Nord-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Amerique-Nord-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Nord 2bis</strong> : <a href="../bac/2025/2025-Amerique-Nord-2bis-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Amerique-Nord-2bis-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Sud 1</strong> : <a href="../bac/2025/2025-Amerique-Sud-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Amerique-Sud-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Sud 2</strong> : <a href="../bac/2025/2025-Amerique-Sud-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Amerique-Sud-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Asie 1</strong> : <a href="../bac/2025/2025-Asie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Asie-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Asie 1 (remplacement)</strong> : <a href="../bac/2025/2025-Asie-1-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Asie-1-Remplacement-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Asie 2</strong> : <a href="../bac/2025/2025-Asie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Asie-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Centres étrangers 1</strong> : <a href="../bac/2025/2025-Centres-Etranger-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Centres-Etranger-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Centres étrangers 2</strong> : <a href="../bac/2025/2025-Centres-Etranger-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Centres-Etranger-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 1</strong> : <a href="../bac/2025/2025-Metropole-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Metropole-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 1 (remplacement)</strong> : <a href="../bac/2025/2025-Metropole-1-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Metropole-1-Remplacement-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 2</strong> : <a href="../bac/2025/2025-Metropole-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Metropole-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 2 (remplacement)</strong> : <a href="../bac/2025/2025-Metropole-2-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Metropole-2-Remplacement-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Nouvelle-Calédonie 1</strong> : <a href="../bac/2025/2025-Nouv-Caledonie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Nouv-Caledonie-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Nouvelle-Calédonie 2</strong> : <a href="../bac/2025/2025-Nouv-Caledonie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Nouv-Caledonie-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Polynésie 1</strong> : <a href="../bac/2025/2025-Polynesie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Polynesie-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Polynésie 1 (remplacement)</strong> : <a href="../bac/2025/2025-Polynesie-1-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Polynesie-1-Remplacement-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Polynésie 2</strong> : <a href="../bac/2025/2025-Polynesie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2025/2025-Polynesie-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2024",
+      category: "Annales du Bac",
+      content: `
+        <h2>Annales 2024</h2>
+        <p>18 sujets, 9 corrigés.</p>
+        <ul>
+        <li><strong>Amérique Nord 1</strong> : <a href="../bac/2024/2024-Amerique-Nord-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2024/2024-Amerique-Nord-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Nord 2</strong> : <a href="../bac/2024/2024-Amerique-Nord-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2024/2024-Amerique-Nord-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Sud 1</strong> : <a href="../bac/2024/2024-Amerique-Sud-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2024/2024-Amerique-Sud-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Sud 2</strong> : <a href="../bac/2024/2024-Amerique-Sud-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Asie 1</strong> : <a href="../bac/2024/2024-Asie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Asie 2</strong> : <a href="../bac/2024/2024-Asie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Centres étrangers 1</strong> : <a href="../bac/2024/2024-Centres-Etranger-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2024/2024-Centres-Etranger-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Centres étrangers 2</strong> : <a href="../bac/2024/2024-Centres-Etranger-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2024/2024-Centres-Etranger-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 1</strong> : <a href="../bac/2024/2024-Metropole-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2024/2024-Metropole-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 1 (remplacement)</strong> : <a href="../bac/2024/2024-Metropole-1-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole 2</strong> : <a href="../bac/2024/2024-Metropole-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2024/2024-Metropole-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 2 Bis</strong> : <a href="../bac/2024/2024-Metropole-2-Bis-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole 2 (remplacement)</strong> : <a href="../bac/2024/2024-Metropole-2-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Polynésie 1</strong> : <a href="../bac/2024/2024-Polynesie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2024/2024-Polynesie-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Polynésie 1 (remplacement)</strong> : <a href="../bac/2024/2024-Polynesie-1-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Polynésie 2</strong> : <a href="../bac/2024/2024-Polynesie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2024/2024-Polynesie-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Suède 2</strong> : <a href="../bac/2024/2024-Suede-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Zero 1</strong> : <a href="../bac/2024/2024-Zero-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2023",
+      category: "Annales du Bac",
+      content: `
+        <h2>Annales 2023</h2>
+        <p>21 sujets, 9 corrigés.</p>
+        <ul>
+        <li><strong>Amérique Nord 1</strong> : <a href="../bac/2023/2023-Amerique-Nord-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2023/2023-Amerique-Nord-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Nord 2</strong> : <a href="../bac/2023/2023-Amerique-Nord-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2023/2023-Amerique-Nord-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Sud 1</strong> : <a href="../bac/2023/2023-Amerique-Sud-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Amérique Sud 2</strong> : <a href="../bac/2023/2023-Amerique-Sud-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Asie 1</strong> : <a href="../bac/2023/2023-Asie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2023/2023-Asie-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Asie 2</strong> : <a href="../bac/2023/2023-Asie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Centres étrangers 1</strong> : <a href="../bac/2023/2023-Centres-Etranger-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2023/2023-Centres-Etranger-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Centres étrangers 2</strong> : <a href="../bac/2023/2023-Centres-Etranger-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2023/2023-Centres-Etranger-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>La Réunion 1</strong> : <a href="../bac/2023/2023-La-Reunion-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2023/2023-La-Reunion-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>La Réunion 2</strong> : <a href="../bac/2023/2023-La-Reunion-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Liban 1</strong> : <a href="../bac/2023/2023-Liban-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2023/2023-Liban-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Liban 2</strong> : <a href="../bac/2023/2023-Liban-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole 1</strong> : <a href="../bac/2023/2023-Metropole-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2023/2023-Metropole-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 1 (remplacement)</strong> : <a href="../bac/2023/2023-Metropole-1-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole 2</strong> : <a href="../bac/2023/2023-Metropole-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2023/2023-Metropole-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 2 (remplacement)</strong> : <a href="../bac/2023/2023-Metropole-2-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Nouvelle-Calédonie 1</strong> : <a href="../bac/2023/2023-Nouv-Caledonie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Nouvelle-Calédonie 2</strong> : <a href="../bac/2023/2023-Nouv-Caledonie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Polynésie 1</strong> : <a href="../bac/2023/2023-Polynesie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Polynésie 1 (remplacement)</strong> : <a href="../bac/2023/2023-Polynesie-1-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Polynésie 2</strong> : <a href="../bac/2023/2023-Polynesie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2022",
+      category: "Annales du Bac",
+      content: `
+        <h2>Annales 2022</h2>
+        <p>19 sujets, 5 corrigés.</p>
+        <ul>
+        <li><strong>Amérique Nord 1</strong> : <a href="../bac/2022/2022-Amerique-Nord-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2022/2022-Amerique-Nord-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Nord 2</strong> : <a href="../bac/2022/2022-Amerique-Nord-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2022/2022-Amerique-Nord-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Amérique Sud 1</strong> : <a href="../bac/2022/2022-Amerique-Sud-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Amérique Sud 2</strong> : <a href="../bac/2022/2022-Amerique-Sud-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Asie 1</strong> : <a href="../bac/2022/2022-Asie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Asie 2</strong> : <a href="../bac/2022/2022-Asie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Centres étrangers 1</strong> : <a href="../bac/2022/2022-Centres-Etranger-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Centres étrangers 2</strong> : <a href="../bac/2022/2022-Centres-Etranger-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Mayotte Liban 1</strong> : <a href="../bac/2022/2022-Mayotte-Liban-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Mayotte Liban 2</strong> : <a href="../bac/2022/2022-Mayotte-Liban-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole 1</strong> : <a href="../bac/2022/2022-Metropole-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2022/2022-Metropole-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 1 (remplacement)</strong> : <a href="../bac/2022/2022-Metropole-1-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole 2</strong> : <a href="../bac/2022/2022-Metropole-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole 2 (remplacement)</strong> : <a href="../bac/2022/2022-Metropole-2-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Nouvelle-Calédonie 1</strong> : <a href="../bac/2022/2022-Nouv-Caledonie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Nouvelle-Calédonie 2</strong> : <a href="../bac/2022/2022-Nouv-Caledonie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Polynésie 1</strong> : <a href="../bac/2022/2022-Polynesie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2022/2022-Polynesie-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Polynésie 1 (remplacement)</strong> : <a href="../bac/2022/2022-Polynesie-1-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Polynésie 2</strong> : <a href="../bac/2022/2022-Polynesie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2022/2022-Polynesie-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        </ul>
+      `,
+    },
+    {
+      title: "Annales 2021",
+      category: "Annales du Bac",
+      content: `
+        <h2>Annales 2021</h2>
+        <p>12 sujets, 7 corrigés.</p>
+        <ul>
+        <li><strong>Amérique Nord 1</strong> : <a href="../bac/2021/2021-Amerique-Nord-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2021/2021-Amerique-Nord-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Asie 1</strong> : <a href="../bac/2021/2021-Asie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2021/2021-Asie-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Asie 2</strong> : <a href="../bac/2021/2021-Asie-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2021/2021-Asie-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Centres étrangers 1</strong> : <a href="../bac/2021/2021-Centres-Etranger-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2021/2021-Centres-Etranger-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Centres étrangers 2</strong> : <a href="../bac/2021/2021-Centres-Etranger-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2021/2021-Centres-Etranger-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole Cand Libre 1</strong> : <a href="../bac/2021/2021-Metro-Cand-Libre-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole Cand Libre 2</strong> : <a href="../bac/2021/2021-Metro-Cand-Libre-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2021/2021-Metro-Cand-Libre-2-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
+        <li><strong>Métropole 1</strong> : <a href="../bac/2021/2021-Metropole-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole 2</strong> : <a href="../bac/2021/2021-Metropole-2-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Métropole 2 (remplacement)</strong> : <a href="../bac/2021/2021-Metropole-2-Remplacement-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Polynésie 1</strong> : <a href="../bac/2021/2021-Polynesie-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <em>corrigé indisponible</em></li>
+        <li><strong>Zero 1</strong> : <a href="../bac/2021/2021-Zero-1-sujet.pdf" target="_blank" rel="noopener">sujet</a> · <a href="../bac/2021/2021-Zero-1-corrige.pdf" target="_blank" rel="noopener">corrigé</a></li>
         </ul>
       `,
     },
