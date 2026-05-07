@@ -615,6 +615,170 @@
       letter-spacing: 0.06em;
     }
 
+    /* ─── Modal d'exercices ─────────────────────────── */
+    .ex-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 28px;
+      padding: 14px 22px;
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      color: white;
+      border: none;
+      border-radius: var(--r);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: var(--shadow);
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .ex-cta:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    .ex-cta:active { transform: translateY(0); }
+
+    .ex-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(17, 24, 39, 0.55);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      z-index: 70;
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .ex-backdrop.show { display: flex; }
+    .ex-modal {
+      background: var(--bg-elev);
+      border-radius: var(--r-lg);
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 25px 70px rgba(17, 24, 39, 0.4);
+    }
+    .ex-modal .ex-meta {
+      font-size: 11px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .ex-modal h2 {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 18px;
+      letter-spacing: -0.01em;
+    }
+    .ex-question {
+      background: var(--primary-soft);
+      border-left: 3px solid var(--primary);
+      padding: 14px 18px;
+      border-radius: var(--r-sm);
+      margin-bottom: 16px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .ex-input-wrap { margin-bottom: 14px; }
+    .ex-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--r-sm);
+      font-size: 17px;
+      font-family: 'JetBrains Mono', 'Inter', monospace;
+      color: var(--text);
+      background: var(--bg-elev);
+    }
+    .ex-input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+    .ex-mcq { display: grid; gap: 8px; margin-bottom: 14px; }
+    .ex-mcq-option {
+      width: 100%;
+      text-align: left;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      background: var(--bg-elev);
+      cursor: pointer;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .ex-mcq-option:hover { border-color: var(--primary); background: var(--primary-soft); }
+    .ex-mcq-option.selected { border-color: var(--primary); background: var(--primary-soft); font-weight: 600; }
+    .ex-buttons {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .ex-feedback {
+      padding: 12px 16px;
+      border-radius: var(--r-sm);
+      margin-top: 14px;
+      font-size: 14.5px;
+    }
+    .ex-feedback.ok {
+      background: var(--success-soft);
+      border-left: 3px solid var(--success);
+      color: var(--success-text);
+    }
+    .ex-feedback.ko {
+      background: var(--danger-soft);
+      border-left: 3px solid var(--danger);
+      color: var(--danger-text);
+    }
+    .ex-solution {
+      background: var(--bg-soft);
+      border-radius: var(--r-sm);
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+    .ex-solution h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-2);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .ex-solution ol { margin: 0 0 10px 24px; padding: 0; }
+    .ex-solution ol li { margin-bottom: 6px; line-height: 1.55; font-size: 14.5px; }
+    .ex-solution code {
+      background: var(--primary-soft);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--primary-hover);
+      font-size: 0.92em;
+    }
+    .ex-final {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: var(--bg-elev);
+      border-radius: var(--r-sm);
+      border: 1px solid var(--success);
+      color: var(--success-text);
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .ex-stats {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+    }
+    .ex-readonly {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      font-size: 17px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-2);
+      background: var(--bg-soft);
+      margin-bottom: 14px;
+    }
+
     /* Mobile */
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
@@ -667,6 +831,10 @@
     <main class="content" id="content" role="main"></main>
   </div>
   <div class="sidebar-backdrop" id="backdrop"></div>
+
+  <div class="ex-backdrop" id="ex-backdrop" role="dialog" aria-modal="true" aria-labelledby="ex-title">
+    <div class="ex-modal" id="ex-modal"></div>
+  </div>
 
 <script>
 'use strict';
@@ -6644,6 +6812,603 @@ function chapters5e() {
 }
 
 // ─── État + persistance ─────────────────────────────────────────
+// ─── Système d'exercices ────────────────────────────────────────
+// EXERCISES indexé par "levelId-chapterIdx" → tableau de templates.
+// Un template = { title, generate() } où generate() renvoie un objet
+// { question, inputType, answer, steps, options?, placeholder?, tolerance? }
+// inputType : 'number' | 'text' | 'fraction' | 'mcq'.
+const EXERCISES = {};
+
+// ─── Templates d'exercices : 6e ─────────────────────────────────
+// Ordre des chapitres 6e (cf. chapters6e()) :
+// 0 Nombres entiers · 1 Nombres décimaux · 2 Add/sous/mul · 3 Division
+// 4 Fractions sens · 5 Proportionnalité · 6 Droites perp/par · 7 Angles
+// 8 Cercle/médiatrice · 9 Triangles/quadri · 10 Symétrie axiale
+// 11 Symétrie centrale · 12 Périmètre/aire · 13 Volumes · 14 Tableaux
+
+EXERCISES['6e-0'] = [
+  {
+    title: 'Valeur d\'un chiffre dans un nombre',
+    generate() {
+      const n = exRand(1234, 9876);
+      const digits = String(n).split('').map(Number);
+      const positions = ['unités', 'dizaines', 'centaines', 'milliers'];
+      const values = [1, 10, 100, 1000];
+      const posIdx = exRand(0, 3);
+      const digit = digits[3 - posIdx];
+      const value = digit * values[posIdx];
+      return {
+        question: `Dans le nombre <code>${n}</code>, quelle est la <strong>valeur</strong> du chiffre des ${positions[posIdx]} ?`,
+        inputType: 'number',
+        answer: value,
+        steps: [
+          `Le chiffre des ${positions[posIdx]} dans <code>${n}</code> est <code>${digit}</code>.`,
+          `Sa valeur est : <code>${digit} × ${values[posIdx]} = ${value}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Comparer deux entiers',
+    generate() {
+      const a = exRand(1000, 99999);
+      let b;
+      do { b = exRand(1000, 99999); } while (b === a);
+      return {
+        question: `Quel est le plus grand de ces deux nombres ?<br><code>${a}</code> ou <code>${b}</code>`,
+        inputType: 'mcq',
+        options: [String(a), String(b)],
+        answer: a > b ? 0 : 1,
+        steps: [
+          `On compare d'abord le nombre de chiffres : <code>${a}</code> en a ${String(a).length}, <code>${b}</code> en a ${String(b).length}.`,
+          `${String(a).length === String(b).length
+            ? `Même nombre de chiffres : on compare chiffre à chiffre en partant de la gauche.`
+            : `Plus de chiffres = plus grand : <code>${String(a).length > String(b).length ? a : b}</code> gagne.`}`,
+          `Le plus grand est <code>${Math.max(a, b)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Arrondir à la dizaine',
+    generate() {
+      const n = exRand(123, 9876);
+      const arr = Math.round(n / 10) * 10;
+      return {
+        question: `Arrondis <code>${n}</code> à la <strong>dizaine</strong> la plus proche.`,
+        inputType: 'number',
+        answer: arr,
+        steps: [
+          `On regarde le chiffre des unités : <code>${n % 10}</code>.`,
+          `${n % 10 >= 5
+            ? `Comme <code>${n % 10} ≥ 5</code>, on arrondit au-dessus.`
+            : `Comme <code>${n % 10} &lt; 5</code>, on arrondit en-dessous.`}`,
+          `Résultat : <code>${arr}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-1'] = [
+  {
+    title: 'Comparer deux décimaux',
+    generate() {
+      const aE = exRand(2, 9), bE = aE; // même partie entière
+      const aD = exRand(10, 99) / 100;
+      let bD;
+      do { bD = exRand(1, 9) / 10; } while (Math.abs(aD - bD) < 0.001);
+      const a = aE + aD;
+      const b = bE + bD;
+      return {
+        question: `Quel est le plus grand : <code>${a.toFixed(2)}</code> ou <code>${b.toFixed(1)}</code> ?`,
+        inputType: 'mcq',
+        options: [a.toFixed(2), b.toFixed(1)],
+        answer: a > b ? 0 : 1,
+        steps: [
+          `Parties entières égales (<code>${aE}</code>), on compare la partie décimale.`,
+          `Astuce : compléter avec un zéro pour que les deux décimales aient la même longueur.`,
+          `Le plus grand est <code>${Math.max(a, b).toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Arrondir un décimal au dixième',
+    generate() {
+      const n = exRand(100, 999) / 100;
+      const arr = Math.round(n * 10) / 10;
+      return {
+        question: `Arrondis <code>${n.toFixed(2)}</code> au <strong>dixième</strong>.`,
+        inputType: 'number',
+        answer: arr,
+        tolerance: 0.01,
+        steps: [
+          `On regarde le chiffre des centièmes : <code>${Math.floor(n * 100) % 10}</code>.`,
+          `${Math.floor(n * 100) % 10 >= 5 ? `Comme c'est ≥ 5, on arrondit au-dessus.` : `Comme c'est < 5, on arrondit en-dessous.`}`,
+          `Résultat : <code>${arr.toFixed(1)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-2'] = [
+  {
+    title: 'Calcul mental : multiplication par 9',
+    generate() {
+      const n = exRand(2, 12);
+      return {
+        question: `Calcule mentalement : <code>9 × ${n}</code>`,
+        inputType: 'number',
+        answer: 9 * n,
+        steps: [
+          `Astuce : <code>9 × ${n} = 10 × ${n} − ${n}</code>.`,
+          `<code>10 × ${n} = ${10 * n}</code>, puis <code>${10 * n} − ${n} = ${9 * n}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Multiplication par 10 / 100 / 1000',
+    generate() {
+      const n = exRand(123, 9999) / (exPick([10, 100]));
+      const k = exPick([10, 100, 1000]);
+      return {
+        question: `Calcule : <code>${n} × ${k}</code>`,
+        inputType: 'number',
+        answer: n * k,
+        tolerance: 0.001,
+        steps: [
+          `Multiplier par ${k}, c'est décaler la virgule de ${String(k).length - 1} rang${k > 10 ? 's' : ''} vers la droite.`,
+          `Résultat : <code>${n * k}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Addition posée de décimaux',
+    generate() {
+      const a = exRand(100, 999) / 10;
+      const b = exRand(100, 999) / 100;
+      return {
+        question: `Calcule : <code>${a.toFixed(1)} + ${b.toFixed(2)}</code>`,
+        inputType: 'number',
+        answer: Math.round((a + b) * 100) / 100,
+        tolerance: 0.001,
+        steps: [
+          `Aligner les virgules : <code>${a.toFixed(2)} + ${b.toFixed(2)}</code>.`,
+          `Additionner colonne par colonne (en commençant par la droite).`,
+          `Résultat : <code>${(a + b).toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-3'] = [
+  {
+    title: 'Division euclidienne : quotient et reste',
+    generate() {
+      const b = exRand(3, 12);
+      const q = exRand(5, 50);
+      const r = exRand(0, b - 1);
+      const a = b * q + r;
+      return {
+        question: `Effectue la division euclidienne de <code>${a}</code> par <code>${b}</code>. Quel est le quotient ?`,
+        inputType: 'number',
+        answer: q,
+        steps: [
+          `On cherche le plus grand multiple de ${b} ne dépassant pas ${a}.`,
+          `<code>${b} × ${q} = ${b * q}</code>, et <code>${b} × ${q + 1} = ${b * (q + 1)} > ${a}</code>.`,
+          `Quotient : <code>${q}</code>. Reste : <code>${r}</code>. On vérifie : <code>${b} × ${q} + ${r} = ${a}</code> ✓.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Critère de divisibilité',
+    generate() {
+      const div = exPick([2, 3, 5, 9, 10]);
+      const n = exRand(100, 9999);
+      const isDiv = n % div === 0;
+      return {
+        question: `Le nombre <code>${n}</code> est-il divisible par <code>${div}</code> ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: isDiv ? 0 : 1,
+        steps: [
+          div === 2 ? `Critère par 2 : le nombre se termine par 0, 2, 4, 6 ou 8. Ici dernier chiffre = ${n % 10}.`
+          : div === 5 ? `Critère par 5 : le nombre se termine par 0 ou 5. Ici dernier chiffre = ${n % 10}.`
+          : div === 10 ? `Critère par 10 : le nombre se termine par 0. Ici dernier chiffre = ${n % 10}.`
+          : div === 3 ? `Critère par 3 : la somme des chiffres est divisible par 3. Ici somme = ${String(n).split('').reduce((a, b) => a + +b, 0)}.`
+          : `Critère par 9 : la somme des chiffres est divisible par 9. Ici somme = ${String(n).split('').reduce((a, b) => a + +b, 0)}.`,
+          isDiv ? `Donc <code>${n}</code> est divisible par <code>${div}</code>.` : `Donc <code>${n}</code> n'est pas divisible par <code>${div}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-5'] = [
+  {
+    title: 'Quatrième proportionnelle',
+    generate() {
+      const k = exRand(2, 9);
+      const a = exRand(2, 12);
+      const b = exRand(2, 12);
+      const aK = a * k;
+      // a → aK, b → ?
+      return {
+        question: `Pour <code>${a}</code> personnes, il faut <code>${aK}</code> g de farine. Combien faut-il pour <code>${b}</code> personnes (en g) ?`,
+        inputType: 'number',
+        answer: b * k,
+        tolerance: 0.01,
+        steps: [
+          `On utilise le coefficient de proportionnalité : <code>${aK} / ${a} = ${k}</code> g par personne.`,
+          `Pour ${b} personnes : <code>${b} × ${k} = ${b * k}</code> g.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-7'] = [
+  {
+    title: 'Angles complémentaires',
+    generate() {
+      const a = exRand(10, 80);
+      return {
+        question: `Quel est le complément de l'angle <code>${a}°</code> ?`,
+        inputType: 'number',
+        answer: 90 - a,
+        steps: [
+          `Deux angles complémentaires ont pour somme <code>90°</code>.`,
+          `Complément : <code>90° − ${a}° = ${90 - a}°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Angles supplémentaires',
+    generate() {
+      const a = exRand(20, 160);
+      return {
+        question: `Quel est le supplément de l'angle <code>${a}°</code> ?`,
+        inputType: 'number',
+        answer: 180 - a,
+        steps: [
+          `Deux angles supplémentaires ont pour somme <code>180°</code>.`,
+          `Supplément : <code>180° − ${a}° = ${180 - a}°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Type d\'angle',
+    generate() {
+      const choice = exPick([
+        { val: exRand(1, 89), type: 'aigu' },
+        { val: 90, type: 'droit' },
+        { val: exRand(91, 179), type: 'obtus' },
+        { val: 180, type: 'plat' },
+      ]);
+      const types = ['aigu', 'droit', 'obtus', 'plat'];
+      return {
+        question: `Comment qualifier un angle de <code>${choice.val}°</code> ?`,
+        inputType: 'mcq',
+        options: types,
+        answer: types.indexOf(choice.type),
+        steps: [
+          `Aigu : 0 < α < 90°. Droit : 90°. Obtus : 90 < α < 180°. Plat : 180°.`,
+          `<code>${choice.val}°</code> est un angle <strong>${choice.type}</strong>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-12'] = [
+  {
+    title: 'Périmètre d\'un rectangle',
+    generate() {
+      const L = exRand(5, 30);
+      const l = exRand(2, L - 1);
+      return {
+        question: `Calcule le périmètre d'un rectangle de longueur <code>${L} cm</code> et largeur <code>${l} cm</code>.`,
+        inputType: 'number',
+        answer: 2 * (L + l),
+        steps: [
+          `Formule : <code>P = 2 × (L + l)</code>.`,
+          `<code>P = 2 × (${L} + ${l}) = 2 × ${L + l} = ${2 * (L + l)} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Aire d\'un rectangle',
+    generate() {
+      const L = exRand(4, 25);
+      const l = exRand(2, L - 1);
+      return {
+        question: `Calcule l'aire d'un rectangle de <code>${L} cm</code> sur <code>${l} cm</code>.`,
+        inputType: 'number',
+        answer: L * l,
+        steps: [
+          `Formule : <code>A = L × l</code>.`,
+          `<code>A = ${L} × ${l} = ${L * l} cm²</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Aire d\'un triangle',
+    generate() {
+      const b = exRand(4, 20);
+      const h = exRand(3, 15);
+      // pour faire que le résultat soit un nombre simple, on garantit que b*h soit pair
+      const bb = b % 2 === 0 ? b : b + 1;
+      return {
+        question: `Aire d'un triangle de base <code>${bb} cm</code> et hauteur <code>${h} cm</code> ?`,
+        inputType: 'number',
+        answer: (bb * h) / 2,
+        tolerance: 0.01,
+        steps: [
+          `Formule : <code>A = (b × h) / 2</code>.`,
+          `<code>A = (${bb} × ${h}) / 2 = ${bb * h} / 2 = ${(bb * h) / 2} cm²</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-13'] = [
+  {
+    title: 'Volume d\'un cube',
+    generate() {
+      const c = exRand(2, 12);
+      return {
+        question: `Volume d'un cube d'arête <code>${c} cm</code> ?`,
+        inputType: 'number',
+        answer: c ** 3,
+        steps: [
+          `Formule : <code>V = c³</code>.`,
+          `<code>V = ${c}³ = ${c} × ${c} × ${c} = ${c ** 3} cm³</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Volume d\'un pavé droit',
+    generate() {
+      const L = exRand(3, 15);
+      const l = exRand(2, 10);
+      const h = exRand(2, 10);
+      return {
+        question: `Volume d'un pavé droit <code>${L} × ${l} × ${h}</code> cm ?`,
+        inputType: 'number',
+        answer: L * l * h,
+        steps: [
+          `Formule : <code>V = L × l × h</code>.`,
+          `<code>V = ${L} × ${l} × ${h} = ${L * l * h} cm³</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Conversion volume → litres',
+    generate() {
+      const v = exRand(2, 50) * 1000; // en cm³
+      return {
+        question: `Une cuve a un volume de <code>${v} cm³</code>. Combien cela fait-il en <strong>litres</strong> ?`,
+        inputType: 'number',
+        answer: v / 1000,
+        tolerance: 0.001,
+        steps: [
+          `Rappel : <code>1 dm³ = 1 L = 1 000 cm³</code>.`,
+          `<code>${v} cm³ = ${v / 1000} L</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+const exState = { current: null, selectedMcq: null, sessionStats: { tried: 0, correct: 0 } };
+const exRand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+const exPick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+function exKey(levelId, idx) { return `${levelId}-${idx}`; }
+
+function hasExercises(levelId, idx) {
+  const list = EXERCISES[exKey(levelId, idx)];
+  return Array.isArray(list) && list.length > 0;
+}
+
+function generateExercise(levelId, idx) {
+  const list = EXERCISES[exKey(levelId, idx)];
+  const tmpl = list[Math.floor(Math.random() * list.length)];
+  const data = tmpl.generate();
+  return {
+    template: tmpl,
+    levelId, idx,
+    title: tmpl.title,
+    ...data,
+    userAnswer: null,
+    status: 'pending',
+  };
+}
+
+function openExercise(levelId, idx) {
+  exState.current = generateExercise(levelId, idx);
+  exState.selectedMcq = null;
+  $('#ex-backdrop').classList.add('show');
+  renderExerciseModal();
+}
+
+function closeExercise() {
+  exState.current = null;
+  exState.selectedMcq = null;
+  $('#ex-backdrop').classList.remove('show');
+}
+
+function newExercise() {
+  if (!exState.current) return;
+  openExercise(exState.current.levelId, exState.current.idx);
+}
+
+function exNormalize(s) {
+  return String(s).toLowerCase().trim().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+function exCheckAnswer(ex, userAns) {
+  if (typeof ex.template.check === 'function') {
+    return !!ex.template.check(userAns, ex);
+  }
+  if (ex.inputType === 'mcq') return userAns === ex.answer;
+  if (ex.inputType === 'number') {
+    const n = parseFloat(String(userAns).replace(',', '.').replace(/\s/g, ''));
+    if (isNaN(n)) return false;
+    return Math.abs(n - ex.answer) < (ex.tolerance != null ? ex.tolerance : 1e-6);
+  }
+  if (ex.inputType === 'text') {
+    return exNormalize(userAns) === exNormalize(ex.answer);
+  }
+  if (ex.inputType === 'fraction') {
+    const m = String(userAns).replace(/\s/g, '').match(/^(-?\d+)\/(-?\d+)$/);
+    if (!m) return false;
+    const num = parseInt(m[1], 10), den = parseInt(m[2], 10);
+    if (den === 0) return false;
+    return Math.abs(num / den - ex.answer) < 1e-9;
+  }
+  return false;
+}
+
+function checkExercise() {
+  const ex = exState.current;
+  if (!ex || (ex.status !== 'pending' && ex.status !== 'wrong')) return;
+  let userAns;
+  if (ex.inputType === 'mcq') {
+    userAns = exState.selectedMcq;
+    if (userAns == null) return;
+  } else {
+    const input = $('#ex-input');
+    if (!input) return;
+    userAns = input.value.trim();
+    if (!userAns) return;
+  }
+  ex.userAnswer = userAns;
+  const ok = exCheckAnswer(ex, userAns);
+  ex.status = ok ? 'correct' : 'wrong';
+  exState.sessionStats.tried++;
+  if (ok) exState.sessionStats.correct++;
+  renderExerciseModal();
+}
+
+function revealSolution() {
+  if (!exState.current) return;
+  exState.current.status = 'revealed';
+  renderExerciseModal();
+}
+
+function exFormatAnswer(ex) {
+  if (ex.inputType === 'mcq') return ex.options[ex.answer];
+  if (ex.formatAnswer) return ex.formatAnswer(ex);
+  return String(ex.answer);
+}
+
+function renderExerciseModal() {
+  const modal = $('#ex-modal');
+  if (!modal) return;
+  modal.innerHTML = '';
+  const ex = exState.current;
+  if (!ex) return;
+
+  const level = findLevel(ex.levelId);
+  const chapter = level.chapters[ex.idx];
+
+  modal.appendChild(el('div', { class: 'ex-meta' }, `${level.name} · ${chapter.title}`));
+  modal.appendChild(el('h2', { id: 'ex-title' }, ex.title));
+  modal.appendChild(el('div', { class: 'ex-question', html: ex.question }));
+
+  if (ex.status === 'pending' || ex.status === 'wrong') {
+    if (ex.inputType === 'mcq') {
+      const wrap = el('div', { class: 'ex-mcq' });
+      ex.options.forEach((opt, i) => {
+        wrap.appendChild(el('button', {
+          class: 'ex-mcq-option' + (exState.selectedMcq === i ? ' selected' : ''),
+          onclick: () => { exState.selectedMcq = i; renderExerciseModal(); },
+          html: opt,
+        }));
+      });
+      modal.appendChild(wrap);
+    } else {
+      const wrap = el('div', { class: 'ex-input-wrap' });
+      const input = el('input', {
+        class: 'ex-input',
+        id: 'ex-input',
+        type: 'text',
+        inputmode: ex.inputType === 'number' ? 'decimal' : 'text',
+        placeholder: ex.placeholder || 'Ta réponse',
+        autocomplete: 'off',
+        spellcheck: 'false',
+      });
+      if (ex.userAnswer) input.value = ex.userAnswer;
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); checkExercise(); }
+      });
+      wrap.appendChild(input);
+      modal.appendChild(wrap);
+    }
+  } else {
+    // Affichage en lecture seule de la réponse de l'élève
+    const display = ex.inputType === 'mcq'
+      ? (ex.options[ex.userAnswer] || '—')
+      : (ex.userAnswer || '—');
+    modal.appendChild(el('div', { class: 'ex-readonly', html: display }));
+  }
+
+  // Boutons
+  const buttons = el('div', { class: 'ex-buttons' });
+  if (ex.status === 'pending' || ex.status === 'wrong') {
+    buttons.appendChild(el('button', { class: 'nav-btn next', onclick: checkExercise }, 'Vérifier'));
+    buttons.appendChild(el('button', { class: 'nav-btn', onclick: revealSolution }, 'Voir la correction'));
+  } else {
+    buttons.appendChild(el('button', { class: 'nav-btn next', onclick: newExercise }, '🎲 Nouvel exercice'));
+  }
+  buttons.appendChild(el('button', { class: 'nav-btn', onclick: closeExercise }, 'Fermer'));
+  modal.appendChild(buttons);
+
+  if (ex.status === 'correct') {
+    modal.appendChild(el('div', { class: 'ex-feedback ok', html: '✅ <strong>Bonne réponse !</strong> Bien joué.' }));
+  }
+  if (ex.status === 'wrong') {
+    modal.appendChild(el('div', { class: 'ex-feedback ko', html: '❌ Ce n\'est pas tout à fait ça. Réessaie ou regarde la correction.' }));
+  }
+
+  if (ex.status === 'revealed' || ex.status === 'correct') {
+    const sol = el('div', { class: 'ex-solution' });
+    sol.appendChild(el('h3', {}, 'Correction détaillée'));
+    if (ex.steps && ex.steps.length) {
+      const ol = el('ol');
+      for (const step of ex.steps) ol.appendChild(el('li', { html: step }));
+      sol.appendChild(ol);
+    }
+    sol.appendChild(el('div', { class: 'ex-final', html: `Réponse : <code>${exFormatAnswer(ex)}</code>` }));
+    modal.appendChild(sol);
+  }
+
+  if (exState.sessionStats.tried > 0) {
+    const s = exState.sessionStats;
+    modal.appendChild(el('div', { class: 'ex-stats' },
+      `Session : ${s.correct} / ${s.tried} bonne${s.correct > 1 ? 's' : ''} réponse${s.correct > 1 ? 's' : ''} (${Math.round(100 * s.correct / s.tried)} %).`));
+  }
+
+  setTimeout(() => {
+    const input = $('#ex-input');
+    if (input && (ex.status === 'pending' || ex.status === 'wrong')) input.focus();
+  }, 50);
+}
+
 const STATE_KEY = 'mathcours_v1';
 let state = { levelId: '5e', chapterId: null };
 let searchState = { query: '' };
@@ -7005,6 +7770,17 @@ function renderChapter(main, level, chapter, idx) {
   const body = el('div');
   body.innerHTML = chapter.content;
   main.appendChild(body);
+
+  // Bouton « S'entraîner » si des exercices sont disponibles pour ce chapitre.
+  if (hasExercises(level.id, idx)) {
+    const ctaWrap = el('p', { style: 'text-align:center' });
+    ctaWrap.appendChild(el('button', {
+      class: 'ex-cta',
+      onclick: () => openExercise(level.id, idx),
+    }, '💪 S\'entraîner sur ce chapitre'));
+    main.appendChild(ctaWrap);
+  }
+
   // Navigation chapitre suivant / précédent
   const nav = el('div', { class: 'chap-nav' });
   if (idx > 0) {
@@ -7059,6 +7835,9 @@ function boot() {
   render();
   $('#menu-btn').addEventListener('click', openSidebarMobile);
   $('#backdrop').addEventListener('click', closeSidebarMobile);
+  $('#ex-backdrop').addEventListener('click', (e) => {
+    if (e.target.id === 'ex-backdrop') closeExercise();
+  });
   $('#home-btn').addEventListener('click', () => {
     state.levelId = null;
     state.chapterId = null;
@@ -7085,8 +7864,9 @@ function boot() {
         input.select();
       }
     }
-    // Échap ferme le drawer mobile s'il est ouvert.
+    // Échap ferme le drawer mobile ou le modal d'exercice.
     if (e.key === 'Escape') {
+      if ($('#ex-backdrop').classList.contains('show')) { closeExercise(); return; }
       if ($('#sidebar').classList.contains('open')) closeSidebarMobile();
     }
   });
