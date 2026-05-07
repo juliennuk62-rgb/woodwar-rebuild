@@ -938,11 +938,14 @@ function chapters3e() {
         ${lc.prop("Une infinité de solutions", `<p>Si on aboutit à une <strong>égalité toujours vraie</strong> (par exemple <code>0 = 0</code>), le système a une <strong>infinité</strong> de solutions. Les deux équations représentent en fait la même droite.</p>`)}
 
         <h2>5. Application : problèmes</h2>
-        ${lc.example("Mise en équations", `<p>« 5 stylos et 3 cahiers coûtent 14,50 €. 3 stylos et 4 cahiers coûtent 14 €. Quel est le prix d'un stylo et celui d'un cahier ? »</p>
+        ${lc.example("Mise en équations", `<p>« 2 stylos et 3 cahiers coûtent 11 €. 4 stylos et 1 cahier coûtent 12 €. Quel est le prix d'un stylo et celui d'un cahier ? »</p>
           <ol><li>Soit <code>x</code> le prix d'un stylo, <code>y</code> celui d'un cahier.</li>
-          <li>Système : <code>{ 5x + 3y = 14,5 ; 3x + 4y = 14 }</code>.</li>
-          <li>Par combinaison ou substitution, on trouve <code>x = 1</code> et <code>y = 2,75</code>.</li>
-          <li>Conclusion : un stylo coûte <strong>1 €</strong>, un cahier coûte <strong>2,75 €</strong>.</li></ol>`)}
+          <li>Système : <code>{ 2x + 3y = 11 ; 4x + y = 12 }</code>.</li>
+          <li>De la 2e équation : <code>y = 12 − 4x</code>.</li>
+          <li>Substitution : <code>2x + 3(12 − 4x) = 11</code> → <code>2x + 36 − 12x = 11</code> → <code>−10x = −25</code> → <code>x = 2,5</code>.</li>
+          <li>Donc <code>y = 12 − 4 × 2,5 = 2</code>.</li>
+          <li>Conclusion : un stylo coûte <strong>2,50 €</strong>, un cahier coûte <strong>2 €</strong>.</li>
+          <li>Vérification : <code>2 × 2,5 + 3 × 2 = 11</code> ✓ et <code>4 × 2,5 + 2 = 12</code> ✓.</li></ol>`)}
       `,
     },
 
