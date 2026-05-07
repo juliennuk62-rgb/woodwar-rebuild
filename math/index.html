@@ -633,19 +633,7 @@ const CURRICULUM = [
     id: 'lycee', name: 'Lycée',
     levels: [
       { id: '2nde', name: '2nde', chapters: chapters2nde() },
-      { id: '1ere', name: '1ère', chapters: [
-        todo("Suites numériques (arithmétique, géométrique)", "Suites"),
-        todo("Limites de suites (intuition)", "Suites"),
-        todo("Dérivation : nombre dérivé, fonction dérivée", "Analyse"),
-        todo("Études de fonctions, extremums", "Analyse"),
-        todo("Fonction exponentielle", "Analyse"),
-        todo("Polynômes du second degré", "Analyse"),
-        todo("Trigonométrie : cercle trigo, formules", "Géométrie"),
-        todo("Vecteurs : produit scalaire", "Géométrie"),
-        todo("Probabilités conditionnelles, indépendance", "Probabilités"),
-        todo("Variables aléatoires, espérance, variance", "Probabilités"),
-        todo("Loi binomiale", "Probabilités"),
-      ]},
+      { id: '1ere', name: '1ère', chapters: chapters1ere() },
       { id: 'tle', name: 'Terminale', chapters: [
         todo("Limites de fonctions", "Analyse"),
         todo("Continuité, théorème des valeurs intermédiaires", "Analyse"),
@@ -695,6 +683,542 @@ const CURRICULUM = [
     ],
   },
 ];
+
+// ─── Contenu pédagogique : 1ère à fond ───────────────────────────
+function chapters1ere() {
+  return [
+    {
+      title: "Suites numériques : arithmétique et géométrique",
+      category: "Suites",
+      content: `
+        <h2>1. Notion de suite</h2>
+        ${lc.def("Suite numérique", `<p>Une <strong>suite numérique</strong> est une fonction qui à chaque entier <code>n</code> (souvent à partir de 0 ou 1) associe un nombre réel, noté <code>uₙ</code> (« u indice n »).</p>
+          <p>Notation : on note la suite <code>(uₙ)</code> ou <code>(uₙ)ₙ ∈ ℕ</code>.</p>`)}
+        ${lc.example("Une suite simple", `<p>Soit la suite définie par <code>uₙ = 3n + 2</code>. On a <code>u₀ = 2</code>, <code>u₁ = 5</code>, <code>u₂ = 8</code>, <code>u₃ = 11</code>, etc.</p>`)}
+
+        <h2>2. Modes de définition</h2>
+        ${lc.prop("Forme explicite", `<p>Une suite est définie de manière <strong>explicite</strong> quand on a une formule directe : <code>uₙ = f(n)</code>. On peut calculer n'importe quel terme directement.</p>`)}
+        ${lc.prop("Forme par récurrence", `<p>Une suite est définie par <strong>récurrence</strong> quand on connaît le premier terme et une relation pour passer d'un terme au suivant : <code>u_{n+1} = g(uₙ)</code>.</p>`)}
+        ${lc.example("Récurrence", `<p>Soit <code>u₀ = 1</code> et <code>u_{n+1} = 2uₙ + 3</code>. Alors :</p>
+          <ul><li><code>u₁ = 2 × 1 + 3 = 5</code></li>
+          <li><code>u₂ = 2 × 5 + 3 = 13</code></li>
+          <li><code>u₃ = 2 × 13 + 3 = 29</code></li></ul>`)}
+
+        <h2>3. Suites arithmétiques</h2>
+        ${lc.def("Suite arithmétique", `<p>Une suite est <strong>arithmétique</strong> de raison <code>r</code> si chaque terme s'obtient en ajoutant <code>r</code> au précédent :</p>`)}
+        ${lc.formula("u_{n+1} = uₙ + r")}
+        ${lc.prop("Forme explicite", `<p>Si <code>(uₙ)</code> est arithmétique de raison <code>r</code> et de premier terme <code>u₀</code> :</p>`)}
+        ${lc.formula("uₙ = u₀ + n × r")}
+        <p>Plus généralement, partant de n'importe quel rang <code>p</code> : <code>uₙ = u_p + (n − p) × r</code>.</p>
+        ${lc.example("Calcul", `<p>Suite arithmétique de premier terme <code>u₀ = 4</code> et raison <code>r = 3</code>.</p>
+          <p><code>uₙ = 4 + 3n</code>. Donc <code>u₁₀ = 4 + 30 = 34</code>.</p>`)}
+
+        <h2>4. Somme des termes d'une suite arithmétique</h2>
+        ${lc.formula("u₀ + u₁ + … + uₙ = (n + 1) × (u₀ + uₙ) / 2")}
+        ${lc.tip("Astuce de Gauss", `<p>« Nombre de termes × moyenne du premier et du dernier terme ». Cette formule vient d'une astuce célèbre de Gauss enfant pour calculer <code>1 + 2 + … + 100 = 100 × 101 / 2 = 5050</code>.</p>`)}
+
+        <h2>5. Suites géométriques</h2>
+        ${lc.def("Suite géométrique", `<p>Une suite est <strong>géométrique</strong> de raison <code>q</code> (avec <code>q ≠ 0</code>) si chaque terme s'obtient en multipliant le précédent par <code>q</code> :</p>`)}
+        ${lc.formula("u_{n+1} = q × uₙ")}
+        ${lc.prop("Forme explicite", `<p>Si <code>(uₙ)</code> est géométrique de raison <code>q</code> et de premier terme <code>u₀</code> :</p>`)}
+        ${lc.formula("uₙ = u₀ × qⁿ")}
+        ${lc.example("Calcul", `<p>Suite géométrique de premier terme <code>u₀ = 5</code> et raison <code>q = 2</code>.</p>
+          <p><code>uₙ = 5 × 2ⁿ</code>. Donc <code>u₅ = 5 × 32 = 160</code>.</p>`)}
+
+        <h2>6. Somme des termes d'une suite géométrique</h2>
+        ${lc.formula("u₀ + u₁ + … + uₙ = u₀ × (1 − q^{n+1}) / (1 − q) &nbsp;&nbsp; (q ≠ 1)")}
+        ${lc.example("Application", `<p>Suite géométrique <code>u₀ = 2</code>, <code>q = 3</code>. Somme des 5 premiers termes (<code>u₀</code> à <code>u₄</code>) :</p>
+          <p><code>S = 2 × (1 − 3⁵)/(1 − 3) = 2 × (1 − 243)/(−2) = 2 × (−242)/(−2) = 242</code>.</p>`)}
+
+        <h2>7. Sens de variation</h2>
+        ${lc.prop("Suites arithmétiques", `<ul>
+          <li><code>r > 0</code> : strictement croissante.</li>
+          <li><code>r < 0</code> : strictement décroissante.</li>
+          <li><code>r = 0</code> : constante.</li>
+        </ul>`)}
+        ${lc.prop("Suites géométriques (avec u₀ > 0)", `<ul>
+          <li><code>q > 1</code> : strictement croissante.</li>
+          <li><code>0 < q < 1</code> : strictement décroissante (vers 0).</li>
+          <li><code>q = 1</code> : constante.</li>
+          <li><code>q < 0</code> : signes alternés (ni croissante ni décroissante).</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Limites de suites (intuition)",
+      category: "Suites",
+      content: `
+        <h2>1. Idée intuitive</h2>
+        ${lc.def("Limite d'une suite", `<p>Étudier la limite d'une suite <code>(uₙ)</code>, c'est observer ce que devient <code>uₙ</code> quand <code>n</code> devient « très grand » (tend vers <code>+∞</code>).</p>`)}
+
+        <h2>2. Suite convergente</h2>
+        ${lc.def("Convergence vers un réel", `<p>Une suite <code>(uₙ)</code> <strong>converge</strong> vers un réel <code>L</code> si <code>uₙ</code> se rapproche de plus en plus de <code>L</code> quand <code>n → +∞</code>.</p>
+          <p>Notation : <code>lim uₙ = L</code> (quand <code>n → +∞</code>).</p>`)}
+        ${lc.example("Suite qui tend vers 0", `<p><code>uₙ = 1/n</code>. Pour <code>n = 100</code>, <code>uₙ = 0,01</code>. Pour <code>n = 1000</code>, <code>uₙ = 0,001</code>. La suite tend vers 0.</p>
+          <p><code>lim 1/n = 0</code>.</p>`)}
+
+        <h2>3. Suite divergente vers l'infini</h2>
+        ${lc.def("Divergence vers ±∞", `<p>Une suite <strong>diverge vers +∞</strong> si <code>uₙ</code> dépasse n'importe quelle borne pour <code>n</code> assez grand. Idem pour <code>−∞</code>.</p>`)}
+        ${lc.example("Croissance non bornée", `<p><code>uₙ = n²</code>. Pour <code>n = 10</code>, <code>uₙ = 100</code> ; pour <code>n = 100</code>, <code>uₙ = 10 000</code>. La suite tend vers <code>+∞</code>.</p>`)}
+
+        <h2>4. Suite divergente sans limite</h2>
+        ${lc.example("Sans limite", `<p><code>uₙ = (−1)ⁿ</code> donne <code>1, −1, 1, −1, …</code>. Cette suite ne converge pas et ne diverge pas vers ±∞ : elle <strong>n'a pas de limite</strong>.</p>`)}
+
+        <h2>5. Limites des suites usuelles</h2>
+        ${lc.prop("À retenir", `<ul>
+          <li><code>lim n = +∞</code></li>
+          <li><code>lim n² = +∞</code>, <code>lim n³ = +∞</code>, …, <code>lim nᵏ = +∞</code> (k > 0)</li>
+          <li><code>lim 1/n = 0</code></li>
+          <li><code>lim 1/n² = 0</code>, etc.</li>
+          <li><code>lim √n = +∞</code></li>
+        </ul>`)}
+
+        <h2>6. Limite d'une suite géométrique qⁿ</h2>
+        ${lc.prop("Selon la valeur de q", `<ul>
+          <li>Si <code>q > 1</code> : <code>lim qⁿ = +∞</code>.</li>
+          <li>Si <code>q = 1</code> : <code>lim qⁿ = 1</code>.</li>
+          <li>Si <code>−1 < q < 1</code> : <code>lim qⁿ = 0</code>.</li>
+          <li>Si <code>q ≤ −1</code> : pas de limite (oscille).</li>
+        </ul>`)}
+        ${lc.example("Calcul", `<ul>
+          <li><code>lim 2ⁿ = +∞</code> (q = 2 > 1).</li>
+          <li><code>lim (1/3)ⁿ = 0</code> (0 < q < 1).</li>
+          <li><code>lim (−2)ⁿ</code> n'existe pas (oscille en signe avec valeur croissante).</li>
+        </ul>`)}
+
+        <h2>7. Opérations sur les limites</h2>
+        ${lc.prop("Règles intuitives", `<ul>
+          <li>Si <code>lim uₙ = a</code> et <code>lim vₙ = b</code>, alors <code>lim (uₙ + vₙ) = a + b</code>.</li>
+          <li><code>lim (uₙ × vₙ) = a × b</code>.</li>
+          <li>Si <code>b ≠ 0</code> : <code>lim (uₙ / vₙ) = a / b</code>.</li>
+        </ul>`)}
+        ${lc.warn("Formes indéterminées", `<p>Certains cas ne se calculent pas directement : <code>+∞ − ∞</code>, <code>0 × ∞</code>, <code>∞/∞</code>, <code>0/0</code>. Il faut alors transformer l'expression.</p>`)}
+      `,
+    },
+
+    {
+      title: "Dérivation : nombre dérivé, fonction dérivée",
+      category: "Analyse",
+      content: `
+        <h2>1. Idée intuitive de la dérivée</h2>
+        ${lc.def("Pente de la tangente", `<p>La <strong>dérivée</strong> de <code>f</code> en un point <code>a</code>, notée <code>f'(a)</code>, est la <strong>pente de la tangente</strong> à la courbe de <code>f</code> au point d'abscisse <code>a</code>.</p>`)}
+        ${lc.tip("Vitesse instantanée", `<p>Si <code>f(t)</code> représente une position à l'instant <code>t</code>, alors <code>f'(t)</code> est la <strong>vitesse instantanée</strong> à cet instant.</p>`)}
+
+        <h2>2. Définition formelle</h2>
+        ${lc.formula("f'(a) = lim_{h → 0} (f(a + h) − f(a)) / h")}
+        <p>Ce nombre représente la limite du <strong>taux d'accroissement</strong> de <code>f</code> entre <code>a</code> et <code>a+h</code>, quand <code>h</code> tend vers 0.</p>
+
+        <h2>3. Tangente à la courbe</h2>
+        ${lc.formula("Équation de la tangente en a : y = f'(a)(x − a) + f(a)")}
+        ${lc.example("Calcul de tangente", `<p>Soit <code>f(x) = x²</code>. On admet <code>f'(2) = 4</code> et <code>f(2) = 4</code>.</p>
+          <p>Tangente : <code>y = 4(x − 2) + 4 = 4x − 4</code>.</p>`)}
+
+        <h2>4. Fonction dérivée</h2>
+        ${lc.def("Fonction dérivée", `<p>Si <code>f</code> est dérivable en chaque point d'un intervalle, on peut définir une nouvelle fonction <code>f'</code> qui à <code>x</code> associe <code>f'(x)</code>.</p>`)}
+
+        <h2>5. Dérivées des fonctions usuelles</h2>
+        ${lc.formula("(c)' = 0 &nbsp;&nbsp; (x)' = 1 &nbsp;&nbsp; (xⁿ)' = n × x^{n−1}")}
+        ${lc.formula("(1/x)' = −1/x² &nbsp;&nbsp; (√x)' = 1/(2√x)")}
+        ${lc.example("Dériver f(x) = x³", `<p><code>f'(x) = 3x²</code>.</p>`)}
+        ${lc.example("Dériver f(x) = 1/x", `<p><code>f'(x) = −1/x²</code>.</p>`)}
+
+        <h2>6. Règles de dérivation</h2>
+        ${lc.prop("Opérations", `<ul>
+          <li><code>(u + v)' = u' + v'</code></li>
+          <li><code>(k × u)' = k × u'</code> (k constante)</li>
+          <li><code>(u × v)' = u' × v + u × v'</code></li>
+          <li><code>(u / v)' = (u' × v − u × v') / v²</code></li>
+        </ul>`)}
+
+        <h2>7. Exemples pas à pas</h2>
+        ${lc.example("Dériver f(x) = 3x² − 5x + 7", `<ol>
+          <li><code>(3x²)' = 3 × 2x = 6x</code>.</li>
+          <li><code>(−5x)' = −5</code>.</li>
+          <li><code>(7)' = 0</code>.</li>
+          <li>Donc <code>f'(x) = 6x − 5</code>.</li>
+        </ol>`)}
+        ${lc.example("Dériver f(x) = x² × (x + 1)", `<ol>
+          <li>Avec la formule du produit : <code>u = x²</code>, <code>v = x + 1</code>.</li>
+          <li><code>u' = 2x</code>, <code>v' = 1</code>.</li>
+          <li><code>f'(x) = 2x × (x + 1) + x² × 1 = 2x² + 2x + x² = 3x² + 2x</code>.</li>
+        </ol>`)}
+      `,
+    },
+
+    {
+      title: "Études de fonctions et extremums",
+      category: "Analyse",
+      content: `
+        <h2>1. Lien entre dérivée et variations</h2>
+        ${lc.prop("Théorème fondamental", `<p>Soit <code>f</code> dérivable sur un intervalle <code>I</code>.</p>
+          <ul><li>Si <code>f'(x) > 0</code> sur <code>I</code> : <code>f</code> est <strong>strictement croissante</strong> sur <code>I</code>.</li>
+          <li>Si <code>f'(x) < 0</code> sur <code>I</code> : <code>f</code> est <strong>strictement décroissante</strong>.</li>
+          <li>Si <code>f'(x) = 0</code> sur <code>I</code> : <code>f</code> est <strong>constante</strong>.</li></ul>`)}
+        ${lc.tip("Méthode d'étude", `<p>Pour étudier les variations d'une fonction <code>f</code> :</p>
+          <ol><li>Calculer <code>f'(x)</code>.</li>
+          <li>Étudier le signe de <code>f'(x)</code>.</li>
+          <li>En déduire les variations de <code>f</code>.</li></ol>`)}
+
+        <h2>2. Étude complète : exemple</h2>
+        ${lc.example("Étudier f(x) = x³ − 3x", `<ol>
+          <li>Dérivée : <code>f'(x) = 3x² − 3 = 3(x² − 1) = 3(x − 1)(x + 1)</code>.</li>
+          <li>Signe de <code>f'</code> :
+            <table>
+              <tr><th>Intervalle</th><th>]−∞ ; −1[</th><th>]−1 ; 1[</th><th>]1 ; +∞[</th></tr>
+              <tr><td>x − 1</td><td>−</td><td>−</td><td>+</td></tr>
+              <tr><td>x + 1</td><td>−</td><td>+</td><td>+</td></tr>
+              <tr><td>3(x−1)(x+1)</td><td>+</td><td>−</td><td>+</td></tr>
+            </table>
+          </li>
+          <li>Variations : <code>f</code> est croissante sur <code>]−∞ ; −1]</code>, décroissante sur <code>[−1 ; 1]</code>, croissante sur <code>[1 ; +∞[</code>.</li>
+          <li>Maximum local en <code>−1</code> : <code>f(−1) = −1 + 3 = 2</code>.</li>
+          <li>Minimum local en <code>1</code> : <code>f(1) = 1 − 3 = −2</code>.</li>
+        </ol>`)}
+
+        <h2>3. Extremums : maximum et minimum</h2>
+        ${lc.def("Extremum local", `<p>Un <strong>maximum local</strong> est atteint en <code>a</code> si <code>f(a)</code> est la plus grande valeur de <code>f</code> sur un voisinage de <code>a</code>. Idem pour un <strong>minimum local</strong>.</p>`)}
+        ${lc.prop("Caractérisation par la dérivée", `<p>Si <code>f</code> est dérivable et présente un extremum local en <code>a</code>, alors <code>f'(a) = 0</code>. La dérivée s'annule et <strong>change de signe</strong> en <code>a</code>.</p>`)}
+        ${lc.warn("Réciproque fausse", `<p>L'annulation de la dérivée n'est pas suffisante. Pour <code>f(x) = x³</code>, on a <code>f'(0) = 0</code> mais pas d'extremum (la dérivée ne change pas de signe).</p>`)}
+
+        <h2>4. Tableau de variations standard</h2>
+        ${lc.example("Tableau type", `<p>Pour <code>f(x) = x³ − 3x</code>, on résume :</p>
+          <table>
+            <tr><th>x</th><th>−∞</th><th>−1</th><th>1</th><th>+∞</th></tr>
+            <tr><td>f'(x)</td><td>+</td><td>0</td><td>−</td><td>0</td><td>+</td></tr>
+            <tr><td>f(x)</td><td>−∞</td><td>2</td><td></td><td>−2</td><td>+∞</td></tr>
+          </table>`)}
+
+        <h2>5. Application : optimisation</h2>
+        ${lc.example("Boîte de volume maximal", `<p>On découpe des carrés de côté <code>x</code> aux 4 coins d'une feuille rectangulaire de 20 cm × 30 cm pour faire une boîte. Quel volume maximum ?</p>
+          <ol><li><code>V(x) = x(20 − 2x)(30 − 2x)</code>, défini pour <code>0 < x < 10</code>.</li>
+          <li>On dérive et on cherche les zéros : <code>V'(x) = 12x² − 200x + 600</code>.</li>
+          <li>Solutions : <code>x ≈ 3,92</code> ou <code>x ≈ 12,75</code> (à rejeter).</li>
+          <li>Volume max ≈ <code>1056 cm³</code> pour <code>x ≈ 3,92 cm</code>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Fonction exponentielle",
+      category: "Analyse",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Fonction exponentielle", `<p>Il existe une unique fonction <code>f</code> définie et dérivable sur ℝ telle que :</p>
+          <ul><li><code>f' = f</code> (la dérivée est égale à la fonction),</li>
+          <li><code>f(0) = 1</code>.</li></ul>
+          <p>Cette fonction est appelée <strong>fonction exponentielle</strong> et notée <code>exp</code> ou <code>e^x</code>.</p>`)}
+        ${lc.tip("Constante e", `<p>Le nombre <code>e = exp(1) ≈ 2,71828</code> est une constante fondamentale (constante d'Euler).</p>`)}
+
+        <h2>2. Propriétés essentielles</h2>
+        ${lc.formula("e⁰ = 1 &nbsp;&nbsp; e¹ = e &nbsp;&nbsp; (e^x)' = e^x")}
+        ${lc.prop("Règles algébriques", `<ul>
+          <li><code>e^{a+b} = e^a × e^b</code></li>
+          <li><code>e^{a−b} = e^a / e^b</code></li>
+          <li><code>e^{−a} = 1 / e^a</code></li>
+          <li><code>(e^a)^n = e^{na}</code></li>
+        </ul>`)}
+        ${lc.example("Simplifier", `<p><code>e³ × e^{−5} = e^{3−5} = e^{−2} = 1/e²</code>.</p>`)}
+
+        <h2>3. Équation et inéquations</h2>
+        ${lc.prop("Strictement positive et croissante", `<p>Pour tout <code>x</code> réel, <code>e^x > 0</code>. La fonction est strictement croissante sur ℝ.</p>
+          <p>Conséquence : <code>e^a = e^b ⇔ a = b</code> et <code>e^a < e^b ⇔ a < b</code>.</p>`)}
+        ${lc.example("Résoudre e^{2x+1} = e³", `<p>Équivaut à <code>2x + 1 = 3</code>, donc <code>x = 1</code>.</p>`)}
+
+        <h2>4. Variations et limites</h2>
+        ${lc.prop("Variations", `<p><code>(e^x)' = e^x > 0</code>, donc <code>x → e^x</code> est strictement croissante sur ℝ.</p>`)}
+        ${lc.prop("Limites", `<ul>
+          <li><code>lim_{x → +∞} e^x = +∞</code></li>
+          <li><code>lim_{x → −∞} e^x = 0</code></li>
+        </ul>`)}
+
+        <h2>5. Croissance comparée</h2>
+        ${lc.prop("L'exponentielle écrase tout", `<p>Quand <code>x → +∞</code>, <code>e^x</code> croît plus vite que toute puissance de <code>x</code> :</p>`)}
+        ${lc.formula("lim_{x → +∞} e^x / x^n = +∞ &nbsp;&nbsp; (pour tout n > 0)")}
+
+        <h2>6. Dérivée d'une exponentielle composée</h2>
+        ${lc.formula("(e^{u(x)})' = u'(x) × e^{u(x)}")}
+        ${lc.example("Dériver f(x) = e^{3x²}", `<p><code>u(x) = 3x²</code>, <code>u'(x) = 6x</code>.</p>
+          <p><code>f'(x) = 6x × e^{3x²}</code>.</p>`)}
+
+        <h2>7. Modélisation : croissance / décroissance exponentielle</h2>
+        ${lc.example("Population qui double", `<p>Si une population suit <code>P(t) = P₀ × e^{kt}</code> avec <code>k > 0</code>, elle croît exponentiellement. Le temps de doublement est <code>ln(2)/k</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Polynômes du second degré",
+      category: "Analyse",
+      content: `
+        <h2>1. Forme générale</h2>
+        ${lc.def("Trinôme du 2nd degré", `<p>Un <strong>trinôme du second degré</strong> est une expression de la forme :</p>`)}
+        ${lc.formula("f(x) = ax² + bx + c &nbsp;&nbsp; (a ≠ 0)")}
+        <p>Sa courbe représentative est une <strong>parabole</strong>, tournée vers le haut si <code>a > 0</code> et vers le bas si <code>a < 0</code>.</p>
+
+        <h2>2. Discriminant</h2>
+        ${lc.def("Discriminant Δ", `<p>Le <strong>discriminant</strong> de <code>ax² + bx + c</code> est :</p>`)}
+        ${lc.formula("Δ = b² − 4ac")}
+        <p>Il détermine le nombre de racines de l'équation <code>ax² + bx + c = 0</code>.</p>
+
+        <h2>3. Racines selon le discriminant</h2>
+        ${lc.prop("Trois cas", `<ul>
+          <li><strong>Δ > 0</strong> : deux racines réelles distinctes.<br>
+            <code>x₁ = (−b − √Δ) / (2a)</code>, <code>x₂ = (−b + √Δ) / (2a)</code></li>
+          <li><strong>Δ = 0</strong> : une racine double.<br>
+            <code>x₀ = −b / (2a)</code></li>
+          <li><strong>Δ < 0</strong> : aucune racine réelle.</li>
+        </ul>`)}
+        ${lc.example("Résoudre 2x² − 5x + 2 = 0", `<ol>
+          <li><code>a = 2</code>, <code>b = −5</code>, <code>c = 2</code>.</li>
+          <li><code>Δ = (−5)² − 4 × 2 × 2 = 25 − 16 = 9</code>. Δ > 0.</li>
+          <li><code>x₁ = (5 − 3)/4 = 0,5</code> ; <code>x₂ = (5 + 3)/4 = 2</code>.</li>
+        </ol>`)}
+
+        <h2>4. Forme factorisée</h2>
+        ${lc.prop("Si Δ ≥ 0", `<p>Quand le trinôme admet des racines <code>x₁</code> et <code>x₂</code> (éventuellement confondues), on peut factoriser :</p>`)}
+        ${lc.formula("ax² + bx + c = a(x − x₁)(x − x₂)")}
+
+        <h2>5. Forme canonique</h2>
+        ${lc.prop("Mise sous forme canonique", `<p>Pour tout trinôme :</p>`)}
+        ${lc.formula("ax² + bx + c = a(x + b/(2a))² − Δ/(4a)")}
+        ${lc.tip("Sommet de la parabole", `<p>Le sommet de la parabole est le point <code>S(−b/(2a) ; −Δ/(4a))</code>.</p>
+          <ul><li>Si <code>a > 0</code> : minimum, atteint en <code>x = −b/(2a)</code>.</li>
+          <li>Si <code>a < 0</code> : maximum.</li></ul>`)}
+
+        <h2>6. Signe du trinôme</h2>
+        ${lc.prop("Règle du signe", `<ul>
+          <li>Si <strong>Δ < 0</strong> : <code>ax² + bx + c</code> est du <strong>signe de a</strong> partout.</li>
+          <li>Si <strong>Δ = 0</strong> : du signe de <code>a</code> partout sauf en <code>x₀</code> (où il vaut 0).</li>
+          <li>Si <strong>Δ > 0</strong> : du signe de <code>a</code> à l'<em>extérieur</em> des racines, du signe de <code>−a</code> entre elles.</li>
+        </ul>`)}
+        ${lc.example("Signe de x² − 4x + 3", `<p>Δ = 16 − 12 = 4. Racines : <code>x₁ = 1</code>, <code>x₂ = 3</code>.</p>
+          <p><code>a = 1 > 0</code>. Donc le trinôme est :</p>
+          <ul><li>positif sur <code>]−∞ ; 1[ ∪ ]3 ; +∞[</code> ;</li>
+          <li>négatif sur <code>]1 ; 3[</code>.</li></ul>`)}
+      `,
+    },
+
+    {
+      title: "Trigonométrie : cercle trigonométrique et formules",
+      category: "Géométrie",
+      content: `
+        <h2>1. Cercle trigonométrique</h2>
+        ${lc.def("Cercle trigonométrique", `<p>Le <strong>cercle trigonométrique</strong> est le cercle de centre <code>O</code> (origine du repère) et de <strong>rayon 1</strong>, parcouru dans le sens direct (anti-horaire).</p>`)}
+
+        <h2>2. Radian</h2>
+        ${lc.def("Radian", `<p>Le <strong>radian</strong> est l'unité d'angle correspondant à un arc de longueur 1 sur le cercle trigonométrique.</p>`)}
+        ${lc.formula("180° ↔ π rad &nbsp;&nbsp; 90° ↔ π/2 &nbsp;&nbsp; 60° ↔ π/3 &nbsp;&nbsp; 45° ↔ π/4 &nbsp;&nbsp; 30° ↔ π/6")}
+        ${lc.example("Conversion", `<p>Conversion de 120° en radians : <code>120 × π / 180 = 2π/3</code>.</p>`)}
+
+        <h2>3. Cosinus et sinus dans le cercle trigo</h2>
+        ${lc.def("Définitions générales", `<p>Pour un angle <code>x</code> en radians, le point <code>M</code> du cercle trigonométrique tel que l'arc <code>(I, M)</code> mesure <code>x</code> a pour coordonnées <code>(cos x, sin x)</code>.</p>`)}
+        ${lc.tip("Cas des angles aigus", `<p>Pour <code>0 ≤ x ≤ π/2</code>, on retrouve les définitions du triangle rectangle.</p>`)}
+
+        <h2>4. Valeurs particulières</h2>
+        ${lc.prop("À mémoriser", `<table>
+          <tr><th>x</th><th>0</th><th>π/6</th><th>π/4</th><th>π/3</th><th>π/2</th></tr>
+          <tr><td>cos x</td><td>1</td><td>√3/2</td><td>√2/2</td><td>1/2</td><td>0</td></tr>
+          <tr><td>sin x</td><td>0</td><td>1/2</td><td>√2/2</td><td>√3/2</td><td>1</td></tr>
+        </table>`)}
+
+        <h2>5. Propriétés fondamentales</h2>
+        ${lc.formula("cos²(x) + sin²(x) = 1")}
+        ${lc.formula("−1 ≤ cos(x) ≤ 1 &nbsp;&nbsp; −1 ≤ sin(x) ≤ 1")}
+        ${lc.prop("Périodicité", `<p>Les fonctions cosinus et sinus sont <strong>2π-périodiques</strong> :</p>
+          <p><code>cos(x + 2π) = cos(x)</code> et <code>sin(x + 2π) = sin(x)</code>.</p>`)}
+
+        <h2>6. Parité</h2>
+        ${lc.prop("Cosinus est paire, sinus est impaire", `<ul>
+          <li><code>cos(−x) = cos(x)</code> (paire)</li>
+          <li><code>sin(−x) = −sin(x)</code> (impaire)</li>
+        </ul>`)}
+
+        <h2>7. Angles associés</h2>
+        ${lc.formula("cos(π − x) = −cos(x) &nbsp;&nbsp; sin(π − x) = sin(x)")}
+        ${lc.formula("cos(π + x) = −cos(x) &nbsp;&nbsp; sin(π + x) = −sin(x)")}
+        ${lc.formula("cos(π/2 − x) = sin(x) &nbsp;&nbsp; sin(π/2 − x) = cos(x)")}
+
+        <h2>8. Fonctions cosinus et sinus</h2>
+        ${lc.prop("Variations sur [0, π]", `<ul>
+          <li><code>cos</code> est <strong>décroissante</strong> sur <code>[0 ; π]</code>, de 1 à −1.</li>
+          <li><code>sin</code> est croissante sur <code>[0 ; π/2]</code>, décroissante sur <code>[π/2 ; π]</code>.</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Vecteurs : produit scalaire",
+      category: "Géométrie",
+      content: `
+        <h2>1. Définition par projection</h2>
+        ${lc.def("Produit scalaire", `<p>Le <strong>produit scalaire</strong> de deux vecteurs <code>u→</code> et <code>v→</code> est un nombre réel, noté <code>u→ · v→</code>.</p>`)}
+        ${lc.formula("u→ · v→ = ||u→|| × ||v→|| × cos(u→, v→)")}
+        <p>où <code>(u→, v→)</code> désigne l'angle non orienté entre les deux vecteurs.</p>
+
+        <h2>2. Calcul en coordonnées</h2>
+        ${lc.formula("Si u→(x ; y) et v→(x' ; y'), alors u→ · v→ = x×x' + y×y'")}
+        ${lc.example("Calcul", `<p>Pour <code>u→(2 ; 3)</code> et <code>v→(1 ; 4)</code> :</p>
+          <p><code>u→ · v→ = 2 × 1 + 3 × 4 = 2 + 12 = 14</code>.</p>`)}
+
+        <h2>3. Lien avec la norme</h2>
+        ${lc.formula("u→ · u→ = ||u→||²")}
+        ${lc.example("Avec la norme", `<p><code>u→(3 ; 4)</code>. <code>u→ · u→ = 9 + 16 = 25</code>. Donc <code>||u→|| = 5</code>.</p>`)}
+
+        <h2>4. Orthogonalité</h2>
+        ${lc.prop("Caractérisation", `<p>Deux vecteurs non nuls <code>u→</code> et <code>v→</code> sont <strong>orthogonaux</strong> (leur angle vaut π/2) si et seulement si :</p>`)}
+        ${lc.formula("u→ · v→ = 0")}
+        ${lc.example("Tester l'orthogonalité", `<p><code>u→(2 ; −3)</code> et <code>v→(6 ; 4)</code>. <code>u→ · v→ = 12 − 12 = 0</code> → orthogonaux.</p>`)}
+
+        <h2>5. Propriétés</h2>
+        ${lc.prop("Propriétés algébriques", `<ul>
+          <li><strong>Symétrie</strong> : <code>u→ · v→ = v→ · u→</code></li>
+          <li><strong>Bilinéarité</strong> : <code>(k × u→) · v→ = k × (u→ · v→)</code></li>
+          <li><strong>Distributivité</strong> : <code>u→ · (v→ + w→) = u→ · v→ + u→ · w→</code></li>
+        </ul>`)}
+
+        <h2>6. Identités remarquables vectorielles</h2>
+        ${lc.formula("||u→ + v→||² = ||u→||² + 2 u→·v→ + ||v→||²")}
+        ${lc.formula("||u→ − v→||² = ||u→||² − 2 u→·v→ + ||v→||²")}
+
+        <h2>7. Application : calcul d'angle</h2>
+        ${lc.formula("cos(u→, v→) = (u→ · v→) / (||u→|| × ||v→||)")}
+        ${lc.example("Trouver l'angle", `<p><code>u→(1 ; 1)</code> et <code>v→(0 ; 1)</code>.</p>
+          <ol><li><code>u→ · v→ = 0 + 1 = 1</code>.</li>
+          <li><code>||u→|| = √2</code>, <code>||v→|| = 1</code>.</li>
+          <li><code>cos θ = 1/√2 = √2/2</code>, donc <code>θ = π/4 = 45°</code>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Probabilités conditionnelles, indépendance",
+      category: "Probabilités",
+      content: `
+        <h2>1. Probabilité conditionnelle</h2>
+        ${lc.def("Probabilité de A sachant B", `<p>La <strong>probabilité conditionnelle</strong> de l'événement <code>A</code> <em>sachant</em> que <code>B</code> est réalisé, notée <code>P_B(A)</code> ou <code>P(A | B)</code>, est définie pour <code>P(B) ≠ 0</code> par :</p>`)}
+        ${lc.formula("P_B(A) = P(A ∩ B) / P(B)")}
+
+        <h2>2. Formule des probabilités composées</h2>
+        ${lc.formula("P(A ∩ B) = P(B) × P_B(A) = P(A) × P_A(B)")}
+        ${lc.example("Tirage successif sans remise", `<p>Une urne contient 3 boules rouges et 2 vertes. On tire 2 boules <em>sans</em> remise.</p>
+          <p>Probabilité de tirer 2 rouges : <code>P(R₁ ∩ R₂) = P(R₁) × P_{R₁}(R₂) = (3/5) × (2/4) = 6/20 = 3/10</code>.</p>`)}
+
+        <h2>3. Arbre pondéré</h2>
+        ${lc.prop("Règle des arbres", `<ul>
+          <li>La probabilité d'un <strong>chemin</strong> = produit des probabilités des branches qui le composent.</li>
+          <li>La probabilité d'un événement = somme des probabilités des chemins qui y mènent.</li>
+          <li>La somme des probabilités des branches partant d'un même nœud vaut <strong>1</strong>.</li>
+        </ul>`)}
+
+        <h2>4. Formule des probabilités totales</h2>
+        ${lc.def("Partition de l'univers", `<p>Si <code>B₁, B₂, …, Bₙ</code> forment une <strong>partition</strong> de l'univers (incompatibles deux à deux et de réunion <code>Ω</code>), alors pour tout événement <code>A</code> :</p>`)}
+        ${lc.formula("P(A) = P(A ∩ B₁) + … + P(A ∩ Bₙ)")}
+        ${lc.example("Maladie et test", `<p>1 % de la population est malade. Le test est positif chez 95 % des malades et chez 2 % des non-malades. Probabilité d'un test positif ?</p>
+          <ol><li><code>P(M) = 0,01</code>, <code>P(M̄) = 0,99</code>.</li>
+          <li><code>P_M(+) = 0,95</code>, <code>P_{M̄}(+) = 0,02</code>.</li>
+          <li><code>P(+) = 0,01 × 0,95 + 0,99 × 0,02 = 0,0095 + 0,0198 = 0,0293</code>.</li>
+          <li>Soit environ <strong>2,93 %</strong>.</li></ol>`)}
+
+        <h2>5. Indépendance</h2>
+        ${lc.def("Événements indépendants", `<p>Deux événements <code>A</code> et <code>B</code> sont <strong>indépendants</strong> si la réalisation de l'un n'influence pas la probabilité de l'autre :</p>`)}
+        ${lc.formula("P(A ∩ B) = P(A) × P(B)")}
+        ${lc.tip("Caractérisation équivalente", `<p>Si <code>P(B) ≠ 0</code>, l'indépendance équivaut à <code>P_B(A) = P(A)</code> : sachant <code>B</code>, la probabilité de <code>A</code> est inchangée.</p>`)}
+        ${lc.example("Lancers de dés", `<p>Deux lancers d'un dé sont <strong>indépendants</strong> : ce que donne le premier lancer ne change pas la probabilité du second.</p>`)}
+        ${lc.warn("Indépendance ≠ Incompatibilité", `<p>Deux événements <strong>incompatibles</strong> (<code>A ∩ B = ∅</code>) ne sont <em>pas</em> indépendants si tous deux ont une probabilité non nulle (puisque si l'un est réalisé, l'autre ne peut pas l'être).</p>`)}
+      `,
+    },
+
+    {
+      title: "Variables aléatoires : espérance et variance",
+      category: "Probabilités",
+      content: `
+        <h2>1. Variable aléatoire</h2>
+        ${lc.def("Variable aléatoire (réelle)", `<p>Une <strong>variable aléatoire réelle</strong> sur un univers <code>Ω</code> est une fonction <code>X : Ω → ℝ</code>, qui à chaque issue associe un nombre réel.</p>`)}
+        ${lc.example("Au jeu de dé", `<p>On lance un dé. <code>X = </code> nombre obtenu. <code>X</code> peut prendre les valeurs 1, 2, 3, 4, 5 ou 6.</p>`)}
+
+        <h2>2. Loi de probabilité de X</h2>
+        ${lc.def("Loi de X", `<p>Donner la <strong>loi de probabilité</strong> de <code>X</code>, c'est donner toutes les valeurs possibles <code>x_i</code> avec leurs probabilités <code>P(X = x_i)</code>.</p>
+          <p>La somme de ces probabilités doit valoir 1.</p>`)}
+        ${lc.example("Loi du dé équilibré", `<table>
+          <tr><th>x_i</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+          <tr><td>P(X = x_i)</td><td>1/6</td><td>1/6</td><td>1/6</td><td>1/6</td><td>1/6</td><td>1/6</td></tr>
+        </table>`)}
+
+        <h2>3. Espérance E(X)</h2>
+        ${lc.def("Espérance", `<p>L'<strong>espérance</strong> de <code>X</code> est la « moyenne » que l'on espère sur un très grand nombre d'expériences :</p>`)}
+        ${lc.formula("E(X) = Σ x_i × P(X = x_i)")}
+        ${lc.example("Espérance du dé", `<p><code>E(X) = (1 + 2 + 3 + 4 + 5 + 6) / 6 = 21/6 = 3,5</code>.</p>`)}
+
+        <h2>4. Linéarité de l'espérance</h2>
+        ${lc.formula("E(aX + b) = a × E(X) + b")}
+        ${lc.formula("E(X + Y) = E(X) + E(Y) &nbsp;&nbsp; (toujours)")}
+
+        <h2>5. Variance V(X) et écart-type σ(X)</h2>
+        ${lc.def("Variance", `<p>La <strong>variance</strong> mesure la dispersion autour de l'espérance :</p>`)}
+        ${lc.formula("V(X) = E((X − E(X))²) = Σ (x_i − E(X))² × P(X = x_i)")}
+        ${lc.formula("σ(X) = √V(X)")}
+        ${lc.example("Variance du dé", `<ol><li><code>E(X) = 3,5</code>.</li>
+          <li>Écarts au carré : <code>(1−3,5)² = 6,25</code>, <code>(2−3,5)² = 2,25</code>, <code>(3−3,5)² = 0,25</code>, idem en miroir pour 4, 5, 6.</li>
+          <li>Somme pondérée : <code>2 × (6,25 + 2,25 + 0,25) / 6 = 17,5/6 ≈ 2,917</code>.</li>
+          <li><code>σ ≈ √2,917 ≈ 1,71</code>.</li></ol>`)}
+
+        <h2>6. Propriétés</h2>
+        ${lc.formula("V(aX + b) = a² × V(X)")}
+        ${lc.tip("Le b disparaît", `<p>Une translation (<code>+ b</code>) ne change pas la dispersion. Une dilatation (<code>× a</code>) la multiplie par <code>a²</code> en variance, par <code>|a|</code> en écart-type.</p>`)}
+
+        <h2>7. Formule de König-Huygens</h2>
+        ${lc.formula("V(X) = E(X²) − [E(X)]²")}
+        <p>Souvent plus pratique que la formule de définition.</p>
+      `,
+    },
+
+    {
+      title: "Loi binomiale",
+      category: "Probabilités",
+      content: `
+        <h2>1. Schéma de Bernoulli</h2>
+        ${lc.def("Épreuve de Bernoulli", `<p>Une <strong>épreuve de Bernoulli</strong> est une expérience aléatoire à <strong>deux issues</strong> : un « succès » (probabilité <code>p</code>) et un « échec » (probabilité <code>1 − p</code>).</p>`)}
+        ${lc.example("Exemples", `<ul>
+          <li>Lancer une pièce : succès = pile (p = 1/2).</li>
+          <li>Lancer un dé : succès = obtenir 6 (p = 1/6).</li>
+          <li>Tirer une carte : succès = obtenir un cœur (p = 13/52 = 1/4).</li>
+        </ul>`)}
+
+        <h2>2. Schéma de Bernoulli</h2>
+        ${lc.def("Schéma de Bernoulli", `<p>Un <strong>schéma de Bernoulli</strong> de paramètres <code>n</code> et <code>p</code> consiste à répéter <strong>n fois</strong>, de manière <strong>indépendante</strong>, une épreuve de Bernoulli de paramètre <code>p</code>.</p>`)}
+
+        <h2>3. Loi binomiale</h2>
+        ${lc.def("Loi binomiale ℬ(n, p)", `<p>Soit <code>X</code> la variable aléatoire qui compte le <strong>nombre de succès</strong> dans un schéma de Bernoulli. <code>X</code> suit la <strong>loi binomiale</strong> de paramètres <code>n</code> et <code>p</code>, notée <code>ℬ(n ; p)</code>.</p>
+          <p><code>X</code> peut prendre les valeurs 0, 1, 2, …, n.</p>`)}
+
+        <h2>4. Formule de la loi binomiale</h2>
+        ${lc.formula("P(X = k) = C(n, k) × p^k × (1 − p)^{n−k}")}
+        <p>où <code>C(n, k)</code> est le <strong>coefficient binomial</strong> (« k parmi n »).</p>
+
+        <h2>5. Coefficient binomial</h2>
+        ${lc.def("C(n, k)", `<p>Le coefficient binomial <code>C(n, k)</code> compte le nombre de façons de choisir <code>k</code> objets parmi <code>n</code> (sans tenir compte de l'ordre). Il s'écrit aussi <code>(n choose k)</code> ou ⎛n⎞⎝k⎠.</p>`)}
+        ${lc.formula("C(n, k) = n! / (k! × (n−k)!)")}
+        ${lc.tip("Triangle de Pascal", `<p>On obtient les coefficients binomiaux par le <strong>triangle de Pascal</strong> :</p>
+          <pre>1
+1 1
+1 2 1
+1 3 3 1
+1 4 6 4 1
+1 5 10 10 5 1</pre>
+          <p>La 5e ligne donne <code>C(4, 0) = 1</code>, <code>C(4, 1) = 4</code>, <code>C(4, 2) = 6</code>, <code>C(4, 3) = 4</code>, <code>C(4, 4) = 1</code>.</p>`)}
+
+        <h2>6. Espérance et variance</h2>
+        ${lc.formula("Si X ~ ℬ(n, p) : E(X) = np &nbsp;&nbsp; V(X) = np(1−p)")}
+        ${lc.example("Calcul", `<p><code>X ~ ℬ(20 ; 0,3)</code>. <code>E(X) = 20 × 0,3 = 6</code>. <code>V(X) = 20 × 0,3 × 0,7 = 4,2</code>. <code>σ(X) ≈ 2,05</code>.</p>`)}
+
+        <h2>7. Exemple complet</h2>
+        ${lc.example("Tirages successifs avec remise", `<p>On lance 5 fois un dé équilibré. <code>X</code> = nombre de 6 obtenus. Calculer <code>P(X = 2)</code>.</p>
+          <ol><li><code>X ~ ℬ(5 ; 1/6)</code>.</li>
+          <li><code>P(X = 2) = C(5, 2) × (1/6)² × (5/6)³</code></li>
+          <li><code>= 10 × (1/36) × (125/216)</code></li>
+          <li><code>= 1250 / 7776 ≈ 0,161</code> (environ 16,1 %).</li></ol>`)}
+      `,
+    },
+  ];
+}
 
 // ─── Contenu pédagogique : 2nde à fond ───────────────────────────
 function chapters2nde() {
