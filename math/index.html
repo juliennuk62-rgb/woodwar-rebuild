@@ -2618,6 +2618,8 @@ function chapters1ere() {
       title: "Limites de suites (intuition)",
       category: "Suites",
       content: `
+        ${lc.warn("Note de programme", `<p>L'étude formelle des limites de suites se fait en <strong>Terminale</strong>. Ce chapitre est une <strong>anticipation intuitive</strong> qui aide à comprendre le comportement asymptotique des suites géométriques (vu en 1ère). Tu pourras y revenir plus tard.</p>`)}
+
         <h2>1. Idée intuitive</h2>
         ${lc.def("Limite d'une suite", `<p>Étudier la limite d'une suite <code>(uₙ)</code>, c'est observer ce que devient <code>uₙ</code> quand <code>n</code> devient « très grand » (tend vers <code>+∞</code>).</p>`)}
 
@@ -2670,6 +2672,8 @@ function chapters1ere() {
       title: "Raisonnement par récurrence",
       category: "Suites",
       content: `
+        ${lc.warn("Note de programme", `<p>Le raisonnement par récurrence est officiellement introduit en <strong>Terminale spé maths</strong>. Ce chapitre est une <strong>anticipation</strong> très utile pour démontrer des propriétés sur les suites dès la 1ère. Tu retrouveras une présentation plus complète l'an prochain.</p>`)}
+
         <h2>1. Principe de récurrence</h2>
         ${lc.def("Récurrence", `<p>Pour démontrer qu'une propriété <code>P(n)</code> est vraie pour tout entier <code>n ≥ n₀</code>, on procède en deux temps :</p>
           <ol><li><strong>Initialisation</strong> : on vérifie que <code>P(n₀)</code> est vraie (le cas de base).</li>
@@ -3009,11 +3013,14 @@ function chapters1ere() {
         <p>Utile en géométrie analytique pour démontrer l'égalité de distances ou trouver les coordonnées du milieu autrement.</p>
 
         <h2>10. Équations cos(x) = a et sin(x) = a</h2>
-        ${lc.prop("cos(x) = a, avec −1 ≤ a ≤ 1", `<p>Les solutions sont :</p>
-          <p><code>x = ±arccos(a) + 2kπ</code> &nbsp;(k ∈ ℤ)</p>`)}
-        ${lc.prop("sin(x) = a, avec −1 ≤ a ≤ 1", `<p>Les solutions sont :</p>
-          <p><code>x = arcsin(a) + 2kπ</code> &nbsp;ou&nbsp; <code>x = π − arcsin(a) + 2kπ</code></p>`)}
-        ${lc.example("Résoudre cos(x) = 1/2 sur [0 ; 2π]", `<p>Solutions : <code>x = π/3</code> et <code>x = −π/3 + 2π = 5π/3</code>.</p>`)}
+        ${lc.prop("Méthode (par angle de référence)", `<p>Soit <code>α</code> un angle particulier tel que <code>cos(α) = a</code> (à lire sur le cercle trigo ou la table des valeurs particulières). Alors :</p>
+          <p>Les solutions de <code>cos(x) = a</code> sont <code>x = α + 2kπ</code> ou <code>x = −α + 2kπ</code> (k ∈ ℤ).</p>
+          <p>Pour <code>sin(x) = a</code> avec <code>sin(β) = a</code> : solutions <code>x = β + 2kπ</code> ou <code>x = π − β + 2kπ</code>.</p>`)}
+        ${lc.example("Résoudre cos(x) = 1/2 sur [0 ; 2π]", `<ol>
+          <li>On cherche un angle <code>α</code> tel que <code>cos(α) = 1/2</code>. La table des valeurs donne <code>α = π/3</code>.</li>
+          <li>Solutions générales : <code>x = π/3 + 2kπ</code> ou <code>x = −π/3 + 2kπ</code>.</li>
+          <li>Sur <code>[0 ; 2π]</code> : <code>x = π/3</code> et <code>x = −π/3 + 2π = 5π/3</code>.</li>
+        </ol>`)}
       `,
     },
 
@@ -5668,10 +5675,9 @@ function chapters6e() {
         ${lc.formula("Carré (côté c) &nbsp;:&nbsp; A = c × c = c²")}
         ${lc.formula("Rectangle (longueur L, largeur l) &nbsp;:&nbsp; A = L × l")}
         ${lc.formula("Triangle (base b, hauteur h) &nbsp;:&nbsp; A = (b × h) / 2")}
-        ${lc.formula("Disque (rayon r) &nbsp;:&nbsp; A = π × r²")}
         ${lc.example("Aire d'un carré de 6 cm de côté", `<p><code>A = 6 × 6 = 36 cm²</code>.</p>`)}
         ${lc.example("Aire d'un triangle de base 8 cm et hauteur 5 cm", `<p><code>A = (8 × 5) / 2 = 40 / 2 = 20 cm²</code>.</p>`)}
-        ${lc.example("Aire d'un disque de rayon 3 cm", `<p><code>A = π × 3² = 9π ≈ 9 × 3,14 ≈ 28,26 cm²</code>.</p>`)}
+        ${lc.tip("Anticipation cycle 4 : aire du disque", `<p>L'aire d'un <strong>disque</strong> est étudiée en cycle 4 (5e/4e) : <code>A = π × r²</code>. À découvrir au prochain cycle.</p>`)}
 
         <h2>4. Unités d'aire</h2>
         ${lc.prop("Conversions", `<p>Pour passer d'une unité d'aire à une autre, on multiplie ou divise par <strong>100</strong> à chaque palier (et non par 10 comme pour les longueurs !).</p>
@@ -5872,7 +5878,8 @@ function chapters5e() {
           <p>On peut aussi voir ça comme : 1/5 de 25, c'est 5. Donc 3/5, c'est <code>3 × 5 = 15</code>.</p>`)}
         ${lc.warn("Ordre des mots", `<p>« Les 2/3 de 60 » et « 60 fois 2/3 » donnent le <em>même</em> calcul : <code>2/3 × 60 = 40</code>. La multiplication est commutative.</p>`)}
 
-        <h2>5. Division de fractions</h2>
+        <h2>5. Division de fractions <em>(anticipation 4e)</em></h2>
+        ${lc.tip("Pour aller plus loin", `<p>Cette section anticipe le programme de 4e (division de fractions). Tu peux la lire pour préparer le terrain ou y revenir l'an prochain.</p>`)}
         ${lc.def("Inverse d'une fraction", `<p>L'<strong>inverse</strong> de la fraction <code>a/b</code> (avec <code>a, b ≠ 0</code>) est <code>b/a</code> : on permute numérateur et dénominateur. Le produit d'une fraction par son inverse vaut <strong>1</strong>.</p>`)}
         ${lc.prop("Règle clé", `<p>Diviser par une fraction, c'est <strong>multiplier par son inverse</strong>.</p>`)}
         ${lc.formula("a/b ÷ c/d &nbsp;=&nbsp; a/b × d/c &nbsp;=&nbsp; (a × d) / (b × c)")}
@@ -5957,11 +5964,12 @@ function chapters5e() {
       title: "Priorités opératoires",
       category: "Nombres et calculs",
       content: `
-        <h2>1. La règle PEMDAS</h2>
-        ${lc.prop("Ordre des opérations", `<p>Dans un calcul avec plusieurs opérations, on suit cet ordre :</p>
+        <h2>1. Ordre des opérations</h2>
+        ${lc.prop("La règle des priorités", `<p>Dans un calcul avec plusieurs opérations, on respecte cet ordre :</p>
           <ol><li><strong>Parenthèses</strong> d'abord (et calculs entre parenthèses, en commençant par les plus internes).</li>
           <li>Puis <strong>Multiplications</strong> et <strong>Divisions</strong>, de gauche à droite.</li>
-          <li>Enfin <strong>Additions</strong> et <strong>Soustractions</strong>, de gauche à droite.</li></ol>`)}
+          <li>Enfin <strong>Additions</strong> et <strong>Soustractions</strong>, de gauche à droite.</li></ol>
+          <p>Moyen mnémotechnique anglo-saxon : <em>PEMDAS</em> (Parentheses, Exponents, Multiplication, Division, Addition, Subtraction).</p>`)}
         ${lc.example("Calculer 5 + 2 × 3", `<p>Multiplication d'abord : <code>2 × 3 = 6</code>. Puis <code>5 + 6 = 11</code>.</p>
           <p>Et <strong>non</strong> : « <code>5 + 2 = 7</code> puis <code>7 × 3 = 21</code> » qui est faux.</p>`)}
 
@@ -6112,7 +6120,7 @@ function chapters5e() {
         ${lc.tip("Image", `<p>On « distribue » le facteur <code>k</code> sur chaque terme de la parenthèse.</p>`)}
         ${lc.example("Développer 3 × (x + 5)", `<p><code>3(x + 5) = 3 × x + 3 × 5 = 3x + 15</code>.</p>`)}
         ${lc.example("Développer 4 × (2x − 7)", `<p><code>4(2x − 7) = 4 × 2x − 4 × 7 = 8x − 28</code>.</p>`)}
-        ${lc.warn("Sens inverse : factoriser", `<p>L'opération inverse s'appelle <strong>factoriser</strong> : <code>3x + 15 = 3(x + 5)</code>. On reconnaît le facteur commun <code>3</code> dans les deux termes et on le « met en facteur ».</p>`)}
+        ${lc.tip("Anticipation 4e : factoriser", `<p>L'opération inverse s'appelle <strong>factoriser</strong> (étudiée à fond en 4e) : <code>3x + 15 = 3(x + 5)</code>. On reconnaît le facteur commun <code>3</code> dans les deux termes et on le « met en facteur ».</p>`)}
       `,
     },
     {
