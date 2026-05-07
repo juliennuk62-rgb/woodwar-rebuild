@@ -640,35 +640,861 @@ const CURRICULUM = [
   {
     id: 'postbac', name: 'Post-bac',
     levels: [
-      { id: 'analyse', name: 'Analyse', chapters: [
-        todo("Suites : convergence formelle", "Suites"),
-        todo("Séries numériques", "Séries"),
-        todo("Fonctions de plusieurs variables", "Analyse"),
-        todo("Intégration par parties", "Analyse"),
-        todo("Changement de variable", "Analyse"),
-        todo("Équations différentielles linéaires", "Analyse"),
-        todo("Développements limités", "Analyse"),
-      ]},
-      { id: 'algebre', name: 'Algèbre linéaire', chapters: [
-        todo("Espaces vectoriels", "Algèbre linéaire"),
-        todo("Applications linéaires", "Algèbre linéaire"),
-        todo("Matrices : opérations", "Algèbre linéaire"),
-        todo("Systèmes linéaires, pivot de Gauss", "Algèbre linéaire"),
-        todo("Déterminants", "Algèbre linéaire"),
-        todo("Diagonalisation, valeurs propres", "Algèbre linéaire"),
-        todo("Produits scalaires en dimension n", "Algèbre linéaire"),
-      ]},
-      { id: 'probas', name: 'Probabilités', chapters: [
-        todo("Espaces probabilisés", "Probabilités"),
-        todo("Variables aléatoires discrètes", "Probabilités"),
-        todo("Variables aléatoires continues", "Probabilités"),
-        todo("Lois usuelles (Poisson, exponentielle...)", "Probabilités"),
-        todo("Théorèmes limites (loi des grands nombres, TCL)", "Probabilités"),
-        todo("Tests statistiques", "Statistiques"),
-      ]},
+      { id: 'analyse', name: 'Analyse', chapters: chaptersAnalyse() },
+      { id: 'algebre', name: 'Algèbre linéaire', chapters: chaptersAlgebre() },
+      { id: 'probas', name: 'Probabilités', chapters: chaptersProbasPostBac() },
     ],
   },
 ];
+
+// ─── Contenu pédagogique : Post-bac Analyse ──────────────────────
+function chaptersAnalyse() {
+  return [
+    {
+      title: "Suites : convergence formelle",
+      category: "Suites",
+      content: `
+        <h2>1. Définition formelle (ε-N)</h2>
+        ${lc.def("Convergence vers L", `<p>Une suite <code>(uₙ)</code> converge vers <code>L ∈ ℝ</code> si :</p>`)}
+        ${lc.formula("∀ ε > 0, ∃ N ∈ ℕ, ∀ n ≥ N, |uₙ − L| < ε")}
+        <p>Pour tout écart aussi petit qu'on veut, à partir d'un certain rang, tous les termes en sont à moins de cet écart.</p>
+
+        <h2>2. Unicité de la limite</h2>
+        ${lc.prop("Théorème", `<p>Si une suite converge, sa limite est <strong>unique</strong>.</p>`)}
+        ${lc.tip("Démonstration", `<p>On suppose deux limites <code>L</code> et <code>L'</code> distinctes. En prenant <code>ε = |L − L'|/3</code>, on aboutit à une contradiction (les boules de centres L et L' ne peuvent contenir <em>simultanément</em> tous les <code>uₙ</code> à partir d'un certain rang).</p>`)}
+
+        <h2>3. Suites bornées</h2>
+        ${lc.def("Suite bornée", `<p>Une suite <code>(uₙ)</code> est <strong>majorée</strong> s'il existe <code>M</code> tel que <code>uₙ ≤ M</code> pour tout <code>n</code>. <strong>Minorée</strong> s'il existe <code>m</code> tel que <code>uₙ ≥ m</code>. <strong>Bornée</strong> si elle est à la fois majorée et minorée.</p>`)}
+        ${lc.prop("Toute suite convergente est bornée", `<p>La réciproque est fausse (la suite <code>(−1)ⁿ</code> est bornée mais ne converge pas).</p>`)}
+
+        <h2>4. Théorème de la convergence monotone</h2>
+        ${lc.prop("Énoncé clé", `<p>Toute suite <strong>croissante et majorée</strong> converge. Toute suite <strong>décroissante et minorée</strong> converge.</p>`)}
+
+        <h2>5. Suites adjacentes</h2>
+        ${lc.def("Suites adjacentes", `<p>Deux suites <code>(uₙ)</code> et <code>(vₙ)</code> sont <strong>adjacentes</strong> si :</p>
+          <ul><li><code>(uₙ)</code> est croissante,</li>
+          <li><code>(vₙ)</code> est décroissante,</li>
+          <li><code>lim (vₙ − uₙ) = 0</code>.</li></ul>`)}
+        ${lc.prop("Conséquence", `<p>Deux suites adjacentes <strong>convergent vers la même limite</strong>.</p>`)}
+
+        <h2>6. Critère de Cauchy</h2>
+        ${lc.def("Suite de Cauchy", `<p>Une suite <code>(uₙ)</code> est de <strong>Cauchy</strong> si :</p>`)}
+        ${lc.formula("∀ ε > 0, ∃ N, ∀ p, q ≥ N, |u_p − u_q| < ε")}
+        ${lc.prop("Théorème", `<p>Dans ℝ, une suite est de Cauchy <strong>si et seulement si</strong> elle est convergente. (ℝ est dit « complet ».)</p>`)}
+        ${lc.tip("Utilité", `<p>Permet de prouver qu'une suite converge sans connaître sa limite.</p>`)}
+
+        <h2>7. Limites infinies</h2>
+        ${lc.def("Divergence vers +∞", `<p><code>(uₙ)</code> tend vers <code>+∞</code> si :</p>`)}
+        ${lc.formula("∀ A > 0, ∃ N, ∀ n ≥ N, uₙ > A")}
+      `,
+    },
+
+    {
+      title: "Séries numériques",
+      category: "Séries",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Série", `<p>Étant donnée une suite <code>(uₙ)</code>, la <strong>série</strong> de terme général <code>uₙ</code> est la suite des <strong>sommes partielles</strong> :</p>`)}
+        ${lc.formula("S_n = u_0 + u_1 + … + u_n = Σ_{k=0}^{n} u_k")}
+        ${lc.def("Convergence", `<p>La série <code>Σ uₙ</code> <strong>converge</strong> si la suite <code>(S_n)</code> a une limite finie. Cette limite est la <strong>somme</strong> de la série, notée <code>Σ_{n=0}^{+∞} uₙ</code>. Sinon la série <strong>diverge</strong>.</p>`)}
+
+        <h2>2. Condition nécessaire de convergence</h2>
+        ${lc.prop("Théorème", `<p>Si <code>Σ uₙ</code> converge, alors <code>lim uₙ = 0</code>.</p>`)}
+        ${lc.warn("Réciproque fausse !", `<p>La réciproque est <strong>fausse</strong>. La série harmonique <code>Σ 1/n</code> a un terme général qui tend vers 0, mais <strong>diverge</strong>.</p>`)}
+        ${lc.tip("Conséquence pratique (test de divergence grossière)", `<p>Si <code>uₙ</code> ne tend pas vers 0, on peut conclure directement : la série diverge.</p>`)}
+
+        <h2>3. Série géométrique</h2>
+        ${lc.formula("Σ_{n=0}^{+∞} qⁿ converge ⇔ |q| < 1")}
+        ${lc.formula("Σ_{n=0}^{+∞} qⁿ = 1 / (1 − q) &nbsp;&nbsp; (|q| < 1)")}
+        ${lc.example("Calcul", `<p><code>Σ_{n=0}^{+∞} (1/2)ⁿ = 1/(1 − 1/2) = 2</code>.</p>`)}
+
+        <h2>4. Série harmonique et série de Riemann</h2>
+        ${lc.formula("Σ 1/n^α converge ⇔ α > 1")}
+        <p>En particulier :</p>
+        <ul>
+          <li><code>α = 1</code> : série harmonique <code>Σ 1/n</code> <strong>diverge</strong>.</li>
+          <li><code>α = 2</code> : <code>Σ 1/n²</code> <strong>converge</strong> (vers <code>π²/6</code>, mais cette valeur n'est pas demandée à ce niveau).</li>
+        </ul>
+
+        <h2>5. Critères de convergence</h2>
+        ${lc.prop("Comparaison (séries à termes positifs)", `<p>Si <code>0 ≤ uₙ ≤ vₙ</code> à partir d'un certain rang :</p>
+          <ul><li>Si <code>Σ vₙ</code> converge, alors <code>Σ uₙ</code> aussi.</li>
+          <li>Si <code>Σ uₙ</code> diverge, alors <code>Σ vₙ</code> aussi.</li></ul>`)}
+        ${lc.prop("Équivalence", `<p>Si <code>uₙ ~ vₙ</code> au voisinage de <code>+∞</code> (suites positives), les séries <code>Σ uₙ</code> et <code>Σ vₙ</code> sont de <strong>même nature</strong> (toutes les deux convergentes ou toutes les deux divergentes).</p>`)}
+        ${lc.prop("d'Alembert (rapport)", `<p>Si <code>|u_{n+1}/uₙ| → ℓ</code> :</p>
+          <ul><li><code>ℓ < 1</code> : la série converge absolument.</li>
+          <li><code>ℓ > 1</code> : la série diverge.</li>
+          <li><code>ℓ = 1</code> : on ne peut pas conclure.</li></ul>`)}
+
+        <h2>6. Séries alternées</h2>
+        ${lc.prop("Critère de Leibniz", `<p>Si <code>(aₙ)</code> est positive, décroissante, et tend vers 0, la série alternée <code>Σ (−1)ⁿ aₙ</code> converge.</p>`)}
+        ${lc.example("Application", `<p><code>Σ (−1)ⁿ / n</code> converge (par Leibniz) bien que <code>Σ 1/n</code> diverge.</p>`)}
+      `,
+    },
+
+    {
+      title: "Fonctions de plusieurs variables",
+      category: "Analyse",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Fonction de plusieurs variables", `<p>Une fonction de <code>n</code> variables est une application <code>f : D ⊂ ℝⁿ → ℝ</code> qui à un n-uplet <code>(x₁, …, xₙ)</code> associe un réel <code>f(x₁, …, xₙ)</code>.</p>`)}
+        ${lc.example("Exemples", `<ul>
+          <li><code>f(x, y) = x² + y²</code> (paraboloïde)</li>
+          <li><code>g(x, y, z) = xyz</code> (volume d'un pavé)</li>
+        </ul>`)}
+
+        <h2>2. Représentation graphique (n = 2)</h2>
+        <p>Pour <code>f : ℝ² → ℝ</code>, on représente la <strong>surface</strong> d'équation <code>z = f(x, y)</code> dans l'espace.</p>
+        ${lc.def("Lignes de niveau", `<p>Les <strong>lignes de niveau</strong> sont les courbes du plan <code>(x, y)</code> définies par <code>f(x, y) = c</code> (c constant). Ce sont les « courbes de niveau » d'une carte topographique.</p>`)}
+
+        <h2>3. Dérivées partielles</h2>
+        ${lc.def("Dérivée partielle", `<p>La <strong>dérivée partielle</strong> de <code>f</code> par rapport à <code>x</code>, notée <code>∂f/∂x</code> ou <code>f'_x</code>, est la dérivée par rapport à <code>x</code> en considérant les autres variables comme constantes.</p>`)}
+        ${lc.example("Dérivées partielles", `<p>Pour <code>f(x, y) = x²y + 3y²</code> :</p>
+          <ul><li><code>∂f/∂x = 2xy</code> (y est constante)</li>
+          <li><code>∂f/∂y = x² + 6y</code> (x est constante)</li></ul>`)}
+
+        <h2>4. Gradient</h2>
+        ${lc.def("Gradient", `<p>Le <strong>gradient</strong> de <code>f</code>, noté <code>∇f</code>, est le vecteur des dérivées partielles :</p>`)}
+        ${lc.formula("∇f(x, y) = (∂f/∂x ; ∂f/∂y)")}
+        ${lc.tip("Sens géométrique", `<p>Le gradient pointe dans la direction de <strong>plus forte croissance</strong> de <code>f</code>. Sa norme est la pente maximale en ce point.</p>`)}
+
+        <h2>5. Différentiabilité</h2>
+        ${lc.def("Différentiable", `<p><code>f</code> est <strong>différentiable</strong> en <code>(a, b)</code> si elle admet un développement linéaire :</p>`)}
+        ${lc.formula("f(a + h, b + k) = f(a, b) + h × ∂f/∂x(a,b) + k × ∂f/∂y(a,b) + o(√(h² + k²))")}
+
+        <h2>6. Recherche d'extremums</h2>
+        ${lc.prop("Condition nécessaire", `<p>Si <code>f</code> a un extremum local en un point intérieur, alors <code>∇f = 0</code> en ce point. On parle de <strong>point critique</strong>.</p>`)}
+        ${lc.warn("Condition non suffisante", `<p>Un point critique peut être un maximum, un minimum, ou un <strong>point selle</strong> (<code>f(x, y) = x² − y²</code> en (0, 0)). Pour distinguer, on étudie la matrice hessienne (hors programme à ce niveau).</p>`)}
+        ${lc.example("Trouver les points critiques", `<p>Pour <code>f(x, y) = x² + y² − 4x − 6y</code> :</p>
+          <ol><li><code>∂f/∂x = 2x − 4 = 0</code> → <code>x = 2</code>.</li>
+          <li><code>∂f/∂y = 2y − 6 = 0</code> → <code>y = 3</code>.</li>
+          <li>Point critique : <code>(2, 3)</code>. <code>f(2, 3) = 4 + 9 − 8 − 18 = −13</code>.</li>
+          <li>(C'est un minimum global puisque <code>f(x, y) = (x−2)² + (y−3)² − 13</code>.)</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Intégration par parties",
+      category: "Analyse",
+      content: `
+        <h2>1. Formule</h2>
+        ${lc.prop("Théorème (IPP)", `<p>Soient <code>u</code> et <code>v</code> deux fonctions de classe <code>C¹</code> sur <code>[a ; b]</code>. Alors :</p>`)}
+        ${lc.formula("∫_a^b u'(x) v(x) dx = [u(x) v(x)]_a^b − ∫_a^b u(x) v'(x) dx")}
+        ${lc.tip("Mnémonique", `<p>« On dérive un facteur, on intègre l'autre, on permute. »</p>`)}
+
+        <h2>2. Quand utiliser l'IPP ?</h2>
+        ${lc.prop("Cas typiques", `<p>L'IPP est utile quand l'intégrande est un produit où :</p>
+          <ul><li>l'un des facteurs se simplifie en dérivant (typique : <code>x</code>, <code>x²</code>, <code>ln(x)</code>) ;</li>
+          <li>l'autre admet une primitive simple (<code>e^x</code>, <code>cos x</code>, <code>sin x</code>).</li></ul>`)}
+
+        <h2>3. Exemples classiques</h2>
+        ${lc.example("Calculer ∫₀¹ x e^x dx", `<ol>
+          <li>Posons <code>u'(x) = e^x</code>, <code>v(x) = x</code>.</li>
+          <li>Alors <code>u(x) = e^x</code>, <code>v'(x) = 1</code>.</li>
+          <li><code>∫₀¹ x e^x dx = [x e^x]₀¹ − ∫₀¹ e^x dx = e − 0 − [e^x]₀¹ = e − (e − 1) = 1</code>.</li>
+        </ol>`)}
+        ${lc.example("Calculer ∫₁^e ln(x) dx", `<p>Astuce : <code>ln(x) = 1 × ln(x)</code>.</p>
+          <ol><li><code>u'(x) = 1</code>, <code>v(x) = ln(x)</code>.</li>
+          <li><code>u(x) = x</code>, <code>v'(x) = 1/x</code>.</li>
+          <li><code>∫₁^e ln(x) dx = [x ln(x)]₁^e − ∫₁^e 1 dx = (e × 1 − 1 × 0) − (e − 1) = e − e + 1 = 1</code>.</li>
+        </ol>`)}
+        ${lc.example("IPP itérée : ∫ x² e^x dx", `<p>Première IPP : <code>u' = e^x</code>, <code>v = x²</code>. Reste <code>− ∫ 2x e^x dx</code>.</p>
+          <p>Seconde IPP sur <code>∫ 2x e^x dx</code> : <code>u' = e^x</code>, <code>v = 2x</code>.</p>
+          <p>Au final : <code>∫ x² e^x dx = e^x (x² − 2x + 2) + C</code>.</p>`)}
+
+        <h2>4. Choix du « u' » et « v »</h2>
+        ${lc.tip("Règle pratique LIATE", `<p>Pour choisir <code>v</code> (qu'on dérive), on suit l'ordre :</p>
+          <p><strong>L</strong>ogarithme &nbsp; > &nbsp; <strong>I</strong>nverses trig &nbsp; > &nbsp; <strong>A</strong>lgébrique &nbsp; > &nbsp; <strong>T</strong>rig &nbsp; > &nbsp; <strong>E</strong>xponentielle</p>
+          <p>Le facteur le plus à gauche dans LIATE devient <code>v</code> ; l'autre devient <code>u'</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Changement de variable",
+      category: "Analyse",
+      content: `
+        <h2>1. Formule</h2>
+        ${lc.prop("Théorème", `<p>Soit <code>φ : [a ; b] → [c ; d]</code> de classe <code>C¹</code> bijective, et <code>f</code> continue sur <code>[c ; d]</code>. Alors :</p>`)}
+        ${lc.formula("∫_a^b f(φ(x)) × φ'(x) dx = ∫_{φ(a)}^{φ(b)} f(u) du")}
+        ${lc.tip("En posant u = φ(x)", `<p>On a <code>du = φ'(x) dx</code>, et les bornes deviennent <code>φ(a)</code> et <code>φ(b)</code>.</p>`)}
+
+        <h2>2. Démarche pratique</h2>
+        ${lc.prop("Étapes", `<ol>
+          <li>Identifier <code>u = φ(x)</code> dans l'intégrande.</li>
+          <li>Calculer <code>du = φ'(x) dx</code>.</li>
+          <li>Substituer dans l'intégrale et changer les bornes.</li>
+          <li>Calculer la nouvelle intégrale en <code>u</code>.</li>
+        </ol>`)}
+
+        <h2>3. Exemples</h2>
+        ${lc.example("Calculer ∫₀² x × √(x² + 1) dx", `<ol>
+          <li>Poser <code>u = x² + 1</code>, donc <code>du = 2x dx</code>, soit <code>x dx = du/2</code>.</li>
+          <li>Bornes : <code>x = 0 → u = 1</code> ; <code>x = 2 → u = 5</code>.</li>
+          <li><code>I = ∫_1^5 √u × du/2 = (1/2) × [(2/3) u^{3/2}]_1^5 = (1/3) × (5^{3/2} − 1)</code>.</li>
+          <li><code>5^{3/2} = 5√5 ≈ 11,18</code>. Donc <code>I ≈ (5√5 − 1)/3 ≈ 3,39</code>.</li>
+        </ol>`)}
+        ${lc.example("Calculer ∫₀^{π/2} cos(x) × e^{sin(x)} dx", `<ol>
+          <li>Poser <code>u = sin(x)</code>, donc <code>du = cos(x) dx</code>.</li>
+          <li>Bornes : <code>x = 0 → u = 0</code> ; <code>x = π/2 → u = 1</code>.</li>
+          <li><code>I = ∫_0^1 e^u du = [e^u]_0^1 = e − 1</code>.</li>
+        </ol>`)}
+
+        <h2>4. Cas typiques à reconnaître</h2>
+        ${lc.tip("Combinaisons fréquentes", `<ul>
+          <li><code>f(ax + b)</code> : poser <code>u = ax + b</code>.</li>
+          <li><code>f(x²) × x</code> : poser <code>u = x²</code>.</li>
+          <li><code>f(ln x) / x</code> : poser <code>u = ln x</code>.</li>
+          <li><code>f(sin x) cos x</code> : poser <code>u = sin x</code>.</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Équations différentielles linéaires",
+      category: "Analyse",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Équation différentielle", `<p>Une <strong>équation différentielle</strong> est une équation reliant une fonction inconnue <code>y</code> et ses dérivées. <strong>Linéaire</strong> signifie que <code>y</code> et <code>y'</code> apparaissent à la puissance 1.</p>`)}
+        <p>On s'intéresse aux équations du 1er ordre :</p>
+        ${lc.formula("(E) : y' + a(x) × y = b(x)")}
+        <p>Avec <code>a(x) = 0</code> ou <code>b(x) = 0</code>, on parle de cas particuliers.</p>
+
+        <h2>2. Cas le plus simple : y' = ay (a constante)</h2>
+        ${lc.prop("Solutions", `<p>Les solutions de <code>y' = ay</code> sont :</p>`)}
+        ${lc.formula("y(x) = C × e^{ax} &nbsp;&nbsp; (C ∈ ℝ)")}
+        ${lc.example("Application", `<p>Croissance exponentielle d'une population : <code>P'(t) = k × P(t)</code> donne <code>P(t) = P₀ × e^{kt}</code>.</p>`)}
+
+        <h2>3. Cas y' + ay = b (a, b constantes)</h2>
+        ${lc.prop("Solution générale", `<p>Solution générale = <strong>solution homogène</strong> + <strong>solution particulière</strong> :</p>`)}
+        ${lc.formula("y(x) = C × e^{−ax} + b/a &nbsp;&nbsp; (a ≠ 0)")}
+        <p>La solution particulière constante <code>b/a</code> s'obtient en posant <code>y' = 0</code>.</p>
+        ${lc.example("Résoudre y' + 2y = 6", `<ol>
+          <li>Solution particulière constante : <code>2y = 6</code> donc <code>y = 3</code>.</li>
+          <li>Solution homogène : <code>y' + 2y = 0</code> donne <code>y = C × e^{−2x}</code>.</li>
+          <li>Solution générale : <code>y(x) = C × e^{−2x} + 3</code>.</li>
+        </ol>`)}
+
+        <h2>4. Condition initiale</h2>
+        ${lc.prop("Problème de Cauchy", `<p>Un <strong>problème de Cauchy</strong> est une équation différentielle accompagnée d'une <strong>condition initiale</strong> <code>y(x₀) = y₀</code>. Il admet une solution <em>unique</em>.</p>`)}
+        ${lc.example("Avec condition", `<p>Résoudre <code>y' + 2y = 6</code> avec <code>y(0) = 5</code>.</p>
+          <ol><li>Forme générale : <code>y(x) = C × e^{−2x} + 3</code>.</li>
+          <li>Condition : <code>y(0) = C + 3 = 5</code>, donc <code>C = 2</code>.</li>
+          <li>Solution : <code>y(x) = 2 × e^{−2x} + 3</code>.</li></ol>`)}
+
+        <h2>5. Cas général y' + a(x)y = b(x)</h2>
+        ${lc.prop("Méthode de variation de la constante", `<ol>
+          <li>Résoudre l'<strong>équation homogène</strong> <code>y' + a(x)y = 0</code> : <code>y_h(x) = C × e^{−A(x)}</code> où <code>A</code> est une primitive de <code>a</code>.</li>
+          <li>Chercher une solution particulière sous la forme <code>y_p(x) = C(x) × e^{−A(x)}</code> en faisant varier la constante.</li>
+          <li>La solution générale est <code>y = y_h + y_p</code>.</li>
+        </ol>`)}
+
+        <h2>6. Modélisation</h2>
+        ${lc.example("Décharge d'un condensateur", `<p>L'équation <code>RC × U' + U = 0</code> donne <code>U(t) = U₀ × e^{−t/(RC)}</code>. La constante de temps <code>τ = RC</code> caractérise la rapidité de la décroissance.</p>`)}
+      `,
+    },
+
+    {
+      title: "Développements limités",
+      category: "Analyse",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("DL en 0 d'ordre n", `<p><code>f</code> admet un <strong>développement limité</strong> en 0 d'ordre <code>n</code> s'il existe un polynôme <code>P</code> de degré ≤ <code>n</code> et une fonction <code>ε</code> tendant vers 0 telle que :</p>`)}
+        ${lc.formula("f(x) = P(x) + xⁿ × ε(x)")}
+        <p>On note souvent <code>xⁿ × ε(x) = o(xⁿ)</code> (« petit o »).</p>
+
+        <h2>2. DL usuels en 0</h2>
+        ${lc.formula("e^x = 1 + x + x²/2! + x³/3! + … + xⁿ/n! + o(xⁿ)")}
+        ${lc.formula("ln(1 + x) = x − x²/2 + x³/3 − … + (−1)^{n+1} xⁿ/n + o(xⁿ)")}
+        ${lc.formula("sin(x) = x − x³/3! + x⁵/5! − … + o(x^{2n+1})")}
+        ${lc.formula("cos(x) = 1 − x²/2! + x⁴/4! − … + o(x^{2n})")}
+        ${lc.formula("(1 + x)^α = 1 + αx + α(α−1)/2 × x² + … + o(xⁿ)")}
+        ${lc.formula("1/(1 − x) = 1 + x + x² + x³ + … + xⁿ + o(xⁿ)")}
+
+        <h2>3. Opérations sur les DL</h2>
+        ${lc.prop("Combinaisons", `<ul>
+          <li>Somme : on additionne les DL terme à terme.</li>
+          <li>Produit : on multiplie en gardant les termes jusqu'à l'ordre voulu.</li>
+          <li>Composition : on substitue, en s'assurant que la fonction « interne » s'annule en 0.</li>
+        </ul>`)}
+        ${lc.example("DL de e^x × cos(x) à l'ordre 2", `<ol>
+          <li><code>e^x = 1 + x + x²/2 + o(x²)</code></li>
+          <li><code>cos(x) = 1 − x²/2 + o(x²)</code></li>
+          <li>Produit : <code>(1 + x + x²/2)(1 − x²/2) = 1 + x + x²/2 − x²/2 + o(x²) = 1 + x + o(x²)</code>.</li>
+        </ol>`)}
+
+        <h2>4. Application : calcul de limites</h2>
+        ${lc.example("Limite indéterminée", `<p>Calculer <code>lim_{x → 0} (sin x − x) / x³</code>.</p>
+          <ol><li>DL : <code>sin x = x − x³/6 + o(x³)</code>.</li>
+          <li>Donc <code>sin x − x = −x³/6 + o(x³)</code>.</li>
+          <li><code>(sin x − x) / x³ = −1/6 + o(1)</code>.</li>
+          <li>Limite : <code>−1/6</code>.</li>
+        </ol>`)}
+
+        <h2>5. Formule de Taylor-Young</h2>
+        ${lc.prop("Énoncé", `<p>Si <code>f</code> est de classe <code>C^n</code> au voisinage de 0 :</p>`)}
+        ${lc.formula("f(x) = f(0) + f'(0)·x + f''(0)·x²/2! + … + f⁽ⁿ⁾(0)·xⁿ/n! + o(xⁿ)")}
+        <p>Cette formule justifie tous les DL usuels.</p>
+
+        <h2>6. Précautions</h2>
+        ${lc.warn("Garder le bon ordre", `<p>Quand on multiplie deux DL d'ordre <code>n</code>, on conserve uniquement les termes jusqu'à <code>xⁿ</code>. Tout terme d'ordre supérieur est inclus dans le <code>o(xⁿ)</code>.</p>`)}
+      `,
+    },
+  ];
+}
+
+// ─── Contenu pédagogique : Post-bac Algèbre linéaire ─────────────
+function chaptersAlgebre() {
+  return [
+    {
+      title: "Espaces vectoriels",
+      category: "Algèbre linéaire",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Espace vectoriel sur ℝ", `<p>Un <strong>espace vectoriel</strong> sur ℝ est un ensemble <code>E</code> muni de deux opérations :</p>
+          <ul><li>une <strong>addition</strong> <code>+ : E × E → E</code> ;</li>
+          <li>une <strong>multiplication par un scalaire</strong> <code>· : ℝ × E → E</code> ;</li></ul>
+          <p>vérifiant 8 axiomes (associativité, commutativité, élément neutre <code>0_E</code>, opposé, distributivités, élément 1).</p>`)}
+
+        <h2>2. Exemples fondamentaux</h2>
+        ${lc.example("Espaces vectoriels classiques", `<ul>
+          <li><code>ℝⁿ</code> : <code>n</code>-uplets de réels (ℝ², ℝ³…).</li>
+          <li><code>ℝ_n[X]</code> : polynômes de degré ≤ <code>n</code>.</li>
+          <li><code>ℱ(ℝ, ℝ)</code> : fonctions de ℝ vers ℝ.</li>
+          <li><code>M_{n,p}(ℝ)</code> : matrices à <code>n</code> lignes et <code>p</code> colonnes.</li>
+        </ul>`)}
+
+        <h2>3. Sous-espace vectoriel</h2>
+        ${lc.def("Sous-espace vectoriel", `<p>Une partie <code>F</code> de <code>E</code> est un <strong>sous-espace vectoriel</strong> (s.e.v.) si :</p>
+          <ul><li><code>0_E ∈ F</code> (non vide) ;</li>
+          <li>stabilité par <strong>combinaison linéaire</strong> : <code>∀ u, v ∈ F, ∀ λ ∈ ℝ, λu + v ∈ F</code>.</li></ul>`)}
+        ${lc.example("Sous-espaces de ℝ²", `<ul>
+          <li><code>{(x, y) : y = 2x}</code> — droite passant par 0.</li>
+          <li><code>{(0, 0)}</code> — sous-espace nul.</li>
+          <li><code>ℝ²</code> tout entier.</li>
+        </ul>`)}
+
+        <h2>4. Combinaisons linéaires, famille génératrice</h2>
+        ${lc.def("Combinaison linéaire", `<p>Une <strong>combinaison linéaire</strong> des vecteurs <code>v₁, v₂, …, v_p</code> est un vecteur de la forme <code>λ₁v₁ + λ₂v₂ + … + λ_p v_p</code> (les <code>λᵢ</code> sont des scalaires).</p>`)}
+        ${lc.def("Famille génératrice", `<p>Une famille <code>(v₁, …, v_p)</code> est <strong>génératrice</strong> de <code>E</code> si tout vecteur de <code>E</code> peut s'écrire comme combinaison linéaire de ces vecteurs.</p>`)}
+
+        <h2>5. Famille libre, famille liée</h2>
+        ${lc.def("Famille libre", `<p>Une famille <code>(v₁, …, v_p)</code> est <strong>libre</strong> (ou <strong>linéairement indépendante</strong>) si la seule combinaison linéaire qui donne 0 est la combinaison nulle :</p>`)}
+        ${lc.formula("λ₁v₁ + … + λ_p v_p = 0 &nbsp;⇒&nbsp; λ₁ = … = λ_p = 0")}
+        ${lc.example("Tester la liberté", `<p>Dans <code>ℝ²</code>, les vecteurs <code>v₁ = (1, 2)</code> et <code>v₂ = (3, 4)</code> sont-ils libres ?</p>
+          <ol><li><code>λ₁(1, 2) + λ₂(3, 4) = (0, 0)</code> donne le système <code>{ λ₁ + 3λ₂ = 0 ; 2λ₁ + 4λ₂ = 0 }</code>.</li>
+          <li>Substituer : <code>λ₁ = −3λ₂</code>, donc <code>2(−3λ₂) + 4λ₂ = −2λ₂ = 0</code>, soit <code>λ₂ = 0</code> et <code>λ₁ = 0</code>.</li>
+          <li>Famille <strong>libre</strong>.</li></ol>`)}
+
+        <h2>6. Base et dimension</h2>
+        ${lc.def("Base", `<p>Une <strong>base</strong> de <code>E</code> est une famille à la fois <strong>libre</strong> et <strong>génératrice</strong>. Tout vecteur de <code>E</code> s'écrit de manière <strong>unique</strong> comme combinaison linéaire des vecteurs de la base.</p>`)}
+        ${lc.def("Dimension", `<p>Si <code>E</code> admet une base finie, toutes ses bases ont le <strong>même nombre d'éléments</strong>. Ce nombre est la <strong>dimension</strong> de <code>E</code>, notée <code>dim E</code>.</p>`)}
+        ${lc.example("Dimensions usuelles", `<ul>
+          <li><code>dim ℝⁿ = n</code> (base canonique).</li>
+          <li><code>dim ℝ_n[X] = n + 1</code>.</li>
+          <li><code>dim M_{n,p}(ℝ) = np</code>.</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Applications linéaires",
+      category: "Algèbre linéaire",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Application linéaire", `<p>Une application <code>f : E → F</code> entre deux espaces vectoriels est <strong>linéaire</strong> si :</p>`)}
+        ${lc.formula("f(λu + μv) = λ × f(u) + μ × f(v) &nbsp;&nbsp; (λ, μ ∈ ℝ ; u, v ∈ E)")}
+        ${lc.example("Exemples", `<ul>
+          <li><code>f(x) = 3x</code> : ℝ → ℝ.</li>
+          <li>Dérivation <code>D : ℝ_n[X] → ℝ_n[X]</code>, <code>D(P) = P'</code>.</li>
+          <li>Multiplication par une matrice : <code>X → AX</code>.</li>
+        </ul>`)}
+
+        <h2>2. Noyau et image</h2>
+        ${lc.def("Noyau", `<p>Le <strong>noyau</strong> de <code>f</code> est :</p>`)}
+        ${lc.formula("ker(f) = { u ∈ E : f(u) = 0_F }")}
+        ${lc.def("Image", `<p>L'<strong>image</strong> de <code>f</code> est :</p>`)}
+        ${lc.formula("im(f) = { f(u) : u ∈ E }")}
+        ${lc.prop("Lien avec injectivité / surjectivité", `<ul>
+          <li><code>f</code> est <strong>injective</strong> ⇔ <code>ker(f) = {0}</code>.</li>
+          <li><code>f</code> est <strong>surjective</strong> ⇔ <code>im(f) = F</code>.</li>
+        </ul>`)}
+
+        <h2>3. Théorème du rang</h2>
+        ${lc.def("Rang", `<p>Le <strong>rang</strong> de <code>f</code>, noté <code>rg(f)</code>, est <code>dim(im(f))</code>.</p>`)}
+        ${lc.prop("Théorème du rang", `<p>Pour <code>f : E → F</code> avec <code>E</code> de dimension finie :</p>`)}
+        ${lc.formula("dim(ker f) + rg(f) = dim(E)")}
+        ${lc.example("Application", `<p><code>f : ℝ³ → ℝ²</code> de matrice ((1, 1, 0); (0, 1, 1)). On peut vérifier : <code>rg(f) = 2</code> et <code>dim(ker f) = 1</code>. Total : <code>3 = dim(ℝ³)</code> ✓.</p>`)}
+
+        <h2>4. Composition et inverse</h2>
+        ${lc.prop("Composée d'applications linéaires", `<p>Si <code>f : E → F</code> et <code>g : F → G</code> sont linéaires, alors <code>g ∘ f : E → G</code> est linéaire.</p>`)}
+        ${lc.def("Isomorphisme", `<p>Une application linéaire <code>f : E → F</code> est un <strong>isomorphisme</strong> si elle est bijective. Alors son inverse <code>f⁻¹</code> est aussi linéaire.</p>`)}
+
+        <h2>5. Matrices d'une application linéaire</h2>
+        ${lc.prop("Représentation matricielle", `<p>Si <code>E</code> a pour base <code>(e₁, …, e_n)</code> et <code>F</code> a pour base <code>(f₁, …, f_p)</code>, on associe à <code>f</code> une matrice <code>p × n</code> dont la <code>j</code>-ème colonne contient les coordonnées de <code>f(eⱼ)</code> dans la base de <code>F</code>.</p>`)}
+        ${lc.tip("Conséquence", `<p>Toute application linéaire entre espaces de dimension finie peut être décrite par sa matrice (modulo le choix des bases).</p>`)}
+      `,
+    },
+
+    {
+      title: "Matrices : opérations",
+      category: "Algèbre linéaire",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Matrice", `<p>Une <strong>matrice</strong> de taille <code>n × p</code> est un tableau de nombres à <code>n</code> lignes et <code>p</code> colonnes :</p>`)}
+        ${lc.formula("A = (aᵢⱼ) où i ∈ {1, …, n} et j ∈ {1, …, p}")}
+
+        <h2>2. Addition et multiplication par un scalaire</h2>
+        ${lc.prop("Addition", `<p>L'addition se fait <strong>terme à terme</strong>, et n'est définie que si les matrices ont la <strong>même taille</strong>.</p>`)}
+        ${lc.prop("Multiplication par un scalaire", `<p>On multiplie chaque coefficient de la matrice par le scalaire.</p>`)}
+
+        <h2>3. Produit matriciel</h2>
+        ${lc.prop("Produit AB", `<p>Le produit <code>AB</code> est défini si le nombre de <strong>colonnes de A</strong> égale le nombre de <strong>lignes de B</strong>. Le coefficient <code>(AB)ᵢⱼ</code> est :</p>`)}
+        ${lc.formula("(AB)ᵢⱼ = Σ_k aᵢ_k × b_kⱼ")}
+        ${lc.example("Calcul", `<p>Soit <code>A = ((1, 2); (3, 4))</code> et <code>B = ((5, 6); (7, 8))</code>.</p>
+          <p><code>AB = ((1×5+2×7, 1×6+2×8); (3×5+4×7, 3×6+4×8)) = ((19, 22); (43, 50))</code>.</p>`)}
+        ${lc.warn("Non commutatif", `<p>En général, <code>AB ≠ BA</code> ! Le produit matriciel n'est <strong>pas commutatif</strong>.</p>`)}
+
+        <h2>4. Matrice identité, transposée</h2>
+        ${lc.def("Matrice identité Iₙ", `<p>La <strong>matrice identité</strong> est la matrice carrée <code>n × n</code> avec des 1 sur la diagonale et des 0 ailleurs.</p>
+          <p>Propriété : <code>A × I = A</code> et <code>I × A = A</code>.</p>`)}
+        ${lc.def("Transposée", `<p>La <strong>transposée</strong> <code>A^T</code> de <code>A</code> est la matrice obtenue en échangeant lignes et colonnes : <code>(A^T)ᵢⱼ = aⱼᵢ</code>.</p>
+          <p>Propriétés : <code>(A + B)^T = A^T + B^T</code>, <code>(AB)^T = B^T × A^T</code>.</p>`)}
+
+        <h2>5. Matrice inverse</h2>
+        ${lc.def("Inversibilité", `<p>Une matrice carrée <code>A</code> est <strong>inversible</strong> s'il existe <code>B</code> telle que <code>AB = BA = I</code>. <code>B</code> est l'<strong>inverse</strong> de <code>A</code>, notée <code>A⁻¹</code>.</p>`)}
+        ${lc.formula("Pour une matrice 2×2 ((a, b); (c, d)) :")}
+        ${lc.formula("A⁻¹ = (1 / (ad − bc)) × ((d, −b); (−c, a)) &nbsp;&nbsp; (si ad − bc ≠ 0)")}
+        ${lc.example("Inverser ((2, 1); (3, 4))", `<ol>
+          <li>Déterminant : <code>2×4 − 1×3 = 5</code>.</li>
+          <li><code>A⁻¹ = (1/5) × ((4, −1); (−3, 2)) = ((4/5, −1/5); (−3/5, 2/5))</code>.</li>
+          <li>Vérification : <code>A × A⁻¹ = I</code>.</li>
+        </ol>`)}
+      `,
+    },
+
+    {
+      title: "Systèmes linéaires, pivot de Gauss",
+      category: "Algèbre linéaire",
+      content: `
+        <h2>1. Système linéaire</h2>
+        ${lc.def("Système Ax = b", `<p>Un <strong>système linéaire</strong> de <code>n</code> équations à <code>p</code> inconnues s'écrit <code>Ax = b</code> où <code>A</code> est une matrice <code>n × p</code>, <code>x</code> un vecteur colonne d'inconnues, et <code>b</code> un vecteur colonne de seconds membres.</p>`)}
+
+        <h2>2. Méthode du pivot de Gauss</h2>
+        ${lc.prop("Principe", `<p>On transforme la <strong>matrice augmentée</strong> <code>[A | b]</code> par des <strong>opérations élémentaires</strong> en une matrice échelonnée (zéros sous la diagonale).</p>
+          <p>Opérations autorisées :</p>
+          <ul><li>Échanger deux lignes.</li>
+          <li>Multiplier une ligne par un scalaire non nul.</li>
+          <li>Ajouter un multiple d'une ligne à une autre.</li></ul>`)}
+
+        <h2>3. Exemple complet</h2>
+        ${lc.example("Résoudre x + 2y + z = 6 ; 2x + y − z = 1 ; x − y + 2z = 5", `<ol>
+          <li>Matrice augmentée :</li>
+          <li>
+            <code>L₁ : (1, 2, 1 | 6)<br>
+            L₂ : (2, 1, −1 | 1)<br>
+            L₃ : (1, −1, 2 | 5)</code>
+          </li>
+          <li><code>L₂ ← L₂ − 2L₁</code>, <code>L₃ ← L₃ − L₁</code> :</li>
+          <li>
+            <code>L₁ : (1, 2, 1 | 6)<br>
+            L₂ : (0, −3, −3 | −11)<br>
+            L₃ : (0, −3, 1 | −1)</code>
+          </li>
+          <li><code>L₃ ← L₃ − L₂</code> :</li>
+          <li>
+            <code>L₁ : (1, 2, 1 | 6)<br>
+            L₂ : (0, −3, −3 | −11)<br>
+            L₃ : (0, 0, 4 | 10)</code>
+          </li>
+          <li>De <code>L₃</code> : <code>4z = 10</code>, donc <code>z = 5/2</code>.</li>
+          <li>De <code>L₂</code> : <code>−3y − 3 × 5/2 = −11</code>, donc <code>−3y = −11 + 15/2 = −7/2</code>, soit <code>y = 7/6</code>.</li>
+          <li>De <code>L₁</code> : <code>x + 2 × 7/6 + 5/2 = 6</code>, donc <code>x = 6 − 7/3 − 5/2 = 36/6 − 14/6 − 15/6 = 7/6</code>.</li>
+          <li>Solution : <code>(x, y, z) = (7/6, 7/6, 5/2)</code>.</li>
+        </ol>`)}
+
+        <h2>4. Cas avec/sans solution</h2>
+        ${lc.prop("Trois cas après échelonnement", `<ul>
+          <li><strong>Une unique solution</strong> : autant de pivots que d'inconnues, aucune équation incompatible.</li>
+          <li><strong>Aucune solution</strong> : une ligne devient <code>(0, 0, …, 0 | c)</code> avec <code>c ≠ 0</code>.</li>
+          <li><strong>Infinité de solutions</strong> : moins de pivots que d'inconnues, donc des inconnues libres (paramètres).</li>
+        </ul>`)}
+
+        <h2>5. Lien avec les matrices</h2>
+        ${lc.prop("Inversibilité", `<p>Une matrice carrée <code>A</code> est <strong>inversible</strong> si et seulement si le système <code>Ax = b</code> a une unique solution pour tout <code>b</code>. Le pivot de Gauss permet aussi de calculer <code>A⁻¹</code> en transformant <code>[A | I]</code> en <code>[I | A⁻¹]</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Déterminants",
+      category: "Algèbre linéaire",
+      content: `
+        <h2>1. Déterminant 2×2</h2>
+        ${lc.formula("det((a, b); (c, d)) = ad − bc")}
+        ${lc.example("Calcul", `<p><code>det((3, 1); (2, 5)) = 3×5 − 1×2 = 13</code>.</p>`)}
+
+        <h2>2. Déterminant 3×3 (règle de Sarrus)</h2>
+        ${lc.formula("det((a, b, c); (d, e, f); (g, h, i)) = aei + bfg + cdh − ceg − bdi − afh")}
+        ${lc.tip("Règle de Sarrus", `<p>On recopie les deux premières colonnes à droite, puis on additionne les produits des diagonales descendantes et on soustrait ceux des montantes.</p>`)}
+
+        <h2>3. Développement par rapport à une ligne ou colonne</h2>
+        ${lc.prop("Méthode générale", `<p>Pour développer selon la ligne <code>i</code> :</p>`)}
+        ${lc.formula("det(A) = Σ_j (−1)^{i+j} × aᵢⱼ × det(Aᵢⱼ)")}
+        <p>où <code>Aᵢⱼ</code> est la sous-matrice obtenue en enlevant la ligne <code>i</code> et la colonne <code>j</code>.</p>
+        ${lc.tip("Choix de la ligne/colonne", `<p>On choisit la ligne ou colonne contenant le plus de zéros pour simplifier les calculs.</p>`)}
+
+        <h2>4. Propriétés essentielles</h2>
+        ${lc.prop("Règles du déterminant", `<ul>
+          <li><strong>Multilinéarité</strong> : multiplier une ligne par <code>k</code> multiplie le déterminant par <code>k</code>.</li>
+          <li><strong>Alternance</strong> : échanger deux lignes change le signe du déterminant.</li>
+          <li>Une ligne nulle ⇒ déterminant nul.</li>
+          <li>Deux lignes égales ⇒ déterminant nul.</li>
+          <li><code>det(A^T) = det(A)</code>.</li>
+          <li><code>det(AB) = det(A) × det(B)</code>.</li>
+          <li><code>det(A⁻¹) = 1 / det(A)</code> (si <code>A</code> inversible).</li>
+        </ul>`)}
+
+        <h2>5. Lien avec inversibilité</h2>
+        ${lc.prop("Théorème", `<p>Une matrice carrée <code>A</code> est <strong>inversible</strong> si et seulement si <code>det(A) ≠ 0</code>.</p>`)}
+        ${lc.example("Tester inversibilité", `<p><code>A = ((1, 2); (3, 4))</code>. <code>det(A) = 4 − 6 = −2 ≠ 0</code>, donc <code>A</code> est inversible.</p>`)}
+
+        <h2>6. Application : équations de plans</h2>
+        ${lc.prop("Trois points alignés / coplanaires", `<p>Trois vecteurs de ℝ³ sont coplanaires si leur déterminant 3×3 est nul.</p>`)}
+      `,
+    },
+
+    {
+      title: "Diagonalisation, valeurs propres",
+      category: "Algèbre linéaire",
+      content: `
+        <h2>1. Vecteurs et valeurs propres</h2>
+        ${lc.def("Valeur propre", `<p>Un scalaire <code>λ</code> est <strong>valeur propre</strong> de la matrice <code>A</code> s'il existe un vecteur <strong>non nul</strong> <code>v</code> tel que :</p>`)}
+        ${lc.formula("A × v = λ × v")}
+        <p>Le vecteur <code>v</code> est appelé <strong>vecteur propre</strong> associé à <code>λ</code>.</p>
+
+        <h2>2. Polynôme caractéristique</h2>
+        ${lc.def("Polynôme caractéristique", `<p>Le <strong>polynôme caractéristique</strong> de <code>A</code> est :</p>`)}
+        ${lc.formula("P_A(λ) = det(A − λI)")}
+        ${lc.prop("Théorème", `<p>Les valeurs propres de <code>A</code> sont exactement les <strong>racines</strong> de <code>P_A</code>.</p>`)}
+        ${lc.example("Calcul des valeurs propres de A = ((4, 1); (2, 3))", `<ol>
+          <li><code>A − λI = ((4 − λ, 1); (2, 3 − λ))</code>.</li>
+          <li><code>P_A(λ) = (4 − λ)(3 − λ) − 2 = λ² − 7λ + 10</code>.</li>
+          <li>Racines : <code>λ² − 7λ + 10 = 0</code>, Δ = 49 − 40 = 9, λ = (7±3)/2.</li>
+          <li>Valeurs propres : <code>λ₁ = 5</code>, <code>λ₂ = 2</code>.</li>
+        </ol>`)}
+
+        <h2>3. Sous-espaces propres</h2>
+        ${lc.def("Sous-espace propre", `<p>Le <strong>sous-espace propre</strong> associé à <code>λ</code> est :</p>`)}
+        ${lc.formula("E_λ = ker(A − λI) = { v : Av = λv }")}
+        ${lc.example("Sous-espaces propres de A précédente", `<p>Pour <code>λ = 5</code> : résoudre <code>(A − 5I)v = 0</code>.</p>
+          <p><code>A − 5I = ((−1, 1); (2, −2))</code>. Système : <code>−x + y = 0</code>, donc <code>y = x</code>.</p>
+          <p><code>E_5 = vect((1, 1))</code>. Vecteur propre : <code>(1, 1)</code>.</p>
+          <p>Pour <code>λ = 2</code> : <code>A − 2I = ((2, 1); (2, 1))</code>. Système : <code>2x + y = 0</code>, vecteur propre <code>(1, −2)</code>.</p>`)}
+
+        <h2>4. Diagonalisation</h2>
+        ${lc.def("Matrice diagonalisable", `<p>Une matrice <code>A</code> est <strong>diagonalisable</strong> s'il existe une base de vecteurs propres. Dans ce cas :</p>`)}
+        ${lc.formula("A = P × D × P⁻¹")}
+        <p>où <code>D</code> est diagonale (valeurs propres) et <code>P</code> a pour colonnes les vecteurs propres.</p>
+        ${lc.prop("Critère", `<p>Une matrice <code>n × n</code> est diagonalisable si la somme des dimensions des sous-espaces propres égale <code>n</code>. Cas suffisant : si elle a <code>n</code> valeurs propres distinctes.</p>`)}
+
+        <h2>5. Application : puissances de matrice</h2>
+        ${lc.example("Calculer A^k", `<p>Si <code>A = PDP⁻¹</code> :</p>`)}
+        ${lc.formula("A^k = P × D^k × P⁻¹")}
+        <p><code>D^k</code> se calcule trivialement (élever chaque valeur propre à la puissance <code>k</code>).</p>
+        ${lc.tip("Pourquoi c'est utile", `<p>Permet d'étudier des systèmes dynamiques discrets, des suites définies par récurrence matricielle, etc.</p>`)}
+      `,
+    },
+
+    {
+      title: "Produits scalaires en dimension n",
+      category: "Algèbre linéaire",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Produit scalaire", `<p>Un <strong>produit scalaire</strong> sur un espace vectoriel <code>E</code> est une forme bilinéaire :</p>
+          <ul><li><strong>symétrique</strong> : <code>⟨u, v⟩ = ⟨v, u⟩</code> ;</li>
+          <li><strong>définie positive</strong> : <code>⟨u, u⟩ ≥ 0</code> et <code>⟨u, u⟩ = 0 ⇔ u = 0</code>.</li></ul>`)}
+        ${lc.example("Produit scalaire canonique sur ℝⁿ", `<p>Pour <code>u = (x₁, …, xₙ)</code> et <code>v = (y₁, …, yₙ)</code> :</p>
+          <p><code>⟨u, v⟩ = x₁y₁ + x₂y₂ + … + xₙyₙ</code>.</p>`)}
+
+        <h2>2. Norme et distance</h2>
+        ${lc.formula("||u|| = √⟨u, u⟩")}
+        ${lc.formula("d(u, v) = ||u − v||")}
+        ${lc.prop("Inégalité de Cauchy-Schwarz", `<p>Pour tous <code>u, v</code> :</p>`)}
+        ${lc.formula("|⟨u, v⟩| ≤ ||u|| × ||v||")}
+        <p>Avec égalité si et seulement si <code>u</code> et <code>v</code> sont colinéaires.</p>
+
+        <h2>3. Orthogonalité</h2>
+        ${lc.def("Vecteurs orthogonaux", `<p>Deux vecteurs <code>u</code> et <code>v</code> sont <strong>orthogonaux</strong> si <code>⟨u, v⟩ = 0</code>. On note <code>u ⊥ v</code>.</p>`)}
+        ${lc.prop("Théorème de Pythagore", `<p>Si <code>u ⊥ v</code> :</p>`)}
+        ${lc.formula("||u + v||² = ||u||² + ||v||²")}
+
+        <h2>4. Bases orthonormées</h2>
+        ${lc.def("Base orthonormée", `<p>Une base <code>(e₁, …, eₙ)</code> est <strong>orthonormée</strong> si :</p>
+          <ul><li>les vecteurs sont deux à deux orthogonaux : <code>⟨eᵢ, eⱼ⟩ = 0</code> si <code>i ≠ j</code> ;</li>
+          <li>chaque vecteur est unitaire : <code>||eᵢ|| = 1</code>.</li></ul>`)}
+        ${lc.tip("Coordonnées dans une BON", `<p>Si <code>(eᵢ)</code> est une BON, les coordonnées d'un vecteur <code>u</code> dans cette base sont <code>⟨u, eᵢ⟩</code>.</p>`)}
+
+        <h2>5. Procédé de Gram-Schmidt</h2>
+        ${lc.prop("Orthogonalisation", `<p>À partir d'une famille libre <code>(v₁, …, vₙ)</code>, on construit une base orthonormée <code>(e₁, …, eₙ)</code> du sous-espace engendré, par récurrence :</p>
+          <ol><li><code>e₁ = v₁ / ||v₁||</code>.</li>
+          <li>Pour <code>k > 1</code>, on retire à <code>v_k</code> ses projections sur <code>e₁, …, e_{k−1}</code>, puis on normalise.</li></ol>`)}
+
+        <h2>6. Projection orthogonale</h2>
+        ${lc.def("Projeté orthogonal", `<p>Soit <code>F</code> un sous-espace vectoriel de <code>E</code>. Le <strong>projeté orthogonal</strong> de <code>u</code> sur <code>F</code> est l'unique vecteur <code>p ∈ F</code> tel que <code>u − p</code> est orthogonal à <code>F</code>.</p>`)}
+        ${lc.formula("Si (e₁, …, e_k) est une BON de F : p = Σᵢ ⟨u, eᵢ⟩ × eᵢ")}
+        ${lc.tip("Application", `<p>Le projeté orthogonal est l'élément de <code>F</code> le plus proche de <code>u</code> au sens de la distance : <code>||u − p|| ≤ ||u − w||</code> pour tout <code>w ∈ F</code>. C'est la base de la <strong>méthode des moindres carrés</strong>.</p>`)}
+      `,
+    },
+  ];
+}
+
+// ─── Contenu pédagogique : Post-bac Probabilités ─────────────────
+function chaptersProbasPostBac() {
+  return [
+    {
+      title: "Espaces probabilisés",
+      category: "Probabilités",
+      content: `
+        <h2>1. Univers et tribu</h2>
+        ${lc.def("Univers", `<p>L'<strong>univers</strong> <code>Ω</code> est l'ensemble de toutes les issues possibles d'une expérience aléatoire.</p>`)}
+        ${lc.def("Tribu", `<p>Une <strong>tribu</strong> <code>𝓕</code> sur <code>Ω</code> est une collection de parties de <code>Ω</code> contenant <code>∅</code> et <code>Ω</code>, stable par <strong>complémentaire</strong> et par <strong>union dénombrable</strong>.</p>
+          <p>Les éléments de <code>𝓕</code> sont les <strong>événements</strong>.</p>`)}
+
+        <h2>2. Probabilité</h2>
+        ${lc.def("Probabilité (axiomes de Kolmogorov)", `<p>Une <strong>probabilité</strong> est une application <code>P : 𝓕 → [0, 1]</code> vérifiant :</p>
+          <ul><li><code>P(Ω) = 1</code> ;</li>
+          <li>pour toute famille dénombrable d'événements <em>disjoints</em> <code>(Aₙ)</code> : <code>P(∪ Aₙ) = Σ P(Aₙ)</code> (σ-additivité).</li></ul>`)}
+
+        <h2>3. Propriétés élémentaires</h2>
+        ${lc.formula("P(∅) = 0")}
+        ${lc.formula("P(Ā) = 1 − P(A)")}
+        ${lc.formula("P(A ∪ B) = P(A) + P(B) − P(A ∩ B)")}
+        ${lc.formula("Si A ⊂ B : P(A) ≤ P(B)")}
+        ${lc.formula("P(∪ Aᵢ) ≤ Σ P(Aᵢ)  (inégalité de Boole)")}
+
+        <h2>4. Probabilité conditionnelle</h2>
+        ${lc.def("Conditionnement", `<p>Si <code>P(B) > 0</code>, la probabilité conditionnelle de <code>A</code> sachant <code>B</code> est :</p>`)}
+        ${lc.formula("P(A | B) = P(A ∩ B) / P(B)")}
+        ${lc.prop("Formule de Bayes", `<p>Pour deux événements <code>A</code> et <code>B</code> avec <code>P(B) > 0</code> :</p>`)}
+        ${lc.formula("P(A | B) = P(B | A) × P(A) / P(B)")}
+
+        <h2>5. Probabilités totales</h2>
+        ${lc.prop("Théorème", `<p>Si <code>(Bᵢ)</code> forme une partition (finie ou dénombrable) de <code>Ω</code>, alors pour tout <code>A</code> :</p>`)}
+        ${lc.formula("P(A) = Σᵢ P(A ∩ Bᵢ) = Σᵢ P(A | Bᵢ) × P(Bᵢ)")}
+
+        <h2>6. Indépendance</h2>
+        ${lc.def("Indépendance", `<p><code>A</code> et <code>B</code> sont <strong>indépendants</strong> si <code>P(A ∩ B) = P(A) × P(B)</code>.</p>`)}
+        ${lc.def("Indépendance mutuelle", `<p>Une famille <code>(Aᵢ)</code> est <strong>mutuellement indépendante</strong> si pour toute sous-famille <code>(Aᵢ₁, …, Aᵢₖ)</code> : <code>P(Aᵢ₁ ∩ … ∩ Aᵢₖ) = P(Aᵢ₁) × … × P(Aᵢₖ)</code>.</p>`)}
+        ${lc.warn("Indépendance 2 à 2 ≠ mutuelle", `<p>Trois événements peuvent être indépendants deux à deux sans être mutuellement indépendants. La condition mutuelle est strictement plus forte.</p>`)}
+      `,
+    },
+
+    {
+      title: "Variables aléatoires discrètes",
+      category: "Probabilités",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Variable aléatoire discrète", `<p>Une <strong>variable aléatoire discrète</strong> est une application <code>X : Ω → ℝ</code> dont l'ensemble des valeurs <code>X(Ω)</code> est <strong>fini ou dénombrable</strong>.</p>`)}
+
+        <h2>2. Loi de probabilité</h2>
+        ${lc.def("Loi de X", `<p>Donner la <strong>loi</strong> de <code>X</code>, c'est donner toutes les valeurs <code>x_k</code> possibles avec leurs probabilités <code>p_k = P(X = x_k)</code>. La somme des <code>p_k</code> vaut 1.</p>`)}
+
+        <h2>3. Espérance</h2>
+        ${lc.formula("E(X) = Σ_k x_k × P(X = x_k)")}
+        <p>(série supposée absolument convergente.)</p>
+        ${lc.prop("Linéarité", `<p>Pour <code>X</code>, <code>Y</code> et constantes <code>a</code>, <code>b</code> :</p>`)}
+        ${lc.formula("E(aX + bY) = a × E(X) + b × E(Y)")}
+
+        <h2>4. Variance et écart-type</h2>
+        ${lc.formula("V(X) = E((X − E(X))²) = E(X²) − E(X)²")}
+        ${lc.formula("σ(X) = √V(X)")}
+        ${lc.formula("V(aX + b) = a² × V(X)")}
+
+        <h2>5. Moments</h2>
+        ${lc.def("Moment d'ordre k", `<p>Le <strong>moment d'ordre k</strong> de <code>X</code> est <code>E(X^k)</code>. Le moment d'ordre 1 est l'espérance ; le moment centré d'ordre 2 est la variance.</p>`)}
+
+        <h2>6. Inégalités classiques</h2>
+        ${lc.prop("Inégalité de Markov", `<p>Pour <code>X ≥ 0</code> et <code>a > 0</code> :</p>`)}
+        ${lc.formula("P(X ≥ a) ≤ E(X) / a")}
+        ${lc.prop("Inégalité de Bienaymé-Tchebychev", `<p>Pour tout <code>ε > 0</code> :</p>`)}
+        ${lc.formula("P(|X − E(X)| ≥ ε) ≤ V(X) / ε²")}
+        ${lc.tip("Utilité", `<p>Ces inégalités permettent de borner les probabilités d'<em>écarts</em> à la moyenne sans connaître la loi exacte.</p>`)}
+
+        <h2>7. Couples (X, Y)</h2>
+        ${lc.def("Loi conjointe", `<p>La <strong>loi conjointe</strong> de <code>(X, Y)</code> est donnée par les <code>P(X = x_i, Y = y_j)</code>.</p>`)}
+        ${lc.def("Indépendance", `<p><code>X</code> et <code>Y</code> sont <strong>indépendantes</strong> si pour tous <code>x</code>, <code>y</code> : <code>P(X = x, Y = y) = P(X = x) × P(Y = y)</code>.</p>`)}
+        ${lc.prop("Pour des variables indépendantes", `<ul>
+          <li><code>E(XY) = E(X) × E(Y)</code></li>
+          <li><code>V(X + Y) = V(X) + V(Y)</code></li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Variables aléatoires continues",
+      category: "Probabilités",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Variable continue à densité", `<p>Une variable aléatoire <code>X</code> est <strong>continue à densité</strong> s'il existe une fonction positive <code>f</code> (la <strong>densité</strong>) telle que :</p>`)}
+        ${lc.formula("P(a ≤ X ≤ b) = ∫_a^b f(x) dx")}
+        <p>Avec <code>∫_{−∞}^{+∞} f(x) dx = 1</code>.</p>
+
+        <h2>2. Fonction de répartition</h2>
+        ${lc.def("Fonction de répartition", `<p>La <strong>fonction de répartition</strong> de <code>X</code> est <code>F(x) = P(X ≤ x)</code>.</p>`)}
+        ${lc.formula("F(x) = ∫_{−∞}^x f(t) dt")}
+        ${lc.prop("Propriétés", `<ul>
+          <li><code>F</code> est croissante.</li>
+          <li><code>lim_{x → −∞} F(x) = 0</code>, <code>lim_{x → +∞} F(x) = 1</code>.</li>
+          <li><code>F</code> est continue (pour une variable à densité).</li>
+          <li><code>F'(x) = f(x)</code> aux points où <code>f</code> est continue.</li>
+        </ul>`)}
+
+        <h2>3. Espérance et variance</h2>
+        ${lc.formula("E(X) = ∫_{−∞}^{+∞} x × f(x) dx")}
+        ${lc.formula("V(X) = E(X²) − E(X)² = ∫ x² f(x) dx − [E(X)]²")}
+        <p>(intégrales supposées convergentes.)</p>
+
+        <h2>4. Loi uniforme</h2>
+        ${lc.def("Loi uniforme U([a, b])", `<p>Densité : <code>f(x) = 1/(b − a)</code> sur <code>[a, b]</code>, 0 ailleurs.</p>`)}
+        ${lc.formula("E(X) = (a + b) / 2 &nbsp;&nbsp; V(X) = (b − a)² / 12")}
+
+        <h2>5. Loi exponentielle</h2>
+        ${lc.def("Loi exponentielle ε(λ)", `<p>Densité : <code>f(x) = λ × e^{−λx}</code> sur <code>[0, +∞[</code>.</p>`)}
+        ${lc.formula("E(X) = 1/λ &nbsp;&nbsp; V(X) = 1/λ²")}
+        ${lc.prop("Sans mémoire", `<p>Pour <code>s, t ≥ 0</code> : <code>P(X > s + t | X > s) = P(X > t)</code>. La probabilité de durer encore <code>t</code> ne dépend pas de l'âge déjà accumulé.</p>`)}
+
+        <h2>6. Loi normale</h2>
+        ${lc.def("Loi normale N(μ, σ²)", `<p>Densité : <code>f(x) = (1/(σ√(2π))) × e^{−(x−μ)²/(2σ²)}</code>.</p>`)}
+        ${lc.formula("E(X) = μ &nbsp;&nbsp; V(X) = σ²")}
+        ${lc.prop("Centrer-réduire", `<p>Si <code>X ~ N(μ, σ²)</code>, alors <code>(X − μ)/σ ~ N(0, 1)</code>.</p>`)}
+
+        <h2>7. Changement de variable</h2>
+        ${lc.prop("Densité de Y = g(X)", `<p>Si <code>g</code> est strictement monotone et dérivable, et <code>X</code> a pour densité <code>f_X</code>, alors <code>Y</code> a pour densité :</p>`)}
+        ${lc.formula("f_Y(y) = f_X(g⁻¹(y)) × |1 / g'(g⁻¹(y))|")}
+      `,
+    },
+
+    {
+      title: "Lois usuelles : Poisson, géométrique, ...",
+      category: "Probabilités",
+      content: `
+        <h2>1. Loi de Bernoulli ℬ(p)</h2>
+        ${lc.def("Bernoulli", `<p><code>X ~ ℬ(p)</code> prend les valeurs 0 et 1 avec <code>P(X = 1) = p</code> et <code>P(X = 0) = 1 − p</code>.</p>`)}
+        ${lc.formula("E(X) = p &nbsp;&nbsp; V(X) = p(1 − p)")}
+
+        <h2>2. Loi binomiale 𝓑(n, p)</h2>
+        ${lc.def("Binomiale", `<p><code>X</code> compte le nombre de succès dans <code>n</code> répétitions indépendantes d'épreuves de Bernoulli.</p>`)}
+        ${lc.formula("P(X = k) = C(n, k) × p^k × (1 − p)^{n−k}")}
+        ${lc.formula("E(X) = np &nbsp;&nbsp; V(X) = np(1 − p)")}
+
+        <h2>3. Loi géométrique 𝒢(p)</h2>
+        ${lc.def("Géométrique", `<p><code>X</code> est le rang du <strong>premier succès</strong> dans une suite d'épreuves de Bernoulli indépendantes.</p>`)}
+        ${lc.formula("P(X = k) = (1 − p)^{k−1} × p &nbsp;&nbsp; (k ≥ 1)")}
+        ${lc.formula("E(X) = 1/p &nbsp;&nbsp; V(X) = (1 − p) / p²")}
+        ${lc.example("Application", `<p>Lancer un dé jusqu'à obtenir un 6. <code>p = 1/6</code>. Espérance : <code>1/(1/6) = 6</code> lancers en moyenne.</p>`)}
+
+        <h2>4. Loi de Poisson 𝒫(λ)</h2>
+        ${lc.def("Poisson", `<p>Modélise le nombre d'événements rares survenant dans un intervalle de temps.</p>`)}
+        ${lc.formula("P(X = k) = e^{−λ} × λ^k / k! &nbsp;&nbsp; (k ∈ ℕ)")}
+        ${lc.formula("E(X) = λ &nbsp;&nbsp; V(X) = λ")}
+        ${lc.tip("Utilisation", `<p>Nombre de clients dans une heure, nombre de pannes par jour, désintégrations radioactives par seconde…</p>`)}
+
+        <h2>5. Loi exponentielle ε(λ) (rappel)</h2>
+        <p>Cas continu de Poisson : modélise le <em>temps</em> entre deux événements.</p>
+        ${lc.formula("E(X) = 1/λ &nbsp;&nbsp; V(X) = 1/λ²")}
+
+        <h2>6. Loi normale N(μ, σ²) (rappel)</h2>
+        ${lc.formula("E(X) = μ &nbsp;&nbsp; V(X) = σ²")}
+
+        <h2>7. Approximations</h2>
+        ${lc.prop("Binomiale → Poisson", `<p>Si <code>n</code> est grand, <code>p</code> petit, et <code>np = λ</code> reste modéré, alors <code>𝓑(n, p) ≈ 𝒫(λ)</code>.</p>`)}
+        ${lc.prop("Binomiale → Normale", `<p>Si <code>n</code> est grand et <code>np(1−p) ≥ 5</code>, alors <code>𝓑(n, p) ≈ N(np, np(1−p))</code>. C'est le théorème de Moivre-Laplace, cas particulier du TCL.</p>`)}
+      `,
+    },
+
+    {
+      title: "Théorèmes limites : LGN, TCL",
+      category: "Probabilités",
+      content: `
+        <h2>1. Convergence en probabilité</h2>
+        ${lc.def("Convergence en proba", `<p>Une suite <code>(Xₙ)</code> de variables aléatoires <strong>converge en probabilité</strong> vers <code>X</code> si :</p>`)}
+        ${lc.formula("∀ ε > 0, lim_{n → +∞} P(|Xₙ − X| ≥ ε) = 0")}
+
+        <h2>2. Loi (faible) des grands nombres</h2>
+        ${lc.prop("LGN faible", `<p>Soit <code>(Xₙ)</code> une suite de variables aléatoires <strong>indépendantes</strong>, de <strong>même loi</strong>, d'espérance <code>μ</code> et de variance finie. La moyenne empirique converge en probabilité vers l'espérance :</p>`)}
+        ${lc.formula("M_n = (X₁ + … + Xₙ) / n &nbsp; ⟶ &nbsp; μ")}
+        ${lc.tip("Sens intuitif", `<p>Avec un grand échantillon, la moyenne observée est très proche de l'espérance théorique. C'est le fondement de la statistique inférentielle.</p>`)}
+
+        <h2>3. Théorème central limite (TCL)</h2>
+        ${lc.prop("TCL", `<p>Soit <code>(Xₙ)</code> i.i.d. d'espérance <code>μ</code> et variance <code>σ² > 0</code>. Alors :</p>`)}
+        ${lc.formula("(M_n − μ) × √n / σ &nbsp; ⟶ &nbsp; N(0, 1) en loi")}
+        <p>Plus concrètement : la somme normalisée <code>(X₁ + … + Xₙ − nμ) / (σ√n)</code> tend en loi vers <code>N(0, 1)</code>.</p>
+        ${lc.tip("Pouvoir du TCL", `<p>Quelle que soit la loi des <code>Xᵢ</code> (uniforme, exponentielle, Bernoulli…), la moyenne d'un grand nombre suit approximativement une loi normale. C'est pourquoi cette loi est si universelle.</p>`)}
+
+        <h2>4. Application : intervalle de confiance</h2>
+        ${lc.example("Pour la moyenne", `<p>Avec un échantillon de taille <code>n = 100</code>, moyenne empirique <code>M = 50</code>, écart-type connu <code>σ = 8</code> :</p>
+          <ol><li>Erreur standard : <code>σ/√n = 0,8</code>.</li>
+          <li>IC 95 % : <code>[M − 1,96 × σ/√n ; M + 1,96 × σ/√n] = [48,4 ; 51,6]</code>.</li>
+          <li>Avec 95 % de confiance, la moyenne réelle <code>μ</code> est entre 48,4 et 51,6.</li></ol>`)}
+
+        <h2>5. Convergence en loi (vue rapide)</h2>
+        ${lc.def("Convergence en loi", `<p><code>Xₙ</code> converge en loi vers <code>X</code> si <code>F_{Xₙ}(x) → F_X(x)</code> en tout point de continuité de <code>F_X</code>.</p>`)}
+        ${lc.tip("Hiérarchie des convergences", `<p>Convergence presque sûre ⇒ convergence en probabilité ⇒ convergence en loi.</p>`)}
+      `,
+    },
+
+    {
+      title: "Tests statistiques",
+      category: "Statistiques",
+      content: `
+        <h2>1. Hypothèses</h2>
+        ${lc.def("Hypothèses nulle et alternative", `<ul>
+          <li><strong>Hypothèse nulle</strong> <code>H₀</code> : statu quo, ce qu'on veut « rejeter ».</li>
+          <li><strong>Hypothèse alternative</strong> <code>H₁</code> : ce qu'on essaie de mettre en évidence.</li>
+        </ul>
+          <p>Exemple : tester si une pièce est équilibrée. <code>H₀ : p = 1/2</code> vs <code>H₁ : p ≠ 1/2</code>.</p>`)}
+
+        <h2>2. Erreurs de type I et II</h2>
+        ${lc.def("Risques", `<ul>
+          <li><strong>Erreur de type I</strong> (α, ou « risque de première espèce ») : rejeter <code>H₀</code> alors qu'elle est vraie.</li>
+          <li><strong>Erreur de type II</strong> (β) : ne pas rejeter <code>H₀</code> alors qu'elle est fausse.</li>
+          <li><strong>Puissance</strong> du test : <code>1 − β</code>, probabilité de détecter l'effet quand il existe.</li>
+        </ul>`)}
+        ${lc.tip("Compromis", `<p>Diminuer α augmente β (et vice versa). On choisit α = 5 % par convention.</p>`)}
+
+        <h2>3. Démarche d'un test</h2>
+        ${lc.prop("Étapes", `<ol>
+          <li>Formuler <code>H₀</code> et <code>H₁</code>.</li>
+          <li>Choisir le seuil α (généralement 5 %).</li>
+          <li>Calculer la statistique de test à partir des données.</li>
+          <li>Comparer à la valeur critique (ou calculer la <strong>p-valeur</strong>).</li>
+          <li>Conclure : si <code>p &lt; α</code>, on rejette <code>H₀</code>.</li>
+        </ol>`)}
+
+        <h2>4. p-valeur</h2>
+        ${lc.def("p-valeur", `<p>La <strong>p-valeur</strong> est la probabilité, sous <code>H₀</code>, d'observer un résultat au moins aussi extrême que celui observé. Plus la p-valeur est petite, plus la donnée est incompatible avec <code>H₀</code>.</p>`)}
+        ${lc.tip("Règle pratique", `<p>p &lt; 0,05 → on rejette <code>H₀</code> (résultat « significatif »). p ≥ 0,05 → on ne rejette pas.</p>`)}
+
+        <h2>5. Test Z (proportion connue σ)</h2>
+        ${lc.prop("Statistique Z", `<p>Pour un échantillon de taille <code>n</code> de moyenne <code>x̄</code> tiré d'une loi <code>N(μ, σ²)</code> avec <code>σ</code> connu :</p>`)}
+        ${lc.formula("Z = (x̄ − μ₀) / (σ / √n)")}
+        <p>Sous <code>H₀ : μ = μ₀</code>, <code>Z ~ N(0, 1)</code>. On rejette <code>H₀</code> au seuil 5 % bilatéral si <code>|Z| > 1,96</code>.</p>
+
+        <h2>6. Test de Student (σ inconnu)</h2>
+        ${lc.prop("Statistique T", `<p>Si <code>σ</code> est inconnu, on l'estime par l'écart-type empirique <code>s</code> :</p>`)}
+        ${lc.formula("T = (x̄ − μ₀) / (s / √n)")}
+        <p>Sous <code>H₀</code>, <code>T</code> suit une loi de Student à <code>n − 1</code> degrés de liberté.</p>
+
+        <h2>7. Test du χ²</h2>
+        ${lc.def("Test du chi-deux", `<p>Permet de tester l'<strong>adéquation</strong> à une loi théorique en comparant effectifs observés et théoriques.</p>`)}
+        ${lc.formula("χ² = Σ (Oᵢ − Eᵢ)² / Eᵢ")}
+        <p>Sous <code>H₀</code>, <code>χ²</code> suit une loi du chi-deux à <code>k − 1</code> degrés de liberté (<code>k</code> = nombre de classes).</p>
+
+        <h2>8. Précautions d'interprétation</h2>
+        ${lc.warn("Significatif ≠ important", `<p>Un test significatif (<code>p &lt; α</code>) <strong>ne dit pas</strong> que l'effet est grand, juste qu'il est non nul. Toujours regarder l'<strong>amplitude</strong> de l'effet, pas seulement la p-valeur.</p>`)}
+      `,
+    },
+  ];
+}
 
 // ─── Contenu pédagogique : Terminale à fond ──────────────────────
 function chaptersTle() {
