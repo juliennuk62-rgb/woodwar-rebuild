@@ -1487,7 +1487,8 @@ function chaptersProbasPostBac() {
         <h2>7. Test du χ²</h2>
         ${lc.def("Test du chi-deux", `<p>Permet de tester l'<strong>adéquation</strong> à une loi théorique en comparant effectifs observés et théoriques.</p>`)}
         ${lc.formula("χ² = Σ (Oᵢ − Eᵢ)² / Eᵢ")}
-        <p>Sous <code>H₀</code>, <code>χ²</code> suit une loi du chi-deux à <code>k − 1</code> degrés de liberté (<code>k</code> = nombre de classes).</p>
+        <p>Sous <code>H₀</code>, <code>χ²</code> suit une loi du chi-deux à <code>k − 1 − r</code> degrés de liberté, où <code>k</code> est le nombre de classes et <code>r</code> le nombre de paramètres estimés à partir des données. Si la loi théorique est <strong>entièrement spécifiée</strong> à l'avance (r = 0), on retrouve <code>k − 1</code> ddl.</p>
+        ${lc.warn("Conditions de validité", `<p>Le test n'est fiable que si chaque effectif théorique vérifie <code>Eᵢ ≥ 5</code>. Sinon, on regroupe des classes voisines.</p>`)}
 
         <h2>8. Précautions d'interprétation</h2>
         ${lc.warn("Significatif ≠ important", `<p>Un test significatif (<code>p &lt; α</code>) <strong>ne dit pas</strong> que l'effet est grand, juste qu'il est non nul. Toujours regarder l'<strong>amplitude</strong> de l'effet, pas seulement la p-valeur.</p>`)}
@@ -1954,6 +1955,7 @@ function chaptersTle() {
       title: "Lois de probabilité à densité",
       category: "Probabilités",
       content: `
+        ${lc.warn("Note de programme", `<p>Ce chapitre figurait au programme de Terminale S avant 2020 ; le programme actuel de spé maths (2020+) ne l'inclut plus. Il reste utile en option « Maths complémentaires » ou comme transition vers le post-bac (cf. chapitres post-bac « Variables continues » et « Lois usuelles »).</p>`)}
         <h2>1. Variable aléatoire continue</h2>
         ${lc.def("Variable continue", `<p>Une variable aléatoire <code>X</code> est <strong>continue</strong> si elle peut prendre n'importe quelle valeur dans un intervalle (ou ℝ tout entier), pas seulement des valeurs discrètes.</p>
           <p>Exemple : la taille d'une personne, le temps d'attente à un guichet, la durée de vie d'une ampoule.</p>`)}
@@ -1992,6 +1994,7 @@ function chaptersTle() {
       title: "Loi normale",
       category: "Probabilités",
       content: `
+        ${lc.warn("Note de programme", `<p>Comme le chapitre précédent, la loi normale a été retirée du programme spé maths Terminale en 2020. Conservée ici pour la culture générale et la préparation au post-bac.</p>`)}
         <h2>1. Loi normale centrée réduite</h2>
         ${lc.def("N(0, 1)", `<p>La <strong>loi normale centrée réduite</strong>, notée <code>N(0, 1)</code>, a pour densité sur ℝ :</p>`)}
         ${lc.formula("φ(x) = (1 / √(2π)) × e^{−x²/2}")}
@@ -2033,6 +2036,7 @@ function chaptersTle() {
       title: "Échantillonnage et estimation",
       category: "Probabilités",
       content: `
+        ${lc.warn("Note de programme", `<p>Le programme spé maths Terminale 2020+ a remplacé ce contenu par <strong>l'inégalité de Bienaymé-Tchebychev et la loi (faible) des grands nombres pour la binomiale</strong> (cf. nouveaux chapitres). Le chapitre ci-dessous reste pertinent pour les filières qui en ont besoin (sciences sociales, prépa éco) et pour le post-bac.</p>`)}
         <h2>1. Loi des grands nombres</h2>
         ${lc.prop("Énoncé intuitif", `<p>Quand le nombre d'expériences augmente, la <strong>fréquence</strong> observée d'un événement se rapproche de sa <strong>probabilité théorique</strong>.</p>`)}
         ${lc.example("Pile ou face", `<p>Sur 10 lancers d'une pièce équilibrée, on peut très bien obtenir 7 piles. Mais sur 10 000 lancers, la proportion se rapproche très près de 0,5.</p>`)}
@@ -4115,11 +4119,11 @@ function chapters4e() {
         ${lc.tip("Repérage", `<p>L'<strong>hypoténuse</strong> est toujours opposée à l'angle droit (le grand côté). Le <strong>côté opposé</strong> à <code>α</code> est celui qui ne touche pas <code>α</code>. Le reste, c'est l'<strong>adjacent</strong>.</p>`)}
 
         <h2>2. Propriétés du cosinus</h2>
-        ${lc.prop("Encadrement", `<p>Pour tout angle aigu α (entre 0° et 90°) : <code>0 < cos(α) < 1</code>.</p>
-          <p>Quelques valeurs particulières :</p>
+        ${lc.prop("Encadrement", `<p>Pour tout angle aigu α (avec <code>0° ≤ α ≤ 90°</code>) : <code>0 ≤ cos(α) ≤ 1</code>. Les bornes ne sont atteintes qu'aux extrémités :</p>
           <ul><li><code>cos(0°) = 1</code></li>
           <li><code>cos(60°) = 0,5</code></li>
-          <li><code>cos(90°) = 0</code></li></ul>`)}
+          <li><code>cos(90°) = 0</code></li></ul>
+          <p>Pour <code>0° < α < 90°</code> strictement, on a bien <code>0 < cos(α) < 1</code>.</p>`)}
 
         <h2>3. Calculer un cosinus à partir des longueurs</h2>
         ${lc.example("Triangle rectangle", `<p>Triangle <code>ABC</code> rectangle en <code>C</code>. Pour l'angle <code>α</code> en <code>A</code> : adjacent = <code>AC</code>, hypoténuse = <code>AB</code>. Si <code>AC = 4</code> et <code>AB = 5</code> :</p>
@@ -5332,8 +5336,8 @@ function chapters5e() {
           <li>Le grand côté, opposé à l'angle droit, s'appelle l'<strong>hypoténuse</strong>.</li></ul>`)}
 
         <h2>3. Inégalité triangulaire</h2>
-        ${lc.prop("Règle clé", `<p>Dans un triangle, la longueur de chaque côté est <strong>inférieure ou égale</strong> à la somme des deux autres.</p>`)}
-        ${lc.formula("AB ≤ AC + CB &nbsp;&nbsp; AC ≤ AB + BC &nbsp;&nbsp; BC ≤ AB + AC")}
+        ${lc.prop("Règle clé", `<p>Dans un triangle, la longueur de chaque côté est <strong>strictement inférieure</strong> à la somme des deux autres (sinon les trois points seraient alignés et on n'aurait pas de triangle).</p>`)}
+        ${lc.formula("AB < AC + CB &nbsp;&nbsp; AC < AB + BC &nbsp;&nbsp; BC < AB + AC")}
         ${lc.example("Peut-on construire un triangle de côtés 3, 4, 8 cm ?", `<p>On vérifie : <code>3 + 4 = 7 < 8</code>. L'inégalité est violée.</p>
           <p>Réponse : <strong>non, ce triangle n'existe pas</strong>. Les deux petits côtés ne se rejoignent pas.</p>`)}
         ${lc.example("Peut-on construire un triangle de côtés 5, 6, 9 cm ?", `<p><code>5 + 6 = 11 > 9</code> ✓ &nbsp;&nbsp; <code>5 + 9 = 14 > 6</code> ✓ &nbsp;&nbsp; <code>6 + 9 = 15 > 5</code> ✓</p>
