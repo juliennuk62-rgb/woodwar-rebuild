@@ -1178,6 +1178,59 @@ function chaptersAnalyse() {
         ${lc.example("Oscillateur amorti", `<p><code>m y'' + γ y' + k y = 0</code>. Selon <code>Δ</code> on a un mouvement apériodique (Δ > 0), critique (Δ = 0) ou oscillant amorti (Δ < 0).</p>`)}
       `,
     },
+
+    {
+      title: "Séries entières",
+      category: "Séries",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Série entière", `<p>Une <strong>série entière</strong> est une série de la forme :</p>`)}
+        ${lc.formula("Σ_{n=0}^{+∞} aₙ × xⁿ &nbsp;&nbsp; (x ∈ ℝ ou ℂ)")}
+        <p>Les <code>aₙ</code> sont les <strong>coefficients</strong> de la série. Pour chaque <code>x</code>, on étudie la convergence de la série numérique correspondante.</p>
+
+        <h2>2. Rayon de convergence</h2>
+        ${lc.def("Rayon de convergence R", `<p>Il existe un unique <code>R ∈ [0, +∞]</code>, appelé <strong>rayon de convergence</strong>, tel que :</p>
+          <ul><li>la série converge <em>absolument</em> pour <code>|x| < R</code> ;</li>
+          <li>la série diverge pour <code>|x| > R</code> ;</li>
+          <li>le comportement aux bornes <code>|x| = R</code> doit être étudié à part.</li></ul>
+          <p>L'intervalle <code>]−R ; R[</code> est l'<strong>intervalle ouvert de convergence</strong>.</p>`)}
+
+        <h2>3. Calcul du rayon</h2>
+        ${lc.prop("Critère de d'Alembert (rapport)", `<p>Si <code>|aₙ₊₁ / aₙ| → ℓ</code> avec <code>ℓ ∈ [0, +∞]</code>, alors :</p>`)}
+        ${lc.formula("R = 1 / ℓ &nbsp;&nbsp; (avec convention 1/0 = +∞ et 1/+∞ = 0)")}
+        ${lc.prop("Critère de Cauchy (racine n-ième)", `<p>Si <code>|aₙ|^{1/n} → ℓ</code>, même formule : <code>R = 1/ℓ</code>.</p>`)}
+        ${lc.example("Calcul du rayon de Σ xⁿ/n!", `<p><code>aₙ = 1/n!</code>. <code>aₙ₊₁/aₙ = n!/(n+1)! = 1/(n+1) → 0</code>.</p>
+          <p>Donc <code>R = 1/0 = +∞</code> : la série converge sur ℝ tout entier.</p>`)}
+        ${lc.example("Calcul du rayon de Σ xⁿ", `<p><code>aₙ = 1</code>, <code>aₙ₊₁/aₙ = 1 → 1</code>. Donc <code>R = 1</code> : la série converge sur <code>]−1, 1[</code> et diverge ailleurs.</p>`)}
+
+        <h2>4. Somme et propriétés</h2>
+        ${lc.def("Somme", `<p>Sur l'intervalle <code>]−R, R[</code>, la fonction <code>S(x) = Σ aₙ × xⁿ</code> est définie. C'est la <strong>somme</strong> de la série entière.</p>`)}
+        ${lc.prop("Continuité, dérivation, intégration termes à termes", `<p>Sur <code>]−R, R[</code>, la somme <code>S</code> est <strong>de classe C^∞</strong>, et :</p>`)}
+        ${lc.formula("S'(x) = Σ_{n=1}^{+∞} n × aₙ × x^{n−1}")}
+        ${lc.formula("∫_0^x S(t) dt = Σ_{n=0}^{+∞} aₙ × x^{n+1} / (n+1)")}
+        <p>La dérivation et l'intégration termes à termes <strong>conservent le rayon de convergence</strong>.</p>
+
+        <h2>5. Séries entières usuelles</h2>
+        ${lc.formula("e^x = Σ xⁿ/n! &nbsp;&nbsp;&nbsp; (R = +∞)")}
+        ${lc.formula("ln(1 + x) = Σ (−1)^{n+1} × xⁿ / n &nbsp;&nbsp;&nbsp; (R = 1)")}
+        ${lc.formula("1/(1 − x) = Σ xⁿ &nbsp;&nbsp;&nbsp; (R = 1)")}
+        ${lc.formula("sin(x) = Σ (−1)ⁿ × x^{2n+1}/(2n+1)! &nbsp;&nbsp;&nbsp; (R = +∞)")}
+        ${lc.formula("cos(x) = Σ (−1)ⁿ × x^{2n}/(2n)! &nbsp;&nbsp;&nbsp; (R = +∞)")}
+        ${lc.formula("(1 + x)^α = 1 + Σ_{n≥1} α(α−1)…(α−n+1)/n! × xⁿ &nbsp;&nbsp; (R = 1 sauf α ∈ ℕ)")}
+
+        <h2>6. Application : développement en série entière</h2>
+        ${lc.def("Fonction développable en série entière", `<p>Une fonction <code>f</code> est <strong>développable en série entière</strong> au voisinage de 0 s'il existe une série entière de rayon <code>R > 0</code> dont la somme coïncide avec <code>f</code> sur <code>]−R, R[</code>.</p>
+          <p>Toutes les fonctions « usuelles » (exp, ln, sin, cos, polynômes…) le sont. La théorie des séries entières est l'outil central pour calculer formellement avec ces fonctions.</p>`)}
+
+        <h2>7. Exemple résolu</h2>
+        ${lc.example("Trouver le DSE de 1/(1−x²)", `<ol>
+          <li>On part de <code>1/(1−u) = Σ uⁿ</code> pour <code>|u| < 1</code>.</li>
+          <li>On pose <code>u = x²</code> : valable pour <code>|x²| < 1</code>, soit <code>|x| < 1</code>.</li>
+          <li><code>1/(1 − x²) = Σ x^{2n} = 1 + x² + x⁴ + x⁶ + …</code></li>
+          <li>Rayon de convergence : <code>R = 1</code>.</li>
+        </ol>`)}
+      `,
+    },
   ];
 }
 
