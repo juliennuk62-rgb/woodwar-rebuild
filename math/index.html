@@ -599,20 +599,7 @@ const CURRICULUM = [
     levels: [
       { id: '6e',  name: '6e',  chapters: chapters6e() },
       { id: '5e',  name: '5e',  chapters: chapters5e() },
-      { id: '4e',  name: '4e',  chapters: [
-        todo("Nombres relatifs : multiplication et division", "Nombres et calcul"),
-        todo("Fractions : opérations avancées", "Nombres et calcul"),
-        todo("Puissances et notation scientifique", "Nombres et calcul"),
-        todo("Calcul littéral : développement", "Calcul littéral"),
-        todo("Équations du 1er degré", "Calcul littéral"),
-        todo("Théorème de Pythagore", "Géométrie"),
-        todo("Théorème de Thalès (configuration de base)", "Géométrie"),
-        todo("Cosinus dans le triangle rectangle", "Géométrie"),
-        todo("Translations", "Géométrie"),
-        todo("Proportionnalité avancée", "Organisation des données"),
-        todo("Statistiques : moyenne", "Organisation des données"),
-        todo("Probabilités (introduction)", "Organisation des données"),
-      ]},
+      { id: '4e',  name: '4e',  chapters: chapters4e() },
       { id: '3e',  name: '3e',  chapters: [
         todo("Arithmétique : PGCD, fractions irréductibles", "Nombres et calcul"),
         todo("Racines carrées", "Nombres et calcul"),
@@ -709,6 +696,555 @@ const CURRICULUM = [
     ],
   },
 ];
+
+// ─── Contenu pédagogique : 4e à fond ─────────────────────────────
+function chapters4e() {
+  return [
+    {
+      title: "Nombres relatifs : multiplication et division",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Règle des signes</h2>
+        ${lc.prop("Multiplication et division", `<p>Pour multiplier (ou diviser) deux nombres relatifs :</p>
+          <ol><li>On effectue l'opération sur les <strong>distances à zéro</strong>.</li>
+          <li>On applique la <strong>règle des signes</strong> :</li></ol>
+          <ul><li>(+) × (+) = (+)</li>
+          <li>(−) × (−) = (+)</li>
+          <li>(+) × (−) = (−)</li>
+          <li>(−) × (+) = (−)</li></ul>
+          <p>En résumé : <strong>même signe → résultat positif. Signes différents → résultat négatif.</strong></p>`)}
+        ${lc.example("Calculer (−6) × (+4)", `<ol><li>Distances : <code>6 × 4 = 24</code>.</li>
+          <li>Signes différents → résultat négatif.</li>
+          <li>Donc <code>(−6) × (+4) = −24</code>.</li></ol>`)}
+        ${lc.example("Calculer (−7) × (−3)", `<ol><li>Distances : <code>7 × 3 = 21</code>.</li>
+          <li>Mêmes signes (négatifs) → résultat positif.</li>
+          <li>Donc <code>(−7) × (−3) = +21</code>.</li></ol>`)}
+
+        <h2>2. Division</h2>
+        ${lc.prop("Mêmes règles de signes", `<p>La division suit exactement la même règle des signes que la multiplication.</p>`)}
+        ${lc.example("Calculer (−24) ÷ (+6)", `<p>Distances : <code>24 ÷ 6 = 4</code>. Signes différents → négatif. Donc <code>(−24) ÷ (+6) = −4</code>.</p>`)}
+        ${lc.example("Calculer (−30) ÷ (−5)", `<p>Distances : <code>30 ÷ 5 = 6</code>. Mêmes signes → positif. Donc <code>(−30) ÷ (−5) = +6</code>.</p>`)}
+        ${lc.warn("Division par zéro", `<p>On ne divise <strong>jamais</strong> par 0. <code>5 ÷ 0</code> n'existe pas.</p>`)}
+
+        <h2>3. Calculer une suite de produits / quotients</h2>
+        ${lc.prop("Compter les signes négatifs", `<p>Dans un produit (ou un quotient) en chaîne, le résultat est :</p>
+          <ul><li><strong>positif</strong> s'il y a un nombre <em>pair</em> de facteurs négatifs ;</li>
+          <li><strong>négatif</strong> s'il y a un nombre <em>impair</em> de facteurs négatifs.</li></ul>`)}
+        ${lc.example("Calculer (−2) × (+5) × (−3)", `<ol><li>On compte les négatifs : <strong>2</strong> (donc nombre pair → positif).</li>
+          <li>Distances : <code>2 × 5 × 3 = 30</code>.</li>
+          <li>Résultat : <code>+30</code>.</li></ol>`)}
+        ${lc.example("Calculer (−1) × (−2) × (−3) × (−4)", `<p>4 négatifs (pair) → positif. Distances : <code>1 × 2 × 3 × 4 = 24</code>. Résultat : <code>+24</code>.</p>`)}
+
+        <h2>4. Pièges classiques</h2>
+        ${lc.warn("(−2)² ≠ −2²", `<p><code>(−2)²</code> = <code>(−2) × (−2) = +4</code>.</p>
+          <p><code>−2²</code> = <code>−(2 × 2) = −4</code> (le carré ne porte que sur le 2).</p>
+          <p>Toujours mettre des <strong>parenthèses</strong> autour d'un nombre négatif quand on l'élève au carré (ou à toute puissance).</p>`)}
+        ${lc.example("Avec relatif et fraction", `<p>Calculer <code>(−3) × (−5/6)</code> : signes mêmes → positif. Distance : <code>3 × 5/6 = 15/6 = 5/2</code>. Donc <code>(−3) × (−5/6) = +5/2</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Fractions : opérations avancées",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Rappels : addition et soustraction</h2>
+        ${lc.prop("Avec le même dénominateur", `<p>On additionne (ou soustrait) les numérateurs en gardant le dénominateur.</p>`)}
+        ${lc.formula("a/n + b/n &nbsp;=&nbsp; (a + b)/n")}
+        ${lc.prop("Avec dénominateurs différents", `<p>Réduire au même dénominateur d'abord, puis additionner.</p>`)}
+        ${lc.example("Calculer 2/3 + 1/4", `<ol><li>Dénominateur commun : <code>3 × 4 = 12</code>.</li>
+          <li><code>2/3 = 8/12</code> et <code>1/4 = 3/12</code>.</li>
+          <li><code>8/12 + 3/12 = 11/12</code>.</li></ol>`)}
+
+        <h2>2. Multiplication</h2>
+        ${lc.prop("Règle simple", `<p>On multiplie les numérateurs entre eux et les dénominateurs entre eux.</p>`)}
+        ${lc.formula("a/b × c/d &nbsp;=&nbsp; (a × c) / (b × d)")}
+        ${lc.example("Calculer 3/5 × 2/7", `<p><code>3/5 × 2/7 = (3 × 2)/(5 × 7) = 6/35</code>.</p>`)}
+        ${lc.tip("Simplifier avant", `<p>Si possible, simplifie en croix avant de multiplier pour éviter les gros nombres.</p>
+          <p>Calculer <code>4/9 × 3/8</code> : on voit que 4 et 8 ont 4 en commun, et 3 et 9 ont 3 en commun. <code>4/9 × 3/8 = (1/3) × (1/2) = 1/6</code>.</p>`)}
+
+        <h2>3. Inverse d'un nombre, d'une fraction</h2>
+        ${lc.def("Inverse", `<p>L'<strong>inverse</strong> d'un nombre <code>a</code> (non nul) est le nombre <code>1/a</code>. Le produit d'un nombre par son inverse vaut toujours <strong>1</strong>.</p>`)}
+        ${lc.formula("a × (1/a) &nbsp;=&nbsp; 1")}
+        ${lc.example("Inverses", `<ul><li>Inverse de 5 : <code>1/5</code>.</li>
+          <li>Inverse de <code>2/3</code> : <code>3/2</code> (on retourne la fraction).</li>
+          <li>Inverse de 1 : 1. Inverse de −7 : <code>−1/7</code>.</li>
+          <li>Le 0 n'a pas d'inverse.</li></ul>`)}
+
+        <h2>4. Division</h2>
+        ${lc.prop("Règle clé", `<p>Diviser par une fraction, c'est <strong>multiplier par son inverse</strong>.</p>`)}
+        ${lc.formula("a/b ÷ c/d &nbsp;=&nbsp; a/b × d/c &nbsp;=&nbsp; (a × d) / (b × c)")}
+        ${lc.example("Calculer 3/5 ÷ 2/7", `<ol><li>Inverse de <code>2/7</code> : <code>7/2</code>.</li>
+          <li><code>3/5 ÷ 2/7 = 3/5 × 7/2 = 21/10</code>.</li></ol>`)}
+        ${lc.example("Diviser par un entier", `<p><code>4/9 ÷ 2 = 4/9 × 1/2 = 4/18 = 2/9</code>. (Diviser par 2, c'est multiplier par 1/2.)</p>`)}
+
+        <h2>5. Avec les nombres relatifs</h2>
+        <p>Les règles de signes s'appliquent aussi aux fractions.</p>
+        ${lc.example("Calculer (−2/3) × (5/4)", `<p>Signes différents → négatif. Distances : <code>(2 × 5)/(3 × 4) = 10/12 = 5/6</code>. Donc <code>(−2/3) × (5/4) = −5/6</code>.</p>`)}
+
+        <h2>6. Calcul avec priorités</h2>
+        ${lc.example("Calculer 1/2 + 1/3 × 1/4", `<ol><li>Multiplication d'abord : <code>1/3 × 1/4 = 1/12</code>.</li>
+          <li>Addition : <code>1/2 + 1/12 = 6/12 + 1/12 = 7/12</code>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Puissances et notation scientifique",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Définition d'une puissance</h2>
+        ${lc.def("Puissance", `<p>Pour <code>a</code> nombre et <code>n</code> entier positif, <code>a^n</code> est le produit de <code>n</code> facteurs égaux à <code>a</code>.</p>`)}
+        ${lc.formula("a<sup>n</sup> &nbsp;=&nbsp; a × a × … × a &nbsp;&nbsp; (n facteurs)")}
+        ${lc.example("Quelques puissances", `<ul>
+          <li><code>2³ = 2 × 2 × 2 = 8</code></li>
+          <li><code>5² = 5 × 5 = 25</code></li>
+          <li><code>10⁴ = 10 × 10 × 10 × 10 = 10 000</code></li>
+          <li><code>(−3)² = (−3) × (−3) = +9</code></li>
+        </ul>`)}
+        ${lc.def("Cas particuliers", `<ul>
+          <li><code>a¹ = a</code> (par convention).</li>
+          <li><code>a⁰ = 1</code> pour tout <code>a ≠ 0</code> (par convention).</li>
+          <li><code>1ⁿ = 1</code> pour tout <code>n</code>.</li>
+        </ul>`)}
+
+        <h2>2. Puissances négatives</h2>
+        ${lc.def("Puissance négative", `<p>Pour <code>n</code> entier positif et <code>a ≠ 0</code> :</p>`)}
+        ${lc.formula("a<sup>−n</sup> &nbsp;=&nbsp; 1 / a<sup>n</sup>")}
+        ${lc.example("Calcul", `<ul>
+          <li><code>10⁻¹ = 1/10 = 0,1</code></li>
+          <li><code>10⁻² = 1/100 = 0,01</code></li>
+          <li><code>2⁻³ = 1/2³ = 1/8 = 0,125</code></li>
+        </ul>`)}
+
+        <h2>3. Règles de calcul (puissances de même base)</h2>
+        ${lc.prop("Trois règles essentielles", `<ul>
+          <li><code>a<sup>m</sup> × a<sup>n</sup> = a<sup>m+n</sup></code> (on additionne les exposants)</li>
+          <li><code>a<sup>m</sup> ÷ a<sup>n</sup> = a<sup>m−n</sup></code> (on soustrait)</li>
+          <li><code>(a<sup>m</sup>)<sup>n</sup> = a<sup>m×n</sup></code> (on multiplie)</li>
+        </ul>`)}
+        ${lc.example("Simplifier 2³ × 2⁵", `<p><code>= 2<sup>3+5</sup> = 2⁸ = 256</code>.</p>`)}
+        ${lc.example("Simplifier 10⁷ ÷ 10⁴", `<p><code>= 10<sup>7−4</sup> = 10³ = 1000</code>.</p>`)}
+        ${lc.warn("Ne pas confondre", `<p><code>2³ × 5³</code> ne s'additionne <strong>pas</strong> en exposant : ce sont des bases différentes (2 et 5). Ici on a <code>(2 × 5)³ = 10³</code>.</p>`)}
+
+        <h2>4. Puissances de 10</h2>
+        ${lc.prop("Règle simple", `<p>Pour <code>n</code> entier positif :</p>
+          <ul><li><code>10ⁿ</code> = <code>1</code> suivi de <code>n</code> zéros.</li>
+          <li><code>10⁻ⁿ</code> = <code>0,</code> avec <code>n−1</code> zéros puis un <code>1</code>.</li></ul>`)}
+        ${lc.example("Quelques puissances de 10", `<ul>
+          <li><code>10³ = 1 000</code></li>
+          <li><code>10⁶ = 1 000 000</code></li>
+          <li><code>10⁻³ = 0,001</code></li>
+          <li><code>10⁻⁶ = 0,000 001</code></li>
+        </ul>`)}
+
+        <h2>5. Notation scientifique</h2>
+        ${lc.def("Notation scientifique", `<p>Un nombre est en <strong>notation scientifique</strong> s'il est écrit sous la forme :</p>`)}
+        ${lc.formula("a × 10<sup>n</sup> &nbsp;&nbsp; avec &nbsp; 1 ≤ |a| < 10 &nbsp;&nbsp; et &nbsp;n entier")}
+        ${lc.example("Convertir en notation scientifique", `<ul>
+          <li><code>4 530 = 4,53 × 10³</code></li>
+          <li><code>0,0072 = 7,2 × 10⁻³</code></li>
+          <li><code>−128 000 = −1,28 × 10⁵</code></li>
+        </ul>`)}
+        ${lc.tip("Pour quoi c'est utile ?", `<p>Pour exprimer commodément des nombres très grands ou très petits (distances en astronomie, masses des atomes…). Comparer deux nombres en notation scientifique est aussi très rapide : on compare l'exposant.</p>`)}
+        ${lc.example("Comparer 3,2 × 10⁷ et 8,4 × 10⁶", `<p>Les exposants : 7 et 6. Comme <code>7 > 6</code>, le premier est plus grand. Donc <code>3,2 × 10⁷ > 8,4 × 10⁶</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Calcul littéral : développement",
+      category: "Calcul littéral",
+      content: `
+        <h2>1. Développer, c'est quoi ?</h2>
+        ${lc.def("Développement", `<p><strong>Développer</strong> une expression littérale, c'est transformer un produit en une somme. C'est l'opération inverse de la <strong>factorisation</strong>.</p>`)}
+
+        <h2>2. Distributivité simple</h2>
+        ${lc.prop("Règle clé", `<p>Pour tous nombres <code>k, a, b</code> :</p>`)}
+        ${lc.formula("k × (a + b) &nbsp;=&nbsp; k × a + k × b<br>k × (a − b) &nbsp;=&nbsp; k × a − k × b")}
+        ${lc.example("Développer 3(x + 5)", `<p><code>3(x + 5) = 3 × x + 3 × 5 = 3x + 15</code>.</p>`)}
+        ${lc.example("Développer −2(y − 4)", `<p><code>−2(y − 4) = −2 × y + (−2) × (−4) = −2y + 8</code>.</p>
+          <p>Attention : <code>−2 × (−4) = +8</code> (règle des signes).</p>`)}
+
+        <h2>3. Distributivité double</h2>
+        ${lc.prop("Règle plus générale", `<p>Pour tous nombres <code>a, b, c, d</code> :</p>`)}
+        ${lc.formula("(a + b)(c + d) &nbsp;=&nbsp; ac + ad + bc + bd")}
+        ${lc.example("Développer (x + 2)(x + 3)", `<ol><li>On distribue chaque terme du premier facteur sur chaque terme du deuxième :</li>
+          <li><code>= x × x + x × 3 + 2 × x + 2 × 3</code></li>
+          <li><code>= x² + 3x + 2x + 6</code></li>
+          <li>On réduit : <code>= x² + 5x + 6</code>.</li></ol>`)}
+        ${lc.example("Développer (x − 4)(2x + 1)", `<ol><li><code>= x × 2x + x × 1 + (−4) × 2x + (−4) × 1</code></li>
+          <li><code>= 2x² + x − 8x − 4</code></li>
+          <li><code>= 2x² − 7x − 4</code>.</li></ol>`)}
+        ${lc.tip("Astuce mnémotechnique", `<p>« P-O-I-G-N-E-T » ou « FOIL » en anglais : Premiers, Extérieurs, Intérieurs, Derniers. <code>(a + b)(c + d)</code> → <code>ac + ad + bc + bd</code>.</p>`)}
+
+        <h2>4. Réduire après développement</h2>
+        ${lc.prop("Toujours après distribution", `<p>Après avoir développé, on regroupe les termes de même nature (mêmes lettres, même exposant).</p>`)}
+        ${lc.example("Développer puis réduire 3(x + 2) − 5(x − 1)", `<ol><li>Développer chaque terme : <code>3x + 6 − 5x + 5</code>.</li>
+          <li>Regrouper en x : <code>3x − 5x = −2x</code>.</li>
+          <li>Regrouper les constantes : <code>6 + 5 = 11</code>.</li>
+          <li>Résultat : <code>−2x + 11</code>.</li></ol>`)}
+        ${lc.warn("Erreur classique", `<p>Quand un signe « − » précède une parenthèse, il <strong>change le signe</strong> de chaque terme à l'intérieur. <code>−(2x − 5) = −2x + 5</code> (et non <code>−2x − 5</code>).</p>`)}
+
+        <h2>5. Pourquoi développer ?</h2>
+        ${lc.tip("Utilités", `<ul>
+          <li>Réduire pour comparer ou simplifier une expression.</li>
+          <li>Vérifier qu'une expression est bien identique à une autre.</li>
+          <li>Étape souvent nécessaire avant de résoudre une équation avec parenthèses.</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Équations du 1er degré",
+      category: "Calcul littéral",
+      content: `
+        <h2>1. Qu'est-ce qu'une équation ?</h2>
+        ${lc.def("Équation", `<p>Une <strong>équation</strong> est une égalité contenant une ou plusieurs <strong>inconnues</strong> (souvent <code>x</code>). <strong>Résoudre</strong> l'équation, c'est trouver toutes les valeurs de l'inconnue qui rendent l'égalité vraie.</p>`)}
+        ${lc.example("L'équation 3x + 5 = 14", `<p>Pour <code>x = 3</code> : <code>3 × 3 + 5 = 14</code> ✓ (vraie). Donc <code>x = 3</code> est <strong>solution</strong>.</p>`)}
+
+        <h2>2. Principe : conserver l'équilibre</h2>
+        ${lc.prop("Règle d'or", `<p>On peut, sans changer les solutions :</p>
+          <ul><li>ajouter (ou soustraire) un même nombre aux <strong>deux membres</strong> ;</li>
+          <li>multiplier (ou diviser) les deux membres par un même nombre <strong>non nul</strong>.</li></ul>
+          <p>Comme une balance : ce qu'on fait d'un côté, on doit le faire de l'autre.</p>`)}
+
+        <h2>3. Résoudre ax + b = c</h2>
+        ${lc.prop("Méthode en 2 étapes", `<ol>
+          <li><strong>Isoler le terme en x</strong> : on retire <code>b</code> des deux côtés. On obtient <code>ax = c − b</code>.</li>
+          <li><strong>Diviser par a</strong> : <code>x = (c − b) / a</code>.</li>
+        </ol>`)}
+        ${lc.example("Résoudre 3x + 5 = 17", `<ol><li>Retirer 5 : <code>3x = 17 − 5 = 12</code>.</li>
+          <li>Diviser par 3 : <code>x = 12 / 3 = 4</code>.</li>
+          <li>Vérification : <code>3 × 4 + 5 = 17</code> ✓.</li></ol>`)}
+        ${lc.example("Résoudre 7 − 2x = 3", `<ol><li>Retirer 7 : <code>−2x = 3 − 7 = −4</code>.</li>
+          <li>Diviser par −2 : <code>x = −4 / (−2) = 2</code>.</li></ol>`)}
+
+        <h2>4. Avec des x des deux côtés</h2>
+        ${lc.prop("Méthode", `<p>On regroupe les <code>x</code> d'un côté et les nombres de l'autre.</p>`)}
+        ${lc.example("Résoudre 5x + 2 = 3x + 14", `<ol><li>On enlève <code>3x</code> aux deux membres : <code>2x + 2 = 14</code>.</li>
+          <li>On enlève 2 : <code>2x = 12</code>.</li>
+          <li>On divise par 2 : <code>x = 6</code>.</li></ol>`)}
+
+        <h2>5. Avec parenthèses</h2>
+        ${lc.example("Résoudre 2(x + 3) = 5x − 6", `<ol><li>Développer : <code>2x + 6 = 5x − 6</code>.</li>
+          <li>Regrouper les x à droite : <code>6 = 5x − 6 − 2x = 3x − 6</code>.</li>
+          <li>Ajouter 6 : <code>12 = 3x</code>.</li>
+          <li>Diviser par 3 : <code>x = 4</code>.</li></ol>`)}
+
+        <h2>6. Mettre un problème en équation</h2>
+        ${lc.prop("Méthode", `<ol>
+          <li>Choisir l'inconnue : « Soit <code>x</code> le nombre cherché ».</li>
+          <li>Traduire l'énoncé en équation.</li>
+          <li>Résoudre.</li>
+          <li>Conclure en revenant à l'énoncé.</li>
+        </ol>`)}
+        ${lc.example("Problème", `<p>« Le triple d'un nombre, augmenté de 7, vaut 25. Quel est ce nombre ? »</p>
+          <ol><li>Soit <code>x</code> le nombre.</li>
+          <li>Équation : <code>3x + 7 = 25</code>.</li>
+          <li>Résolution : <code>3x = 18</code>, donc <code>x = 6</code>.</li>
+          <li>Conclusion : le nombre cherché est <strong>6</strong>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Théorème de Pythagore",
+      category: "Géométrie",
+      content: `
+        <h2>1. Vocabulaire (rappel)</h2>
+        ${lc.def("Triangle rectangle", `<p>Un <strong>triangle rectangle</strong> a un angle droit. Le côté opposé à l'angle droit s'appelle l'<strong>hypoténuse</strong> ; c'est toujours le plus long des trois côtés.</p>
+          <p>Les deux autres côtés (qui forment l'angle droit) s'appellent les <strong>côtés de l'angle droit</strong>.</p>`)}
+
+        <h2>2. Énoncé du théorème</h2>
+        ${lc.prop("Théorème de Pythagore", `<p>Si un triangle <code>ABC</code> est rectangle en <code>A</code>, alors :</p>`)}
+        ${lc.formula("BC² &nbsp;=&nbsp; AB² + AC²")}
+        <p>Le carré de l'hypoténuse est égal à la somme des carrés des deux autres côtés.</p>
+        ${lc.tip("Pour bien identifier", `<p>L'<strong>hypoténuse</strong>, c'est <code>BC</code> ici (opposée à l'angle droit en <code>A</code>). Sur la formule, c'est toujours le côté seul à gauche.</p>`)}
+
+        <h2>3. Calculer la longueur de l'hypoténuse</h2>
+        ${lc.example("ABC rectangle en A, AB = 3 cm, AC = 4 cm. Calculer BC.", `<ol>
+          <li>Pythagore : <code>BC² = AB² + AC² = 3² + 4² = 9 + 16 = 25</code>.</li>
+          <li>Donc <code>BC = √25 = 5 cm</code>.</li>
+        </ol>`)}
+
+        <h2>4. Calculer un côté de l'angle droit</h2>
+        ${lc.prop("Méthode", `<p>On part de la formule, puis on isole le côté cherché par soustraction.</p>`)}
+        ${lc.example("ABC rectangle en A, BC = 13 cm, AB = 5 cm. Calculer AC.", `<ol>
+          <li>Pythagore : <code>BC² = AB² + AC²</code>, soit <code>13² = 5² + AC²</code>.</li>
+          <li><code>169 = 25 + AC²</code>, donc <code>AC² = 169 − 25 = 144</code>.</li>
+          <li><code>AC = √144 = 12 cm</code>.</li>
+        </ol>`)}
+        ${lc.warn("Côté ou hypoténuse ?", `<p>Quand on cherche un côté de l'angle droit, on <strong>soustrait</strong> les carrés (hypoténuse² − autre côté²). Quand on cherche l'hypoténuse, on <strong>additionne</strong>. Identifie bien quel côté est l'hypoténuse !</p>`)}
+
+        <h2>5. Réciproque : montrer qu'un triangle est rectangle</h2>
+        ${lc.prop("Réciproque du théorème de Pythagore", `<p>Si dans un triangle <code>ABC</code>, <code>BC² = AB² + AC²</code> (où <code>BC</code> est le plus grand côté), alors le triangle est <strong>rectangle en A</strong>.</p>`)}
+        ${lc.example("Le triangle de côtés 6, 8, 10 cm est-il rectangle ?", `<ol>
+          <li>Le plus grand côté est 10. On vérifie : <code>10² =? 6² + 8²</code>.</li>
+          <li><code>100 =? 36 + 64 = 100</code> ✓</li>
+          <li>Donc <strong>oui</strong>, le triangle est rectangle (l'angle droit est opposé au côté de 10 cm).</li>
+        </ol>`)}
+        ${lc.example("Le triangle de côtés 5, 6, 8 cm est-il rectangle ?", `<ol>
+          <li>Plus grand côté : 8. On teste : <code>8² =? 5² + 6²</code>.</li>
+          <li><code>64 =? 25 + 36 = 61</code>. <strong>Non égal.</strong></li>
+          <li>Donc le triangle n'est <strong>pas</strong> rectangle.</li>
+        </ol>`)}
+
+        <h2>6. Quelques triangles rectangles à mémoriser</h2>
+        ${lc.tip("Triplets pythagoriciens classiques", `<p>Triangles dont les côtés sont des entiers et qui sont rectangles :</p>
+          <ul><li>(3, 4, 5)</li>
+          <li>(5, 12, 13)</li>
+          <li>(8, 15, 17)</li>
+          <li>(7, 24, 25)</li>
+          <li>Et tous leurs multiples : (6, 8, 10), (9, 12, 15)…</li></ul>`)}
+      `,
+    },
+
+    {
+      title: "Théorème de Thalès (configuration de base)",
+      category: "Géométrie",
+      content: `
+        <h2>1. La configuration</h2>
+        ${lc.def("Configuration de Thalès", `<p>On a deux droites <code>(d)</code> et <code>(d')</code> qui se coupent en un point <code>A</code>. Sur <code>(d)</code>, on place deux points <code>B</code> et <code>M</code>. Sur <code>(d')</code>, deux points <code>C</code> et <code>N</code>. La configuration est valide si <strong>(BC) est parallèle à (MN)</strong>.</p>`)}
+        ${lc.tip("Visualisation", `<p>Imagine deux triangles emboîtés qui partagent le sommet <code>A</code>. Les bases <code>(BC)</code> et <code>(MN)</code> sont parallèles, et les côtés sont alignés sur les mêmes droites passant par <code>A</code>.</p>`)}
+
+        <h2>2. Énoncé du théorème</h2>
+        ${lc.prop("Théorème de Thalès", `<p>Dans la configuration ci-dessus, si <code>(BC) ∥ (MN)</code>, alors les rapports des longueurs sont égaux :</p>`)}
+        ${lc.formula("AM/AB &nbsp;=&nbsp; AN/AC &nbsp;=&nbsp; MN/BC")}
+        ${lc.warn("Cohérence des rapports", `<p>On forme les rapports en partant <strong>toujours du même côté</strong> : du « petit » triangle (avec M, N) au « grand » (avec B, C), ou l'inverse, mais cohérent partout. Sinon le rapport est inversé.</p>`)}
+
+        <h2>3. Calculer une longueur manquante</h2>
+        ${lc.example("Application", `<p>On a <code>AM = 3 cm</code>, <code>AB = 5 cm</code>, <code>AN = 4 cm</code> et <code>(BC) ∥ (MN)</code>. Calculer <code>AC</code>.</p>
+          <ol><li>D'après Thalès : <code>AM/AB = AN/AC</code>.</li>
+          <li>Soit <code>3/5 = 4/AC</code>.</li>
+          <li>En croix : <code>3 × AC = 5 × 4 = 20</code>.</li>
+          <li>Donc <code>AC = 20/3 ≈ 6,67 cm</code>.</li></ol>`)}
+
+        <h2>4. Calculer MN</h2>
+        ${lc.example("Calculer la base parallèle", `<p>Avec <code>AM/AB = MN/BC</code>. On a <code>AM = 4</code>, <code>AB = 6</code>, <code>BC = 9</code>. Calculer <code>MN</code>.</p>
+          <ol><li><code>4/6 = MN/9</code>, soit <code>2/3 = MN/9</code>.</li>
+          <li><code>MN = (2 × 9)/3 = 18/3 = 6</code>.</li>
+          <li>Donc <code>MN = 6 cm</code>.</li></ol>`)}
+
+        <h2>5. Configuration en « papillon »</h2>
+        ${lc.def("Configuration papillon", `<p>Si les points <code>B</code> et <code>M</code> sont de part et d'autre de <code>A</code> (et idem pour <code>C</code> et <code>N</code>), on parle de configuration « papillon ». Le théorème s'applique quand même, à condition que <code>(BC) ∥ (MN)</code>.</p>`)}
+        ${lc.tip("Pareil mais inversé", `<p>Le calcul est identique. Visuellement, les triangles sont symétriques par rapport à <code>A</code>.</p>`)}
+
+        <h2>6. Pourquoi c'est utile ?</h2>
+        ${lc.example("Hauteur d'un arbre", `<p>On peut mesurer indirectement la hauteur d'un arbre en se servant de l'ombre. Si on mesure son ombre (10 m) et l'ombre d'un bâton (1 m de haut, 1,5 m d'ombre), on a une configuration de Thalès : <code>hauteur arbre / 1 = 10 / 1,5</code>, soit <code>arbre ≈ 6,67 m</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Cosinus dans le triangle rectangle",
+      category: "Géométrie",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Cosinus d'un angle aigu", `<p>Dans un triangle rectangle, pour un angle aigu <code>α</code> :</p>`)}
+        ${lc.formula("cos(α) &nbsp;=&nbsp; (côté adjacent) / (hypoténuse)")}
+        <p>Le <strong>côté adjacent</strong> à <code>α</code> est celui qui forme l'angle avec l'hypoténuse (et qui n'est pas l'hypoténuse).</p>
+        ${lc.tip("Repérage", `<p>L'<strong>hypoténuse</strong> est toujours opposée à l'angle droit (le grand côté). Le <strong>côté opposé</strong> à <code>α</code> est celui qui ne touche pas <code>α</code>. Le reste, c'est l'<strong>adjacent</strong>.</p>`)}
+
+        <h2>2. Propriétés du cosinus</h2>
+        ${lc.prop("Encadrement", `<p>Pour tout angle aigu α (entre 0° et 90°) : <code>0 < cos(α) < 1</code>.</p>
+          <p>Quelques valeurs particulières :</p>
+          <ul><li><code>cos(0°) = 1</code></li>
+          <li><code>cos(60°) = 0,5</code></li>
+          <li><code>cos(90°) = 0</code></li></ul>`)}
+
+        <h2>3. Calculer un cosinus à partir des longueurs</h2>
+        ${lc.example("Triangle rectangle", `<p>Triangle <code>ABC</code> rectangle en <code>C</code>. Pour l'angle <code>α</code> en <code>A</code> : adjacent = <code>AC</code>, hypoténuse = <code>AB</code>. Si <code>AC = 4</code> et <code>AB = 5</code> :</p>
+          <p><code>cos(α) = AC / AB = 4 / 5 = 0,8</code>.</p>`)}
+
+        <h2>4. Trouver un angle (cos⁻¹)</h2>
+        ${lc.prop("Avec la calculatrice", `<p>Quand on connaît <code>cos(α)</code>, on retrouve <code>α</code> avec la touche <strong>cos⁻¹</strong> (parfois notée <strong>arccos</strong> ou <strong>acos</strong>).</p>`)}
+        ${lc.example("Calculer l'angle α tel que cos(α) = 0,8", `<p>Sur la calculatrice : <code>α = cos⁻¹(0,8) ≈ 36,87°</code>.</p>
+          <p>Penser à régler la calculatrice en <strong>degrés</strong> (DEG), pas en radians.</p>`)}
+
+        <h2>5. Trouver une longueur</h2>
+        ${lc.example("Connaissant l'angle et l'hypoténuse", `<p>Triangle rectangle, hypoténuse = 10 cm, angle α = 30°. Calculer le côté adjacent à α.</p>
+          <ol><li><code>cos(30°) = adjacent / 10</code>.</li>
+          <li>Donc <code>adjacent = 10 × cos(30°) ≈ 10 × 0,866 ≈ 8,66 cm</code>.</li></ol>`)}
+        ${lc.example("Connaissant l'angle et l'adjacent", `<p>Adjacent = 6 cm, angle = 40°. Calculer l'hypoténuse.</p>
+          <ol><li><code>cos(40°) = 6 / hypoténuse</code>.</li>
+          <li><code>hypoténuse = 6 / cos(40°) ≈ 6 / 0,766 ≈ 7,83 cm</code>.</li></ol>`)}
+
+        <h2>6. Erreurs à éviter</h2>
+        ${lc.warn("Bien identifier les côtés", `<p>L'erreur la plus fréquente : confondre adjacent et opposé. <strong>Toujours partir de l'angle considéré</strong> et regarder : quel côté touche l'angle (sans être l'hypoténuse) ? C'est l'adjacent.</p>`)}
+        ${lc.warn("Mode de la calculatrice", `<p>Si tu obtiens un résultat aberrant, vérifie que ta calculatrice est en mode <strong>DEG</strong> (degrés) et non RAD (radians) ou GRAD.</p>`)}
+      `,
+    },
+
+    {
+      title: "Translations",
+      category: "Géométrie",
+      content: `
+        <h2>1. Qu'est-ce qu'une translation ?</h2>
+        ${lc.def("Translation", `<p>Une <strong>translation</strong> est un déplacement <em>en ligne droite</em> de toute une figure, dans une <strong>direction</strong>, un <strong>sens</strong> et une <strong>distance</strong> donnés. On parle aussi de « glissement ».</p>`)}
+        ${lc.tip("Image", `<p>Pousser un meuble droit devant toi sans le tourner : c'est une translation. Les rails d'un train qui glisse : tous les wagons subissent la même translation.</p>`)}
+
+        <h2>2. Image d'un point par une translation</h2>
+        ${lc.def("Image", `<p>L'<strong>image</strong> d'un point <code>A</code> par la translation qui transforme un point <code>P</code> en un point <code>P'</code> est le point <code>A'</code> tel que les segments <code>[AA']</code> et <code>[PP']</code> soient <strong>parallèles, de même longueur et de même sens</strong>.</p>`)}
+        ${lc.tip("Idée pratique", `<p>Si la translation envoie <code>P</code> sur <code>P'</code> en allant « 4 cm vers la droite », alors elle envoie tous les autres points de la même façon : 4 cm vers la droite.</p>`)}
+
+        <h2>3. Construire le translaté d'un point</h2>
+        ${lc.prop("Méthode (équerre + règle)", `<ol>
+          <li>Tracer une parallèle à <code>(PP')</code> passant par <code>A</code>.</li>
+          <li>Sur cette parallèle, du même côté que <code>P'</code>, reporter une distance égale à <code>PP'</code>.</li>
+          <li>Le point obtenu est <code>A'</code>.</li>
+        </ol>`)}
+
+        <h2>4. Propriétés de conservation</h2>
+        ${lc.prop("La translation conserve", `<ul>
+          <li>les <strong>longueurs</strong> ;</li>
+          <li>les <strong>angles</strong> ;</li>
+          <li>l'<strong>aire</strong> et le <strong>périmètre</strong> ;</li>
+          <li>le <strong>parallélisme</strong> et la <strong>perpendicularité</strong> ;</li>
+          <li>le <strong>sens</strong> (un sens horaire reste horaire — contrairement aux symétries).</li>
+        </ul>`)}
+        ${lc.tip("En résumé", `<p>Une translation déplace une figure sans la déformer ni la retourner. La figure-image est <em>parfaitement identique</em> à l'originale, juste positionnée ailleurs.</p>`)}
+
+        <h2>5. Image d'une figure</h2>
+        ${lc.example("Translater un triangle", `<p>Soit le triangle <code>ABC</code>. Pour construire son image <code>A'B'C'</code> par une translation donnée :</p>
+          <ol><li>Construire l'image <code>A'</code> de <code>A</code>.</li>
+          <li>Construire l'image <code>B'</code> de <code>B</code>.</li>
+          <li>Construire l'image <code>C'</code> de <code>C</code>.</li>
+          <li>Tracer le triangle <code>A'B'C'</code>.</li></ol>`)}
+
+        <h2>6. Translation et parallélogramme</h2>
+        ${lc.prop("Caractérisation par le parallélogramme", `<p>L'image d'un point <code>A</code> par la translation qui transforme <code>P</code> en <code>P'</code> est l'unique point <code>A'</code> tel que <code>APP'A'</code> soit un <strong>parallélogramme</strong> (à condition que <code>A</code> ne soit pas sur la droite <code>(PP')</code>).</p>`)}
+        ${lc.tip("Pourquoi ?", `<p>Parce que dans un parallélogramme, les côtés opposés sont parallèles ET de même longueur. Or c'est exactement ce que demande la définition de la translation.</p>`)}
+      `,
+    },
+
+    {
+      title: "Proportionnalité avancée",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Tableau de proportionnalité</h2>
+        ${lc.def("Tableau de proportionnalité", `<p>Un tableau à deux lignes est un <strong>tableau de proportionnalité</strong> si on passe de la première ligne à la deuxième en multipliant <strong>toujours par le même nombre</strong> (le coefficient).</p>`)}
+        ${lc.example("Reconnaître", `<p>Tableau : 2 → 6, 5 → 15, 8 → 24. Rapport : <code>6/2 = 3</code>, <code>15/5 = 3</code>, <code>24/8 = 3</code>. Coefficient : <strong>3</strong>. Le tableau est proportionnel.</p>`)}
+
+        <h2>2. Le coefficient de proportionnalité</h2>
+        ${lc.prop("Calcul", `<p>Le <strong>coefficient</strong> est le rapport <code>y/x</code> (constant pour toutes les colonnes). Une fois trouvé, il permet de calculer toute valeur manquante.</p>`)}
+        ${lc.example("Avec un coefficient", `<p>1 kg de pommes coûte 3 €. Coefficient = 3 €/kg. Combien pour 7 kg ? <code>7 × 3 = 21 €</code>.</p>`)}
+
+        <h2>3. La 4e proportionnelle (produit en croix)</h2>
+        ${lc.prop("Méthode du produit en croix", `<p>Si trois valeurs d'un tableau de proportionnalité sont connues, on calcule la 4e par <strong>produit en croix</strong> :</p>`)}
+        ${lc.formula("a/b &nbsp;=&nbsp; c/d &nbsp;⇔&nbsp; a × d = b × c &nbsp;⇒&nbsp; d = (b × c) / a")}
+        ${lc.example("Recette", `<p>Pour 4 personnes, il faut 200 g de farine. Pour 7 personnes, combien ?</p>
+          <ol><li>Tableau : 4 → 200, 7 → ?.</li>
+          <li>Produit en croix : <code>? = (200 × 7) / 4 = 1400 / 4 = 350 g</code>.</li></ol>`)}
+
+        <h2>4. Pourcentages comme proportionnalité</h2>
+        ${lc.prop("Lien", `<p>Calculer <code>p%</code> de <code>n</code> revient à appliquer un coefficient de proportionnalité égal à <code>p/100</code>.</p>`)}
+        ${lc.example("Application", `<p>Calculer 17 % de 80 : coefficient = 17/100 = 0,17. Donc <code>0,17 × 80 = 13,6</code>.</p>`)}
+        ${lc.example("Augmentation et réduction", `<p>Augmenter de 12 % = multiplier par <code>1,12</code>. Réduire de 12 % = multiplier par <code>0,88</code>.</p>
+          <p>Un prix de 200 € augmenté de 12 % : <code>200 × 1,12 = 224 €</code>.</p>`)}
+
+        <h2>5. Vitesse, distance, temps</h2>
+        ${lc.prop("Formules", `<ul>
+          <li><code>distance = vitesse × temps</code></li>
+          <li><code>vitesse = distance / temps</code></li>
+          <li><code>temps = distance / vitesse</code></li>
+        </ul>
+          <p>À vitesse constante, la distance est proportionnelle au temps.</p>`)}
+        ${lc.example("Calculer une distance", `<p>Voiture roulant à 80 km/h pendant 2 h 30 min (= 2,5 h). Distance = <code>80 × 2,5 = 200 km</code>.</p>`)}
+        ${lc.example("Convertir des unités", `<p>Pour passer de m/s à km/h : <strong>multiplier par 3,6</strong>. Pour passer de km/h à m/s : <strong>diviser par 3,6</strong>.</p>
+          <p>10 m/s = <code>10 × 3,6 = 36 km/h</code>.</p>`)}
+
+        <h2>6. Échelles</h2>
+        ${lc.def("Échelle", `<p>Une <strong>échelle</strong> est un coefficient de proportionnalité entre une longueur sur le plan/maquette et la longueur réelle.</p>`)}
+        ${lc.example("Échelle 1/200", `<p>1 cm sur le plan = 200 cm = 2 m en réalité. Si une distance fait 5 cm sur le plan, elle fait <code>5 × 2 = 10 m</code> en réalité.</p>`)}
+      `,
+    },
+
+    {
+      title: "Statistiques : moyenne",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Série statistique", `<p>Une <strong>série statistique</strong> est une liste de valeurs (chiffres) obtenues lors d'une enquête ou d'une mesure.</p>`)}
+        <p>Exemple : notes d'un élève sur 6 contrôles : 12, 14, 9, 15, 11, 13.</p>
+
+        <h2>2. La moyenne (simple)</h2>
+        ${lc.def("Moyenne", `<p>La <strong>moyenne</strong> d'une série statistique est égale à la <strong>somme des valeurs</strong> divisée par leur <strong>nombre</strong>.</p>`)}
+        ${lc.formula("moyenne &nbsp;=&nbsp; (somme des valeurs) / (nombre de valeurs)")}
+        ${lc.example("Calculer la moyenne", `<p>Notes : 12, 14, 9, 15, 11, 13.</p>
+          <ol><li>Somme : <code>12 + 14 + 9 + 15 + 11 + 13 = 74</code>.</li>
+          <li>Nombre : <code>6</code>.</li>
+          <li>Moyenne : <code>74 / 6 ≈ 12,33</code>.</li></ol>`)}
+
+        <h2>3. Moyenne pondérée (avec effectifs)</h2>
+        ${lc.def("Moyenne pondérée", `<p>Quand certaines valeurs apparaissent plusieurs fois (ou ont des coefficients différents), on les multiplie par leur <strong>effectif</strong> (ou poids) avant d'additionner.</p>`)}
+        ${lc.formula("moyenne &nbsp;=&nbsp; (somme des (valeur × effectif)) / (effectif total)")}
+        ${lc.example("Notes pondérées", `<p>Maths : 12 (coefficient 4). Français : 14 (coef 3). Histoire : 10 (coef 2).</p>
+          <ol><li>Somme pondérée : <code>12 × 4 + 14 × 3 + 10 × 2 = 48 + 42 + 20 = 110</code>.</li>
+          <li>Total des coefficients : <code>4 + 3 + 2 = 9</code>.</li>
+          <li>Moyenne : <code>110 / 9 ≈ 12,22</code>.</li></ol>`)}
+        ${lc.example("Notes en série", `<p>Sur 20 élèves, 5 ont eu 12, 8 ont eu 14, 7 ont eu 16. Moyenne ?</p>
+          <p>Somme : <code>5 × 12 + 8 × 14 + 7 × 16 = 60 + 112 + 112 = 284</code>. Effectif : 20. Moyenne : <code>284 / 20 = 14,2</code>.</p>`)}
+
+        <h2>4. Quelques propriétés</h2>
+        ${lc.prop("Propriétés utiles", `<ul>
+          <li>La moyenne est toujours <strong>comprise</strong> entre la valeur minimale et la valeur maximale de la série.</li>
+          <li>Si on ajoute la même valeur <code>k</code> à toutes les données, la moyenne augmente aussi de <code>k</code>.</li>
+          <li>Si on multiplie toutes les valeurs par <code>k</code>, la moyenne aussi.</li>
+        </ul>`)}
+
+        <h2>5. La moyenne ne suffit pas !</h2>
+        ${lc.warn("Limite de la moyenne", `<p>Deux séries peuvent avoir la <strong>même moyenne</strong> mais être très différentes.</p>
+          <p>Série A : 10, 10, 10, 10, 10. Moyenne = 10.</p>
+          <p>Série B : 0, 5, 10, 15, 20. Moyenne = 10 aussi, mais beaucoup plus dispersée.</p>
+          <p>D'où l'intérêt de regarder aussi la <strong>médiane</strong> (vue en 3e) ou l'<strong>étendue</strong>.</p>`)}
+
+        <h2>6. Étendue</h2>
+        ${lc.def("Étendue", `<p>L'<strong>étendue</strong> d'une série est la différence entre la plus grande et la plus petite valeur.</p>`)}
+        ${lc.example("Étendue", `<p>Pour la série 12, 14, 9, 15, 11, 13 : étendue = <code>15 − 9 = 6</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Probabilités (introduction)",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Expérience aléatoire", `<p>Une <strong>expérience aléatoire</strong> est une expérience dont on ne peut pas prédire le résultat à l'avance, mais dont on connaît tous les résultats possibles.</p>
+          <p>Exemples : lancer un dé, tirer une carte, jouer à pile ou face.</p>`)}
+        ${lc.def("Issue", `<p>Une <strong>issue</strong> est l'un des résultats possibles d'une expérience aléatoire.</p>
+          <p>Lancer d'un dé : 6 issues (1, 2, 3, 4, 5, 6).</p>`)}
+        ${lc.def("Événement", `<p>Un <strong>événement</strong> est un ensemble d'issues. Exemple, pour un dé : « obtenir un nombre pair » est un événement composé des issues {2, 4, 6}.</p>`)}
+
+        <h2>2. Calculer une probabilité (cas équiprobable)</h2>
+        ${lc.prop("Formule", `<p>Quand toutes les issues ont la même chance d'apparaître (situation <strong>équiprobable</strong>), la probabilité d'un événement <code>A</code> est :</p>`)}
+        ${lc.formula("P(A) &nbsp;=&nbsp; (nombre d'issues favorables à A) / (nombre total d'issues)")}
+        <p>Une probabilité est toujours un nombre entre <code>0</code> et <code>1</code> (ou en pourcentage, entre 0 % et 100 %).</p>
+
+        <h2>3. Exemples classiques</h2>
+        ${lc.example("Lancer d'un dé", `<p>Probabilité d'obtenir un 6 ?</p>
+          <p>1 issue favorable (le 6), 6 issues totales. Donc <code>P = 1/6 ≈ 0,167</code> (≈ 16,7 %).</p>`)}
+        ${lc.example("Nombre pair", `<p>Probabilité d'obtenir un nombre pair en lançant un dé ?</p>
+          <p>3 issues favorables {2, 4, 6}, 6 issues totales. Donc <code>P = 3/6 = 1/2</code> (50 %).</p>`)}
+        ${lc.example("Tirer une carte", `<p>Dans un jeu de 32 cartes, probabilité de tirer un roi ?</p>
+          <p>4 rois, 32 cartes : <code>P = 4/32 = 1/8</code> = 0,125 (12,5 %).</p>`)}
+
+        <h2>4. Événement certain, impossible</h2>
+        ${lc.def("Événements particuliers", `<ul>
+          <li><strong>Certain</strong> : il se réalise toujours. Probabilité = <code>1</code>.</li>
+          <li><strong>Impossible</strong> : il ne se réalise jamais. Probabilité = <code>0</code>.</li>
+        </ul>`)}
+        ${lc.example("Exemples", `<ul><li>Avec un dé : « obtenir un nombre entre 1 et 6 » est certain (<code>P = 1</code>).</li>
+          <li>« Obtenir un 7 » est impossible (<code>P = 0</code>).</li></ul>`)}
+
+        <h2>5. Événement contraire</h2>
+        ${lc.def("Événement contraire", `<p>L'<strong>événement contraire</strong> de <code>A</code>, noté <code>Ā</code> (« A barre »), est l'événement « <code>A</code> ne se réalise pas ».</p>`)}
+        ${lc.formula("P(Ā) &nbsp;=&nbsp; 1 − P(A)")}
+        ${lc.example("Tirage", `<p>Si <code>P(« tirer un roi ») = 1/8</code>, alors <code>P(« ne pas tirer un roi ») = 1 − 1/8 = 7/8</code>.</p>`)}
+        ${lc.tip("Astuce", `<p>Quand un événement est compliqué à dénombrer, calcule plutôt la probabilité de son contraire et fais <code>1 − P(contraire)</code>.</p>`)}
+
+        <h2>6. Loi des grands nombres (intuition)</h2>
+        ${lc.tip("Plus on répète, plus on s'approche", `<p>Si on lance un dé 10 fois, on n'aura pas forcément un 6 sur 1/6 des lancers. Mais sur des milliers de lancers, la fréquence d'apparition du 6 va se rapprocher de <code>1/6 ≈ 16,67 %</code>. C'est la <strong>loi des grands nombres</strong>.</p>`)}
+        ${lc.warn("Pas de mémoire", `<p>Le dé n'a pas de « mémoire » : si tu obtiens 5 fois pile de suite, le 6e lancer a toujours <code>1/2</code> de chance de donner pile. Les lancers sont indépendants.</p>`)}
+      `,
+    },
+  ];
+}
 
 // ─── Contenu pédagogique : 6e à fond ─────────────────────────────
 function chapters6e() {
