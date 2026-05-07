@@ -1637,13 +1637,24 @@ function chaptersProbasPostBac() {
         ${lc.formula("P(|X − E(X)| ≥ ε) ≤ V(X) / ε²")}
         ${lc.tip("Utilité", `<p>Ces inégalités permettent de borner les probabilités d'<em>écarts</em> à la moyenne sans connaître la loi exacte.</p>`)}
 
-        <h2>7. Couples (X, Y)</h2>
+        <h2>7. Théorème de transfert (cas discret)</h2>
+        ${lc.prop("Énoncé", `<p>Pour toute fonction <code>g</code>, si <code>X</code> est discrète :</p>`)}
+        ${lc.formula("E(g(X)) = Σ_k g(x_k) × P(X = x_k)")}
+        <p>Cas particulier : <code>E(X²) = Σ x_k² × P(X = x_k)</code>, qui sert à calculer la variance via König-Huygens.</p>
+
+        <h2>8. Couples (X, Y)</h2>
         ${lc.def("Loi conjointe", `<p>La <strong>loi conjointe</strong> de <code>(X, Y)</code> est donnée par les <code>P(X = x_i, Y = y_j)</code>.</p>`)}
         ${lc.def("Indépendance", `<p><code>X</code> et <code>Y</code> sont <strong>indépendantes</strong> si pour tous <code>x</code>, <code>y</code> : <code>P(X = x, Y = y) = P(X = x) × P(Y = y)</code>.</p>`)}
-        ${lc.prop("Pour des variables indépendantes", `<ul>
-          <li><code>E(XY) = E(X) × E(Y)</code></li>
-          <li><code>V(X + Y) = V(X) + V(Y)</code></li>
-        </ul>`)}
+
+        <h2>9. Covariance et corrélation</h2>
+        ${lc.def("Covariance", `<p>La <strong>covariance</strong> de deux variables aléatoires est :</p>`)}
+        ${lc.formula("Cov(X, Y) = E((X − E(X))(Y − E(Y))) = E(XY) − E(X) × E(Y)")}
+        ${lc.formula("V(X + Y) = V(X) + V(Y) + 2 × Cov(X, Y)")}
+        ${lc.prop("Si X et Y sont indépendantes", `<p><code>Cov(X, Y) = 0</code>, donc <code>V(X+Y) = V(X) + V(Y)</code>.</p>`)}
+        ${lc.warn("Réciproque fausse", `<p>Cov = 0 n'implique <strong>pas</strong> l'indépendance. Cov mesure une dépendance <em>linéaire</em> ; deux variables peuvent être très liées par une relation non linéaire (ex. <code>Y = X²</code>) avec Cov = 0.</p>`)}
+        ${lc.def("Coefficient de corrélation", `<p>Le <strong>coefficient de corrélation linéaire</strong> est :</p>`)}
+        ${lc.formula("ρ(X, Y) = Cov(X, Y) / (σ(X) × σ(Y))")}
+        <p>Il vérifie <code>−1 ≤ ρ ≤ 1</code>. Plus <code>|ρ|</code> est proche de 1, plus la dépendance linéaire est forte.</p>
       `,
     },
 
@@ -1685,9 +1696,21 @@ function chaptersProbasPostBac() {
         ${lc.formula("E(X) = μ &nbsp;&nbsp; V(X) = σ²")}
         ${lc.prop("Centrer-réduire", `<p>Si <code>X ~ N(μ, σ²)</code>, alors <code>(X − μ)/σ ~ N(0, 1)</code>.</p>`)}
 
-        <h2>7. Changement de variable</h2>
+        <h2>7. Théorème de transfert (cas continu)</h2>
+        ${lc.prop("Énoncé", `<p>Pour toute fonction <code>g</code> mesurable et <code>X</code> continue de densité <code>f</code> :</p>`)}
+        ${lc.formula("E(g(X)) = ∫_{−∞}^{+∞} g(x) × f(x) dx")}
+        <p>Cas particulier <code>g(x) = x²</code> : <code>E(X²) = ∫ x² f(x) dx</code>, base du calcul de la variance.</p>
+
+        <h2>8. Changement de variable</h2>
         ${lc.prop("Densité de Y = g(X)", `<p>Si <code>g</code> est strictement monotone et dérivable, et <code>X</code> a pour densité <code>f_X</code>, alors <code>Y</code> a pour densité :</p>`)}
         ${lc.formula("f_Y(y) = f_X(g⁻¹(y)) × |1 / g'(g⁻¹(y))|")}
+
+        <h2>9. Couples continus</h2>
+        ${lc.def("Densité jointe", `<p>Un couple continu <code>(X, Y)</code> a une <strong>densité jointe</strong> <code>f(x, y)</code> avec <code>f ≥ 0</code> et <code>∬ f = 1</code>. Pour tout domaine <code>D</code> :</p>`)}
+        ${lc.formula("P((X, Y) ∈ D) = ∬_D f(x, y) dx dy")}
+        ${lc.def("Lois marginales", `<p>Les <strong>lois marginales</strong> sont les densités de <code>X</code> et <code>Y</code> séparément, obtenues en intégrant l'autre variable :</p>`)}
+        ${lc.formula("f_X(x) = ∫_{−∞}^{+∞} f(x, y) dy<br>f_Y(y) = ∫_{−∞}^{+∞} f(x, y) dx")}
+        ${lc.prop("Indépendance continue", `<p><code>X</code> et <code>Y</code> sont indépendantes si et seulement si <code>f(x, y) = f_X(x) × f_Y(y)</code>.</p>`)}
       `,
     },
 
