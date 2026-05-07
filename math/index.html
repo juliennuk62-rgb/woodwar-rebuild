@@ -2022,6 +2022,12 @@ const lc = {
   tip:  (label, html) => `<div class="lc-tip"><span class="label">${label}</span>${html}</div>`,
 };
 
+// Liste de chapitres avec content=null (à rédiger plus tard).
+// IMPORTANT : doit être déclaré AVANT buildCurriculum() car les
+// fonctions chaptersXX() l'utilisent dès l'évaluation du module.
+// Sans ça, la TDZ du const fait planter tout le script (page vide).
+const todo = (title, category) => ({ title, category, content: null });
+
 const CURRICULUM = buildCurriculum();
 let learnState = { levelId: null, chapterId: null };
 
@@ -2054,9 +2060,6 @@ function buildCurriculum() {
     },
   ];
 }
-
-// Liste de chapitres avec content=null (à rédiger plus tard)
-const todo = (title, category) => ({ title, category, content: null });
 
 // Chapitres niveau par niveau ─────────────────────────────────────
 function chapters6e() {
