@@ -4883,36 +4883,20 @@ function chapters4e() {
       title: "Statistiques : moyenne et médiane",
       category: "Organisation des données",
       content: `
-        <h2>1. Vocabulaire</h2>
-        ${lc.def("Série statistique", `<p>Une <strong>série statistique</strong> est une liste de valeurs (chiffres) obtenues lors d'une enquête ou d'une mesure.</p>`)}
-        <p>Exemple : notes d'un élève sur 6 contrôles : 12, 14, 9, 15, 11, 13.</p>
-
-        <h2>2. La moyenne (simple)</h2>
-        ${lc.def("Moyenne", `<p>La <strong>moyenne</strong> d'une série statistique est égale à la <strong>somme des valeurs</strong> divisée par leur <strong>nombre</strong>.</p>`)}
+        <h2>1. Rappels de 5e — la moyenne</h2>
+        ${lc.tip("Vu en 5e", `<p>La <strong>moyenne</strong> d'une série, c'est la somme des valeurs divisée par leur nombre. La <strong>moyenne pondérée</strong> tient compte des effectifs (ou coefficients).</p>`)}
         ${lc.formula("moyenne &nbsp;=&nbsp; (somme des valeurs) / (nombre de valeurs)")}
-        ${lc.example("Calculer la moyenne", `<p>Notes : 12, 14, 9, 15, 11, 13.</p>
-          <ol><li>Somme : <code>12 + 14 + 9 + 15 + 11 + 13 = 74</code>.</li>
-          <li>Nombre : <code>6</code>.</li>
-          <li>Moyenne : <code>74 / 6 ≈ 12,33</code>.</li></ol>`)}
+        ${lc.example("Rappel rapide", `<p>Notes : <code>12, 14, 9, 15, 11, 13</code>. Moyenne : <code>74/6 ≈ 12,33</code>.</p>
+          <p>Pondéré : 5 élèves à 12, 8 à 14, 7 à 16 sur 20 → <code>(60+112+112)/20 = 14,2</code>.</p>`)}
 
-        <h2>3. Moyenne pondérée (avec effectifs)</h2>
-        ${lc.def("Moyenne pondérée", `<p>Quand certaines valeurs apparaissent plusieurs fois (ou ont des coefficients différents), on les multiplie par leur <strong>effectif</strong> (ou poids) avant d'additionner.</p>`)}
-        ${lc.formula("moyenne &nbsp;=&nbsp; (somme des (valeur × effectif)) / (effectif total)")}
-        ${lc.example("Notes pondérées", `<p>Maths : 12 (coefficient 4). Français : 14 (coef 3). Histoire : 10 (coef 2).</p>
-          <ol><li>Somme pondérée : <code>12 × 4 + 14 × 3 + 10 × 2 = 48 + 42 + 20 = 110</code>.</li>
-          <li>Total des coefficients : <code>4 + 3 + 2 = 9</code>.</li>
-          <li>Moyenne : <code>110 / 9 ≈ 12,22</code>.</li></ol>`)}
-        ${lc.example("Notes en série", `<p>Sur 20 élèves, 5 ont eu 12, 8 ont eu 14, 7 ont eu 16. Moyenne ?</p>
-          <p>Somme : <code>5 × 12 + 8 × 14 + 7 × 16 = 60 + 112 + 112 = 284</code>. Effectif : 20. Moyenne : <code>284 / 20 = 14,2</code>.</p>`)}
-
-        <h2>4. Quelques propriétés</h2>
+        <h2>2. Propriétés de la moyenne</h2>
         ${lc.prop("Propriétés utiles", `<ul>
-          <li>La moyenne est toujours <strong>comprise</strong> entre la valeur minimale et la valeur maximale de la série.</li>
+          <li>La moyenne est toujours <strong>comprise</strong> entre la valeur minimale et la maximale.</li>
           <li>Si on ajoute la même valeur <code>k</code> à toutes les données, la moyenne augmente aussi de <code>k</code>.</li>
           <li>Si on multiplie toutes les valeurs par <code>k</code>, la moyenne aussi.</li>
         </ul>`)}
 
-        <h2>5. La médiane</h2>
+        <h2>3. La médiane (nouveau en 4e)</h2>
         ${lc.def("Médiane", `<p>La <strong>médiane</strong> d'une série de valeurs (rangées dans l'ordre croissant) est la valeur qui partage la série en <strong>deux moitiés</strong> de même effectif : autant de valeurs en dessous qu'au-dessus.</p>`)}
         ${lc.prop("Calcul", `<ul>
           <li>Si l'effectif <code>n</code> est <strong>impair</strong> : la médiane est la valeur centrale (position <code>(n+1)/2</code>).</li>
@@ -4924,7 +4908,7 @@ function chapters4e() {
           <p>Médiane = <code>(11 + 13)/2 = 12</code>.</p>`)}
         ${lc.tip("Moyenne vs médiane", `<p>La <strong>moyenne</strong> est sensible aux valeurs extrêmes ; la <strong>médiane</strong> ne l'est pas. Pour des salaires (1 800 €, 1 800 €, 1 800 €, 1 800 €, 30 000 €), la moyenne (7 440 €) est trompeuse alors que la médiane (1 800 €) reflète mieux le « salarié type ».</p>`)}
 
-        <h2>6. Étendue</h2>
+        <h2>4. Étendue (nouveau en 4e)</h2>
         ${lc.def("Étendue", `<p>L'<strong>étendue</strong> d'une série est la différence entre la plus grande et la plus petite valeur. Elle mesure la <em>dispersion</em>.</p>`)}
         ${lc.example("Étendue", `<p>Pour la série 12, 14, 9, 15, 11, 13 : étendue = <code>15 − 9 = 6</code>.</p>`)}
       `,
@@ -5610,46 +5594,29 @@ function chapters6e() {
     },
 
     {
-      title: "Symétrie centrale",
+      title: "Symétrie centrale (initiation)",
       category: "Géométrie",
       content: `
-        <h2>1. Définition</h2>
-        ${lc.def("Symétrique d'un point par rapport à un point", `<p>Le <strong>symétrique</strong> d'un point A par rapport à un point O est le point A' tel que O est le <strong>milieu</strong> du segment [AA'].</p>
-          <p>O est appelé le <strong>centre de symétrie</strong>.</p>`)}
-        ${lc.tip("Image visuelle", `<p>Imagine que tu fais tourner la figure de <strong>180°</strong> (un demi-tour) autour du point O : tu obtiens son symétrique. Pas un effet miroir, mais une rotation.</p>`)}
+        ${lc.warn("Note de programme", `<p>La symétrie centrale est officiellement étudiée en <strong>5e</strong>. Cette page est une initiation visuelle à découvrir en 6e ; tu retrouveras la formalisation, les constructions précises et les propriétés en cycle 4.</p>`)}
 
-        <h2>2. Construire un symétrique</h2>
-        ${lc.prop("Méthode (règle graduée)", `<ol>
-          <li>Tracer la droite (AO).</li>
-          <li>Mesurer la distance OA.</li>
-          <li>Reporter la même distance de l'autre côté de O sur la droite.</li>
-          <li>Le point obtenu est A'.</li>
-        </ol>`)}
+        <h2>1. Le demi-tour autour d'un point</h2>
+        ${lc.def("Idée", `<p>Faire un <strong>demi-tour</strong> (180°) d'une figure autour d'un point fixe O, c'est lui appliquer une <strong>symétrie centrale de centre O</strong>. Ce n'est pas un effet miroir, mais une rotation.</p>`)}
+        ${lc.tip("À expérimenter", `<p>Pose une feuille avec un dessin sur la table, plante un crayon sur un point O, et fais tourner la feuille de 180°. La nouvelle position du dessin est l'image par symétrie centrale de centre O.</p>`)}
 
-        <h2>3. Conservation</h2>
-        ${lc.prop("Ce que conserve la symétrie centrale", `<ul>
-          <li>Les <strong>longueurs</strong> (un segment et son image ont même longueur).</li>
-          <li>Les <strong>angles</strong>.</li>
-          <li>Les <strong>aires</strong> et les <strong>périmètres</strong>.</li>
-          <li>Le <strong>parallélisme</strong>.</li>
-        </ul>
-          <p>Mais elle <strong>renverse</strong> le sens d'orientation (un sens horaire devient anti-horaire).</p>`)}
-
-        <h2>4. Centre de symétrie d'une figure</h2>
-        ${lc.def("Centre de symétrie", `<p>Une figure admet un <strong>centre de symétrie</strong> O si elle est confondue avec elle-même par la symétrie de centre O.</p>`)}
-        ${lc.prop("Centres usuels", `<ul>
+        <h2>2. Centre de symétrie d'une figure</h2>
+        ${lc.def("Centre de symétrie", `<p>Une figure admet un <strong>centre de symétrie</strong> O si, après un demi-tour autour de O, on retrouve exactement la même figure.</p>`)}
+        ${lc.prop("Quelques exemples", `<ul>
           <li><strong>Cercle</strong> : son centre.</li>
-          <li><strong>Rectangle, losange, carré</strong> : intersection des diagonales.</li>
-          <li><strong>Parallélogramme</strong> : intersection des diagonales.</li>
+          <li><strong>Rectangle, carré</strong> : intersection des diagonales.</li>
           <li><strong>Triangle équilatéral</strong> : <em>aucun</em> centre de symétrie.</li>
         </ul>`)}
 
-        <h2>5. Différence avec la symétrie axiale</h2>
+        <h2>3. Différence avec la symétrie axiale</h2>
         ${lc.warn("Ne pas confondre", `<ul>
-          <li><strong>Symétrie axiale</strong> : par rapport à une <em>droite</em>. Effet miroir.</li>
-          <li><strong>Symétrie centrale</strong> : par rapport à un <em>point</em>. Demi-tour.</li>
+          <li><strong>Symétrie axiale</strong> : par rapport à une <em>droite</em>. Effet miroir, déjà étudié.</li>
+          <li><strong>Symétrie centrale</strong> : par rapport à un <em>point</em>. Demi-tour, à étudier en 5e.</li>
         </ul>
-          <p>Une lettre comme <strong>A</strong> a un axe de symétrie (vertical) mais pas de centre de symétrie. Une lettre comme <strong>S</strong> n'a pas d'axe mais a un centre de symétrie.</p>`)}
+          <p>Une lettre comme <strong>A</strong> a un axe de symétrie mais pas de centre. Une lettre comme <strong>S</strong> a un centre mais pas d'axe.</p>`)}
       `,
     },
 
