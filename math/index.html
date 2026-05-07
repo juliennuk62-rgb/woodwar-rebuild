@@ -3966,6 +3966,15 @@ function chapters4e() {
           <li>Vérifier qu'une expression est bien identique à une autre.</li>
           <li>Étape souvent nécessaire avant de résoudre une équation avec parenthèses.</li>
         </ul>`)}
+
+        <h2>6. Identités remarquables (sensibilisation)</h2>
+        ${lc.prop("Trois formules à découvrir", `<p>Trois cas particuliers de la distributivité double, à comprendre dès la 4e (étudiés à fond en 3e) :</p>`)}
+        ${lc.formula("(a + b)² = a² + 2ab + b²")}
+        ${lc.formula("(a − b)² = a² − 2ab + b²")}
+        ${lc.formula("(a + b)(a − b) = a² − b²")}
+        ${lc.example("Vérifier (x + 3)²", `<p>Par double distributivité : <code>(x + 3)(x + 3) = x² + 3x + 3x + 9 = x² + 6x + 9</code>. ✓ avec la formule.</p>`)}
+        ${lc.example("Vérifier (x − 5)(x + 5)", `<p><code>= x² + 5x − 5x − 25 = x² − 25</code>. ✓ on retrouve <code>x² − 5²</code>.</p>`)}
+        ${lc.warn("Erreur très fréquente", `<p>(a + b)² <strong>n'est pas</strong> a² + b² ! Il manque le terme <code>2ab</code>. Exemple : <code>(3 + 4)² = 49</code>, mais <code>3² + 4² = 25</code>.</p>`)}
       `,
     },
 
@@ -4103,7 +4112,23 @@ function chapters4e() {
         ${lc.def("Configuration papillon", `<p>Si les points <code>B</code> et <code>M</code> sont de part et d'autre de <code>A</code> (et idem pour <code>C</code> et <code>N</code>), on parle de configuration « papillon ». Le théorème s'applique quand même, à condition que <code>(BC) ∥ (MN)</code>.</p>`)}
         ${lc.tip("Pareil mais inversé", `<p>Le calcul est identique. Visuellement, les triangles sont symétriques par rapport à <code>A</code>.</p>`)}
 
-        <h2>6. Pourquoi c'est utile ?</h2>
+        <h2>6. Réciproque du théorème</h2>
+        ${lc.prop("Réciproque de Thalès", `<p>Si :</p>
+          <ul><li>les points <code>A</code>, <code>M</code>, <code>B</code> sont alignés <strong>dans cet ordre</strong> (ou dans l'ordre A, B, M),</li>
+          <li>les points <code>A</code>, <code>N</code>, <code>C</code> sont alignés <strong>dans le même ordre</strong>,</li>
+          <li>et les rapports <code>AM/AB = AN/AC</code> sont égaux,</li></ul>
+          <p>alors les droites <code>(BC)</code> et <code>(MN)</code> sont <strong>parallèles</strong>.</p>`)}
+        ${lc.warn("L'ordre est crucial", `<p>Si les points ne sont pas alignés dans le même ordre sur les deux droites, la conclusion ne tient plus. Toujours examiner la figure.</p>`)}
+        ${lc.example("Démontrer un parallélisme", `<p>Sur une figure : <code>A, M, B</code> et <code>A, N, C</code> alignés dans cet ordre. <code>AM = 2</code>, <code>AB = 5</code>, <code>AN = 3</code>, <code>AC = 7,5</code>.</p>
+          <ol><li>Rapports : <code>AM/AB = 2/5 = 0,4</code> et <code>AN/AC = 3/7,5 = 0,4</code>.</li>
+          <li>Égaux et l'ordre est respecté → réciproque applicable.</li>
+          <li>Donc <code>(BC) ∥ (MN)</code>.</li></ol>`)}
+
+        <h2>7. Contraposée : montrer un non-parallélisme</h2>
+        ${lc.prop("Contraposée", `<p>Si <code>AM/AB ≠ AN/AC</code> (rapports différents), alors les droites <code>(BC)</code> et <code>(MN)</code> ne sont <strong>pas parallèles</strong>.</p>`)}
+        ${lc.example("Test du non-parallélisme", `<p><code>AM/AB = 2/5 = 0,4</code> mais <code>AN/AC = 3/7 ≈ 0,43</code>. Différents → <code>(BC)</code> et <code>(MN)</code> ne sont pas parallèles.</p>`)}
+
+        <h2>8. Pourquoi c'est utile ?</h2>
         ${lc.example("Hauteur d'un arbre", `<p>On peut mesurer indirectement la hauteur d'un arbre en se servant de l'ombre. Si on mesure son ombre (10 m) et l'ombre d'un bâton (1 m de haut, 1,5 m d'ombre), on a une configuration de Thalès : <code>hauteur arbre / 1 = 10 / 1,5</code>, soit <code>arbre ≈ 6,67 m</code>.</p>`)}
       `,
     },
@@ -4233,7 +4258,7 @@ function chapters4e() {
     },
 
     {
-      title: "Statistiques : moyenne",
+      title: "Statistiques : moyenne et médiane",
       category: "Organisation des données",
       content: `
         <h2>1. Vocabulaire</h2>
@@ -4265,15 +4290,54 @@ function chapters4e() {
           <li>Si on multiplie toutes les valeurs par <code>k</code>, la moyenne aussi.</li>
         </ul>`)}
 
-        <h2>5. La moyenne ne suffit pas !</h2>
-        ${lc.warn("Limite de la moyenne", `<p>Deux séries peuvent avoir la <strong>même moyenne</strong> mais être très différentes.</p>
-          <p>Série A : 10, 10, 10, 10, 10. Moyenne = 10.</p>
-          <p>Série B : 0, 5, 10, 15, 20. Moyenne = 10 aussi, mais beaucoup plus dispersée.</p>
-          <p>D'où l'intérêt de regarder aussi la <strong>médiane</strong> (vue en 3e) ou l'<strong>étendue</strong>.</p>`)}
+        <h2>5. La médiane</h2>
+        ${lc.def("Médiane", `<p>La <strong>médiane</strong> d'une série de valeurs (rangées dans l'ordre croissant) est la valeur qui partage la série en <strong>deux moitiés</strong> de même effectif : autant de valeurs en dessous qu'au-dessus.</p>`)}
+        ${lc.prop("Calcul", `<ul>
+          <li>Si l'effectif <code>n</code> est <strong>impair</strong> : la médiane est la valeur centrale (position <code>(n+1)/2</code>).</li>
+          <li>Si l'effectif <code>n</code> est <strong>pair</strong> : la médiane est la moyenne des deux valeurs centrales (positions <code>n/2</code> et <code>n/2 + 1</code>).</li>
+        </ul>`)}
+        ${lc.example("Effectif impair", `<p>Notes triées : <code>8, 10, 12, 13, 14, 15, 18</code> (n = 7). Position centrale : <code>(7+1)/2 = 4</code>.</p>
+          <p>Médiane = 4ᵉ valeur = <strong>13</strong>.</p>`)}
+        ${lc.example("Effectif pair", `<p>Notes triées : <code>6, 9, 10, 11, 13, 14, 16, 18</code> (n = 8). Valeurs centrales : 4ᵉ (<code>11</code>) et 5ᵉ (<code>13</code>).</p>
+          <p>Médiane = <code>(11 + 13)/2 = 12</code>.</p>`)}
+        ${lc.tip("Moyenne vs médiane", `<p>La <strong>moyenne</strong> est sensible aux valeurs extrêmes ; la <strong>médiane</strong> ne l'est pas. Pour des salaires (1 800 €, 1 800 €, 1 800 €, 1 800 €, 30 000 €), la moyenne (7 440 €) est trompeuse alors que la médiane (1 800 €) reflète mieux le « salarié type ».</p>`)}
 
         <h2>6. Étendue</h2>
-        ${lc.def("Étendue", `<p>L'<strong>étendue</strong> d'une série est la différence entre la plus grande et la plus petite valeur.</p>`)}
+        ${lc.def("Étendue", `<p>L'<strong>étendue</strong> d'une série est la différence entre la plus grande et la plus petite valeur. Elle mesure la <em>dispersion</em>.</p>`)}
         ${lc.example("Étendue", `<p>Pour la série 12, 14, 9, 15, 11, 13 : étendue = <code>15 − 9 = 6</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Volumes : pyramide et cône",
+      category: "Géométrie",
+      content: `
+        <h2>1. La pyramide</h2>
+        ${lc.def("Pyramide", `<p>Une <strong>pyramide</strong> est un solide formé d'un polygone (la <strong>base</strong>) et d'un point (le <strong>sommet</strong>) qui n'appartient pas au plan de la base. Les faces latérales sont des triangles.</p>
+          <p>Si la base est un triangle, c'est un tétraèdre ; carrée, pyramide carrée ; etc.</p>`)}
+        ${lc.def("Hauteur d'une pyramide", `<p>La <strong>hauteur</strong> est la distance entre le sommet et la base, mesurée perpendiculairement à la base.</p>`)}
+
+        <h2>2. Volume d'une pyramide</h2>
+        ${lc.formula("V_{pyramide} = (1/3) × (aire de la base) × hauteur")}
+        ${lc.tip("Pourquoi 1/3 ?", `<p>Une pyramide tient exactement <strong>3 fois</strong> dans un prisme de même base et même hauteur. C'est un résultat géométrique élégant qu'on peut visualiser en remplissant le prisme avec 3 pyramides identiques.</p>`)}
+        ${lc.example("Pyramide à base carrée", `<p>Base carrée de côté 6 cm, hauteur 9 cm.</p>
+          <ol><li>Aire de la base : <code>6 × 6 = 36 cm²</code>.</li>
+          <li>Volume : <code>V = (1/3) × 36 × 9 = 108 cm³</code>.</li></ol>`)}
+
+        <h2>3. Le cône de révolution</h2>
+        ${lc.def("Cône", `<p>Un <strong>cône de révolution</strong> est l'analogue circulaire de la pyramide : sa base est un <strong>disque</strong> de rayon <code>r</code>, et son sommet est à la distance <code>h</code> du plan de la base (perpendiculairement).</p>
+          <p>Image : un cornet de glace.</p>`)}
+
+        <h2>4. Volume d'un cône</h2>
+        ${lc.formula("V_{cône} = (1/3) × π × r² × h")}
+        ${lc.example("Cône rayon 4 cm, hauteur 9 cm", `<p><code>V = (1/3) × π × 16 × 9 = 48π ≈ 150,8 cm³</code>.</p>`)}
+
+        <h2>5. Effet d'agrandissement / réduction</h2>
+        ${lc.prop("Coefficient k", `<p>Si on multiplie toutes les longueurs d'un solide par <code>k</code> :</p>
+          <ul><li>les longueurs sont multipliées par <code>k</code> ;</li>
+          <li>les aires sont multipliées par <code>k²</code> ;</li>
+          <li>les volumes sont multipliés par <code>k³</code>.</li></ul>`)}
+        ${lc.example("Doubler les dimensions", `<p>Une pyramide dont on double toutes les dimensions voit son volume multiplié par <code>2³ = 8</code>.</p>`)}
       `,
     },
 
