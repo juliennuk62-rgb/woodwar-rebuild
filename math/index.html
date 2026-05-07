@@ -281,6 +281,32 @@
     }
     .content a:hover { border-bottom-color: var(--primary); }
 
+    /* Tableaux dans le contenu pédagogique (valeurs trigo, etc.).
+       Sans ces règles, les <table> dans les chapitres rendaient du
+       texte brut sans bordures. */
+    .content table {
+      border-collapse: collapse;
+      margin: 14px auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+    }
+    .content table td, .content table th {
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      text-align: center;
+    }
+    .content table tr:first-child td,
+    .content table th {
+      background: var(--bg-soft);
+      font-weight: 600;
+      color: var(--text-2);
+    }
+    .content table td:first-child {
+      background: var(--bg-soft);
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
     /* Boîtes typées */
     .lc-def, .lc-prop, .lc-warn, .lc-tip, .lc-example, .lc-formula {
       margin: 14px 0;
