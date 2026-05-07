@@ -8286,6 +8286,219 @@ EXERCISES['3e-12'] = [
   },
 ];
 
+// ─── Templates d'exercices : 2nde ───────────────────────────────
+EXERCISES['2nde-1'] = [
+  {
+    title: 'Identités remarquables : développer',
+    generate() {
+      const a = exRand(2, 9), b = exRand(2, 9);
+      return {
+        question: `Développe <code>(${a}x − ${b})²</code>. Quel est le terme constant ?`,
+        inputType: 'number',
+        answer: b * b,
+        steps: [
+          `<code>(${a}x − ${b})² = (${a}x)² − 2 × ${a}x × ${b} + ${b}²</code>.`,
+          `<code>= ${a*a}x² − ${2*a*b}x + ${b*b}</code>. Terme constant = <code>${b*b}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-2'] = [
+  {
+    title: 'Inéquation et intervalle',
+    generate() {
+      const a = exPick([2, 3, 4, 5, -2, -3]);
+      const b = exRand(-10, 10);
+      const c = exRand(-10, 10);
+      const sol = (c - b) / a;
+      const isPos = a > 0;
+      return {
+        question: `Résous <code>${a}x + ${b} ≤ ${c}</code>. Donne la borne (x ${isPos ? '≤' : '≥'} ?).`,
+        inputType: 'number',
+        answer: sol,
+        tolerance: 0.01,
+        steps: [
+          `Soustraire ${b} : <code>${a}x ≤ ${c - b}</code>.`,
+          `Diviser par ${a} (${isPos ? 'positif, sens conservé' : 'négatif, sens inversé'}) : <code>x ${isPos ? '≤' : '≥'} ${sol}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Valeur absolue : résoudre |x − a| ≤ r',
+    generate() {
+      const a = exRand(-8, 8);
+      const r = exRand(2, 10);
+      // Solutions : x ∈ [a − r, a + r]. On demande la borne sup.
+      return {
+        question: `Résous <code>|x − ${a}| ≤ ${r}</code>. Donne la borne supérieure de l'intervalle.`,
+        inputType: 'number',
+        answer: a + r,
+        steps: [
+          `<code>|x − ${a}| ≤ ${r}</code> équivaut à <code>${a - r} ≤ x ≤ ${a + r}</code>.`,
+          `Borne supérieure : <code>${a + r}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-4'] = [
+  {
+    title: 'Pente d\'une droite',
+    generate() {
+      const xA = exRand(-5, 5), yA = exRand(-5, 5);
+      let xB, yB;
+      do { xB = exRand(-5, 5); yB = exRand(-5, 5); } while (xB === xA || yA === yB);
+      const a = (yB - yA) / (xB - xA);
+      return {
+        question: `Pente de la droite passant par <code>A(${xA}, ${yA})</code> et <code>B(${xB}, ${yB})</code> ?`,
+        inputType: 'number',
+        answer: a,
+        tolerance: 0.01,
+        steps: [
+          `<code>a = (y_B − y_A) / (x_B − x_A) = (${yB} − ${yA}) / (${xB} − ${xA}) = ${yB - yA} / ${xB - xA}</code>.`,
+          `<code>= ${a.toFixed(3)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-5'] = [
+  {
+    title: 'Fonction carré',
+    generate() {
+      const x = exRand(-9, 9);
+      return {
+        question: `<code>f(x) = x²</code>. Calcule <code>f(${x})</code>.`,
+        inputType: 'number',
+        answer: x * x,
+        steps: [
+          `<code>f(${x}) = (${x})² = ${x * x}</code>.`,
+          `Attention au signe quand x est négatif : <code>(−n)² = n²</code> (positif).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Antécédent par la fonction carré',
+    generate() {
+      const a = exPick([4, 9, 16, 25, 36, 49, 64, 81]);
+      return {
+        question: `Combien d'antécédents a <code>${a}</code> par la fonction <code>f(x) = x²</code> ? (saisis le nombre)`,
+        inputType: 'number',
+        answer: 2,
+        steps: [
+          `Résoudre <code>x² = ${a}</code> : <code>x = ${Math.sqrt(a)}</code> ou <code>x = −${Math.sqrt(a)}</code>.`,
+          `Soit <strong>2 antécédents</strong>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-6'] = [
+  {
+    title: 'Fonction inverse : antécédent',
+    generate() {
+      const a = exPick([2, 3, 4, 5, -2, -3, -4]);
+      return {
+        question: `Quel est l'antécédent de <code>${(1 / a).toFixed(3)}</code> par <code>f(x) = 1/x</code> ?`,
+        inputType: 'number',
+        answer: a,
+        steps: [
+          `Résoudre <code>1/x = ${(1 / a).toFixed(3)}</code>, donc <code>x = 1 / ${(1 / a).toFixed(3)} = ${a}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-7'] = [
+  {
+    title: 'Norme d\'un vecteur',
+    generate() {
+      const triplets = [[3, 4, 5], [5, 12, 13], [6, 8, 10], [8, 15, 17], [7, 24, 25]];
+      const [a, b, c] = exPick(triplets);
+      const sa = exRand(0, 1) ? a : -a;
+      const sb = exRand(0, 1) ? b : -b;
+      return {
+        question: `Norme du vecteur <code>u→(${sa} ; ${sb})</code> ?`,
+        inputType: 'number',
+        answer: c,
+        steps: [
+          `<code>||u→|| = √(x² + y²) = √(${sa * sa} + ${sb * sb}) = √${sa * sa + sb * sb} = ${c}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-8'] = [
+  {
+    title: 'Distance entre deux points',
+    generate() {
+      const triplets = [[3, 4, 5], [5, 12, 13], [6, 8, 10]];
+      const [dx, dy, d] = exPick(triplets);
+      const xA = exRand(-3, 3), yA = exRand(-3, 3);
+      const xB = xA + dx, yB = yA + dy;
+      return {
+        question: `Distance entre <code>A(${xA}, ${yA})</code> et <code>B(${xB}, ${yB})</code> ?`,
+        inputType: 'number',
+        answer: d,
+        steps: [
+          `<code>AB = √((x_B − x_A)² + (y_B − y_A)²) = √(${dx}² + ${dy}²) = √${dx * dx + dy * dy} = ${d}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Coordonnées du milieu',
+    generate() {
+      const xA = exRand(-8, 8), yA = exRand(-8, 8);
+      const xB = exRand(-8, 8), yB = exRand(-8, 8);
+      const mx = (xA + xB) / 2;
+      return {
+        question: `Coordonnées du milieu de [AB] avec <code>A(${xA}, ${yA})</code> et <code>B(${xB}, ${yB})</code>. Donne l'abscisse.`,
+        inputType: 'number',
+        answer: mx,
+        tolerance: 0.01,
+        steps: [
+          `<code>x_I = (x_A + x_B)/2 = (${xA} + ${xB})/2 = ${mx}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['2nde-9'] = [
+  {
+    title: 'Calculer un écart-type',
+    generate() {
+      const m = exRand(8, 12);
+      // série symétrique autour de m
+      const d = exRand(1, 3);
+      const vals = [m - 2 * d, m - d, m, m + d, m + 2 * d];
+      const variance = vals.reduce((s, v) => s + (v - m) ** 2, 0) / vals.length;
+      const sigma = Math.sqrt(variance);
+      return {
+        question: `Écart-type de la série <code>${vals.join(', ')}</code> ? (arrondi au centième)`,
+        inputType: 'number',
+        answer: Math.round(sigma * 100) / 100,
+        tolerance: 0.05,
+        steps: [
+          `Moyenne : <code>${m}</code>.`,
+          `Variance = moyenne des carrés des écarts = <code>${variance}</code>.`,
+          `Écart-type = <code>√${variance} ≈ ${sigma.toFixed(3)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
 const exState = { current: null, selectedMcq: null, sessionStats: { tried: 0, correct: 0 } };
 const exRand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const exPick = arr => arr[Math.floor(Math.random() * arr.length)];
