@@ -11184,7 +11184,6 @@ EXERCISES['3e-0'] = [
       const k = exRand(2, 12);
       const m = exRand(2, 9);
       const n = exRand(m + 1, m + 8);
-      // pour avoir un PGCD = k précisément, on prend ka et kb avec gcd(a,b)=1
       const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
       const aa = m, bb = n;
       const g = gcd(aa, bb);
@@ -11197,6 +11196,82 @@ EXERCISES['3e-0'] = [
           `Divisions successives : on remplace (a, b) par (b, reste).`,
           `Le dernier reste non nul est le PGCD.`,
           `Résultat : <code>${k}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fraction irréductible',
+    generate() {
+      const c = exPick([
+        { f: '12/18', r: '2/3' }, { f: '15/25', r: '3/5' },
+        { f: '24/36', r: '2/3' }, { f: '14/21', r: '2/3' },
+        { f: '20/35', r: '4/7' }, { f: '18/24', r: '3/4' },
+      ]);
+      return {
+        question: `Donne la forme irréductible de <code>${c.f}</code>.`,
+        inputType: 'fraction',
+        answer: eval(c.f),
+        formatAnswer: () => c.r,
+        steps: [
+          `On divise numérateur et dénominateur par leur PGCD.`,
+          `Forme irréductible : <code>${c.r}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'PGCD : nombres premiers entre eux',
+    generate() {
+      const c = exPick([
+        { a: 14, b: 15, prem: true }, { a: 12, b: 18, prem: false },
+        { a: 7, b: 9, prem: true }, { a: 21, b: 28, prem: false },
+        { a: 11, b: 13, prem: true }, { a: 16, b: 24, prem: false },
+      ]);
+      return {
+        question: `Les nombres <code>${c.a}</code> et <code>${c.b}</code> sont-ils <strong>premiers entre eux</strong> ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.prem ? 0 : 1,
+        steps: [
+          `Premiers entre eux ⇔ PGCD = 1.`,
+          c.prem ? `<code>PGCD(${c.a}, ${c.b}) = 1</code> ✓` : `<code>PGCD(${c.a}, ${c.b}) > 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Diviseurs communs',
+    generate() {
+      const c = exPick([
+        { a: 12, b: 18, pgcd: 6 }, { a: 24, b: 36, pgcd: 12 },
+        { a: 15, b: 25, pgcd: 5 }, { a: 20, b: 30, pgcd: 10 },
+      ]);
+      return {
+        question: `Quel est le PGCD de <code>${c.a}</code> et <code>${c.b}</code> ?`,
+        inputType: 'number',
+        answer: c.pgcd,
+        steps: [
+          `On peut décomposer ou utiliser Euclide.`,
+          `<code>PGCD(${c.a}, ${c.b}) = ${c.pgcd}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'PGCD par soustractions',
+    generate() {
+      const c = exPick([
+        { a: 18, b: 12 }, { a: 28, b: 21 }, { a: 30, b: 18 },
+      ]);
+      const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+      return {
+        question: `Calcule <code>PGCD(${c.a}, ${c.b})</code>.`,
+        inputType: 'number',
+        answer: gcd(c.a, c.b),
+        steps: [
+          `Méthode des soustractions : remplacer (a, b) par (a − b, b) tant que possible.`,
+          `Résultat : <code>${gcd(c.a, c.b)}</code>.`,
         ],
       };
     },
@@ -11217,6 +11292,69 @@ EXERCISES['3e-1'] = [
           `On cherche le plus grand carré qui divise ${n}.`,
           `<code>${n} = ${k * k} × ${r}</code>.`,
           `<code>√${n} = √${k * k} × √${r} = ${k}√${r}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Carré d\'une racine',
+    generate() {
+      const n = exPick([2, 3, 5, 6, 7, 10, 11, 13]);
+      return {
+        question: `Que vaut <code>(√${n})²</code> ?`,
+        inputType: 'number',
+        answer: n,
+        steps: [
+          `Pour tout <code>a ≥ 0</code> : <code>(√a)² = a</code>.`,
+          `<code>(√${n})² = ${n}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Produit de racines',
+    generate() {
+      const c = exPick([
+        { a: 2, b: 8, r: 4 }, { a: 3, b: 12, r: 6 },
+        { a: 5, b: 20, r: 10 }, { a: 2, b: 18, r: 6 },
+      ]);
+      return {
+        question: `Calcule <code>√${c.a} × √${c.b}</code>.`,
+        inputType: 'number',
+        answer: c.r,
+        steps: [
+          `<code>√a × √b = √(a × b)</code>.`,
+          `<code>√${c.a} × √${c.b} = √${c.a * c.b} = ${c.r}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Calculer une racine carrée',
+    generate() {
+      const n = exRand(4, 15);
+      return {
+        question: `Calcule <code>√${n * n}</code>.`,
+        inputType: 'number',
+        answer: n,
+        steps: [
+          `On cherche le nombre positif dont le carré vaut ${n * n}.`,
+          `<code>${n}² = ${n * n}</code>, donc <code>√${n * n} = ${n}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Racine d\'un carré (négatif)',
+    generate() {
+      const n = exRand(3, 12);
+      return {
+        question: `Que vaut <code>√((−${n})²)</code> ?`,
+        inputType: 'number',
+        answer: n,
+        steps: [
+          `<code>(−${n})² = ${n * n}</code> (le carré d'un négatif est positif).`,
+          `<code>√${n * n} = ${n}</code>.`,
         ],
       };
     },
@@ -11256,6 +11394,56 @@ EXERCISES['3e-2'] = [
       };
     },
   },
+  {
+    title: 'Identité (a − b)²',
+    generate() {
+      const a = exRand(1, 6);
+      const b = exRand(1, 9);
+      return {
+        question: `Développe <code>(${a}x − ${b})²</code>. Quel est le coefficient de <code>x</code> ?`,
+        inputType: 'number',
+        answer: -2 * a * b,
+        steps: [
+          `<code>(u − v)² = u² − 2uv + v²</code>.`,
+          `Coefficient de x : <code>−2 × ${a} × ${b} = ${-2 * a * b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Facteur commun',
+    generate() {
+      const k = exRand(2, 7);
+      const a = exRand(2, 6);
+      const b = exRand(2, 9);
+      return {
+        question: `Factorise : <code>${k * a}x + ${k * b}</code>. Quel est le facteur commun ?`,
+        inputType: 'number',
+        answer: k,
+        steps: [
+          `On cherche un facteur commun à ${k * a} et ${k * b}.`,
+          `<code>${k * a}x + ${k * b} = ${k}(${a}x + ${b})</code>. Facteur commun : <code>${k}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Identité remarquable : (a + b)(a − b)',
+    generate() {
+      const a = exRand(2, 7);
+      const b = exRand(1, 9);
+      return {
+        question: `Développe <code>(${a}x + ${b})(${a}x − ${b})</code>. Donne le terme constant.`,
+        inputType: 'number',
+        answer: -b * b,
+        steps: [
+          `Identité : <code>(u + v)(u − v) = u² − v²</code>.`,
+          `<code>(${a}x + ${b})(${a}x − ${b}) = ${a * a}x² − ${b * b}</code>.`,
+          `Terme constant : <code>−${b * b}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['3e-3'] = [
@@ -11264,7 +11452,6 @@ EXERCISES['3e-3'] = [
     generate() {
       const a = exRand(2, 8);
       const b = exRand(-9, 9) || 3;
-      // (x − a)(x + b) = 0 → solutions a et −b
       return {
         question: `Résous : <code>(x − ${a})(x + ${b}) = 0</code>. Quelle est la plus grande solution ?`,
         inputType: 'number',
@@ -11274,6 +11461,76 @@ EXERCISES['3e-3'] = [
           `<code>x − ${a} = 0</code> donne <code>x = ${a}</code>.`,
           `<code>x + ${b} = 0</code> donne <code>x = ${-b}</code>.`,
           `Plus grande solution : <code>${Math.max(a, -b)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Plus petite solution d\'une équation produit',
+    generate() {
+      const a = exRand(2, 8);
+      const b = exRand(2, 9);
+      return {
+        question: `Résous : <code>(x + ${a})(x − ${b}) = 0</code>. Quelle est la plus <strong>petite</strong> solution ?`,
+        inputType: 'number',
+        answer: -a,
+        steps: [
+          `Solutions : <code>x = −${a}</code> ou <code>x = ${b}</code>.`,
+          `Plus petite : <code>−${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Équation produit avec coefficient',
+    generate() {
+      const k = exRand(2, 5);
+      const a = exRand(2, 8);
+      const b = exRand(2, 8);
+      return {
+        question: `Résous : <code>${k}(x − ${a})(x + ${b}) = 0</code>. Plus grande solution ?`,
+        inputType: 'number',
+        answer: Math.max(a, -b),
+        steps: [
+          `${k} ≠ 0, donc on peut diviser par ${k}.`,
+          `Solutions : <code>x = ${a}</code> ou <code>x = −${b}</code>. Max : <code>${Math.max(a, -b)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Factoriser puis résoudre',
+    generate() {
+      const a = exRand(2, 8);
+      return {
+        question: `Résous : <code>x² − ${a * a} = 0</code>. Plus grande solution ?`,
+        inputType: 'number',
+        answer: a,
+        steps: [
+          `Identité remarquable : <code>x² − ${a * a} = (x − ${a})(x + ${a})</code>.`,
+          `Solutions : <code>x = ${a}</code> ou <code>x = −${a}</code>. Max : <code>${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Nombre de solutions',
+    generate() {
+      const c = exPick([
+        { eq: 'x² = 25', n: 2 },
+        { eq: 'x² = 0', n: 1 },
+        { eq: 'x² = −4', n: 0 },
+        { eq: '(x − 1)(x − 2)(x + 3) = 0', n: 3 },
+      ]);
+      return {
+        question: `Combien d'équation <code>${c.eq}</code> a-t-elle de solutions ?`,
+        inputType: 'number',
+        answer: c.n,
+        steps: [
+          c.eq.includes('−4') ? `Un carré n'est jamais négatif : 0 solution.`
+          : c.eq.includes('= 0$') ? `x² = 0 ⇔ x = 0 : 1 solution.`
+          : c.eq === 'x² = 25' ? `x² = 25 ⇔ x = 5 ou x = −5 : 2 solutions.`
+          : `Trois facteurs ⇒ trois solutions distinctes : 3.`,
         ],
       };
     },
@@ -11288,7 +11545,6 @@ EXERCISES['3e-4'] = [
       const b = exRand(-10, 10);
       const c = exRand(-10, 10);
       const cmp = exPick(['≤', '≥']);
-      // ax + b cmp c → x cmp (c-b)/a
       const sol = (c - b) / a;
       return {
         question: `Résous : <code>${a}x + ${b} ${cmp} ${c}</code>. Donne la valeur seuil de x.`,
@@ -11298,6 +11554,78 @@ EXERCISES['3e-4'] = [
         steps: [
           `Soustraire ${b} : <code>${a}x ${cmp} ${c - b}</code>.`,
           `Diviser par ${a} (positif, sens conservé) : <code>x ${cmp} ${sol}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Inéquation : multiplier par négatif',
+    generate() {
+      const a = -exPick([2, 3, 4, 5]);
+      const x = exRand(2, 8);
+      const c = a * x;
+      return {
+        question: `Résous : <code>${a}x ≤ ${c}</code>. Donne la valeur seuil de x.`,
+        inputType: 'number',
+        answer: x,
+        tolerance: 0.01,
+        steps: [
+          `Diviser par <code>${a}</code> (négatif) : on inverse le sens.`,
+          `<code>x ≥ ${c}/${a} = ${x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Tester une solution',
+    generate() {
+      const a = exRand(2, 5);
+      const b = exRand(2, 10);
+      const x = exRand(-3, 8);
+      const lhs = a * x + b;
+      const c = lhs + exRand(-3, 3);
+      const ok = lhs < c;
+      return {
+        question: `<code>x = ${x}</code> est-il solution de <code>${a}x + ${b} &lt; ${c}</code> ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: ok ? 0 : 1,
+        steps: [
+          `Calculer : <code>${a} × ${x} + ${b} = ${lhs}</code>.`,
+          `${lhs} ${ok ? '&lt;' : '≥'} ${c} ${ok ? '✓' : '✗'}.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Plus grande solution entière',
+    generate() {
+      const a = exPick([2, 3]);
+      const x = exRand(3, 9);
+      const c = a * x + exRand(0, a - 1);
+      const sol = Math.floor(c / a);
+      return {
+        question: `Quelle est la plus grande solution entière de <code>${a}x ≤ ${c}</code> ?`,
+        inputType: 'number',
+        answer: sol,
+        steps: [
+          `<code>x ≤ ${c}/${a} ≈ ${(c/a).toFixed(2)}</code>.`,
+          `Plus grande solution entière : <code>${sol}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Inéquation simple x + b ≤ c',
+    generate() {
+      const b = exRand(-10, 10);
+      const c = exRand(-5, 15);
+      return {
+        question: `Résous : <code>x + ${b} ≤ ${c}</code>. Donne la valeur seuil de x.`,
+        inputType: 'number',
+        answer: c - b,
+        steps: [
+          `Soustraire ${b} : <code>x ≤ ${c} − ${b} = ${c - b}</code>.`,
         ],
       };
     },
@@ -11314,7 +11642,6 @@ EXERCISES['3e-5'] = [
       const c = exRand(1, 5), d = exRand(1, 5);
       const r1 = a * x + b * y;
       const r2 = c * x + d * y;
-      // unique si ad-bc != 0
       if (a * d - b * c === 0) return this.generate();
       return {
         question: `Résous le système : <code>${a}x + ${b}y = ${r1} ; ${c}x + ${d}y = ${r2}</code>. Donne la valeur de x.`,
@@ -11324,6 +11651,175 @@ EXERCISES['3e-5'] = [
           `Par combinaison ou substitution.`,
           `On trouve <code>x = ${x}</code> et <code>y = ${y}</code>.`,
           `Vérification : <code>${a} × ${x} + ${b} × ${y} = ${r1}</code> ✓.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Système : valeur de y',
+    generate() {
+      const x = exRand(1, 7);
+      const y = exRand(1, 7);
+      return {
+        question: `Résous : <code>x + y = ${x + y} ; 2x + 3y = ${2 * x + 3 * y}</code>. Donne y.`,
+        inputType: 'number',
+        answer: y,
+        steps: [
+          `De la 1<sup>re</sup> : <code>x = ${x + y} − y</code>. On substitue : <code>2(${x + y} − y) + 3y = ${2 * x + 3 * y}</code>.`,
+          `<code>${2 * (x + y)} + y = ${2 * x + 3 * y}</code>, donc <code>y = ${y}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Système : somme et différence',
+    generate() {
+      const a = exRand(5, 20);
+      const b = exRand(2, a - 1);
+      return {
+        question: `Deux nombres ont pour somme <code>${a + b}</code> et pour différence <code>${a - b}</code>. Quel est le plus grand ?`,
+        inputType: 'number',
+        answer: a,
+        steps: [
+          `Si x + y = S et x − y = D, alors x = (S + D)/2.`,
+          `<code>x = (${a + b} + ${a - b})/2 = ${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Mise en équation',
+    generate() {
+      const c = exPick([
+        { adultes: 18, enfants: 12, prixA: 8, prixE: 5, total: 18*8 + 12*5 },
+        { adultes: 25, enfants: 15, prixA: 10, prixE: 6, total: 25*10 + 15*6 },
+      ]);
+      return {
+        question: `Au cinéma, ${c.adultes} adultes et ${c.enfants} enfants paient <code>${c.total} €</code>. Adulte : ${c.prixA} €. Quel est le prix d'un enfant (en €) ?`,
+        inputType: 'number',
+        answer: c.prixE,
+        steps: [
+          `<code>${c.adultes} × ${c.prixA} + ${c.enfants}x = ${c.total}</code>.`,
+          `<code>${c.adultes * c.prixA} + ${c.enfants}x = ${c.total}</code>, soit <code>x = ${c.prixE}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Solution unique d\'un système',
+    generate() {
+      return {
+        question: `Quand un système 2×2 a-t-il une <strong>solution unique</strong> ?`,
+        inputType: 'mcq',
+        options: [
+          'Toujours',
+          'Quand les coefficients de x et y sont proportionnels',
+          'Quand les coefficients de x et y ne sont pas proportionnels',
+          'Jamais',
+        ],
+        answer: 2,
+        steps: [
+          `Si <code>ad − bc = 0</code> : 0 ou une infinité de solutions.`,
+          `Sinon (<code>ad − bc ≠ 0</code>) : solution unique.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-6'] = [
+  {
+    title: 'Réciproque de Thalès',
+    generate() {
+      const c = exPick([
+        { am: 2, ab: 6, an: 3, ac: 9, par: true },
+        { am: 4, ab: 12, an: 5, ac: 15, par: true },
+        { am: 2, ab: 5, an: 3, ac: 8, par: false },
+        { am: 3, ab: 7, an: 4, ac: 8, par: false },
+      ]);
+      return {
+        question: `<code>AM = ${c.am}</code>, <code>AB = ${c.ab}</code>, <code>AN = ${c.an}</code>, <code>AC = ${c.ac}</code> avec A, M, B alignés et A, N, C alignés. Les droites <code>(MN)</code> et <code>(BC)</code> sont-elles parallèles ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.par ? 0 : 1,
+        steps: [
+          `Comparer les rapports : <code>AM/AB = ${c.am}/${c.ab}</code> et <code>AN/AC = ${c.an}/${c.ac}</code>.`,
+          c.par ? `Rapports égaux → réciproque de Thalès → (MN) ∥ (BC).` : `Rapports différents → pas parallèles.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Thalès : calculer une longueur',
+    generate() {
+      const k = exRand(2, 5);
+      const am = exRand(2, 6);
+      const ab = am * k;
+      const bc = exRand(5, 15);
+      return {
+        question: `Configuration de Thalès : <code>AM = ${am}</code>, <code>AB = ${ab}</code>, <code>BC = ${bc}</code>, <code>(MN) ∥ (BC)</code>. Calcule <code>MN</code>.`,
+        inputType: 'number',
+        answer: bc / k,
+        tolerance: 0.01,
+        steps: [
+          `<code>MN/BC = AM/AB = 1/${k}</code>.`,
+          `<code>MN = ${bc} / ${k} = ${bc/k}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Thalès : configuration en X (papillon)',
+    generate() {
+      const ao = exRand(2, 5);
+      const co = ao * exRand(2, 4);
+      const bo = exRand(2, 6);
+      const dolen = bo * (co / ao);
+      return {
+        question: `Deux droites se coupent en O. <code>AO = ${ao}</code>, <code>CO = ${co}</code>, <code>BO = ${bo}</code>, <code>(AB) ∥ (CD)</code>. Calcule <code>OD</code>.`,
+        inputType: 'number',
+        answer: dolen,
+        tolerance: 0.01,
+        steps: [
+          `Configuration en papillon : <code>OA/OC = OB/OD</code>.`,
+          `<code>OD = OB × OC / OA = ${bo} × ${co} / ${ao} = ${dolen}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Coefficient de réduction',
+    generate() {
+      const k = exRand(2, 5);
+      const am = exRand(2, 7);
+      const ab = am * k;
+      return {
+        question: `<code>AM = ${am}</code>, <code>AB = ${ab}</code>. Quel est le rapport <code>AM/AB</code> sous forme <code>1/k</code> ?`,
+        inputType: 'fraction',
+        answer: 1 / k,
+        formatAnswer: () => `1/${k}`,
+        steps: [
+          `<code>AM/AB = ${am}/${ab} = 1/${k}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Conditions pour la réciproque',
+    generate() {
+      return {
+        question: `Pour appliquer la <strong>réciproque</strong> du théorème de Thalès, il faut que :`,
+        inputType: 'mcq',
+        options: [
+          'Les rapports soient égaux ET les points alignés dans le même ordre',
+          'Les rapports soient égaux uniquement',
+          'Les points soient alignés uniquement',
+          'Les longueurs soient toutes égales',
+        ],
+        answer: 0,
+        steps: [
+          `Réciproque de Thalès : il faut <strong>les rapports égaux ET un même ordre d'alignement</strong>.`,
+          `Sans ces deux conditions, la conclusion (MN) ∥ (BC) n'est pas garantie.`,
         ],
       };
     },
@@ -11351,6 +11847,77 @@ EXERCISES['3e-7'] = [
           `Valeurs particulières : cos(30°)=√3/2, cos(45°)=√2/2, cos(60°)=1/2.`,
           `(et inversement pour sin)`,
           `Réponse : <code>${expected}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Sinus : opposé / hypoténuse',
+    generate() {
+      const opp = exRand(3, 12);
+      const hyp = opp + exRand(2, 10);
+      return {
+        question: `Triangle rectangle. Opposé à α : <code>${opp}</code>, hypoténuse : <code>${hyp}</code>. Donne <code>sin(α)</code> sous forme <code>num/den</code>.`,
+        inputType: 'fraction',
+        answer: opp / hyp,
+        formatAnswer: () => `${opp}/${hyp}`,
+        steps: [
+          `<code>sin(α) = opposé / hypoténuse</code>.`,
+          `<code>sin(α) = ${opp}/${hyp}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Tangente : opposé / adjacent',
+    generate() {
+      const opp = exRand(3, 9);
+      const adj = exRand(3, 9);
+      return {
+        question: `Triangle rectangle. Opposé à α : <code>${opp}</code>, adjacent : <code>${adj}</code>. Donne <code>tan(α)</code> sous forme <code>num/den</code>.`,
+        inputType: 'fraction',
+        answer: opp / adj,
+        formatAnswer: () => `${opp}/${adj}`,
+        steps: [
+          `<code>tan(α) = opposé / adjacent</code>.`,
+          `<code>tan(α) = ${opp}/${adj}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Identification : SOH-CAH-TOA',
+    generate() {
+      const c = exPick([
+        { fn: 'cos', def: 'adjacent / hypoténuse' },
+        { fn: 'sin', def: 'opposé / hypoténuse' },
+        { fn: 'tan', def: 'opposé / adjacent' },
+      ]);
+      return {
+        question: `Quel est le rapport pour <code>${c.fn}(α)</code> ?`,
+        inputType: 'mcq',
+        options: ['adjacent / hypoténuse', 'opposé / hypoténuse', 'opposé / adjacent', 'hypoténuse / opposé'],
+        answer: ['adjacent / hypoténuse', 'opposé / hypoténuse', 'opposé / adjacent', 'hypoténuse / opposé'].indexOf(c.def),
+        steps: [
+          `SOH-CAH-TOA : Sin = Opp/Hyp ; Cos = Adj/Hyp ; Tan = Opp/Adj.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'sin² + cos² = 1',
+    generate() {
+      const c = exPick([
+        { sin: '3/5', cos: '4/5' }, { sin: '5/13', cos: '12/13' },
+      ]);
+      return {
+        question: `Si <code>sin(α) = ${c.sin}</code>, et α est aigu, que vaut <code>cos(α)</code> ?`,
+        inputType: 'fraction',
+        answer: eval(c.cos),
+        formatAnswer: () => c.cos,
+        steps: [
+          `<code>sin² + cos² = 1</code>, donc <code>cos² = 1 − sin²</code>.`,
+          `<code>cos = ${c.cos}</code> (positif car α aigu).`,
         ],
       };
     },
@@ -11395,6 +11962,142 @@ EXERCISES['3e-8'] = [
       };
     },
   },
+  {
+    title: 'Volume du cylindre',
+    generate() {
+      const r = exRand(2, 8);
+      const h = exRand(3, 15);
+      const V = Math.PI * r * r * h;
+      return {
+        question: `Volume d'un cylindre de rayon <code>${r} cm</code> et hauteur <code>${h} cm</code> ? (au dixième)`,
+        inputType: 'number',
+        answer: Math.round(V * 10) / 10,
+        tolerance: 0.5,
+        steps: [
+          `<code>V = π × r² × h = π × ${r * r} × ${h} ≈ ${V.toFixed(2)} cm³</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Aire de la sphère',
+    generate() {
+      const r = exRand(2, 8);
+      const A = 4 * Math.PI * r * r;
+      return {
+        question: `Aire d'une sphère de rayon <code>${r} cm</code> ? (au dixième de cm²)`,
+        inputType: 'number',
+        answer: Math.round(A * 10) / 10,
+        tolerance: 0.5,
+        steps: [
+          `Formule : <code>A = 4 × π × r²</code>.`,
+          `<code>A = 4π × ${r * r} ≈ ${A.toFixed(2)} cm²</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Réduction et volume',
+    generate() {
+      const k = exRand(2, 4);
+      const V = exRand(20, 200);
+      return {
+        question: `Un solide est réduit avec un coefficient <code>1/${k}</code>. Si son volume initial est <code>${V} cm³</code>, quel est le nouveau volume ?`,
+        inputType: 'number',
+        answer: V / (k ** 3),
+        tolerance: 0.01,
+        steps: [
+          `Le volume est multiplié par <code>k³</code> (ou divisé par k³ si réduction).`,
+          `Nouveau volume : <code>${V} / ${k}³ = ${V} / ${k ** 3} = ${V / (k ** 3)} cm³</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['3e-9'] = [
+  {
+    title: 'Homothétie : conservation des longueurs ?',
+    generate() {
+      return {
+        question: `Une homothétie de rapport <code>k</code> (k ≠ 1, −1) :`,
+        inputType: 'mcq',
+        options: [
+          'conserve les longueurs',
+          'multiplie les longueurs par k',
+          'multiplie les longueurs par |k|',
+          'multiplie les longueurs par k²',
+        ],
+        answer: 2,
+        steps: [
+          `Une homothétie de rapport k multiplie les longueurs par <code>|k|</code>.`,
+          `Si <code>k &lt; 0</code>, l'image est aussi inversée par rapport au centre.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Image par homothétie',
+    generate() {
+      const k = exRand(2, 5);
+      const L = exRand(3, 15);
+      return {
+        question: `Une homothétie de rapport <code>${k}</code> transforme un segment de <code>${L} cm</code>. Quelle est la longueur de son image (en cm) ?`,
+        inputType: 'number',
+        answer: k * L,
+        steps: [
+          `Image = k × longueur = <code>${k} × ${L} = ${k * L} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Aire et homothétie',
+    generate() {
+      const k = exRand(2, 4);
+      const A = exRand(10, 100);
+      return {
+        question: `Une figure d'aire <code>${A} cm²</code> est transformée par une homothétie de rapport <code>${k}</code>. Quelle est l'aire de son image (en cm²) ?`,
+        inputType: 'number',
+        answer: k * k * A,
+        steps: [
+          `L'aire est multipliée par <code>k²</code>.`,
+          `Aire image : <code>${k}² × ${A} = ${k * k} × ${A} = ${k * k * A} cm²</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Volume et homothétie',
+    generate() {
+      const k = exRand(2, 4);
+      const V = exRand(10, 100);
+      return {
+        question: `Un solide de volume <code>${V} cm³</code> subit une homothétie de rapport <code>${k}</code>. Volume de l'image (en cm³) ?`,
+        inputType: 'number',
+        answer: k ** 3 * V,
+        steps: [
+          `Le volume est multiplié par <code>k³</code>.`,
+          `<code>${k}³ × ${V} = ${k ** 3} × ${V} = ${k ** 3 * V} cm³</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Centre invariant',
+    generate() {
+      return {
+        question: `Dans une homothétie de centre <code>O</code> et de rapport <code>k</code>, l'image de <code>O</code> est :`,
+        inputType: 'mcq',
+        options: ['O lui-même', 'le point opposé à O', 'k × O', 'on ne peut pas dire'],
+        answer: 0,
+        steps: [
+          `Le centre de l'homothétie est le seul point <strong>invariant</strong> (si k ≠ 1).`,
+          `L'image de O est O.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['3e-10'] = [
@@ -11432,6 +12135,62 @@ EXERCISES['3e-10'] = [
       };
     },
   },
+  {
+    title: 'Coefficient directeur',
+    generate() {
+      const xa = exRand(0, 5);
+      const xb = exRand(xa + 1, xa + 6);
+      const a = exRand(-4, 4) || 2;
+      const ya = a * xa + exRand(-3, 5);
+      const yb = a * (xb - xa) + ya;
+      return {
+        question: `La droite passe par <code>A(${xa}; ${ya})</code> et <code>B(${xb}; ${yb})</code>. Quel est son coefficient directeur ?`,
+        inputType: 'number',
+        answer: a,
+        tolerance: 0.001,
+        steps: [
+          `<code>a = (y<sub>B</sub> − y<sub>A</sub>) / (x<sub>B</sub> − x<sub>A</sub>)</code>.`,
+          `<code>a = (${yb} − ${ya}) / (${xb} − ${xa}) = ${yb - ya} / ${xb - xa} = ${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fonction linéaire = proportionnalité',
+    generate() {
+      return {
+        question: `Une fonction <code>f(x) = ax</code> (avec a ≠ 0) modélise une situation :`,
+        inputType: 'mcq',
+        options: [
+          'de proportionnalité',
+          'd\'augmentation constante',
+          'sans relation simple',
+          'd\'évolution exponentielle',
+        ],
+        answer: 0,
+        steps: [
+          `Une fonction <strong>linéaire</strong> <code>f(x) = ax</code> représente une situation de <strong>proportionnalité</strong>.`,
+          `(Une fonction affine <code>ax + b</code> avec b ≠ 0 n'est PAS une proportionnalité.)`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Image et antécédent : différence',
+    generate() {
+      const a = exRand(2, 6);
+      const b = exRand(-5, 9);
+      const x0 = exRand(2, 8);
+      return {
+        question: `Soit <code>f(x) = ${a}x ${b >= 0 ? '+ ' + b : '− ' + (-b)}</code>. Quelle est l'<strong>image</strong> de <code>${x0}</code> ?`,
+        inputType: 'number',
+        answer: a * x0 + b,
+        steps: [
+          `Image = f(${x0}) = <code>${a} × ${x0} ${b >= 0 ? '+' : '−'} ${Math.abs(b)} = ${a * x0 + b}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['3e-11'] = [
@@ -11453,13 +12212,79 @@ EXERCISES['3e-11'] = [
       };
     },
   },
+  {
+    title: 'Étendue d\'une série',
+    generate() {
+      const n = exPick([6, 7, 8]);
+      const vals = Array.from({length: n}, () => exRand(5, 30));
+      const e = Math.max(...vals) - Math.min(...vals);
+      return {
+        question: `Étendue de la série : <code>${vals.join(', ')}</code> ?`,
+        inputType: 'number',
+        answer: e,
+        steps: [
+          `Étendue = max − min = <code>${Math.max(...vals)} − ${Math.min(...vals)} = ${e}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Moyenne d\'une série',
+    generate() {
+      const n = exPick([5, 6, 7]);
+      const vals = Array.from({length: n}, () => exRand(8, 20));
+      const sum = vals.reduce((a, b) => a + b, 0);
+      const m = sum / n;
+      return {
+        question: `Moyenne de la série : <code>${vals.join(', ')}</code> (au dixième) ?`,
+        inputType: 'number',
+        answer: Math.round(m * 10) / 10,
+        tolerance: 0.05,
+        steps: [
+          `Somme : <code>${sum}</code>, effectif : <code>${n}</code>.`,
+          `Moyenne : <code>${sum} / ${n} ≈ ${m.toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Quartile : Q1',
+    generate() {
+      const vals = [3, 5, 7, 8, 9, 10, 12, 14, 16].slice();
+      const Q1 = vals[Math.ceil(vals.length / 4) - 1];
+      return {
+        question: `Pour la série <code>${vals.join(', ')}</code> (déjà triée), quel est le 1<sup>er</sup> quartile <code>Q₁</code> ?`,
+        inputType: 'number',
+        answer: Q1,
+        steps: [
+          `<code>n = ${vals.length}</code>, <code>n/4 = ${vals.length / 4}</code> → on prend la valeur de rang <code>⌈n/4⌉ = ${Math.ceil(vals.length / 4)}</code>.`,
+          `<code>Q₁ = ${Q1}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Effectif d\'une fréquence',
+    generate() {
+      const total = exPick([20, 25, 50, 100]);
+      const f = exPick([10, 20, 25, 50]);
+      const e = (total * f) / 100;
+      return {
+        question: `Sur <code>${total}</code> élèves, <code>${f}%</code> ont des cheveux blonds. Quel est l'<strong>effectif</strong> ?`,
+        inputType: 'number',
+        answer: e,
+        steps: [
+          `<code>${f}% de ${total} = ${total} × ${f}/100 = ${e}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['3e-12'] = [
   {
     title: 'Probabilité d\'une réunion',
     generate() {
-      // dé : pair (3), multiple de 3 (2), intersection {6} (1)
       const opts = [
         { txt: 'pair OU multiple de 3', pA: 3, pB: 2, pAB: 1, ans: '4/6 = 2/3' },
         { txt: 'pair OU pair', pA: 3, pB: 3, pAB: 3, ans: '3/6 = 1/2' },
@@ -11474,6 +12299,71 @@ EXERCISES['3e-12'] = [
           `<code>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</code>.`,
           `<code>P = ${e.pA}/6 + ${e.pB}/6 − ${e.pAB}/6 = ${e.pA + e.pB - e.pAB}/6</code>.`,
           `Simplification : <code>2/3</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Probabilité événement contraire',
+    generate() {
+      const c = exPick([
+        { p: '1/4', q: '3/4' }, { p: '2/5', q: '3/5' },
+        { p: '1/3', q: '2/3' }, { p: '3/8', q: '5/8' },
+      ]);
+      return {
+        question: `Probabilité d'un événement A : <code>${c.p}</code>. Probabilité de l'événement contraire ?`,
+        inputType: 'fraction',
+        answer: eval(c.q),
+        formatAnswer: () => c.q,
+        steps: [
+          `<code>P(non A) = 1 − P(A) = 1 − ${c.p} = ${c.q}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Tirage sans remise (arbre)',
+    generate() {
+      return {
+        question: `Une urne contient 2 boules rouges et 3 noires. On tire 2 boules SANS remise. Probabilité d'obtenir 2 rouges ?`,
+        inputType: 'fraction',
+        answer: 2/5 * 1/4,
+        formatAnswer: () => `1/10`,
+        steps: [
+          `1<sup>er</sup> tirage : <code>P(R) = 2/5</code>.`,
+          `2<sup>e</sup> tirage (sachant 1<sup>e</sup> R) : <code>P(R|R) = 1/4</code>.`,
+          `<code>P(RR) = 2/5 × 1/4 = 2/20 = 1/10</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Probabilité avec deux dés',
+    generate() {
+      return {
+        question: `On lance 2 dés équilibrés. Probabilité d'obtenir un double 6 ?`,
+        inputType: 'fraction',
+        answer: 1/36,
+        formatAnswer: () => `1/36`,
+        steps: [
+          `Issues totales : <code>6 × 6 = 36</code>.`,
+          `Issue favorable : 1 (le couple (6,6)).`,
+          `<code>P = 1/36</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Probabilité d\'une intersection',
+    generate() {
+      return {
+        question: `Une carte est tirée d'un jeu de 32. Probabilité que ce soit un <strong>roi de cœur</strong> ?`,
+        inputType: 'fraction',
+        answer: 1/32,
+        formatAnswer: () => `1/32`,
+        steps: [
+          `Il y a un seul roi de cœur dans le jeu.`,
+          `<code>P = 1/32</code>.`,
         ],
       };
     },
