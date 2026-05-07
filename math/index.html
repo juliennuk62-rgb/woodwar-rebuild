@@ -205,6 +205,10 @@
       font-style: italic;
     }
     .sidebar .chap-btn.placeholder:hover { color: var(--text-3); background: var(--bg-soft); }
+    /* Quand un placeholder est sélectionné, on garde l'état actif lisible :
+       sans cette règle, .placeholder (déclaré après .active à spécificité
+       égale) imposait son color:var(--text-3) sur fond bleu = contraste raté. */
+    .sidebar .chap-btn.placeholder.active { color: white; background: var(--primary); }
 
     /* ─── Content ────────────────────────────── */
     article.content {
@@ -528,7 +532,10 @@
     @media (max-width: 600px) {
       header.app-header { padding: 10px 14px; }
       .app-title { font-size: 15px; }
-      .breadcrumb-bar { font-size: 12px; }
+      /* Sur écran étroit, un titre de chapitre long faisait déborder le
+         header. Le titre du chapitre est de toute façon répété en h1
+         dans le contenu, donc on cache le breadcrumb. */
+      .breadcrumb-bar { display: none; }
       .content h1 { font-size: 26px; }
       .content h2 { font-size: 19px; }
     }
