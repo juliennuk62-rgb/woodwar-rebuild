@@ -632,20 +632,7 @@ const CURRICULUM = [
   {
     id: 'lycee', name: 'Lycée',
     levels: [
-      { id: '2nde', name: '2nde', chapters: [
-        todo("Ensembles de nombres ℕ, ℤ, 𝔻, ℚ, ℝ", "Nombres et calculs"),
-        todo("Calcul numérique et algébrique", "Nombres et calculs"),
-        todo("Inéquations et intervalles", "Nombres et calculs"),
-        todo("Fonctions : généralités", "Fonctions"),
-        todo("Fonction affine, équations de droites", "Fonctions"),
-        todo("Fonction carré, racine carrée, cube", "Fonctions"),
-        todo("Fonction inverse", "Fonctions"),
-        todo("Vecteurs : définition, somme, colinéarité", "Géométrie"),
-        todo("Géométrie repérée", "Géométrie"),
-        todo("Statistiques : moyenne, médiane, écart-type", "Statistiques"),
-        todo("Probabilités : modélisation", "Probabilités"),
-        todo("Algorithmique et programmation Python", "Algorithmique"),
-      ]},
+      { id: '2nde', name: '2nde', chapters: chapters2nde() },
       { id: '1ere', name: '1ère', chapters: [
         todo("Suites numériques (arithmétique, géométrique)", "Suites"),
         todo("Limites de suites (intuition)", "Suites"),
@@ -708,6 +695,592 @@ const CURRICULUM = [
     ],
   },
 ];
+
+// ─── Contenu pédagogique : 2nde à fond ───────────────────────────
+function chapters2nde() {
+  return [
+    {
+      title: "Ensembles de nombres ℕ, ℤ, 𝔻, ℚ, ℝ",
+      category: "Nombres et calculs",
+      content: `
+        <h2>1. Les cinq ensembles de nombres</h2>
+        ${lc.def("Les ensembles classiques", `<ul>
+          <li><strong>ℕ</strong> : <strong>entiers naturels</strong>. <code>0, 1, 2, 3, 4, 5, …</code></li>
+          <li><strong>ℤ</strong> : <strong>entiers relatifs</strong>. <code>…, −3, −2, −1, 0, 1, 2, 3, …</code></li>
+          <li><strong>𝔻</strong> : <strong>nombres décimaux</strong>. Tout nombre qui s'écrit avec un nombre fini de chiffres après la virgule. <code>3,5 ; −0,01 ; 12 ; …</code></li>
+          <li><strong>ℚ</strong> : <strong>nombres rationnels</strong>. Tout nombre qui s'écrit comme une fraction <code>a/b</code> avec <code>a ∈ ℤ</code> et <code>b ∈ ℤ*</code>. <code>1/3 ; 7/2 ; −5/8 ; …</code></li>
+          <li><strong>ℝ</strong> : <strong>nombres réels</strong>. Tout nombre qu'on peut placer sur la droite numérique.</li>
+        </ul>`)}
+
+        <h2>2. Inclusions</h2>
+        ${lc.prop("Hiérarchie", `<p>Chaque ensemble est inclus dans le suivant :</p>`)}
+        ${lc.formula("ℕ ⊂ ℤ ⊂ 𝔻 ⊂ ℚ ⊂ ℝ")}
+        <p>Tout entier naturel est un entier relatif, tout entier relatif est un décimal (par exemple <code>5 = 5,0</code>), tout décimal est un rationnel (<code>3,5 = 7/2</code>), et tout rationnel est un réel.</p>
+        ${lc.warn("Inclusions strictes", `<p>Ces inclusions sont <strong>strictes</strong> : il existe des éléments à chaque palier qui ne sont pas dans le précédent. Par exemple <code>−2 ∈ ℤ</code> mais <code>−2 ∉ ℕ</code>.</p>`)}
+
+        <h2>3. Notations</h2>
+        ${lc.prop("Symboles à connaître", `<ul>
+          <li><code>x ∈ E</code> : <code>x</code> appartient à <code>E</code>.</li>
+          <li><code>x ∉ E</code> : <code>x</code> n'appartient pas à <code>E</code>.</li>
+          <li><code>A ⊂ B</code> : <code>A</code> est inclus dans <code>B</code>.</li>
+          <li><code>ℕ*</code>, <code>ℤ*</code>, etc. : l'ensemble privé de 0.</li>
+          <li><code>ℝ⁺</code> = <code>[0, +∞[</code> : les réels positifs.</li>
+          <li><code>ℝ⁻</code> = <code>]−∞, 0]</code> : les réels négatifs.</li>
+        </ul>`)}
+
+        <h2>4. Nombres irrationnels</h2>
+        ${lc.def("Irrationnel", `<p>Un nombre <strong>irrationnel</strong> est un réel qui <strong>n'est pas</strong> rationnel : il ne peut pas s'écrire sous la forme d'une fraction <code>a/b</code>.</p>`)}
+        ${lc.example("Quelques irrationnels célèbres", `<ul>
+          <li><code>√2 ≈ 1,41421356…</code> (les décimales ne se répètent jamais)</li>
+          <li><code>π ≈ 3,14159265…</code></li>
+          <li><code>e ≈ 2,71828182…</code> (constante d'Euler)</li>
+        </ul>`)}
+        ${lc.tip("Démonstration célèbre", `<p>On peut démontrer (par l'absurde) que <code>√2</code> est irrationnel : si <code>√2 = p/q</code> avec <code>p/q</code> irréductible, on aboutit à une contradiction. C'est l'un des plus vieux résultats de mathématiques.</p>`)}
+
+        <h2>5. Comment reconnaître l'ensemble d'appartenance</h2>
+        ${lc.example("Classer quelques nombres", `<ul>
+          <li><code>7</code> : appartient à <strong>ℕ</strong> (et à tous les ensembles plus grands).</li>
+          <li><code>−4</code> : appartient à <strong>ℤ</strong> mais pas à ℕ.</li>
+          <li><code>3,75</code> : appartient à <strong>𝔻</strong> mais pas à ℤ.</li>
+          <li><code>1/3 = 0,333…</code> : appartient à <strong>ℚ</strong> mais pas à 𝔻 (décimales infinies périodiques).</li>
+          <li><code>π</code> : appartient à <strong>ℝ</strong> seulement (irrationnel).</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Calcul numérique et algébrique",
+      category: "Nombres et calculs",
+      content: `
+        <h2>1. Rappels sur les fractions</h2>
+        ${lc.formula("a/b + c/d = (ad + bc) / (bd) &nbsp;&nbsp; a/b × c/d = (ac)/(bd) &nbsp;&nbsp; a/b ÷ c/d = (ad)/(bc)")}
+        ${lc.tip("Toujours simplifier", `<p>À la fin d'un calcul, on rend la fraction <strong>irréductible</strong> en divisant par le PGCD.</p>`)}
+
+        <h2>2. Puissances</h2>
+        ${lc.prop("Règles à maîtriser", `<ul>
+          <li><code>a<sup>m</sup> × a<sup>n</sup> = a<sup>m+n</sup></code></li>
+          <li><code>a<sup>m</sup> / a<sup>n</sup> = a<sup>m−n</sup></code></li>
+          <li><code>(a<sup>m</sup>)<sup>n</sup> = a<sup>mn</sup></code></li>
+          <li><code>(ab)<sup>n</sup> = a<sup>n</sup> × b<sup>n</sup></code></li>
+          <li><code>a<sup>0</sup> = 1</code> (pour <code>a ≠ 0</code>) ; <code>a<sup>−n</sup> = 1/a<sup>n</sup></code></li>
+        </ul>`)}
+
+        <h2>3. Racines carrées</h2>
+        ${lc.formula("√(ab) = √a × √b &nbsp;&nbsp; √(a/b) = √a / √b &nbsp;&nbsp; (a, b ≥ 0)")}
+        ${lc.warn("Pas la somme", `<p><code>√(a + b) ≠ √a + √b</code>. Toujours.</p>`)}
+        ${lc.example("Simplifier 3√12 + √48 − √27", `<ol><li>Simplifier chaque racine : <code>√12 = 2√3</code>, <code>√48 = 4√3</code>, <code>√27 = 3√3</code>.</li>
+          <li>Substituer : <code>3 × 2√3 + 4√3 − 3√3 = 6√3 + 4√3 − 3√3</code>.</li>
+          <li>Combiner : <code>= 7√3</code>.</li></ol>`)}
+
+        <h2>4. Identités remarquables</h2>
+        ${lc.formula("(a + b)² = a² + 2ab + b²<br>(a − b)² = a² − 2ab + b²<br>(a + b)(a − b) = a² − b²")}
+        ${lc.example("Développer (3x − 2)²", `<p><code>(3x − 2)² = (3x)² − 2 × 3x × 2 + 2² = 9x² − 12x + 4</code>.</p>`)}
+        ${lc.example("Factoriser 25x² − 16", `<p>Différence de carrés : <code>25x² = (5x)²</code> et <code>16 = 4²</code>. Donc <code>25x² − 16 = (5x − 4)(5x + 4)</code>.</p>`)}
+
+        <h2>5. Notation scientifique</h2>
+        ${lc.def("Notation scientifique", `<p>Tout nombre non nul s'écrit sous la forme <code>a × 10ⁿ</code> avec <code>1 ≤ |a| < 10</code> et <code>n ∈ ℤ</code>.</p>`)}
+        ${lc.example("Convertir", `<ul>
+          <li><code>0,000 47 = 4,7 × 10⁻⁴</code></li>
+          <li><code>−325 000 = −3,25 × 10⁵</code></li>
+        </ul>`)}
+
+        <h2>6. Coefficient multiplicateur (rappel)</h2>
+        ${lc.prop("Augmentation / réduction de p%", `<p>Augmenter de <code>p%</code> = multiplier par <code>1 + p/100</code>.</p>
+          <p>Réduire de <code>p%</code> = multiplier par <code>1 − p/100</code>.</p>
+          <p>Le <strong>coefficient multiplicateur global</strong> de plusieurs évolutions successives est le <em>produit</em> des coefficients (et non leur somme).</p>`)}
+        ${lc.example("Évolutions successives", `<p>Une valeur subit +20 % puis −10 %. Coefficient global : <code>1,2 × 0,9 = 1,08</code>. C'est donc une augmentation globale de <code>8 %</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Inéquations et intervalles",
+      category: "Nombres et calculs",
+      content: `
+        <h2>1. Notation des intervalles</h2>
+        ${lc.def("Intervalles", `<p>Un <strong>intervalle</strong> de ℝ est un ensemble de réels « consécutifs ».</p>`)}
+        ${lc.prop("Notation", `<table>
+          <tr><th>Notation</th><th>Inégalité</th><th>Représentation</th></tr>
+          <tr><td>[a ; b]</td><td>a ≤ x ≤ b</td><td>fermé des deux côtés</td></tr>
+          <tr><td>]a ; b[</td><td>a < x < b</td><td>ouvert des deux côtés</td></tr>
+          <tr><td>[a ; b[</td><td>a ≤ x < b</td><td>fermé en a, ouvert en b</td></tr>
+          <tr><td>[a ; +∞[</td><td>x ≥ a</td><td>de a à l'infini, fermé en a</td></tr>
+          <tr><td>]−∞ ; b]</td><td>x ≤ b</td><td>de l'infini à b, fermé en b</td></tr>
+          <tr><td>]−∞ ; +∞[</td><td>tout x</td><td>= ℝ</td></tr>
+        </table>`)}
+        ${lc.warn("Crochets ouverts vers l'infini", `<p>Le crochet est <strong>toujours ouvert</strong> vers <code>+∞</code> ou <code>−∞</code> : ce ne sont pas des nombres mais des limites.</p>`)}
+
+        <h2>2. Réunion et intersection</h2>
+        ${lc.def("Réunion ∪", `<p><code>A ∪ B</code> = ensemble des nombres qui sont dans <code>A</code> <strong>ou</strong> dans <code>B</code> (ou les deux).</p>`)}
+        ${lc.def("Intersection ∩", `<p><code>A ∩ B</code> = ensemble des nombres qui sont à la fois dans <code>A</code> <strong>et</strong> dans <code>B</code>.</p>`)}
+        ${lc.example("Avec deux intervalles", `<p><code>[2 ; 5] ∩ [3 ; 7] = [3 ; 5]</code> (la partie commune).</p>
+          <p><code>[2 ; 5] ∪ [3 ; 7] = [2 ; 7]</code> (l'union).</p>
+          <p><code>[2 ; 5] ∩ [6 ; 9] = ∅</code> (vide, pas d'intersection).</p>`)}
+
+        <h2>3. Résoudre une inéquation</h2>
+        ${lc.prop("Règles", `<p>Sans changer les solutions, on peut :</p>
+          <ul><li>ajouter / soustraire un même nombre des deux côtés ;</li>
+          <li>multiplier / diviser par un nombre <strong>strictement positif</strong> ;</li>
+          <li>multiplier / diviser par un nombre <strong>strictement négatif</strong> en <strong>changeant le sens</strong> de l'inégalité.</li></ul>`)}
+        ${lc.example("Résoudre 3x − 5 ≤ 7 − x", `<ol><li>Ajouter <code>x</code> : <code>4x − 5 ≤ 7</code>.</li>
+          <li>Ajouter 5 : <code>4x ≤ 12</code>.</li>
+          <li>Diviser par 4 : <code>x ≤ 3</code>.</li>
+          <li>Solutions : <code>S = ]−∞ ; 3]</code>.</li></ol>`)}
+        ${lc.example("Résoudre −2x + 1 > 7", `<ol><li>Soustraire 1 : <code>−2x > 6</code>.</li>
+          <li>Diviser par <code>−2</code> (inverser) : <code>x < −3</code>.</li>
+          <li>Solutions : <code>S = ]−∞ ; −3[</code>.</li></ol>`)}
+
+        <h2>4. Système d'inéquations</h2>
+        ${lc.example("Résoudre simultanément 2x − 1 ≥ 3 et 3x + 4 < 10", `<ol><li>Première : <code>2x ≥ 4</code>, donc <code>x ≥ 2</code>, soit <code>S₁ = [2 ; +∞[</code>.</li>
+          <li>Deuxième : <code>3x < 6</code>, donc <code>x < 2</code>, soit <code>S₂ = ]−∞ ; 2[</code>.</li>
+          <li>Solutions : <code>S = S₁ ∩ S₂ = ∅</code>. Aucune solution !</li></ol>`)}
+
+        <h2>5. Tableau de signes (introduction)</h2>
+        ${lc.prop("Pour étudier le signe d'un produit ou d'un quotient", `<p>On dresse un tableau dont les colonnes sont les valeurs où chaque facteur s'annule. Pour chaque ligne (facteur), on note le signe.</p>`)}
+        ${lc.example("Signe de (x − 1)(x + 2)", `<p>Les facteurs s'annulent en <code>1</code> et <code>−2</code>.</p>
+          <table>
+            <tr><th>x</th><th>−∞</th><th>−2</th><th>1</th><th>+∞</th></tr>
+            <tr><td>x − 1</td><td colspan="2">−</td><td colspan="2">+</td></tr>
+            <tr><td>x + 2</td><td>−</td><td colspan="3">+</td></tr>
+            <tr><td>(x−1)(x+2)</td><td>+</td><td>−</td><td>+</td><td></td></tr>
+          </table>
+          <p>Donc <code>(x − 1)(x + 2) ≥ 0</code> sur <code>]−∞ ; −2] ∪ [1 ; +∞[</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Fonctions : généralités",
+      category: "Fonctions",
+      content: `
+        <h2>1. Définition d'une fonction</h2>
+        ${lc.def("Fonction", `<p>Définir une fonction <code>f</code> sur un ensemble <code>D</code>, c'est associer à chaque élément <code>x</code> de <code>D</code> un unique nombre, noté <code>f(x)</code>.</p>
+          <p><code>D</code> est l'<strong>ensemble de définition</strong>, <code>x</code> est la <strong>variable</strong>, et <code>f(x)</code> est l'<strong>image</strong> de <code>x</code>.</p>`)}
+        ${lc.formula("f : D → ℝ ;  x → f(x)")}
+
+        <h2>2. Image et antécédent</h2>
+        ${lc.def("Image et antécédent", `<ul>
+          <li>L'<strong>image</strong> de <code>x</code> par <code>f</code> est <code>f(x)</code>. Un nombre a une <em>seule</em> image.</li>
+          <li>Un <strong>antécédent</strong> de <code>y</code> est un nombre <code>x</code> tel que <code>f(x) = y</code>. Un nombre peut avoir 0, 1 ou plusieurs antécédents.</li>
+        </ul>`)}
+        ${lc.example("Avec f(x) = x²", `<ul>
+          <li>L'image de 3 est <code>f(3) = 9</code>.</li>
+          <li>Les antécédents de 9 sont <code>3</code> et <code>−3</code> (deux antécédents).</li>
+          <li>L'antécédent de <code>−4</code> n'existe pas (un carré n'est jamais négatif).</li>
+        </ul>`)}
+
+        <h2>3. Ensemble de définition</h2>
+        ${lc.prop("Trouver D", `<p>L'ensemble de définition est l'ensemble des <code>x</code> pour lesquels <code>f(x)</code> a un sens.</p>
+          <ul><li>Une <strong>fraction</strong> est définie quand le dénominateur n'est pas nul.</li>
+          <li>Une <strong>racine carrée</strong> est définie quand son contenu est positif (ou nul).</li></ul>`)}
+        ${lc.example("Ensemble de définition", `<ul>
+          <li><code>f(x) = 1/(x − 2)</code> : il faut <code>x ≠ 2</code>. Donc <code>D = ]−∞ ; 2[ ∪ ]2 ; +∞[</code>.</li>
+          <li><code>g(x) = √(x − 5)</code> : il faut <code>x − 5 ≥ 0</code>, soit <code>x ≥ 5</code>. Donc <code>D = [5 ; +∞[</code>.</li>
+        </ul>`)}
+
+        <h2>4. Représentation graphique</h2>
+        ${lc.def("Courbe représentative", `<p>La <strong>courbe représentative</strong> de <code>f</code> est l'ensemble des points de coordonnées <code>(x, f(x))</code> dans un repère.</p>`)}
+        ${lc.tip("Lecture graphique", `<ul>
+          <li><strong>Image de a</strong> : on lit l'ordonnée du point d'abscisse <code>a</code> sur la courbe.</li>
+          <li><strong>Antécédents de b</strong> : on cherche les abscisses des points dont l'ordonnée vaut <code>b</code> (intersection avec la droite <code>y = b</code>).</li>
+        </ul>`)}
+
+        <h2>5. Variations</h2>
+        ${lc.def("Croissance / décroissance", `<p>Sur un intervalle <code>I</code>, <code>f</code> est :</p>
+          <ul><li><strong>croissante</strong> si quand <code>x</code> augmente, <code>f(x)</code> augmente aussi : <code>x₁ < x₂ ⇒ f(x₁) ≤ f(x₂)</code>.</li>
+          <li><strong>décroissante</strong> si quand <code>x</code> augmente, <code>f(x)</code> diminue : <code>x₁ < x₂ ⇒ f(x₁) ≥ f(x₂)</code>.</li>
+          <li><strong>constante</strong> si <code>f(x)</code> ne change pas.</li></ul>`)}
+
+        <h2>6. Tableau de variations</h2>
+        ${lc.prop("Forme du tableau", `<p>Un tableau de variations résume les variations de <code>f</code> sur son ensemble de définition. Il indique les valeurs aux bornes et aux extrémums.</p>`)}
+        ${lc.example("Pour f(x) = x² sur ℝ", `<table>
+          <tr><th>x</th><th>−∞</th><th>0</th><th>+∞</th></tr>
+          <tr><td>f(x)</td><td>+∞</td><td>0</td><td>+∞</td></tr>
+        </table>
+          <p>(Décroissante sur <code>]−∞ ; 0]</code>, croissante sur <code>[0 ; +∞[</code>, minimum en 0.)</p>`)}
+
+        <h2>7. Maximum, minimum</h2>
+        ${lc.def("Extrémums", `<ul>
+          <li><strong>Maximum</strong> de <code>f</code> sur <code>I</code> : la plus grande valeur de <code>f(x)</code> sur <code>I</code>.</li>
+          <li><strong>Minimum</strong> : la plus petite.</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Fonction affine, équations de droites",
+      category: "Fonctions",
+      content: `
+        <h2>1. Fonction affine</h2>
+        ${lc.def("Fonction affine", `<p>Une <strong>fonction affine</strong> est définie sur ℝ par <code>f(x) = ax + b</code>, où <code>a</code> et <code>b</code> sont des réels fixés.</p>
+          <ul><li><code>a</code> est le <strong>coefficient directeur</strong> (ou pente).</li>
+          <li><code>b</code> est l'<strong>ordonnée à l'origine</strong> (la valeur de <code>f(0) = b</code>).</li></ul>`)}
+        ${lc.tip("Cas particuliers", `<ul>
+          <li><code>b = 0</code> : fonction <strong>linéaire</strong> <code>f(x) = ax</code>.</li>
+          <li><code>a = 0</code> : fonction <strong>constante</strong> <code>f(x) = b</code>.</li>
+        </ul>`)}
+
+        <h2>2. Représentation graphique</h2>
+        ${lc.prop("Une droite", `<p>La courbe représentative est une <strong>droite</strong> non verticale, qui coupe l'axe des ordonnées en <code>(0, b)</code>.</p>
+          <ul><li><code>a > 0</code> : la droite est strictement croissante.</li>
+          <li><code>a < 0</code> : strictement décroissante.</li>
+          <li><code>a = 0</code> : horizontale.</li></ul>`)}
+
+        <h2>3. Calculer le coefficient directeur</h2>
+        ${lc.formula("a = (y_B − y_A) / (x_B − x_A) &nbsp;&nbsp; (x_A ≠ x_B)")}
+        ${lc.example("Pente d'une droite", `<p>La droite passe par <code>A(2, 5)</code> et <code>B(6, 13)</code>.</p>
+          <p><code>a = (13 − 5) / (6 − 2) = 8 / 4 = 2</code>.</p>`)}
+
+        <h2>4. Trouver une équation de droite</h2>
+        ${lc.example("À partir de deux points", `<p>Droite passant par <code>A(2, 5)</code> et <code>B(6, 13)</code>.</p>
+          <ol><li>Pente : <code>a = 2</code> (ci-dessus).</li>
+          <li>Avec <code>A</code> : <code>5 = 2 × 2 + b</code> → <code>b = 1</code>.</li>
+          <li>Équation : <code>y = 2x + 1</code>.</li>
+          <li>Vérification avec <code>B</code> : <code>2 × 6 + 1 = 13</code> ✓.</li></ol>`)}
+
+        <h2>5. Cas particuliers : droites verticales et horizontales</h2>
+        ${lc.prop("Droites particulières", `<ul>
+          <li>Une droite <strong>horizontale</strong> a une équation de la forme <code>y = c</code> (avec <code>c</code> constant).</li>
+          <li>Une droite <strong>verticale</strong> a une équation de la forme <code>x = c</code>. Ce n'est <em>pas</em> une fonction (un même x donnerait plusieurs y).</li>
+        </ul>`)}
+
+        <h2>6. Position relative de deux droites</h2>
+        ${lc.prop("Parallélisme et sécance", `<ul>
+          <li>Deux droites <code>y = ax + b</code> et <code>y = a'x + b'</code> sont <strong>parallèles</strong> si elles ont le même coefficient directeur (<code>a = a'</code>).</li>
+          <li>Si <code>a = a'</code> et <code>b = b'</code> : elles sont <strong>confondues</strong>.</li>
+          <li>Si <code>a ≠ a'</code> : elles sont <strong>sécantes</strong> en un point unique.</li>
+        </ul>`)}
+        ${lc.example("Trouver le point d'intersection", `<p>Droites <code>y = 2x + 1</code> et <code>y = −x + 7</code>.</p>
+          <ol><li>Résoudre <code>2x + 1 = −x + 7</code> → <code>3x = 6</code> → <code>x = 2</code>.</li>
+          <li>Donc <code>y = 2 × 2 + 1 = 5</code>.</li>
+          <li>Point d'intersection : <strong>(2, 5)</strong>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Fonction carré, racine carrée, cube",
+      category: "Fonctions",
+      content: `
+        <h2>1. Fonction carré</h2>
+        ${lc.def("Fonction carré", `<p>La fonction <code>f(x) = x²</code> est définie sur ℝ.</p>`)}
+        ${lc.prop("Variations", `<ul>
+          <li>Décroissante sur <code>]−∞ ; 0]</code>.</li>
+          <li>Croissante sur <code>[0 ; +∞[</code>.</li>
+          <li>Minimum en 0 : <code>f(0) = 0</code>.</li>
+        </ul>`)}
+        ${lc.tip("Représentation : la parabole", `<p>La courbe est une <strong>parabole</strong> tournée vers le haut, symétrique par rapport à l'axe des ordonnées (la fonction est <strong>paire</strong> : <code>f(−x) = f(x)</code>).</p>`)}
+
+        <h2>2. Équation x² = a</h2>
+        ${lc.prop("Solutions", `<ul>
+          <li>Si <code>a < 0</code> : <strong>aucune solution</strong>.</li>
+          <li>Si <code>a = 0</code> : une solution, <code>x = 0</code>.</li>
+          <li>Si <code>a > 0</code> : <strong>deux solutions</strong>, <code>x = √a</code> et <code>x = −√a</code>.</li>
+        </ul>`)}
+
+        <h2>3. Fonction cube</h2>
+        ${lc.def("Fonction cube", `<p>La fonction <code>f(x) = x³</code> est définie sur ℝ.</p>`)}
+        ${lc.prop("Variations", `<p>Strictement <strong>croissante</strong> sur ℝ (sans pause au passage par 0).</p>
+          <p>Cette fonction est <strong>impaire</strong> : <code>f(−x) = −f(x)</code>. La courbe est symétrique par rapport à l'origine.</p>`)}
+
+        <h2>4. Équation x³ = a</h2>
+        ${lc.prop("Solution unique", `<p>Pour tout réel <code>a</code>, l'équation <code>x³ = a</code> a <strong>une seule solution</strong> dans ℝ : la racine cubique <code>∛a</code>.</p>`)}
+
+        <h2>5. Fonction racine carrée</h2>
+        ${lc.def("Racine carrée", `<p>La fonction <code>f(x) = √x</code> est définie sur <code>[0 ; +∞[</code>.</p>`)}
+        ${lc.prop("Variations", `<ul>
+          <li>Strictement <strong>croissante</strong> sur <code>[0 ; +∞[</code>.</li>
+          <li>Mais sa croissance ralentit : la pente diminue à mesure que <code>x</code> augmente.</li>
+          <li>Valeurs : <code>√0 = 0</code>, <code>√1 = 1</code>, <code>√4 = 2</code>, <code>√9 = 3</code>, <code>√16 = 4</code>...</li>
+        </ul>`)}
+
+        <h2>6. Comparaisons utiles</h2>
+        ${lc.prop("Sur l'intervalle [0, 1]", `<p>Pour <code>0 ≤ x ≤ 1</code>, on a : <code>x² ≤ x ≤ √x</code>.</p>`)}
+        ${lc.prop("Sur [1, +∞[", `<p>Pour <code>x ≥ 1</code>, on a : <code>√x ≤ x ≤ x²</code>.</p>`)}
+        ${lc.example("Vérifier", `<ul>
+          <li>Pour <code>x = 0,25</code> : <code>x² = 0,0625</code>, <code>x = 0,25</code>, <code>√x = 0,5</code>. ✓ <code>x² < x < √x</code>.</li>
+          <li>Pour <code>x = 4</code> : <code>√x = 2</code>, <code>x = 4</code>, <code>x² = 16</code>. ✓ <code>√x < x < x²</code>.</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Fonction inverse",
+      category: "Fonctions",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Fonction inverse", `<p>La fonction <code>f(x) = 1/x</code> est définie sur <code>ℝ*</code> (réels sauf 0).</p>
+          <p>Son ensemble de définition est <code>]−∞ ; 0[ ∪ ]0 ; +∞[</code>.</p>`)}
+        ${lc.warn("Pas définie en 0", `<p>On ne peut pas calculer <code>1/0</code>. La courbe a un « trou » en <code>x = 0</code>.</p>`)}
+
+        <h2>2. Variations</h2>
+        ${lc.prop("Variations", `<ul>
+          <li>Strictement <strong>décroissante</strong> sur <code>]−∞ ; 0[</code>.</li>
+          <li>Strictement <strong>décroissante</strong> sur <code>]0 ; +∞[</code>.</li>
+        </ul>
+          <p>⚠ Mais on ne peut <strong>pas</strong> dire qu'elle est décroissante sur tout <code>ℝ*</code> : il y a un saut autour de 0.</p>`)}
+        ${lc.example("Vérifier", `<p><code>f(−1) = −1</code> et <code>f(1) = 1</code>. Bien que <code>−1 < 1</code>, on a <code>f(−1) < f(1)</code>. Donc la fonction n'est pas globalement décroissante sur <code>ℝ*</code>.</p>`)}
+
+        <h2>3. Représentation graphique</h2>
+        ${lc.prop("Une hyperbole", `<p>La courbe est une <strong>hyperbole</strong> à deux branches, symétrique par rapport à l'origine.</p>
+          <p>La fonction est <strong>impaire</strong> : <code>f(−x) = −f(x)</code>.</p>`)}
+        ${lc.tip("Asymptotes (intuition)", `<ul>
+          <li>Quand <code>x → ±∞</code>, <code>1/x → 0</code> : la courbe se rapproche de l'axe des abscisses.</li>
+          <li>Quand <code>x → 0⁺</code>, <code>1/x → +∞</code> ; quand <code>x → 0⁻</code>, <code>1/x → −∞</code>.</li>
+        </ul>`)}
+
+        <h2>4. Équation 1/x = a</h2>
+        ${lc.prop("Solutions", `<ul>
+          <li>Si <code>a = 0</code> : <strong>aucune solution</strong> (un inverse n'est jamais nul).</li>
+          <li>Si <code>a ≠ 0</code> : une seule solution, <code>x = 1/a</code>.</li>
+        </ul>`)}
+
+        <h2>5. Comparaisons</h2>
+        ${lc.prop("Sur ]0, +∞[", `<p>Sur <code>]0 ; +∞[</code>, la fonction inverse est décroissante. Donc <code>x₁ < x₂ ⇒ 1/x₁ > 1/x₂</code> : <strong>l'inégalité s'inverse</strong>.</p>`)}
+        ${lc.example("Vérifier", `<p><code>2 < 5</code>, et <code>1/2 = 0,5 > 0,2 = 1/5</code>. ✓</p>`)}
+        ${lc.warn("Avec des signes différents", `<p>Si <code>x₁ < 0 < x₂</code>, on ne peut <strong>pas</strong> en déduire l'ordre des inverses : <code>1/x₁ < 0 < 1/x₂</code> est correct, mais ne suit pas la règle de la décroissance.</p>`)}
+      `,
+    },
+
+    {
+      title: "Vecteurs : définition, somme, colinéarité",
+      category: "Géométrie",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Vecteur", `<p>Un <strong>vecteur</strong> est défini par trois caractéristiques :</p>
+          <ul><li>une <strong>direction</strong> (la droite qui le porte) ;</li>
+          <li>un <strong>sens</strong> (orientation sur la droite) ;</li>
+          <li>une <strong>longueur</strong> (ou « norme »).</li></ul>
+          <p>Notation : <code>AB→</code> (vecteur de A vers B), ou avec une lettre : <code>u→</code>.</p>`)}
+
+        <h2>2. Vecteurs égaux</h2>
+        ${lc.def("Égalité de vecteurs", `<p>Deux vecteurs sont <strong>égaux</strong> s'ils ont même direction, même sens et même longueur.</p>
+          <p>Caractérisation : <code>AB→ = CD→</code> si et seulement si <code>ABDC</code> est un <strong>parallélogramme</strong> (sommets dans cet ordre).</p>`)}
+
+        <h2>3. Vecteur nul</h2>
+        ${lc.def("Vecteur nul", `<p>Le <strong>vecteur nul</strong>, noté <code>0→</code>, a une longueur nulle. C'est <code>AA→</code> pour n'importe quel point <code>A</code>.</p>`)}
+
+        <h2>4. Somme de vecteurs (relation de Chasles)</h2>
+        ${lc.prop("Relation de Chasles", `<p>Pour tous points <code>A</code>, <code>B</code>, <code>C</code> :</p>`)}
+        ${lc.formula("AB→ + BC→ = AC→")}
+        ${lc.tip("Astuce mnémotechnique", `<p>Le <code>B</code> du milieu « disparaît ». On enchaîne deux trajets pour obtenir le trajet direct.</p>`)}
+
+        <h2>5. Multiplication par un nombre (scalaire)</h2>
+        ${lc.def("Produit d'un vecteur par un scalaire", `<p>Pour un réel <code>k</code> et un vecteur <code>u→</code> :</p>
+          <ul><li>Si <code>k > 0</code> : <code>k × u→</code> a même sens que <code>u→</code> et est <code>k</code> fois plus long.</li>
+          <li>Si <code>k < 0</code> : sens contraire et <code>|k|</code> fois plus long.</li>
+          <li>Si <code>k = 0</code> : produit = <code>0→</code>.</li></ul>`)}
+
+        <h2>6. Vecteurs colinéaires</h2>
+        ${lc.def("Colinéarité", `<p>Deux vecteurs <code>u→</code> et <code>v→</code> sont <strong>colinéaires</strong> s'ils ont la même direction (peu importe le sens et la longueur).</p>
+          <p>Caractérisation : <code>u→</code> et <code>v→</code> colinéaires ⇔ il existe un réel <code>k</code> tel que <code>v→ = k × u→</code> (ou si <code>u→ = 0→</code>).</p>`)}
+
+        <h2>7. Applications géométriques</h2>
+        ${lc.prop("Démonstrations classiques", `<ul>
+          <li><strong>Alignement</strong> : les points <code>A</code>, <code>B</code>, <code>C</code> sont alignés ⇔ <code>AB→</code> et <code>AC→</code> sont colinéaires.</li>
+          <li><strong>Parallélisme</strong> : <code>(AB) ∥ (CD)</code> ⇔ <code>AB→</code> et <code>CD→</code> sont colinéaires.</li>
+          <li><strong>Milieu</strong> : <code>I</code> est le milieu de <code>[AB]</code> ⇔ <code>AI→ = IB→</code> ⇔ <code>AI→ = (1/2) × AB→</code>.</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Géométrie repérée",
+      category: "Géométrie",
+      content: `
+        <h2>1. Coordonnées d'un point</h2>
+        ${lc.def("Repère orthonormé", `<p>On se place dans un <strong>repère orthonormé</strong> du plan, avec origine <code>O</code> et axes perpendiculaires <code>(Ox)</code> et <code>(Oy)</code>. Un point <code>A</code> est repéré par ses coordonnées <code>(x_A, y_A)</code> : abscisse et ordonnée.</p>`)}
+
+        <h2>2. Coordonnées d'un vecteur</h2>
+        ${lc.formula("Si A(x_A, y_A) et B(x_B, y_B), alors AB→(x_B − x_A ; y_B − y_A)")}
+        ${lc.example("Calcul", `<p>Avec <code>A(1, 3)</code> et <code>B(5, 7)</code> :</p>
+          <p><code>AB→ = (5 − 1 ; 7 − 3) = (4 ; 4)</code>.</p>`)}
+
+        <h2>3. Norme d'un vecteur (longueur)</h2>
+        ${lc.formula("Si u→(x ; y), alors ||u→|| = √(x² + y²)")}
+        ${lc.example("Calcul", `<p>Pour <code>u→(3 ; 4)</code> : <code>||u→|| = √(9 + 16) = √25 = 5</code>.</p>`)}
+
+        <h2>4. Distance entre deux points</h2>
+        ${lc.formula("AB = √((x_B − x_A)² + (y_B − y_A)²)")}
+        ${lc.example("Distance", `<p>Avec <code>A(1, 2)</code> et <code>B(4, 6)</code> :</p>
+          <p><code>AB = √((4−1)² + (6−2)²) = √(9 + 16) = √25 = 5</code>.</p>`)}
+
+        <h2>5. Coordonnées du milieu</h2>
+        ${lc.formula("Milieu I de [AB] : I = ((x_A + x_B)/2 ; (y_A + y_B)/2)")}
+        ${lc.example("Milieu", `<p>Avec <code>A(2, 4)</code> et <code>B(6, 10)</code> : milieu = <code>((2+6)/2 ; (4+10)/2) = (4 ; 7)</code>.</p>`)}
+
+        <h2>6. Test de colinéarité (déterminant)</h2>
+        ${lc.prop("Critère par le déterminant", `<p>Soit <code>u→(x ; y)</code> et <code>v→(x' ; y')</code> deux vecteurs. Ils sont <strong>colinéaires</strong> si et seulement si :</p>`)}
+        ${lc.formula("x × y' − x' × y = 0")}
+        ${lc.example("Tester la colinéarité", `<p><code>u→(2 ; 6)</code> et <code>v→(3 ; 9)</code>. Calcul : <code>2 × 9 − 3 × 6 = 18 − 18 = 0</code>. Colinéaires ✓.</p>
+          <p><code>u→(2 ; 5)</code> et <code>v→(3 ; 7)</code>. Calcul : <code>2 × 7 − 3 × 5 = 14 − 15 = −1 ≠ 0</code>. Non colinéaires.</p>`)}
+
+        <h2>7. Application : démontrer un parallélisme</h2>
+        ${lc.example("Démonstration", `<p>Soit <code>A(1, 2)</code>, <code>B(4, 5)</code>, <code>C(2, 1)</code>, <code>D(8, 7)</code>. Démontrer que <code>(AB) ∥ (CD)</code>.</p>
+          <ol><li><code>AB→ = (4−1 ; 5−2) = (3 ; 3)</code>.</li>
+          <li><code>CD→ = (8−2 ; 7−1) = (6 ; 6)</code>.</li>
+          <li>Déterminant : <code>3 × 6 − 6 × 3 = 18 − 18 = 0</code> → colinéaires.</li>
+          <li>Donc <code>(AB) ∥ (CD)</code>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Statistiques : moyenne, médiane, écart-type",
+      category: "Statistiques",
+      content: `
+        <h2>1. Moyenne et médiane (rappels)</h2>
+        ${lc.formula("Moyenne x̄ = (somme des valeurs) / (effectif total)")}
+        ${lc.def("Médiane", `<p>La <strong>médiane</strong> partage la série en deux moitiés de même effectif. Elle est plus robuste aux valeurs extrêmes que la moyenne.</p>`)}
+
+        <h2>2. Quartiles</h2>
+        ${lc.def("Premier et troisième quartile", `<ul>
+          <li><code>Q₁</code> (1er quartile) : 25 % des valeurs sont ≤ Q₁.</li>
+          <li><code>Q₃</code> (3e quartile) : 75 % des valeurs sont ≤ Q₃.</li>
+          <li>La médiane est le 2e quartile <code>Q₂</code>.</li>
+        </ul>`)}
+        ${lc.def("Écart interquartile", `<p>L'<strong>écart interquartile</strong> est <code>Q₃ − Q₁</code>. Il mesure la dispersion de la moitié centrale de la série, en éliminant les valeurs extrêmes.</p>`)}
+
+        <h2>3. Étendue (rappel)</h2>
+        ${lc.formula("Étendue = (valeur max) − (valeur min)")}
+
+        <h2>4. Variance et écart-type</h2>
+        ${lc.def("Variance", `<p>La <strong>variance</strong> mesure la dispersion par rapport à la moyenne.</p>`)}
+        ${lc.formula("V = (1/n) × Σ(x_i − x̄)²")}
+        ${lc.def("Écart-type", `<p>L'<strong>écart-type</strong> est la racine carrée de la variance. Il s'exprime dans la même unité que les valeurs.</p>`)}
+        ${lc.formula("σ = √V")}
+
+        <h2>5. Calcul pas-à-pas</h2>
+        ${lc.example("Série 4, 6, 8, 10, 12", `<ol>
+          <li>Moyenne : <code>x̄ = (4+6+8+10+12)/5 = 40/5 = 8</code>.</li>
+          <li>Écarts à la moyenne : <code>−4, −2, 0, 2, 4</code>.</li>
+          <li>Carrés des écarts : <code>16, 4, 0, 4, 16</code>. Somme : <code>40</code>.</li>
+          <li>Variance : <code>V = 40/5 = 8</code>.</li>
+          <li>Écart-type : <code>σ = √8 ≈ 2,83</code>.</li>
+        </ol>`)}
+
+        <h2>6. Interprétation</h2>
+        ${lc.prop("Plus σ est petit", `<p>Plus l'écart-type est petit, plus les valeurs sont concentrées autour de la moyenne. Un écart-type nul (σ = 0) signifie que toutes les valeurs sont égales.</p>`)}
+        ${lc.example("Comparer deux séries", `<p>Série A : <code>9, 10, 11</code> → moyenne 10, écart-type ≈ 0,82.</p>
+          <p>Série B : <code>5, 10, 15</code> → moyenne 10, écart-type ≈ 4,08.</p>
+          <p>Même moyenne, mais B est <strong>plus dispersée</strong> que A.</p>`)}
+
+        <h2>7. Diagramme en boîte</h2>
+        ${lc.def("Boîte à moustaches", `<p>Le <strong>diagramme en boîte</strong> représente visuellement min, Q₁, médiane, Q₃, max. La boîte va de Q₁ à Q₃ ; la médiane est marquée à l'intérieur ; les « moustaches » s'étendent jusqu'aux extrêmes.</p>`)}
+      `,
+    },
+
+    {
+      title: "Probabilités : modélisation",
+      category: "Probabilités",
+      content: `
+        <h2>1. Univers et événements</h2>
+        ${lc.def("Univers Ω", `<p>L'<strong>univers</strong> d'une expérience aléatoire est l'ensemble de toutes les <strong>issues</strong> possibles. On le note <code>Ω</code>.</p>
+          <p>Exemple : pour le lancer d'un dé, <code>Ω = {1, 2, 3, 4, 5, 6}</code>.</p>`)}
+        ${lc.def("Événement", `<p>Un <strong>événement</strong> est un sous-ensemble de <code>Ω</code>.</p>
+          <p>« Obtenir un nombre pair » correspond à <code>A = {2, 4, 6}</code>.</p>`)}
+
+        <h2>2. Loi de probabilité</h2>
+        ${lc.def("Loi de probabilité", `<p>Une <strong>loi de probabilité</strong> sur <code>Ω = {ω₁, ω₂, …, ωₙ}</code> attribue à chaque issue <code>ωᵢ</code> un nombre <code>pᵢ</code> entre 0 et 1, tel que :</p>`)}
+        ${lc.formula("p₁ + p₂ + … + pₙ = 1")}
+        <p>La probabilité d'un événement <code>A</code> est la <strong>somme des probabilités</strong> des issues qui le composent.</p>
+
+        <h2>3. Cas équiprobable</h2>
+        ${lc.def("Équiprobabilité", `<p>Quand toutes les issues ont la même probabilité <code>1/n</code>, la situation est <strong>équiprobable</strong>.</p>`)}
+        ${lc.formula("P(A) = (nombre d'issues de A) / (nombre total d'issues)")}
+        ${lc.example("Dé équilibré", `<p><code>P(« obtenir un pair ») = 3/6 = 1/2</code>.</p>`)}
+
+        <h2>4. Cas non équiprobable</h2>
+        ${lc.example("Pièce truquée", `<p>Pile a une probabilité de 0,7, face de 0,3.</p>
+          <p>Vérification : <code>0,7 + 0,3 = 1</code> ✓.</p>
+          <p>Si on lance et qu'on regarde « obtenir face » : <code>P = 0,3</code>.</p>`)}
+
+        <h2>5. Réunion, intersection, contraire</h2>
+        ${lc.formula("P(A ∪ B) = P(A) + P(B) − P(A ∩ B)")}
+        ${lc.formula("Si A et B incompatibles : P(A ∪ B) = P(A) + P(B)")}
+        ${lc.formula("P(Ā) = 1 − P(A)")}
+        ${lc.example("Avec un dé", `<p>A = « pair », B = « multiple de 3 ».</p>
+          <p><code>A = {2, 4, 6}</code>, <code>B = {3, 6}</code>, <code>A ∩ B = {6}</code>.</p>
+          <p><code>P(A ∪ B) = 3/6 + 2/6 − 1/6 = 4/6 = 2/3</code>.</p>`)}
+
+        <h2>6. Exemples typiques de modélisation</h2>
+        ${lc.example("Tirage au hasard dans une urne", `<p>Une urne contient 3 boules rouges et 5 boules vertes (8 au total).</p>
+          <ul><li><code>P(rouge) = 3/8</code></li>
+          <li><code>P(verte) = 5/8</code></li>
+          <li>Vérification : <code>3/8 + 5/8 = 1</code> ✓</li></ul>`)}
+        ${lc.example("Deux dés à six faces", `<p>Univers : 36 couples possibles. Probabilité d'obtenir une somme égale à 7 ?</p>
+          <p>Couples : <code>(1,6), (2,5), (3,4), (4,3), (5,2), (6,1)</code>. 6 couples favorables.</p>
+          <p><code>P = 6/36 = 1/6</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Algorithmique et programmation Python",
+      category: "Algorithmique",
+      content: `
+        <h2>1. Variables et affectation</h2>
+        ${lc.def("Variable", `<p>Une <strong>variable</strong> est une « boîte » qui mémorise une valeur. En Python, on utilise l'opérateur <code>=</code> pour <strong>affecter</strong> une valeur.</p>`)}
+        ${lc.example("Affectations", `<pre><code>x = 5
+y = 2 * x + 3
+nom = "Pythagore"
+pi = 3.14159</code></pre>`)}
+        ${lc.tip("Bien lire =", `<p>En Python, <code>x = 5</code> ne signifie <em>pas</em> « x est égal à 5 », mais <em>« mets la valeur 5 dans x »</em>. Cette nuance est importante : <code>x = x + 1</code> a un sens (incrémentation).</p>`)}
+
+        <h2>2. Types de données</h2>
+        ${lc.prop("Principaux types", `<ul>
+          <li><code>int</code> : entiers (<code>0, 7, −3</code>).</li>
+          <li><code>float</code> : décimaux (<code>3.14</code>, <code>−0.5</code>) — point, pas virgule.</li>
+          <li><code>str</code> : chaînes de caractères (<code>"bonjour"</code>).</li>
+          <li><code>bool</code> : booléens (<code>True</code>, <code>False</code>).</li>
+        </ul>`)}
+
+        <h2>3. Structure conditionnelle</h2>
+        ${lc.prop("if / elif / else", `<pre><code>if condition:
+    # bloc exécuté si condition vraie
+elif autre_condition:
+    # sinon, si autre_condition vraie
+else:
+    # sinon</code></pre>`)}
+        ${lc.example("Test de signe", `<pre><code>x = float(input("Entre un nombre : "))
+if x > 0:
+    print("positif")
+elif x < 0:
+    print("négatif")
+else:
+    print("nul")</code></pre>`)}
+
+        <h2>4. Boucle for</h2>
+        ${lc.prop("for", `<pre><code>for i in range(5):
+    print(i)</code></pre>
+          <p>Affiche <code>0, 1, 2, 3, 4</code>. <code>range(n)</code> génère les entiers de 0 à <code>n−1</code>.</p>`)}
+        ${lc.example("Somme des entiers de 1 à 10", `<pre><code>somme = 0
+for i in range(1, 11):
+    somme = somme + i
+print(somme)  # affiche 55</code></pre>`)}
+
+        <h2>5. Boucle while</h2>
+        ${lc.prop("while", `<pre><code>while condition:
+    # bloc répété tant que la condition est vraie</code></pre>`)}
+        ${lc.example("Trouver le plus petit n tel que 2ⁿ > 1000", `<pre><code>n = 0
+puissance = 1
+while puissance &lt;= 1000:
+    n = n + 1
+    puissance = puissance * 2
+print(n)  # affiche 10</code></pre>`)}
+
+        <h2>6. Listes</h2>
+        ${lc.def("Listes", `<p>Une <strong>liste</strong> stocke plusieurs valeurs. On la note avec des crochets, et on accède aux éléments par leur indice (commençant à 0).</p>`)}
+        ${lc.example("Manipulation de listes", `<pre><code>notes = [12, 14, 9, 15]
+print(notes[0])     # 12 (premier élément)
+print(len(notes))   # 4 (longueur)
+notes.append(18)    # ajoute 18 à la fin</code></pre>`)}
+
+        <h2>7. Fonctions</h2>
+        ${lc.def("Fonction", `<p>Une fonction Python encapsule un calcul réutilisable.</p>`)}
+        ${lc.example("Définir et appeler", `<pre><code>def aire_disque(r):
+    return 3.14159 * r * r
+
+print(aire_disque(5))   # affiche 78.539...</code></pre>`)}
+      `,
+    },
+  ];
+}
 
 // ─── Contenu pédagogique : 3e à fond ─────────────────────────────
 function chapters3e() {
