@@ -661,10 +661,334 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ─── Tabs ──────────────────────────────────────── */
+    .tabs {
+      display: flex; gap: 4px;
+      background: var(--bg-soft);
+      padding: 4px;
+      border-radius: var(--r);
+    }
+    .tab {
+      background: transparent;
+      border: none;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+      cursor: pointer;
+      border-radius: var(--r-sm);
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s;
+    }
+    .tab:hover { background: rgba(255,255,255,0.6); }
+    .tab.active {
+      background: var(--bg-elev);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .hud-stats { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+
+    /* ─── Vue Apprentissage ─────────────────────────── */
+    .learn-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 0;
+      max-width: 1200px;
+      margin: 0 auto;
+      min-height: calc(100vh - 70px);
+    }
+    .learn-sidebar {
+      background: var(--bg-elev);
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+      position: sticky;
+      top: 70px;
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+      align-self: start;
+    }
+    .learn-sidebar .level-group {
+      padding: 0 14px 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .learn-sidebar .level-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    .learn-sidebar h4 {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 8px 6px;
+      margin-bottom: 4px;
+    }
+    .learn-sidebar .level-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 7px 10px;
+      border-radius: var(--r-sm);
+      font-size: 14px;
+      color: var(--text-2);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+      transition: background 0.12s, color 0.12s;
+    }
+    .learn-sidebar .level-btn:hover { background: var(--bg-soft); color: var(--text); }
+    .learn-sidebar .level-btn.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .learn-sidebar .chapters {
+      margin-left: 12px;
+      margin-top: 2px;
+      padding-left: 8px;
+      border-left: 1px solid var(--border);
+    }
+    .learn-sidebar .chapter-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 5px 8px;
+      border-radius: var(--r-sm);
+      font-size: 13px;
+      color: var(--text-2);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.12s, color 0.12s;
+      line-height: 1.4;
+    }
+    .learn-sidebar .chapter-btn:hover { background: var(--bg-soft); color: var(--text); }
+    .learn-sidebar .chapter-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    .learn-sidebar .chapter-btn.placeholder {
+      color: var(--text-3);
+      font-style: italic;
+    }
+    .learn-sidebar .chapter-btn.placeholder:hover { color: var(--text-3); }
+
+    .learn-content {
+      padding: 36px 48px 80px;
+      max-width: 760px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .learn-content .breadcrumb {
+      font-size: 12px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .learn-content h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .learn-content .chapter-meta {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: var(--text-2);
+    }
+    .learn-content .chapter-meta .pill {
+      background: var(--bg-soft);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+    .learn-content h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 32px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+      color: var(--text);
+    }
+    .learn-content h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin: 22px 0 8px;
+      color: var(--text);
+    }
+    .learn-content p { margin-bottom: 12px; font-size: 15.5px; }
+    .learn-content ul, .learn-content ol {
+      margin: 0 0 14px 22px;
+      padding: 0;
+    }
+    .learn-content li { margin-bottom: 6px; font-size: 15.5px; }
+    .learn-content code {
+      background: var(--bg-soft);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.93em;
+      color: var(--primary-hover);
+      font-weight: 500;
+    }
+    .learn-content strong { font-weight: 700; color: var(--text); }
+    .learn-content em { color: var(--text); }
+    .learn-content a { color: var(--primary); text-decoration: underline; }
+
+    /* Boîtes spéciales */
+    .lc-def {
+      background: var(--primary-soft);
+      border-left: 3px solid var(--primary);
+      padding: 14px 18px;
+      border-radius: var(--r-sm);
+      margin: 14px 0;
+    }
+    .lc-def .label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .lc-prop {
+      background: var(--success-soft);
+      border-left: 3px solid var(--success);
+      padding: 14px 18px;
+      border-radius: var(--r-sm);
+      margin: 14px 0;
+    }
+    .lc-prop .label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--success);
+      margin-bottom: 4px;
+    }
+    .lc-formula {
+      background: var(--bg-elev);
+      border: 1.5px solid var(--border-strong);
+      padding: 14px 18px;
+      border-radius: var(--r-sm);
+      margin: 14px 0;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      color: var(--text);
+    }
+    .lc-example {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      border-radius: var(--r-sm);
+      margin: 14px 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .lc-example .label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-2);
+      margin-bottom: 8px;
+    }
+    .lc-example .label.solved::before { content: "✏️ "; }
+    .lc-example ol { counter-reset: stp; list-style: none; margin-left: 0; padding-left: 0; }
+    .lc-example ol li {
+      counter-increment: stp;
+      padding-left: 28px;
+      position: relative;
+      margin-bottom: 6px;
+    }
+    .lc-example ol li::before {
+      content: counter(stp);
+      position: absolute; left: 0; top: 1px;
+      width: 20px; height: 20px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lc-warn {
+      background: var(--warning-soft);
+      border-left: 3px solid var(--warning);
+      padding: 12px 16px;
+      border-radius: var(--r-sm);
+      margin: 14px 0;
+    }
+    .lc-warn .label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--warning);
+      margin-bottom: 4px;
+    }
+    .lc-warn .label::before { content: "⚠️ "; }
+    .lc-tip {
+      background: var(--diamond-soft);
+      border-left: 3px solid var(--diamond);
+      padding: 12px 16px;
+      border-radius: var(--r-sm);
+      margin: 14px 0;
+    }
+    .lc-tip .label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--diamond);
+      margin-bottom: 4px;
+    }
+    .lc-tip .label::before { content: "💡 "; }
+
+    .lc-empty {
+      max-width: 480px;
+      margin: 80px auto;
+      text-align: center;
+      color: var(--text-3);
+      font-size: 15px;
+    }
+    .lc-empty .big { font-size: 56px; margin-bottom: 12px; }
+
     /* ─── Mobile ─────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .learn-layout {
+        grid-template-columns: 1fr;
+      }
+      .learn-sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        max-height: 280px;
+      }
+      .learn-content { padding: 24px 20px 60px; }
+    }
     @media (max-width: 600px) {
       .hud { padding: 10px 14px; gap: 6px; }
-      .hud-title { font-size: 16px; flex: 1 1 100%; margin-bottom: 4px; }
+      .hud-title { font-size: 16px; }
+      .tabs { padding: 3px; flex: 1 1 100%; order: 2; margin-top: 4px; }
+      .tab { flex: 1; padding: 6px 10px; font-size: 12px; }
+      .hud-stats { width: 100%; order: 3; margin-top: 4px; }
       .stat { padding: 5px 10px; font-size: 12px; }
       .wrap { padding: 22px 16px; }
       .city { grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -675,6 +999,9 @@
       .modal-body { padding: 18px; }
       .lesson { padding: 14px 16px; font-size: 14px; }
       .exercise { padding: 16px; }
+      .learn-content h1 { font-size: 26px; }
+      .learn-content h2 { font-size: 19px; }
+      .learn-content { font-size: 15px; }
     }
   </style>
 </head>
@@ -684,36 +1011,51 @@
       <span class="logo">∑</span>
       <span>Mathopolis</span>
     </div>
-    <div class="stat gold" title="Théorèmes">
-      🪙 <span class="val" id="stat-T">0</span>
-    </div>
-    <div class="stat diamond" title="Insights">
-      💎 <span class="val" id="stat-I">0</span>
-    </div>
-    <div class="stat streak" title="Streak quotidienne">
-      🔥 <span class="val" id="stat-streak">0</span>
-    </div>
-    <div class="stat xp" title="XP Recteur">
-      ⭐ <span class="val" id="stat-xp">0</span>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="city" role="tab">🏛️ Cité</button>
+      <button class="tab" data-tab="learn" role="tab">📚 Apprentissage</button>
+    </nav>
+    <div class="hud-stats">
+      <div class="stat gold" title="Théorèmes">
+        🪙 <span class="val" id="stat-T">0</span>
+      </div>
+      <div class="stat diamond" title="Insights">
+        💎 <span class="val" id="stat-I">0</span>
+      </div>
+      <div class="stat streak" title="Streak quotidienne">
+        🔥 <span class="val" id="stat-streak">0</span>
+      </div>
+      <div class="stat xp" title="XP Recteur">
+        ⭐ <span class="val" id="stat-xp">0</span>
+      </div>
     </div>
   </header>
 
-  <main class="wrap">
-    <div class="intro">
-      <h2>Bienvenue, Recteur</h2>
-      <p>Ta cité de mathématiciens t'attend. Clique sur un bâtiment pour suivre la leçon, résous quelques exos, et regarde tes <strong>théorèmes</strong> 🪙 s'accumuler — même quand tu n'es pas là. Maintiens ta streak en faisant <strong>3 exos par jour</strong>.</p>
-    </div>
+  <main>
+    <section id="view-city" class="wrap">
+      <div class="intro">
+        <h2>Bienvenue, Recteur</h2>
+        <p>Ta cité de mathématiciens t'attend. Clique sur un bâtiment pour suivre la leçon, résous quelques exos, et regarde tes <strong>théorèmes</strong> 🪙 s'accumuler — même quand tu n'es pas là. Maintiens ta streak en faisant <strong>3 exos par jour</strong>.</p>
+      </div>
 
-    <h3 class="section">
-      <span class="label">🏛️ Quartier des Fondations</span>
-      <span class="tag" id="founda-progress">0/5 maîtrisés</span>
-    </h3>
-    <div class="city" id="city"></div>
+      <h3 class="section">
+        <span class="label">🏛️ Quartier des Fondations</span>
+        <span class="tag" id="founda-progress">0/5 maîtrisés</span>
+      </h3>
+      <div class="city" id="city"></div>
 
-    <div class="footer-actions">
-      <button class="reset-link" id="btn-test" title="Panneau de test (raccourci : Maj+T)">🧪 Mode test</button>
-      <button class="reset-link" id="btn-reset">Réinitialiser ma cité</button>
-    </div>
+      <div class="footer-actions">
+        <button class="reset-link" id="btn-test" title="Panneau de test (raccourci : Maj+T)">🧪 Mode test</button>
+        <button class="reset-link" id="btn-reset">Réinitialiser ma cité</button>
+      </div>
+    </section>
+
+    <section id="view-learn" hidden>
+      <div class="learn-layout">
+        <aside class="learn-sidebar" id="learn-sidebar"></aside>
+        <article class="learn-content" id="learn-content"></article>
+      </div>
+    </section>
   </main>
 
   <div class="modal-bg" id="modal-bg">
@@ -1665,6 +2007,909 @@ function simulateIdle(minutes) {
   toast(`💤 Simulé ${minutes} min (capé à ${capped} min) : +${fmtNum(earned)} 🪙`);
 }
 
+// ─── Curriculum scolaire (Apprentissage) ─────────────────────────
+// Structure : groupes (collège / lycée / post-bac) → niveaux (6e, 5e…)
+// → chapitres. Chaque chapitre a un id, un titre, une catégorie et un
+// content HTML (null = à rédiger dans une session ultérieure).
+//
+// Helper pour produire des blocs pédagogiques typés en HTML.
+const lc = {
+  def:  (label, html) => `<div class="lc-def"><span class="label">${label}</span>${html}</div>`,
+  prop: (label, html) => `<div class="lc-prop"><span class="label">${label}</span>${html}</div>`,
+  formula: (html) => `<div class="lc-formula">${html}</div>`,
+  example: (label, html) => `<div class="lc-example"><span class="label solved">${label}</span>${html}</div>`,
+  warn: (label, html) => `<div class="lc-warn"><span class="label">${label}</span>${html}</div>`,
+  tip:  (label, html) => `<div class="lc-tip"><span class="label">${label}</span>${html}</div>`,
+};
+
+const CURRICULUM = buildCurriculum();
+let learnState = { levelId: null, chapterId: null };
+
+function buildCurriculum() {
+  return [
+    {
+      id: 'college', name: 'Collège',
+      levels: [
+        { id: '6e',  name: '6e',  chapters: chapters6e() },
+        { id: '5e',  name: '5e',  chapters: chapters5e() },
+        { id: '4e',  name: '4e',  chapters: chapters4e() },
+        { id: '3e',  name: '3e',  chapters: chapters3e() },
+      ],
+    },
+    {
+      id: 'lycee', name: 'Lycée',
+      levels: [
+        { id: '2nde', name: '2nde',     chapters: chapters2nde() },
+        { id: '1ere', name: '1ère',     chapters: chapters1ere() },
+        { id: 'tle',  name: 'Terminale', chapters: chaptersTle() },
+      ],
+    },
+    {
+      id: 'postbac', name: 'Post-bac',
+      levels: [
+        { id: 'analyse', name: 'Analyse',         chapters: chaptersAnalyse() },
+        { id: 'algebre', name: 'Algèbre linéaire', chapters: chaptersAlgebre() },
+        { id: 'probas',  name: 'Probabilités',     chapters: chaptersProbasPostBac() },
+      ],
+    },
+  ];
+}
+
+// Liste de chapitres avec content=null (à rédiger plus tard)
+const todo = (title, category) => ({ title, category, content: null });
+
+// Chapitres niveau par niveau ─────────────────────────────────────
+function chapters6e() {
+  return [
+    todo("Nombres entiers : lecture et écriture", "Nombres et calcul"),
+    todo("Nombres décimaux : lecture, comparaison", "Nombres et calcul"),
+    todo("Addition, soustraction, multiplication", "Nombres et calcul"),
+    todo("Division euclidienne", "Nombres et calcul"),
+    todo("Fractions : sens et premières représentations", "Nombres et calcul"),
+    todo("Proportionnalité (sensibilisation)", "Organisation des données"),
+    todo("Droites perpendiculaires et parallèles", "Géométrie"),
+    todo("Cercle, médiatrice", "Géométrie"),
+    todo("Triangles et quadrilatères : reconnaissance", "Géométrie"),
+    todo("Symétrie axiale", "Géométrie"),
+    todo("Périmètre et aire", "Grandeurs et mesures"),
+    todo("Lecture de tableaux et de graphiques", "Organisation des données"),
+  ];
+}
+
+function chapters5e() {
+  // RÉDIGÉ À FOND DANS chapters5eFull()
+  return chapters5eFull();
+}
+
+function chapters4e() {
+  return [
+    todo("Nombres relatifs : multiplication et division", "Nombres et calcul"),
+    todo("Fractions : opérations avancées", "Nombres et calcul"),
+    todo("Puissances et notation scientifique", "Nombres et calcul"),
+    todo("Calcul littéral : développement", "Calcul littéral"),
+    todo("Équations du 1er degré", "Calcul littéral"),
+    todo("Théorème de Pythagore", "Géométrie"),
+    todo("Théorème de Thalès (configuration de base)", "Géométrie"),
+    todo("Cosinus dans le triangle rectangle", "Géométrie"),
+    todo("Translations", "Géométrie"),
+    todo("Proportionnalité avancée", "Organisation des données"),
+    todo("Statistiques : moyenne", "Organisation des données"),
+    todo("Probabilités (introduction)", "Organisation des données"),
+  ];
+}
+
+function chapters3e() {
+  return [
+    todo("Arithmétique : PGCD, fractions irréductibles", "Nombres et calcul"),
+    todo("Racines carrées", "Nombres et calcul"),
+    todo("Calcul littéral : factorisation, identités remarquables", "Calcul littéral"),
+    todo("Équations produits", "Calcul littéral"),
+    todo("Inéquations du 1er degré", "Calcul littéral"),
+    todo("Systèmes d'équations", "Calcul littéral"),
+    todo("Théorème de Thalès et réciproque", "Géométrie"),
+    todo("Trigonométrie : sin, cos, tan", "Géométrie"),
+    todo("Géométrie dans l'espace (volumes)", "Géométrie"),
+    todo("Homothéties", "Géométrie"),
+    todo("Fonctions linéaires et affines", "Fonctions"),
+    todo("Statistiques : médiane, étendue", "Organisation des données"),
+    todo("Probabilités : événements", "Organisation des données"),
+  ];
+}
+
+function chapters2nde() {
+  return [
+    todo("Ensembles de nombres ℕ, ℤ, 𝔻, ℚ, ℝ", "Nombres et calculs"),
+    todo("Calcul numérique et algébrique", "Nombres et calculs"),
+    todo("Inéquations et intervalles", "Nombres et calculs"),
+    todo("Fonctions : généralités", "Fonctions"),
+    todo("Fonction affine, équations de droites", "Fonctions"),
+    todo("Fonction carré, racine carrée, cube", "Fonctions"),
+    todo("Fonction inverse", "Fonctions"),
+    todo("Vecteurs : définition, somme, colinéarité", "Géométrie"),
+    todo("Géométrie repérée", "Géométrie"),
+    todo("Statistiques : moyenne, médiane, écart-type", "Statistiques"),
+    todo("Probabilités : modélisation", "Probabilités"),
+    todo("Algorithmique et programmation Python", "Algorithmique"),
+  ];
+}
+
+function chapters1ere() {
+  return [
+    todo("Suites numériques (arithmétique, géométrique)", "Suites"),
+    todo("Limites de suites (intuition)", "Suites"),
+    todo("Dérivation : nombre dérivé, fonction dérivée", "Analyse"),
+    todo("Études de fonctions, extremums", "Analyse"),
+    todo("Fonction exponentielle", "Analyse"),
+    todo("Polynômes du second degré", "Analyse"),
+    todo("Trigonométrie : cercle trigo, formules", "Géométrie"),
+    todo("Vecteurs : produit scalaire", "Géométrie"),
+    todo("Probabilités conditionnelles, indépendance", "Probabilités"),
+    todo("Variables aléatoires, espérance, variance", "Probabilités"),
+    todo("Loi binomiale", "Probabilités"),
+  ];
+}
+
+function chaptersTle() {
+  return [
+    todo("Limites de fonctions", "Analyse"),
+    todo("Continuité, théorème des valeurs intermédiaires", "Analyse"),
+    todo("Compléments sur la dérivation (composées)", "Analyse"),
+    todo("Fonction logarithme", "Analyse"),
+    todo("Primitives", "Analyse"),
+    todo("Intégrales", "Analyse"),
+    todo("Suites : raisonnement par récurrence", "Suites"),
+    todo("Limites de suites (formel)", "Suites"),
+    todo("Géométrie dans l'espace : vecteurs, droites, plans", "Géométrie"),
+    todo("Produit scalaire dans l'espace", "Géométrie"),
+    todo("Lois de probabilité à densité", "Probabilités"),
+    todo("Loi normale", "Probabilités"),
+    todo("Échantillonnage et estimation", "Probabilités"),
+  ];
+}
+
+function chaptersAnalyse() {
+  return [
+    todo("Suites : convergence formelle", "Suites"),
+    todo("Séries numériques", "Séries"),
+    todo("Fonctions de plusieurs variables", "Analyse"),
+    todo("Intégration par parties", "Analyse"),
+    todo("Changement de variable", "Analyse"),
+    todo("Équations différentielles linéaires", "Analyse"),
+    todo("Développements limités", "Analyse"),
+  ];
+}
+
+function chaptersAlgebre() {
+  return [
+    todo("Espaces vectoriels", "Algèbre linéaire"),
+    todo("Applications linéaires", "Algèbre linéaire"),
+    todo("Matrices : opérations", "Algèbre linéaire"),
+    todo("Systèmes linéaires, pivot de Gauss", "Algèbre linéaire"),
+    todo("Déterminants", "Algèbre linéaire"),
+    todo("Diagonalisation, valeurs propres", "Algèbre linéaire"),
+    todo("Produits scalaires en dimension n", "Algèbre linéaire"),
+  ];
+}
+
+function chaptersProbasPostBac() {
+  return [
+    todo("Espaces probabilisés", "Probabilités"),
+    todo("Variables aléatoires discrètes", "Probabilités"),
+    todo("Variables aléatoires continues", "Probabilités"),
+    todo("Lois usuelles (Poisson, exponentielle...)", "Probabilités"),
+    todo("Théorèmes limites (loi des grands nombres, TCL)", "Probabilités"),
+    todo("Tests statistiques", "Statistiques"),
+  ];
+}
+
+// ─── Contenu pédagogique : 5e à fond ─────────────────────────────
+function chapters5eFull() {
+  return [
+    {
+      title: "Nombres décimaux",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Lecture et écriture</h2>
+        <p>Un <strong>nombre décimal</strong> est un nombre qu'on peut écrire avec une partie entière et une partie décimale, séparées par une virgule.</p>
+        ${lc.def("Définition", `<p><code>12,375</code> a pour partie entière <code>12</code> et pour partie décimale <code>375</code>. On lit : « douze unités et trois cent soixante-quinze millièmes ».</p>`)}
+        ${lc.formula(`12,375 &nbsp;=&nbsp; 1×10 + 2×1 + 3×0,1 + 7×0,01 + 5×0,001`)}
+        <h3>Le tableau de position</h3>
+        <p>Chaque chiffre a une valeur qui dépend de sa position. À droite de la virgule, on a successivement les <strong>dixièmes</strong> (0,1), <strong>centièmes</strong> (0,01), <strong>millièmes</strong> (0,001), etc.</p>
+        ${lc.example("Exemple résolu : décomposer 47,028", `<ol>
+          <li>4 est dans la colonne des dizaines : <code>4 × 10 = 40</code>.</li>
+          <li>7 est dans la colonne des unités : <code>7 × 1 = 7</code>.</li>
+          <li>0 dans les dixièmes (donc 0).</li>
+          <li>2 dans les centièmes : <code>2 × 0,01 = 0,02</code>.</li>
+          <li>8 dans les millièmes : <code>8 × 0,001 = 0,008</code>.</li>
+        </ol><p>Vérification : <code>40 + 7 + 0 + 0,02 + 0,008 = 47,028</code> ✓</p>`)}
+
+        <h2>2. Comparaison de décimaux</h2>
+        ${lc.prop("Méthode", `<p>Pour comparer deux décimaux :</p><ol>
+          <li>On compare d'abord les <strong>parties entières</strong>. La plus grande gagne.</li>
+          <li>Si elles sont égales, on compare chiffre à chiffre <strong>après la virgule</strong> en partant de la gauche (dixièmes, puis centièmes…).</li>
+        </ol>`)}
+        ${lc.example("Comparer 3,52 et 3,5", `<p>Parties entières : <code>3 = 3</code>, on continue.</p>
+          <p>Dixièmes : <code>5 = 5</code>, on continue.</p>
+          <p>Centièmes : pour 3,5 il n'y a rien… donc 0. Donc <code>2 > 0</code>.</p>
+          <p>Conclusion : <code>3,52 > 3,5</code>.</p>`)}
+        ${lc.warn("Piège classique", `<p>Beaucoup d'élèves pensent que <code>3,12 > 3,2</code> parce que « 12 > 2 ». C'est faux : <code>3,12 = 3,12</code> et <code>3,2 = 3,20</code>, donc <code>3,2 > 3,12</code>. Toujours penser à compléter avec des zéros pour comparer.</p>`)}
+
+        <h2>3. Encadrement et arrondi</h2>
+        <p><strong>Encadrer</strong> un nombre, c'est trouver deux valeurs entre lesquelles il se situe.</p>
+        ${lc.example("Encadrer 7,38 au dixième", `<p>Au dixième, on regarde la position après la virgule. <code>7,38</code> est entre <code>7,3</code> et <code>7,4</code>. On écrit : <code>7,3 < 7,38 < 7,4</code>.</p>`)}
+        <p><strong>Arrondir</strong>, c'est choisir la valeur la plus proche.</p>
+        ${lc.prop("Règle de l'arrondi", `<p>Pour arrondir au rang voulu, on regarde le <em>chiffre suivant</em> :</p>
+          <ul><li>S'il vaut <strong>0, 1, 2, 3 ou 4</strong> → on arrondit vers le bas (on garde).</li>
+          <li>S'il vaut <strong>5, 6, 7, 8 ou 9</strong> → on arrondit vers le haut (on ajoute 1).</li></ul>`)}
+        ${lc.example("Arrondir 7,386 au dixième", `<p>On regarde le chiffre des centièmes : <code>8</code>. Comme <code>8 ≥ 5</code>, on arrondit vers le haut : <code>7,386 ≈ 7,4</code>.</p>`)}
+
+        <h2>4. Opérations sur les décimaux</h2>
+        ${lc.prop("Addition / soustraction posée", `<p>On aligne les <strong>virgules</strong> les unes en dessous des autres. On peut compléter par des zéros à droite si besoin.</p>`)}
+        ${lc.example("Calculer 12,7 + 8,35", `<p>On aligne :</p>
+          <p><code>&nbsp;12,70&nbsp;</code><br><code>+&nbsp;8,35&nbsp;</code><br><code>━━━━━━</code><br><code>&nbsp;21,05</code></p>`)}
+        ${lc.prop("Multiplication", `<p>On multiplie comme des entiers, sans s'occuper des virgules. À la fin, le résultat a autant de chiffres après la virgule que la <strong>somme</strong> des chiffres après la virgule des deux nombres.</p>`)}
+        ${lc.example("Calculer 2,5 × 1,3", `<ol><li>On multiplie sans virgule : <code>25 × 13 = 325</code>.</li>
+          <li>Compte les décimales : <code>2,5</code> a 1 chiffre après la virgule, <code>1,3</code> a 1 chiffre après la virgule. Total : <code>1 + 1 = 2</code>.</li>
+          <li>Donc : <code>2,5 × 1,3 = 3,25</code> (2 chiffres après la virgule).</li></ol>`)}
+        ${lc.tip("Astuce", `<p>Pour multiplier par 10, 100, 1000 : on décale la virgule de 1, 2 ou 3 rangs vers la droite. <code>3,57 × 100 = 357</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Multiples, diviseurs, divisibilité",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Multiples et diviseurs</h2>
+        ${lc.def("Multiple", `<p>Un nombre <code>a</code> est un <strong>multiple</strong> d'un nombre <code>b</code> s'il existe un entier <code>k</code> tel que <code>a = b × k</code>.</p>
+          <p>Exemples : 15 est un multiple de 3 car <code>15 = 3 × 5</code>. 24 est un multiple de 6 car <code>24 = 6 × 4</code>.</p>`)}
+        ${lc.def("Diviseur", `<p>Si <code>a</code> est un multiple de <code>b</code>, on dit aussi que <code>b</code> est un <strong>diviseur</strong> de <code>a</code>, ou que <code>a</code> est <strong>divisible</strong> par <code>b</code>.</p>
+          <p>Exemple : 3 et 5 sont des diviseurs de 15.</p>`)}
+        ${lc.tip("Lien", `<p>« 15 est un multiple de 3 » <strong>=</strong> « 3 est un diviseur de 15 » <strong>=</strong> « 15 est divisible par 3 ». Trois façons de dire la même chose.</p>`)}
+
+        <h2>2. Critères de divisibilité</h2>
+        <p>Pour savoir rapidement si un nombre est divisible par 2, 3, 4, 5, 9, 10 sans poser la division.</p>
+        ${lc.prop("Les critères à retenir", `<ul>
+          <li><strong>Par 2</strong> : si le nombre se termine par 0, 2, 4, 6 ou 8 (nombres pairs).</li>
+          <li><strong>Par 5</strong> : si le nombre se termine par 0 ou 5.</li>
+          <li><strong>Par 10</strong> : si le nombre se termine par 0.</li>
+          <li><strong>Par 3</strong> : si la somme de ses chiffres est divisible par 3.</li>
+          <li><strong>Par 9</strong> : si la somme de ses chiffres est divisible par 9.</li>
+          <li><strong>Par 4</strong> : si les deux derniers chiffres forment un nombre divisible par 4.</li>
+        </ul>`)}
+        ${lc.example("Est-ce que 1 287 est divisible par 3 ?", `<p>Somme des chiffres : <code>1 + 2 + 8 + 7 = 18</code>. Or <code>18 = 3 × 6</code>, donc 18 est divisible par 3. Donc 1 287 est divisible par 3.</p>
+          <p>Vérification : <code>1287 ÷ 3 = 429</code> ✓</p>`)}
+        ${lc.example("455 est-il divisible par 9 ?", `<p>Somme : <code>4 + 5 + 5 = 14</code>. <code>14</code> n'est pas un multiple de 9, donc 455 <strong>n'est pas</strong> divisible par 9.</p>`)}
+
+        <h2>3. Division euclidienne</h2>
+        ${lc.def("Division euclidienne", `<p>Diviser <code>a</code> par <code>b</code> (entiers, <code>b ≠ 0</code>), c'est trouver deux entiers : un <strong>quotient</strong> <code>q</code> et un <strong>reste</strong> <code>r</code> tels que :</p>`)}
+        ${lc.formula("a = b × q + r &nbsp;&nbsp; avec &nbsp;&nbsp; 0 ≤ r < b")}
+        ${lc.example("Diviser 47 par 6", `<p>Quel est le plus grand multiple de 6 inférieur ou égal à 47 ? <code>6 × 7 = 42</code>, et <code>6 × 8 = 48 > 47</code>. Donc <code>q = 7</code>.</p>
+          <p>Reste : <code>47 − 42 = 5</code>. Donc <code>r = 5</code>.</p>
+          <p>On écrit : <code>47 = 6 × 7 + 5</code>.</p>`)}
+        ${lc.warn("Toujours vérifier", `<p>Le reste doit être <strong>strictement plus petit</strong> que le diviseur. Si on trouve <code>47 = 6 × 6 + 11</code>, c'est faux car <code>11 > 6</code>.</p>`)}
+
+        <h2>4. Nombres premiers (notion)</h2>
+        ${lc.def("Nombre premier", `<p>Un <strong>nombre premier</strong> est un entier supérieur à 1 qui n'a que <strong>deux diviseurs</strong> : 1 et lui-même.</p>
+          <p>Les premiers nombres premiers : <code>2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31…</code></p>`)}
+        ${lc.warn("Cas particuliers", `<p><strong>1 n'est pas premier</strong> (il n'a qu'un seul diviseur). <strong>2 est le seul nombre premier pair.</strong></p>`)}
+      `,
+    },
+
+    {
+      title: "Fractions : sens et comparaison",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Qu'est-ce qu'une fraction ?</h2>
+        ${lc.def("Fraction", `<p>Une <strong>fraction</strong> <code>a/b</code> représente le résultat de la division de <code>a</code> par <code>b</code> (avec <code>b ≠ 0</code>).</p>
+          <ul><li><code>a</code> est le <strong>numérateur</strong> (en haut, ce qu'on prend).</li>
+          <li><code>b</code> est le <strong>dénominateur</strong> (en bas, en combien on partage).</li></ul>`)}
+        <p>Exemple : <code>3/4</code> signifie « 3 parts sur 4 », ou « <code>3 ÷ 4 = 0,75</code> ».</p>
+
+        <h2>2. Fractions égales</h2>
+        ${lc.prop("Règle fondamentale", `<p>On peut multiplier (ou diviser) le numérateur ET le dénominateur d'une fraction par un même nombre non nul sans changer sa valeur.</p>`)}
+        ${lc.formula("a/b &nbsp;=&nbsp; (a × k) / (b × k) &nbsp;&nbsp; pour tout k ≠ 0")}
+        ${lc.example("Trois écritures du même nombre", `<p><code>3/4 = 6/8 = 15/20 = 30/40</code>. Toutes valent 0,75.</p>`)}
+
+        <h2>3. Simplifier une fraction</h2>
+        <p>Simplifier une fraction, c'est l'écrire avec des nombres plus petits, en divisant haut et bas par un même diviseur commun.</p>
+        ${lc.example("Simplifier 18/24", `<ol><li>Cherche un diviseur commun à 18 et 24. Tous les deux sont divisibles par 2 : <code>18/24 = 9/12</code>.</li>
+          <li>9 et 12 sont divisibles par 3 : <code>9/12 = 3/4</code>.</li>
+          <li>3 et 4 n'ont plus de diviseur commun (à part 1) : la fraction est <strong>irréductible</strong>.</li></ol>
+          <p>Donc <code>18/24 = 3/4</code>.</p>`)}
+        ${lc.tip("Plus rapide", `<p>Si tu trouves directement le PGCD (plus grand diviseur commun), tu simplifies en une seule étape. PGCD(18, 24) = 6, donc <code>18/24 = 3/4</code> directement.</p>`)}
+
+        <h2>4. Comparer des fractions</h2>
+        ${lc.prop("Si même dénominateur", `<p>La plus grande fraction est celle qui a le plus grand <strong>numérateur</strong>.</p>
+          <p>Exemple : <code>5/7 > 3/7</code> car <code>5 > 3</code>.</p>`)}
+        ${lc.prop("Si dénominateurs différents", `<p>On <strong>réduit au même dénominateur</strong> avant de comparer.</p>`)}
+        ${lc.example("Comparer 3/4 et 5/7", `<ol><li>On choisit un dénominateur commun. Le plus simple : multiplier 4 par 7 et 7 par 4, soit 28.</li>
+          <li><code>3/4 = (3×7)/(4×7) = 21/28</code>.</li>
+          <li><code>5/7 = (5×4)/(7×4) = 20/28</code>.</li>
+          <li><code>21 > 20</code>, donc <code>3/4 > 5/7</code>.</li></ol>`)}
+        ${lc.tip("Comparer à 1", `<p>Une fraction est <strong>plus grande que 1</strong> si son numérateur est plus grand que son dénominateur (ex : <code>7/5</code>). Elle est <strong>plus petite que 1</strong> sinon (ex : <code>3/4</code>). Pratique pour vérifier rapidement.</p>`)}
+      `,
+    },
+
+    {
+      title: "Fractions : addition et soustraction",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Avec le même dénominateur</h2>
+        ${lc.prop("Règle simple", `<p>Pour additionner ou soustraire deux fractions de <strong>même dénominateur</strong>, on additionne (ou soustrait) les numérateurs en gardant le dénominateur.</p>`)}
+        ${lc.formula("a/n + b/n &nbsp;=&nbsp; (a + b) / n")}
+        ${lc.example("Calculer 3/7 + 2/7", `<p><code>3/7 + 2/7 = (3+2)/7 = 5/7</code>.</p>`)}
+        ${lc.example("Calculer 5/9 − 2/9", `<p><code>5/9 − 2/9 = (5−2)/9 = 3/9 = 1/3</code> (après simplification).</p>`)}
+        ${lc.warn("Erreur classique", `<p>Ne jamais additionner les dénominateurs ! <code>3/7 + 2/7 ≠ 5/14</code>. Le dénominateur reste le même.</p>`)}
+
+        <h2>2. Avec des dénominateurs différents</h2>
+        ${lc.prop("Méthode en 3 étapes", `<ol>
+          <li>Trouver un <strong>dénominateur commun</strong> aux deux fractions.</li>
+          <li>Réécrire chaque fraction avec ce dénominateur.</li>
+          <li>Additionner les numérateurs comme avant.</li>
+        </ol>`)}
+        ${lc.example("Calculer 1/2 + 1/3", `<ol><li>Dénominateur commun : <code>2 × 3 = 6</code>.</li>
+          <li><code>1/2 = 3/6</code> et <code>1/3 = 2/6</code>.</li>
+          <li><code>3/6 + 2/6 = 5/6</code>.</li></ol>`)}
+        ${lc.example("Calculer 3/4 − 1/6", `<ol><li>Dénominateur commun : on peut prendre <code>4 × 6 = 24</code>, ou plus malin <code>12</code> (PPCM).</li>
+          <li>Avec 12 : <code>3/4 = 9/12</code> et <code>1/6 = 2/12</code>.</li>
+          <li><code>9/12 − 2/12 = 7/12</code>.</li></ol>`)}
+        ${lc.tip("Choisir un bon dénominateur", `<p>Si l'un des dénominateurs est un <strong>multiple</strong> de l'autre, prends le plus grand. Exemple : <code>1/3 + 1/6</code>. Comme <code>6 = 3 × 2</code>, on prend 6 : <code>1/3 = 2/6</code>, donc <code>2/6 + 1/6 = 3/6 = 1/2</code>.</p>`)}
+
+        <h2>3. Avec un entier et une fraction</h2>
+        ${lc.prop("Astuce", `<p>Tout entier peut s'écrire en fraction : <code>5 = 5/1</code>. Pour additionner avec une fraction, on met l'entier au même dénominateur.</p>`)}
+        ${lc.example("Calculer 2 + 3/4", `<p><code>2 = 2/1 = 8/4</code> (au même dénominateur que 3/4).</p>
+          <p><code>8/4 + 3/4 = 11/4</code>.</p>
+          <p>On peut aussi écrire <code>11/4 = 2,75</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Fractions : multiplication",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Règle de multiplication</h2>
+        ${lc.prop("Règle fondamentale", `<p>Pour multiplier deux fractions, on multiplie les <strong>numérateurs entre eux</strong>, et les <strong>dénominateurs entre eux</strong>.</p>`)}
+        ${lc.formula("a/b × c/d &nbsp;=&nbsp; (a × c) / (b × d)")}
+        ${lc.example("Calculer 2/3 × 4/5", `<p><code>2/3 × 4/5 = (2 × 4) / (3 × 5) = 8/15</code>.</p>`)}
+
+        <h2>2. Simplifier avant de multiplier</h2>
+        ${lc.tip("Bonne pratique", `<p>Avant de multiplier, on peut <strong>simplifier en croix</strong> si un numérateur et un dénominateur ont un facteur commun. Ça évite de manipuler de gros chiffres.</p>`)}
+        ${lc.example("Calculer 4/9 × 3/8", `<ol><li>On voit que <code>3</code> et <code>9</code> partagent <code>3</code>, et <code>4</code> et <code>8</code> partagent <code>4</code>.</li>
+          <li>On simplifie : <code>9 ÷ 3 = 3</code>, <code>3 ÷ 3 = 1</code>, <code>4 ÷ 4 = 1</code>, <code>8 ÷ 4 = 2</code>.</li>
+          <li>Reste : <code>1/3 × 1/2 = 1/6</code>.</li></ol>
+          <p>Sans simplifier : <code>4/9 × 3/8 = 12/72 = 1/6</code> (même résultat, mais avec un calcul plus lourd).</p>`)}
+
+        <h2>3. Multiplier un entier par une fraction</h2>
+        ${lc.example("Calculer 3 × 2/7", `<p>On écrit <code>3 = 3/1</code>, donc <code>3 × 2/7 = 3/1 × 2/7 = 6/7</code>.</p>
+          <p>Plus rapide : on multiplie le numérateur par l'entier, et on garde le dénominateur. <code>3 × 2/7 = 6/7</code>.</p>`)}
+
+        <h2>4. Prendre une fraction d'une quantité</h2>
+        ${lc.prop("Sens concret", `<p>« Prendre les <code>2/3</code> de 60 » signifie : <code>2/3 × 60</code>.</p>`)}
+        ${lc.example("Calculer les 3/5 de 25 €", `<ol><li><code>3/5 × 25 = (3 × 25) / 5 = 75/5 = 15</code>.</li>
+          <li>Donc les 3/5 de 25 € font <strong>15 €</strong>.</li></ol>
+          <p>On peut aussi voir ça comme : 1/5 de 25, c'est 5. Donc 3/5, c'est <code>3 × 5 = 15</code>.</p>`)}
+        ${lc.warn("Ordre des mots", `<p>« Les 2/3 de 60 » et « 60 fois 2/3 » donnent le <em>même</em> calcul : <code>2/3 × 60 = 40</code>. La multiplication est commutative.</p>`)}
+      `,
+    },
+
+    {
+      title: "Nombres relatifs : sens et repérage",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Pourquoi les nombres négatifs ?</h2>
+        <p>Les nombres relatifs servent à parler de <strong>quantités opposées</strong> à un point de référence (le zéro) :</p>
+        <ul>
+          <li>Températures sous 0 °C : <code>−5 °C</code>.</li>
+          <li>Sous-sol d'un immeuble : étage <code>−2</code>.</li>
+          <li>Compte bancaire à découvert : <code>−120 €</code>.</li>
+        </ul>
+        ${lc.def("Nombre relatif", `<p>Un nombre relatif est un nombre <strong>positif</strong> (avec le signe +, qu'on peut omettre) ou <strong>négatif</strong> (avec le signe −, obligatoire).</p>
+          <p>L'ensemble des nombres relatifs entiers est noté ℤ : <code>… −3, −2, −1, 0, 1, 2, 3 …</code></p>`)}
+
+        <h2>2. Repérage sur une droite graduée</h2>
+        <p>Sur une <strong>droite graduée</strong>, on choisit une origine (le 0) et un sens. Les positifs se placent à droite, les négatifs à gauche.</p>
+        ${lc.formula("←  −5  −4  −3  −2  −1  &nbsp;0&nbsp;  +1  +2  +3  +4  +5  →")}
+        ${lc.def("Abscisse", `<p>L'<strong>abscisse</strong> d'un point est sa position sur la droite. Si le point A est à 3 graduations à gauche du 0, son abscisse est <code>−3</code>.</p>`)}
+
+        <h2>3. Distance à zéro</h2>
+        ${lc.def("Distance à zéro", `<p>La <strong>distance à zéro</strong> d'un nombre relatif est le nombre <em>sans son signe</em>. C'est toujours un nombre positif.</p>
+          <ul><li>La distance à zéro de <code>+7</code> est <code>7</code>.</li>
+          <li>La distance à zéro de <code>−7</code> est aussi <code>7</code>.</li></ul>`)}
+        ${lc.def("Opposés", `<p>Deux nombres sont <strong>opposés</strong> s'ils ont la même distance à zéro mais des signes contraires. <code>+7</code> et <code>−7</code> sont opposés.</p>`)}
+
+        <h2>4. Comparer des nombres relatifs</h2>
+        ${lc.prop("Règles", `<ul>
+          <li>Un positif est toujours plus grand qu'un négatif.</li>
+          <li>Pour deux positifs, le plus grand est celui qui a la plus grande distance à zéro.</li>
+          <li>Pour deux <strong>négatifs</strong>, le plus grand est celui qui a la <em>plus petite</em> distance à zéro.</li>
+        </ul>`)}
+        ${lc.example("Comparer −8 et −3", `<p>Distance à zéro de <code>−8</code> : 8. Distance à zéro de <code>−3</code> : 3.</p>
+          <p>3 < 8, donc le plus proche du zéro est <code>−3</code>. Donc <code>−3 > −8</code>.</p>`)}
+        ${lc.tip("Visuel", `<p>Sur la droite graduée, le plus grand nombre est celui qui est <strong>le plus à droite</strong>. <code>−3</code> est à droite de <code>−8</code>, donc <code>−3 > −8</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Nombres relatifs : addition et soustraction",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Addition</h2>
+        ${lc.prop("Même signe", `<p>Pour additionner deux nombres de <strong>même signe</strong> : on additionne les distances à zéro et on garde le signe commun.</p>`)}
+        ${lc.example("Calculer (−5) + (−3)", `<p>Même signe (négatif). On additionne les distances : <code>5 + 3 = 8</code>. On garde le signe : <code>−8</code>.</p>
+          <p>Donc <code>(−5) + (−3) = −8</code>.</p>
+          <p>Image : tu dois 5 € puis tu dois encore 3 € → tu dois 8 €.</p>`)}
+        ${lc.prop("Signes différents", `<p>Pour additionner deux nombres de <strong>signes différents</strong> : on soustrait les distances à zéro (la plus grande moins la plus petite) et on garde le signe du nombre dont la distance est la plus grande.</p>`)}
+        ${lc.example("Calculer (+8) + (−3)", `<p>Distances : 8 et 3. Différence : <code>8 − 3 = 5</code>. La plus grande distance est celle de <code>+8</code> (positive), donc le résultat est positif.</p>
+          <p>Donc <code>(+8) + (−3) = +5</code>.</p>`)}
+        ${lc.example("Calculer (−12) + (+5)", `<p>Différence : <code>12 − 5 = 7</code>. La plus grande distance est celle de <code>−12</code> (négative).</p>
+          <p>Donc <code>(−12) + (+5) = −7</code>.</p>`)}
+
+        <h2>2. Soustraction</h2>
+        ${lc.prop("Règle clé", `<p>Soustraire un nombre revient à <strong>additionner son opposé</strong>.</p>`)}
+        ${lc.formula("a − b &nbsp;=&nbsp; a + (−b)")}
+        ${lc.example("Calculer (+7) − (−3)", `<p>L'opposé de <code>−3</code> est <code>+3</code>. Donc :</p>
+          <p><code>(+7) − (−3) = (+7) + (+3) = +10</code>.</p>
+          <p>(« Moins moins fait plus » : enlever une dette de 3, c'est gagner 3.)</p>`)}
+        ${lc.example("Calculer (−4) − (+9)", `<p>L'opposé de <code>+9</code> est <code>−9</code>. Donc :</p>
+          <p><code>(−4) − (+9) = (−4) + (−9) = −13</code>.</p>`)}
+
+        <h2>3. Calculer une suite d'additions/soustractions</h2>
+        ${lc.tip("Méthode efficace", `<p>On peut <strong>regrouper les positifs entre eux</strong> et <strong>les négatifs entre eux</strong>, puis additionner les deux totaux.</p>`)}
+        ${lc.example("Calculer (+5) + (−7) + (+3) + (−2) + (+9)", `<ol><li>Positifs : <code>5 + 3 + 9 = 17</code>.</li>
+          <li>Négatifs : <code>−7 + (−2) = −9</code>.</li>
+          <li>Total : <code>17 + (−9) = 17 − 9 = 8</code>.</li></ol>`)}
+
+        <h2>4. Suppression des parenthèses</h2>
+        ${lc.prop("Règles utiles", `<ul><li>Devant un <strong>+</strong>, on enlève les parenthèses sans rien changer : <code>+(−3) = −3</code>, <code>+(+5) = +5</code>.</li>
+          <li>Devant un <strong>−</strong>, on enlève les parenthèses en <strong>changeant le signe</strong> : <code>−(−3) = +3</code>, <code>−(+5) = −5</code>.</li></ul>`)}
+        ${lc.example("Simplifier 6 − (−4) + (−2)", `<p><code>= 6 + 4 − 2 = 8</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Priorités opératoires",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. La règle PEMDAS</h2>
+        ${lc.prop("Ordre des opérations", `<p>Dans un calcul avec plusieurs opérations, on suit cet ordre :</p>
+          <ol><li><strong>Parenthèses</strong> d'abord (et calculs entre parenthèses, en commençant par les plus internes).</li>
+          <li>Puis <strong>Multiplications</strong> et <strong>Divisions</strong>, de gauche à droite.</li>
+          <li>Enfin <strong>Additions</strong> et <strong>Soustractions</strong>, de gauche à droite.</li></ol>`)}
+        ${lc.example("Calculer 5 + 2 × 3", `<p>Multiplication d'abord : <code>2 × 3 = 6</code>. Puis <code>5 + 6 = 11</code>.</p>
+          <p>Et <strong>non</strong> : « <code>5 + 2 = 7</code> puis <code>7 × 3 = 21</code> » qui est faux.</p>`)}
+
+        <h2>2. Avec parenthèses</h2>
+        <p>Les parenthèses servent à <strong>forcer un autre ordre</strong>.</p>
+        ${lc.example("Calculer (5 + 2) × 3", `<p>Parenthèses d'abord : <code>5 + 2 = 7</code>. Puis <code>7 × 3 = 21</code>.</p>`)}
+        ${lc.example("Calculer 20 − (3 + 4) × 2", `<ol><li>Parenthèses : <code>3 + 4 = 7</code>.</li>
+          <li>Multiplication : <code>7 × 2 = 14</code>.</li>
+          <li>Soustraction : <code>20 − 14 = 6</code>.</li></ol>`)}
+
+        <h2>3. Parenthèses imbriquées</h2>
+        ${lc.example("Calculer 4 × (3 + (8 − 2))", `<ol><li>Parenthèse la plus interne : <code>8 − 2 = 6</code>. Reste : <code>4 × (3 + 6)</code>.</li>
+          <li>Parenthèse externe : <code>3 + 6 = 9</code>. Reste : <code>4 × 9</code>.</li>
+          <li>Multiplication : <code>4 × 9 = 36</code>.</li></ol>`)}
+
+        <h2>4. Pièges classiques</h2>
+        ${lc.warn("Soustraction et addition à priorité égale", `<p><code>10 − 3 + 2</code> se calcule de gauche à droite : <code>(10 − 3) + 2 = 7 + 2 = 9</code>. Et <strong>non</strong> <code>10 − (3 + 2) = 5</code>.</p>`)}
+        ${lc.warn("Division avant addition", `<p><code>12 + 8 ÷ 4</code> = <code>12 + 2 = 14</code> (division d'abord). Et non <code>(12 + 8) ÷ 4 = 5</code>.</p>`)}
+        ${lc.tip("Astuce de lecture", `<p>Quand un calcul est ambigu pour toi, ajoute mentalement des parenthèses autour des multiplications et divisions pour clarifier l'ordre.</p>`)}
+
+        <h2>5. Avec relatifs et fractions</h2>
+        <p>Les règles sont les mêmes : parenthèses, puis ×/÷, puis +/−.</p>
+        ${lc.example("Calculer −3 + 2 × (−4)", `<ol><li>Multiplication : <code>2 × (−4) = −8</code>.</li>
+          <li>Addition : <code>−3 + (−8) = −11</code>.</li></ol>`)}
+        ${lc.example("Calculer 1/2 + 1/3 × 1/4", `<ol><li>Multiplication : <code>1/3 × 1/4 = 1/12</code>.</li>
+          <li>Addition : <code>1/2 + 1/12 = 6/12 + 1/12 = 7/12</code>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Proportionnalité",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Reconnaître une situation proportionnelle</h2>
+        ${lc.def("Définition", `<p>Deux grandeurs sont <strong>proportionnelles</strong> si l'une s'obtient en multipliant l'autre par un nombre fixe, appelé <strong>coefficient de proportionnalité</strong>.</p>`)}
+        <p>Exemples typiques :</p>
+        <ul><li>Le prix payé est proportionnel à la quantité achetée (à prix unitaire fixe).</li>
+        <li>La distance parcourue à vitesse constante est proportionnelle au temps.</li>
+        <li>L'aire d'un carré <em>n'est pas</em> proportionnelle à son côté (c'est <code>côté²</code>).</li></ul>
+        ${lc.example("Tableau proportionnel ?", `<p>3 stylos coûtent 6 €. 5 stylos coûtent 10 €. 8 stylos coûtent 16 €.</p>
+          <p>On vérifie : <code>6/3 = 2</code>, <code>10/5 = 2</code>, <code>16/8 = 2</code>. Le coefficient est toujours 2 (le prix unitaire). C'est <strong>proportionnel</strong>.</p>`)}
+
+        <h2>2. Coefficient de proportionnalité</h2>
+        ${lc.prop("Calcul", `<p>Si <code>y</code> est proportionnel à <code>x</code> avec coefficient <code>k</code>, alors <code>y = k × x</code> et <code>k = y / x</code>.</p>`)}
+        ${lc.example("Trouver le coefficient", `<p>Pour 4 kg de pommes, on paie 8 €. Le coefficient (= prix par kg) est <code>8 ÷ 4 = 2 €/kg</code>.</p>
+          <p>On peut alors prédire : pour 7 kg, on paiera <code>7 × 2 = 14 €</code>.</p>`)}
+
+        <h2>3. La 4ème proportionnelle</h2>
+        ${lc.def("Quatrième proportionnelle", `<p>Quand on connaît trois nombres dans un tableau de proportionnalité, on peut calculer le quatrième. C'est la <strong>quatrième proportionnelle</strong>.</p>`)}
+        ${lc.formula("Si &nbsp; a/b &nbsp;=&nbsp; c/d &nbsp;, &nbsp; alors &nbsp; d &nbsp;=&nbsp; (b × c) / a")}
+        ${lc.example("Recette pour 6 personnes → pour 10 ?", `<p>Pour 6 personnes, il faut 300 g de farine. Combien pour 10 ?</p>
+          <ol><li>On pose : <code>300/6 = ?/10</code>.</li>
+          <li>Calcul : <code>? = (300 × 10) / 6 = 3000 / 6 = 500</code>.</li>
+          <li>Il faut <strong>500 g</strong>.</li></ol>`)}
+
+        <h2>4. Le passage par l'unité</h2>
+        ${lc.tip("Méthode classique", `<p>On calcule d'abord la valeur pour <strong>1 unité</strong>, puis on multiplie par la quantité voulue.</p>`)}
+        ${lc.example("Au passage par l'unité", `<p>5 kg de pommes coûtent 12 €. Combien coûtent 8 kg ?</p>
+          <ol><li>1 kg coûte : <code>12 ÷ 5 = 2,4 €</code>.</li>
+          <li>8 kg coûtent : <code>8 × 2,4 = 19,2 €</code>.</li></ol>`)}
+
+        <h2>5. Échelles</h2>
+        ${lc.def("Échelle d'une carte", `<p>Une <strong>échelle</strong> exprime le rapport entre une distance sur le plan et la distance réelle.</p>
+          <p>Une échelle de <code>1/100</code> signifie que <strong>1 cm sur le plan = 100 cm en réalité</strong>.</p>`)}
+        ${lc.example("Distance réelle", `<p>Sur un plan à l'échelle 1/200, deux points sont distants de 4 cm. Quelle est la distance réelle ?</p>
+          <p>Distance réelle = <code>4 × 200 = 800 cm = 8 m</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Pourcentages",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Pourcentage", `<p>Un <strong>pourcentage</strong> est une fraction dont le dénominateur est 100. <code>p%</code> signifie <code>p/100</code>.</p>
+          <p>Exemple : <code>25% = 25/100 = 0,25</code>.</p>`)}
+
+        <h2>2. Prendre p% d'une quantité</h2>
+        ${lc.formula("p% de N &nbsp;=&nbsp; (p / 100) × N &nbsp;=&nbsp; p × N / 100")}
+        ${lc.example("Calculer 20% de 75", `<p><code>20% de 75 = (20 × 75) / 100 = 1500 / 100 = 15</code>.</p>`)}
+        ${lc.tip("Calcul mental", `<ul><li><strong>10%</strong> : divise par 10 (<code>10% de 240 = 24</code>).</li>
+          <li><strong>50%</strong> : divise par 2 (la moitié).</li>
+          <li><strong>25%</strong> : divise par 4 (le quart).</li>
+          <li><strong>5%</strong> : prends la moitié de 10%.</li></ul>`)}
+
+        <h2>3. Augmentation et réduction</h2>
+        ${lc.prop("Augmenter de p%", `<p>Augmenter une valeur de <code>p%</code>, c'est la multiplier par <code>(1 + p/100)</code>.</p>`)}
+        ${lc.example("Une augmentation de 15%", `<p>Un prix de 80 € augmente de 15%. Nouveau prix ?</p>
+          <p>Nouveau prix = <code>80 × (1 + 15/100) = 80 × 1,15 = 92 €</code>.</p>
+          <p>Vérification par étapes : <code>15% de 80 = 12 €</code>. <code>80 + 12 = 92</code> ✓</p>`)}
+        ${lc.prop("Réduire de p%", `<p>Réduire de <code>p%</code>, c'est multiplier par <code>(1 − p/100)</code>.</p>`)}
+        ${lc.example("Une réduction de 30%", `<p>Article à 50 €, soldé à −30%. Prix soldé ?</p>
+          <p>Prix soldé = <code>50 × (1 − 30/100) = 50 × 0,70 = 35 €</code>.</p>`)}
+
+        <h2>4. Calculer un pourcentage à partir de valeurs</h2>
+        ${lc.formula("Pourcentage &nbsp;=&nbsp; (partie / total) × 100")}
+        ${lc.example("Quel pourcentage ?", `<p>Sur 200 élèves, 36 portent des lunettes. Quel pourcentage ?</p>
+          <p><code>(36 / 200) × 100 = 18%</code>.</p>`)}
+
+        <h2>5. Augmentations et réductions successives</h2>
+        ${lc.warn("Piège classique", `<p>Une augmentation de 50% suivie d'une baisse de 50% <strong>ne ramène pas</strong> au prix de départ !</p>
+          <p><code>100 → 100 × 1,5 = 150 → 150 × 0,5 = 75</code>. Au final, baisse de 25% par rapport au départ.</p>`)}
+        ${lc.example("Deux augmentations", `<p>Un loyer de 600 € subit deux augmentations successives de 5% puis 3%.</p>
+          <p>Loyer final = <code>600 × 1,05 × 1,03 = 648,90 €</code>.</p>
+          <p>Au total : <code>(648,90 / 600 − 1) × 100 ≈ 8,15%</code>, et non 8% (les pourcentages ne s'additionnent pas).</p>`)}
+      `,
+    },
+
+    {
+      title: "Calcul littéral : expressions et tests",
+      category: "Calcul littéral",
+      content: `
+        <h2>1. Qu'est-ce qu'une expression littérale ?</h2>
+        ${lc.def("Expression littérale", `<p>Une <strong>expression littérale</strong> est une expression mathématique qui contient des <strong>lettres</strong> (en plus, parfois, de chiffres).</p>
+          <p>Les lettres représentent des nombres dont la valeur peut varier ou est inconnue.</p>`)}
+        <p>Exemples : <code>3x + 2</code> ; <code>2a − 5b</code> ; <code>x² + 1</code>.</p>
+        ${lc.tip("Notation simplifiée", `<p>On omet souvent le signe × :</p>
+          <ul><li><code>3 × x</code> s'écrit <code>3x</code>.</li>
+          <li><code>a × b</code> s'écrit <code>ab</code>.</li>
+          <li><code>2 × (x + 1)</code> s'écrit <code>2(x + 1)</code>.</li></ul>
+          <p>Mais on garde le signe entre deux nombres : <code>3 × 5</code> ne s'écrit jamais <code>35</code>.</p>`)}
+
+        <h2>2. Calculer la valeur d'une expression</h2>
+        ${lc.prop("Méthode", `<p>Pour calculer la valeur d'une expression pour une valeur donnée d'une lettre, on <strong>remplace</strong> la lettre par sa valeur, puis on calcule en respectant les priorités.</p>`)}
+        ${lc.example("Valeur de 3x + 5 pour x = 4", `<p><code>3x + 5 = 3 × 4 + 5 = 12 + 5 = 17</code>.</p>`)}
+        ${lc.example("Valeur de a² − 2a + 1 pour a = 3", `<ol><li>On remplace : <code>3² − 2 × 3 + 1</code>.</li>
+          <li>Puissance d'abord : <code>9 − 2 × 3 + 1</code>.</li>
+          <li>Multiplication : <code>9 − 6 + 1</code>.</li>
+          <li>Gauche à droite : <code>3 + 1 = 4</code>.</li></ol>`)}
+        ${lc.warn("Attention au signe", `<p>Pour <code>x = −2</code>, le calcul de <code>x²</code> donne <code>(−2)² = 4</code>. Toujours mettre des parenthèses autour des nombres négatifs lors du remplacement.</p>`)}
+
+        <h2>3. Tester une égalité</h2>
+        ${lc.def("Tester une égalité", `<p><strong>Tester</strong> une égalité, c'est vérifier si elle est vraie pour une valeur donnée des lettres. On calcule chaque membre séparément et on compare.</p>`)}
+        ${lc.example("L'égalité 2x + 3 = 11 est-elle vraie pour x = 4 ?", `<ol><li>Membre de gauche : <code>2 × 4 + 3 = 11</code>.</li>
+          <li>Membre de droite : <code>11</code>.</li>
+          <li>Les deux membres sont égaux : oui, l'égalité est vraie pour <code>x = 4</code>.</li></ol>`)}
+        ${lc.example("L'égalité 5y − 1 = 14 est-elle vraie pour y = 2 ?", `<ol><li>Gauche : <code>5 × 2 − 1 = 9</code>.</li>
+          <li>Droite : <code>14</code>.</li>
+          <li><code>9 ≠ 14</code> : l'égalité <strong>n'est pas vraie</strong> pour <code>y = 2</code>.</li></ol>`)}
+
+        <h2>4. Réduire une expression</h2>
+        ${lc.def("Réduire", `<p>Réduire une expression littérale, c'est l'écrire avec le moins de termes possibles. On regroupe les termes <strong>de même nature</strong> (mêmes lettres avec les mêmes puissances).</p>`)}
+        ${lc.example("Réduire 3x + 5 + 2x − 1", `<ol><li>Termes en x : <code>3x + 2x = 5x</code>.</li>
+          <li>Termes constants : <code>5 − 1 = 4</code>.</li>
+          <li>Résultat : <code>5x + 4</code>.</li></ol>`)}
+        ${lc.warn("Ne pas mélanger", `<p>On <strong>ne peut pas</strong> additionner <code>3x</code> et <code>2</code> : ce ne sont pas des termes de même nature. <code>3x + 2</code> reste <code>3x + 2</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Symétrie centrale",
+      category: "Géométrie",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Symétrique d'un point par rapport à un point", `<p>Le <strong>symétrique</strong> d'un point A par rapport à un point O est le point A' tel que O est le <strong>milieu</strong> de [AA'].</p>
+          <p>On dit que A et A' sont symétriques par rapport au <strong>centre</strong> O.</p>`)}
+        ${lc.tip("Image visuelle", `<p>Imagine que tu fais tourner une figure de <strong>180°</strong> autour du point O : tu obtiens son symétrique.</p>`)}
+
+        <h2>2. Construire un symétrique</h2>
+        ${lc.prop("Méthode au compas et à la règle", `<ol>
+          <li>Tracer la droite passant par A et O.</li>
+          <li>Reporter avec le compas la distance OA, à partir de O, dans le prolongement de [AO].</li>
+          <li>Le point obtenu est A', symétrique de A par rapport à O.</li>
+        </ol>`)}
+        ${lc.example("Cas concret", `<p>A et O sont placés sur la feuille. <code>OA = 4 cm</code>. On trace la droite (OA), on reporte 4 cm de l'autre côté de O. On obtient A' avec <code>OA' = 4 cm</code> et O milieu de [AA'].</p>`)}
+
+        <h2>3. Symétrique d'une figure</h2>
+        ${lc.prop("Conservation des longueurs", `<p>La symétrie centrale <strong>conserve</strong> :</p>
+          <ul><li>Les <strong>longueurs</strong> (un segment et son symétrique ont même longueur).</li>
+          <li>Les <strong>angles</strong> (un angle et son symétrique sont égaux).</li>
+          <li>Les <strong>aires</strong> et les <strong>périmètres</strong>.</li>
+          <li>Le <strong>parallélisme</strong> et la <strong>perpendicularité</strong>.</li></ul>
+          <p>En revanche, elle <strong>inverse l'orientation</strong> (un sens horaire devient anti-horaire).</p>`)}
+
+        <h2>4. Centre de symétrie d'une figure</h2>
+        ${lc.def("Centre de symétrie", `<p>Une figure admet un <strong>centre de symétrie</strong> O si la symétrie centrale de centre O laisse la figure inchangée.</p>`)}
+        ${lc.prop("Exemples", `<ul><li>Le <strong>cercle</strong> a pour centre de symétrie son centre.</li>
+          <li>Le <strong>parallélogramme</strong> a pour centre de symétrie le point d'intersection de ses diagonales.</li>
+          <li>Le <strong>rectangle</strong>, le <strong>losange</strong> et le <strong>carré</strong> aussi (ce sont des parallélogrammes particuliers).</li>
+          <li>Le <strong>triangle équilatéral</strong> n'a <strong>pas</strong> de centre de symétrie.</li></ul>`)}
+
+        <h2>5. Symétrie centrale vs symétrie axiale</h2>
+        ${lc.warn("Ne pas confondre", `<p>La <strong>symétrie axiale</strong> se fait par rapport à une <em>droite</em> (effet miroir). La <strong>symétrie centrale</strong> se fait par rapport à un <em>point</em> (rotation de 180°).</p>
+          <p>Test rapide : si une lettre garde la même apparence en la regardant à l'envers (rotation 180°), elle a un centre de symétrie. <code>S</code>, <code>N</code>, <code>Z</code>, <code>O</code>, <code>X</code>, <code>I</code>, <code>H</code> ont un centre de symétrie. <code>A</code>, <code>M</code>, <code>T</code> n'en ont pas.</p>`)}
+      `,
+    },
+
+    {
+      title: "Triangles : construction et propriétés",
+      category: "Géométrie",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Triangle", `<p>Un <strong>triangle</strong> est une figure formée par <strong>trois points</strong> non alignés (les <strong>sommets</strong>) reliés par trois segments (les <strong>côtés</strong>).</p>`)}
+        <p>On nomme un triangle par ses trois sommets : triangle <code>ABC</code>.</p>
+
+        <h2>2. Triangles particuliers</h2>
+        ${lc.prop("Les 4 grandes familles", `<ul>
+          <li><strong>Isocèle</strong> : 2 côtés de même longueur (et donc 2 angles égaux).</li>
+          <li><strong>Équilatéral</strong> : 3 côtés de même longueur (et 3 angles égaux à 60°).</li>
+          <li><strong>Rectangle</strong> : 1 angle droit (90°).</li>
+          <li><strong>Rectangle isocèle</strong> : 1 angle droit + 2 côtés égaux.</li>
+        </ul>`)}
+        ${lc.tip("Vocabulaire utile", `<p>Dans un triangle rectangle :</p>
+          <ul><li>Les deux côtés qui forment l'angle droit s'appellent les <strong>côtés de l'angle droit</strong> (ou les « pattes »).</li>
+          <li>Le grand côté, opposé à l'angle droit, s'appelle l'<strong>hypoténuse</strong>.</li></ul>`)}
+
+        <h2>3. Inégalité triangulaire</h2>
+        ${lc.prop("Règle clé", `<p>Dans un triangle, la longueur de chaque côté est <strong>inférieure ou égale</strong> à la somme des deux autres.</p>`)}
+        ${lc.formula("AB ≤ AC + CB &nbsp;&nbsp; AC ≤ AB + BC &nbsp;&nbsp; BC ≤ AB + AC")}
+        ${lc.example("Peut-on construire un triangle de côtés 3, 4, 8 cm ?", `<p>On vérifie : <code>3 + 4 = 7 < 8</code>. L'inégalité est violée.</p>
+          <p>Réponse : <strong>non, ce triangle n'existe pas</strong>. Les deux petits côtés ne se rejoignent pas.</p>`)}
+        ${lc.example("Peut-on construire un triangle de côtés 5, 6, 9 cm ?", `<p><code>5 + 6 = 11 > 9</code> ✓ &nbsp;&nbsp; <code>5 + 9 = 14 > 6</code> ✓ &nbsp;&nbsp; <code>6 + 9 = 15 > 5</code> ✓</p>
+          <p>Réponse : <strong>oui</strong>, ce triangle existe.</p>`)}
+
+        <h2>4. Somme des angles</h2>
+        ${lc.prop("Théorème fondamental", `<p>La somme des trois angles d'un triangle est toujours égale à <strong>180°</strong>.</p>`)}
+        ${lc.formula("∠A + ∠B + ∠C &nbsp;=&nbsp; 180°")}
+        ${lc.example("Trouver le 3e angle", `<p>Dans un triangle, deux angles mesurent 50° et 65°. Quel est le 3e ?</p>
+          <p>Troisième angle = <code>180° − 50° − 65° = 65°</code>.</p>
+          <p>(Le triangle est donc isocèle, puisque deux angles sont égaux.)</p>`)}
+        ${lc.example("Cas particuliers", `<ul><li><strong>Équilatéral</strong> : trois angles égaux à <code>60°</code> (car <code>180/3 = 60</code>).</li>
+          <li><strong>Rectangle</strong> : un angle de 90°. Les deux autres sont complémentaires : leur somme fait 90°.</li>
+          <li><strong>Rectangle isocèle</strong> : 90° + 45° + 45°.</li></ul>`)}
+
+        <h2>5. Construction d'un triangle</h2>
+        ${lc.prop("Connaître les 3 côtés", `<ol><li>Vérifier d'abord l'inégalité triangulaire.</li>
+          <li>Tracer un côté à la règle (par exemple AB).</li>
+          <li>À partir de A, tracer un arc de cercle de rayon AC.</li>
+          <li>À partir de B, tracer un arc de cercle de rayon BC.</li>
+          <li>L'intersection des deux arcs est le point C.</li></ol>`)}
+        ${lc.tip("Méthode pratique", `<p>Pour vérifier ton triangle, mesure les trois côtés au final : tu dois retrouver les longueurs demandées (à 1 mm près).</p>`)}
+      `,
+    },
+
+    {
+      title: "Parallélogrammes",
+      category: "Géométrie",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Parallélogramme", `<p>Un <strong>parallélogramme</strong> est un quadrilatère dont les côtés opposés sont <strong>parallèles deux à deux</strong>.</p>`)}
+
+        <h2>2. Propriétés</h2>
+        ${lc.prop("Les 4 propriétés-clés", `<p>Dans un parallélogramme :</p>
+          <ol><li>Les côtés opposés sont <strong>de même longueur</strong>.</li>
+          <li>Les angles opposés sont <strong>égaux</strong>.</li>
+          <li>Les diagonales se <strong>coupent en leur milieu</strong>.</li>
+          <li>Il a un <strong>centre de symétrie</strong> (l'intersection des diagonales).</li></ol>`)}
+
+        <h2>3. Reconnaître un parallélogramme</h2>
+        ${lc.prop("4 façons équivalentes", `<p>Un quadrilatère est un parallélogramme si et seulement si l'<strong>une</strong> des conditions est vraie :</p>
+          <ul><li>ses côtés opposés sont parallèles deux à deux ;</li>
+          <li>ses côtés opposés sont de même longueur ;</li>
+          <li>ses diagonales se coupent en leur milieu ;</li>
+          <li>il a deux côtés opposés à la fois <strong>parallèles et de même longueur</strong>.</li></ul>`)}
+        ${lc.example("Démontrer qu'ABCD est un parallélogramme", `<p>On sait que <code>AB = 5 cm</code>, <code>CD = 5 cm</code>, et <code>(AB) ∥ (CD)</code>.</p>
+          <p>Les côtés [AB] et [CD] sont à la fois parallèles et de même longueur, donc <strong>ABCD est un parallélogramme</strong>.</p>`)}
+
+        <h2>4. Parallélogrammes particuliers</h2>
+        ${lc.prop("Le rectangle", `<p>Un <strong>rectangle</strong> est un parallélogramme avec un angle droit (et donc 4 angles droits).</p>
+          <p>Propriété supplémentaire : ses diagonales sont de <strong>même longueur</strong>.</p>`)}
+        ${lc.prop("Le losange", `<p>Un <strong>losange</strong> est un parallélogramme dont les 4 côtés sont de même longueur.</p>
+          <p>Propriété supplémentaire : ses diagonales sont <strong>perpendiculaires</strong>.</p>`)}
+        ${lc.prop("Le carré", `<p>Un <strong>carré</strong> est à la fois un rectangle <em>et</em> un losange.</p>
+          <p>Donc : 4 côtés égaux, 4 angles droits, diagonales de même longueur, perpendiculaires, et qui se coupent en leur milieu.</p>`)}
+        ${lc.tip("Hiérarchie", `<p>Carré ⊂ Rectangle ⊂ Parallélogramme. Carré ⊂ Losange ⊂ Parallélogramme.</p>
+          <p>Un carré est un rectangle, mais un rectangle n'est pas forcément un carré.</p>`)}
+
+        <h2>5. Aires (rappels)</h2>
+        ${lc.formula("Parallélogramme &nbsp;:&nbsp; A = base × hauteur")}
+        ${lc.formula("Rectangle &nbsp;:&nbsp; A = longueur × largeur")}
+        ${lc.formula("Carré &nbsp;:&nbsp; A = côté²")}
+        ${lc.formula("Losange &nbsp;:&nbsp; A = (D × d) / 2  (D et d = diagonales)")}
+        ${lc.example("Aire d'un parallélogramme", `<p>Base = 8 cm, hauteur = 5 cm. Aire = <code>8 × 5 = 40 cm²</code>.</p>
+          <p>Attention : la <strong>hauteur</strong> est la distance entre la base et le côté opposé, mesurée perpendiculairement (et non la longueur du côté oblique).</p>`)}
+      `,
+    },
+
+  ];
+}
+
+// ─── Vue Apprentissage : rendering ──────────────────────────────
+function renderLearnSidebar() {
+  const sidebar = $('#learn-sidebar');
+  sidebar.innerHTML = '';
+  for (const group of CURRICULUM) {
+    const groupDiv = el('div', { class: 'level-group' });
+    groupDiv.appendChild(el('h4', {}, group.name));
+    for (const level of group.levels) {
+      const isActive = learnState.levelId === level.id;
+      const levelBtn = el('button', {
+        class: 'level-btn' + (isActive ? ' active' : ''),
+        onclick: () => { learnState.levelId = level.id; learnState.chapterId = null; renderLearn(); }
+      }, level.name);
+      groupDiv.appendChild(levelBtn);
+      // Affiche les chapitres si ce niveau est actif
+      if (isActive) {
+        const chaptersDiv = el('div', { class: 'chapters' });
+        for (let i = 0; i < level.chapters.length; i++) {
+          const ch = level.chapters[i];
+          const chId = `${level.id}-${i}`;
+          const isChActive = learnState.chapterId === chId;
+          const isPlaceholder = !ch.content;
+          chaptersDiv.appendChild(el('button', {
+            class: 'chapter-btn' + (isChActive ? ' active' : '') + (isPlaceholder ? ' placeholder' : ''),
+            onclick: () => { learnState.chapterId = chId; renderLearn(); }
+          }, `${i + 1}. ${ch.title}`));
+        }
+        groupDiv.appendChild(chaptersDiv);
+      }
+    }
+    sidebar.appendChild(groupDiv);
+  }
+}
+
+function renderLearnContent() {
+  const main = $('#learn-content');
+  main.innerHTML = '';
+  if (!learnState.levelId) {
+    main.appendChild(el('div', { class: 'lc-empty', html: `
+      <div class="big">📚</div>
+      <p>Bienvenue dans l'<strong>apprentissage scolaire</strong>.</p>
+      <p>Choisis un niveau dans la barre de gauche pour commencer. Le programme va du collège jusqu'au post-bac.</p>
+    `}));
+    return;
+  }
+  const level = findLevel(learnState.levelId);
+  if (!level) return;
+  if (!learnState.chapterId) {
+    // Page d'accueil du niveau : liste des chapitres
+    main.appendChild(el('div', { class: 'breadcrumb' }, level.name));
+    main.appendChild(el('h1', {}, `Programme de ${level.name}`));
+    const filled = level.chapters.filter(c => c.content).length;
+    main.appendChild(el('div', { class: 'chapter-meta' }, [
+      el('span', { class: 'pill' }, `${level.chapters.length} chapitres`),
+      el('span', { class: 'pill' }, `${filled} rédigés`),
+    ]));
+    main.appendChild(el('p', {},
+      filled === level.chapters.length
+        ? `Tous les chapitres sont rédigés. Clique sur un chapitre dans la barre de gauche pour le lire.`
+        : `Le contenu de ce niveau est en cours de rédaction. Les chapitres déjà disponibles sont en bleu, les autres en gris (à venir).`
+    ));
+    // Mini liste regroupée par catégorie
+    const byCat = {};
+    for (let i = 0; i < level.chapters.length; i++) {
+      const c = level.chapters[i];
+      if (!byCat[c.category]) byCat[c.category] = [];
+      byCat[c.category].push({ ...c, idx: i });
+    }
+    for (const cat of Object.keys(byCat)) {
+      main.appendChild(el('h2', {}, cat));
+      const ul = el('ul');
+      for (const c of byCat[cat]) {
+        const a = el('a', {
+          href: '#',
+          onclick: (e) => { e.preventDefault(); learnState.chapterId = `${level.id}-${c.idx}`; renderLearn(); }
+        }, `${c.idx + 1}. ${c.title}`);
+        if (!c.content) {
+          a.style.color = 'var(--text-3)';
+          a.style.fontStyle = 'italic';
+        }
+        const li = el('li');
+        li.appendChild(a);
+        if (!c.content) li.appendChild(document.createTextNode(' — à venir'));
+        ul.appendChild(li);
+      }
+      main.appendChild(ul);
+    }
+    return;
+  }
+  // Page d'un chapitre
+  const [, idxStr] = learnState.chapterId.split(/-(?=\d+$)/);
+  const idx = parseInt(idxStr, 10);
+  const chapter = level.chapters[idx];
+  if (!chapter) return;
+  main.appendChild(el('div', { class: 'breadcrumb' }, `${level.name} · ${chapter.category}`));
+  main.appendChild(el('h1', {}, chapter.title));
+  main.appendChild(el('div', { class: 'chapter-meta' }, [
+    el('span', { class: 'pill' }, `Chapitre ${idx + 1}`),
+    el('span', { class: 'pill' }, chapter.category),
+  ]));
+  if (!chapter.content) {
+    main.appendChild(el('div', { class: 'lc-empty', html: `
+      <div class="big">📝</div>
+      <p>Ce chapitre n'est <strong>pas encore rédigé</strong>.</p>
+      <p>Il sera ajouté lors d'une prochaine session — niveau par niveau, en commençant par les fondamentaux.</p>
+    `}));
+    return;
+  }
+  const article = el('div', { class: 'chapter-body' });
+  article.innerHTML = chapter.content;
+  main.appendChild(article);
+  // Navigation suivant/précédent
+  const nav = el('div', { style: 'display:flex;gap:10px;justify-content:space-between;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)' });
+  if (idx > 0) {
+    nav.appendChild(el('button', {
+      class: 'btn ghost',
+      onclick: () => { learnState.chapterId = `${level.id}-${idx - 1}`; renderLearn(); }
+    }, `← ${level.chapters[idx - 1].title}`));
+  } else {
+    nav.appendChild(el('div', {}));
+  }
+  if (idx < level.chapters.length - 1) {
+    nav.appendChild(el('button', {
+      class: 'btn',
+      onclick: () => { learnState.chapterId = `${level.id}-${idx + 1}`; renderLearn(); }
+    }, `${level.chapters[idx + 1].title} →`));
+  }
+  main.appendChild(nav);
+}
+
+function findLevel(id) {
+  for (const g of CURRICULUM) for (const l of g.levels) if (l.id === id) return l;
+  return null;
+}
+
+function renderLearn() {
+  renderLearnSidebar();
+  renderLearnContent();
+  $('#learn-content').scrollTop = 0;
+}
+
+// ─── Tab switching ──────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  $('#view-city').hidden = (name !== 'city');
+  $('#view-learn').hidden = (name !== 'learn');
+  if (name === 'learn' && !learnState.levelId) {
+    // Pré-sélection : 5e par défaut puisque c'est le seul niveau rédigé pour l'instant
+    learnState.levelId = '5e';
+    renderLearn();
+  } else if (name === 'learn') {
+    renderLearn();
+  }
+}
+
 // ─── Boot ────────────────────────────────────────────────────────
 function boot() {
   state = loadState();
@@ -1700,6 +2945,11 @@ function boot() {
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && $('#modal-bg').classList.contains('show')) closeModal();
+  });
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => showTab(t.dataset.tab));
   });
 }
 
