@@ -3584,6 +3584,29 @@ function chapters3e() {
           <li>les aires sont multipliées par <code>k²</code> ;</li>
           <li>les volumes sont multipliés par <code>k³</code>.</li></ul>`)}
         ${lc.example("Doubler les dimensions", `<p>Si on double (k = 2) toutes les dimensions d'un cube, son volume est multiplié par <code>2³ = 8</code>. Un cube 8 fois plus volumineux !</p>`)}
+        ${lc.example("Réduire d'un tiers", `<p>Pour <code>k = 1/3</code> : longueurs ÷ 3, aires ÷ 9, volumes ÷ 27.</p>`)}
+
+        <h2>6. Sections planes des solides</h2>
+        ${lc.def("Section plane", `<p>La <strong>section plane</strong> d'un solide par un plan est la figure qu'on obtient en « coupant » le solide avec ce plan.</p>`)}
+        ${lc.prop("Sections du pavé droit", `<ul>
+          <li>Section parallèle à une face : <strong>rectangle</strong> identique à cette face.</li>
+          <li>Section perpendiculaire à une arête : <strong>rectangle</strong>.</li>
+        </ul>`)}
+        ${lc.prop("Sections du cylindre", `<ul>
+          <li>Section parallèle à la base : <strong>disque</strong> identique à la base.</li>
+          <li>Section perpendiculaire à la base et passant par l'axe : <strong>rectangle</strong> (largeur = diamètre, hauteur = hauteur du cylindre).</li>
+        </ul>`)}
+        ${lc.prop("Sections du cône / pyramide", `<p>Une section <strong>parallèle à la base</strong> donne une figure <strong>semblable</strong> à la base, mais réduite. C'est une <strong>réduction</strong> de la base par un coefficient <code>k</code>.</p>`)}
+        ${lc.example("Cône réduit par section parallèle", `<p>Cône de rayon 6, hauteur 12. On le coupe par un plan parallèle à la base à 4 cm du sommet.</p>
+          <ol><li>Coefficient de réduction : <code>k = 4/12 = 1/3</code> (rapport des hauteurs depuis le sommet).</li>
+          <li>Rayon du nouveau disque : <code>6 × 1/3 = 2 cm</code>.</li>
+          <li>Volume du « petit cône » obtenu : <code>(1/3) × π × 2² × 4 = 16π/3 ≈ 16,76 cm³</code>.</li>
+          <li>Vérification via k³ : volume initial = <code>(1/3) × π × 36 × 12 = 144π</code>. Volume réduit = <code>144π × (1/3)³ = 144π/27 = 16π/3</code> ✓.</li>
+        </ol>`)}
+
+        <h2>7. Tronc de cône / pyramide</h2>
+        ${lc.def("Tronc", `<p>Quand on enlève le « petit » cône (ou pyramide) d'une réduction par section parallèle, ce qui reste est un <strong>tronc de cône</strong> (ou de pyramide).</p>
+          <p>Volume du tronc = volume initial − volume du « petit » solide retiré.</p>`)}
       `,
     },
 
