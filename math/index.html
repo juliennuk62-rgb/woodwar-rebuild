@@ -15968,12 +15968,280 @@ EXERCISES['tle-16'] = [
 ];
 
 // ─── Templates d'exercices : post-bac ───────────────────────────
+EXERCISES['analyse-0'] = [
+  {
+    title: 'Définition de la convergence',
+    generate() {
+      return {
+        question: `<code>(u_n)</code> converge vers <code>ℓ</code> si :`,
+        inputType: 'mcq',
+        options: [
+          '∀ε > 0, ∃N, ∀n ≥ N, |u_n − ℓ| &lt; ε',
+          '∃ε > 0, ∀N, ∀n, |u_n − ℓ| &lt; ε',
+          'lim u_n = +∞',
+          '|u_n| ≤ ℓ',
+        ],
+        answer: 0,
+        steps: [
+          `Définition formelle : pour tout ε > 0 (aussi petit qu'on veut), il existe N tel que pour tout <code>n ≥ N</code>, <code>|u_n − ℓ| &lt; ε</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Suite de Cauchy',
+    generate() {
+      return {
+        question: `Une suite réelle est de Cauchy si :`,
+        inputType: 'mcq',
+        options: [
+          '∀ε > 0, ∃N, ∀p,q ≥ N, |u_p − u_q| &lt; ε',
+          'elle est bornée',
+          '|u_n| → 0',
+          'elle est monotone',
+        ],
+        answer: 0,
+        steps: [
+          `Définition : <code>∀ε > 0, ∃N, ∀p,q ≥ N, |u_p − u_q| &lt; ε</code>.`,
+          `Dans ℝ, Cauchy ⇔ convergente.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Théorème de Bolzano-Weierstrass',
+    generate() {
+      return {
+        question: `D'après Bolzano-Weierstrass, toute suite <strong>bornée</strong> de ℝ :`,
+        inputType: 'mcq',
+        options: [
+          'admet une sous-suite convergente',
+          'converge',
+          'est constante',
+          'tend vers 0',
+        ],
+        answer: 0,
+        steps: [
+          `Bolzano-Weierstrass : toute suite bornée admet (au moins) une sous-suite convergente.`,
+          `(Mais la suite elle-même peut diverger : ex. <code>(−1)^n</code>.)`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite et opérations',
+    generate() {
+      const a = exRand(2, 6);
+      const b = exRand(2, 6);
+      return {
+        question: `<code>u_n → ${a}</code>, <code>v_n → ${b}</code>. Que vaut <code>lim u_n × v_n</code> ?`,
+        inputType: 'number',
+        answer: a * b,
+        steps: [
+          `<code>lim(u × v) = lim u × lim v = ${a} × ${b} = ${a * b}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Convergence absolue',
+    generate() {
+      return {
+        question: `Si <code>|u_n| → 0</code>, alors :`,
+        inputType: 'mcq',
+        options: ['u_n → 0', 'u_n diverge', 'u_n est positif', 'on ne sait pas'],
+        answer: 0,
+        steps: [
+          `<code>|u_n − 0| = |u_n| → 0</code>, donc par définition <code>u_n → 0</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['analyse-1'] = [
+  {
+    title: 'Série géométrique : convergence',
+    generate() {
+      const c = exPick([
+        { q: 0.5, conv: true }, { q: 2, conv: false },
+        { q: 1/3, conv: true }, { q: -0.5, conv: true },
+      ]);
+      return {
+        question: `La série <code>Σ ${c.q}<sup>n</sup></code> converge-t-elle ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.conv ? 0 : 1,
+        steps: [
+          `Une série géométrique <code>Σ q<sup>n</sup></code> converge ⇔ <code>|q| &lt; 1</code>.`,
+          c.conv ? `<code>|${c.q}| &lt; 1</code> → converge.` : `<code>|${c.q}| ≥ 1</code> → diverge.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Somme d\'une série géométrique',
+    generate() {
+      const c = exPick([
+        { q: 0.5, s: 2 }, { q: 1/3, s: 1.5 },
+        { q: 2/3, s: 3 }, { q: 0.25, s: 4/3 },
+      ]);
+      return {
+        question: `Calcule <code>Σ_{n=0}^{+∞} ${c.q}<sup>n</sup></code> (au centième).`,
+        inputType: 'number',
+        answer: Math.round(c.s * 100) / 100,
+        tolerance: 0.01,
+        steps: [
+          `<code>Σ_{n=0}^{+∞} q<sup>n</sup> = 1/(1 − q)</code> pour |q| &lt; 1.`,
+          `<code>= 1/(1 − ${c.q}) = ${c.s}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Critère de Riemann',
+    generate() {
+      const c = exPick([
+        { alpha: 2, conv: true }, { alpha: 0.5, conv: false },
+        { alpha: 3, conv: true }, { alpha: 1, conv: false },
+      ]);
+      return {
+        question: `La série <code>Σ 1/n<sup>${c.alpha}</sup></code> converge-t-elle ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.conv ? 0 : 1,
+        steps: [
+          `Riemann : <code>Σ 1/n<sup>α</sup></code> converge ⇔ <code>α > 1</code>.`,
+          c.conv ? `<code>${c.alpha} > 1</code> → converge.` : `<code>${c.alpha} ≤ 1</code> → diverge.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Condition nécessaire',
+    generate() {
+      return {
+        question: `Si <code>Σ u_n</code> converge, alors :`,
+        inputType: 'mcq',
+        options: [
+          'u_n → 0',
+          'u_n → ∞',
+          'u_n est constant',
+          'la suite est croissante',
+        ],
+        answer: 0,
+        steps: [
+          `Condition nécessaire (mais non suffisante) : <code>u_n → 0</code>.`,
+          `Contre-exemple : Σ 1/n diverge bien que 1/n → 0.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Série harmonique',
+    generate() {
+      return {
+        question: `La série harmonique <code>Σ 1/n</code> :`,
+        inputType: 'mcq',
+        options: [
+          'converge vers 1',
+          'converge vers ln(2)',
+          'diverge vers +∞',
+          'oscille',
+        ],
+        answer: 2,
+        steps: [
+          `Série de Riemann avec α = 1 → <strong>diverge</strong>.`,
+          `H_n = 1 + 1/2 + ... + 1/n ~ ln(n) → +∞.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['analyse-2'] = [
+  {
+    title: 'Dérivée partielle',
+    generate() {
+      return {
+        question: `Soit <code>f(x, y) = x²y + 3y</code>. Que vaut <code>∂f/∂x</code> en (1, 2) ?`,
+        inputType: 'number',
+        answer: 4,
+        steps: [
+          `<code>∂f/∂x = 2xy</code>.`,
+          `En (1, 2) : <code>2 × 1 × 2 = 4</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Dérivée partielle ∂/∂y',
+    generate() {
+      return {
+        question: `<code>f(x, y) = x²y + 3y</code>. Que vaut <code>∂f/∂y</code> en (2, 1) ?`,
+        inputType: 'number',
+        answer: 7,
+        steps: [
+          `<code>∂f/∂y = x² + 3</code>.`,
+          `En (2, 1) : <code>2² + 3 = 7</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Gradient en un point',
+    generate() {
+      return {
+        question: `<code>f(x, y) = x² + y²</code>. Première composante de <code>∇f(1, 2)</code> ?`,
+        inputType: 'number',
+        answer: 2,
+        steps: [
+          `<code>∂f/∂x = 2x</code>, <code>∂f/∂y = 2y</code>.`,
+          `<code>∇f(1, 2) = (2, 4)</code>. Première composante : <code>2</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Point critique',
+    generate() {
+      return {
+        question: `<code>f(x, y) = x² − 2x + y² − 4y + 5</code>. En quel point f a-t-elle un point critique ? (donne x)`,
+        inputType: 'number',
+        answer: 1,
+        steps: [
+          `<code>∂f/∂x = 2x − 2 = 0</code> ⇒ <code>x = 1</code>.`,
+          `<code>∂f/∂y = 2y − 4 = 0</code> ⇒ <code>y = 2</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Composition',
+    generate() {
+      return {
+        question: `Si <code>g(t) = f(2t, 3t)</code> avec <code>f</code> de classe C¹, <code>g'(t) = ?</code>`,
+        inputType: 'mcq',
+        options: [
+          '2 ∂f/∂x + 3 ∂f/∂y',
+          '∂f/∂x + ∂f/∂y',
+          '6 × f',
+          'f',
+        ],
+        answer: 0,
+        steps: [
+          `Règle de la chaîne : <code>g'(t) = (dx/dt) × ∂f/∂x + (dy/dt) × ∂f/∂y = 2 ∂f/∂x + 3 ∂f/∂y</code>.`,
+        ],
+      };
+    },
+  },
+];
+
 EXERCISES['analyse-3'] = [
   {
     title: 'IPP : ∫ x e^x dx',
     generate() {
       const top = exRand(1, 3);
-      // ∫₀^top x e^x dx = (top - 1)e^top + 1
       const result = (top - 1) * Math.exp(top) + 1;
       return {
         question: `Calcule <code>∫₀<sup>${top}</sup> x·e<sup>x</sup> dx</code> (au dixième).`,
@@ -15988,6 +16256,889 @@ EXERCISES['analyse-3'] = [
       };
     },
   },
+  {
+    title: 'Formule IPP',
+    generate() {
+      return {
+        question: `La formule d'intégration par parties est :`,
+        inputType: 'mcq',
+        options: [
+          '∫ uv\' = uv − ∫ u\'v',
+          '∫ uv\' = u\'v',
+          '∫ uv\' = u + v',
+          '∫ uv = u + v',
+        ],
+        answer: 0,
+        steps: [
+          `<code>∫_a^b u(x) v'(x) dx = [u(x)v(x)]_a^b − ∫_a^b u'(x) v(x) dx</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'IPP : ∫ ln(x) dx',
+    generate() {
+      return {
+        question: `Une primitive de <code>ln(x)</code> est :`,
+        inputType: 'mcq',
+        options: [
+          'x ln(x) − x',
+          '1/x',
+          'x ln(x)',
+          'ln(x)/2',
+        ],
+        answer: 0,
+        steps: [
+          `IPP avec <code>u = ln(x)</code>, <code>v' = 1</code>.`,
+          `<code>∫ ln(x) dx = x ln(x) − ∫ 1 dx = x ln(x) − x + C</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Quel choix de u, v\' ?',
+    generate() {
+      return {
+        question: `Pour <code>∫ x cos(x) dx</code>, on choisit :`,
+        inputType: 'mcq',
+        options: [
+          'u = x, v\' = cos(x)',
+          'u = cos(x), v\' = x',
+          'u = x cos(x), v\' = 1',
+          'u = 1, v\' = x cos(x)',
+        ],
+        answer: 0,
+        steps: [
+          `On dérive le polynôme x (qui se simplifie) et on intègre cos(x).`,
+          `Ainsi : <code>u = x</code>, <code>v' = cos(x)</code> → <code>v = sin(x)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'IPP appliquée 2 fois',
+    generate() {
+      return {
+        question: `<code>∫ x² e<sup>x</sup> dx</code> nécessite combien d'IPP ?`,
+        inputType: 'number',
+        answer: 2,
+        steps: [
+          `1<sup>re</sup> IPP : on baisse le degré de x² à x.`,
+          `2<sup>e</sup> IPP : on baisse de x à 1.`,
+          `Total : <strong>2</strong> IPP.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['analyse-4'] = [
+  {
+    title: 'Changement de variable simple',
+    generate() {
+      return {
+        question: `Pour <code>∫ 2x e<sup>x²</sup> dx</code>, on pose <code>u = x²</code>. Alors <code>du = ?</code>`,
+        inputType: 'mcq',
+        options: ['2x dx', 'x dx', 'dx', '2 dx'],
+        answer: 0,
+        steps: [
+          `<code>du = u' dx = 2x dx</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: '∫ 2x/(1 + x²) dx',
+    generate() {
+      return {
+        question: `Une primitive de <code>2x/(1 + x²)</code> est :`,
+        inputType: 'mcq',
+        options: [
+          'ln(1 + x²)',
+          '1/(1 + x²)',
+          'arctan(x)',
+          '2x ln(1 + x²)',
+        ],
+        answer: 0,
+        steps: [
+          `On reconnaît <code>u'/u</code> avec <code>u = 1 + x²</code>.`,
+          `Primitive : <code>ln|u| = ln(1 + x²)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Bornes après changement',
+    generate() {
+      return {
+        question: `<code>∫_0^1 f(2x) dx</code> avec <code>u = 2x</code>. Quelles sont les nouvelles bornes ?`,
+        inputType: 'mcq',
+        options: ['0 et 2', '0 et 1', '1 et 2', '−1 et 1'],
+        answer: 0,
+        steps: [
+          `Quand <code>x = 0</code> : <code>u = 0</code>. Quand <code>x = 1</code> : <code>u = 2</code>.`,
+          `Bornes : <code>0</code> à <code>2</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: '∫ sin(x) cos(x) dx',
+    generate() {
+      return {
+        question: `Une primitive de <code>sin(x) cos(x)</code> est :`,
+        inputType: 'mcq',
+        options: [
+          'sin²(x)/2',
+          '−cos²(x)/2',
+          'tan(x)',
+          'cos(x) sin(x)',
+        ],
+        answer: 0,
+        steps: [
+          `Avec <code>u = sin(x)</code>, <code>du = cos(x) dx</code>.`,
+          `<code>∫ u du = u²/2 = sin²(x)/2</code>. (Aussi −cos²(x)/2 + Cste, équivalent.)`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Changement avec dx = ...',
+    generate() {
+      return {
+        question: `Pour <code>∫ √(1 − x²) dx</code> on pose <code>x = sin(t)</code>. Alors <code>dx =</code> ?`,
+        inputType: 'mcq',
+        options: ['cos(t) dt', 'sin(t) dt', 'dt', '−sin(t) dt'],
+        answer: 0,
+        steps: [
+          `<code>x = sin(t)</code> ⇒ <code>dx = cos(t) dt</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['analyse-5'] = [
+  {
+    title: 'Solution générale y\' + ay = 0',
+    generate() {
+      const a = exRand(2, 5);
+      return {
+        question: `Solution générale de <code>y' + ${a}y = 0</code> ?`,
+        inputType: 'mcq',
+        options: [
+          `C × e<sup>−${a}t</sup>`,
+          `C × e<sup>${a}t</sup>`,
+          `C + ${a}t`,
+          `C × ${a}<sup>t</sup>`,
+        ],
+        answer: 0,
+        steps: [
+          `<code>y' = −${a}y</code> ⇒ <code>y = C e<sup>−${a}t</sup></code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Constante avec condition initiale',
+    generate() {
+      const a = exRand(2, 4);
+      const y0 = exRand(2, 5);
+      return {
+        question: `<code>y' = ${a}y</code>, <code>y(0) = ${y0}</code>. Que vaut <code>y(1)</code> (au centième) ?`,
+        inputType: 'number',
+        answer: Math.round(y0 * Math.exp(a) * 100) / 100,
+        tolerance: 1,
+        steps: [
+          `<code>y(t) = ${y0} e<sup>${a}t</sup></code>.`,
+          `<code>y(1) = ${y0} × e<sup>${a}</sup> ≈ ${(y0 * Math.exp(a)).toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Solution particulière constante',
+    generate() {
+      const a = exRand(2, 4);
+      const b = exRand(2, 6);
+      return {
+        question: `<code>y' = ${a}y + ${b}</code>. Solution particulière constante <code>y_p = ?</code>`,
+        inputType: 'number',
+        answer: -b / a,
+        tolerance: 0.001,
+        steps: [
+          `<code>y_p</code> constante ⇒ <code>y_p' = 0</code>, donc <code>0 = ${a} y_p + ${b}</code> ⇒ <code>y_p = −${b}/${a} = ${(-b/a).toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Linéaire ordre 1 : structure',
+    generate() {
+      return {
+        question: `La solution générale d'une EDL d'ordre 1 est :`,
+        inputType: 'mcq',
+        options: [
+          'solution homogène + solution particulière',
+          'solution homogène uniquement',
+          'solution particulière uniquement',
+          '0',
+        ],
+        answer: 0,
+        steps: [
+          `<code>y_g = y_h + y_p</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variation de la constante',
+    generate() {
+      return {
+        question: `Pour résoudre <code>y' + a(t)y = b(t)</code>, on peut utiliser :`,
+        inputType: 'mcq',
+        options: [
+          'la méthode de variation de la constante',
+          'la formule du discriminant',
+          'la dérivation logarithmique',
+          'rien',
+        ],
+        answer: 0,
+        steps: [
+          `Variation de la constante : on cherche <code>y = C(t) × y_h(t)</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['analyse-6'] = [
+  {
+    title: 'DL de e^x à l\'ordre 2',
+    generate() {
+      return {
+        question: `Le DL de <code>e<sup>x</sup></code> à l'ordre 2 en 0 est :`,
+        inputType: 'mcq',
+        options: [
+          '1 + x + x²/2 + o(x²)',
+          '1 + x + x² + o(x²)',
+          '1 − x + x²/2 + o(x²)',
+          'x + x²/2 + o(x²)',
+        ],
+        answer: 0,
+        steps: [
+          `<code>e<sup>x</sup> = 1 + x + x²/2! + x³/3! + ...</code>`,
+          `À l'ordre 2 : <code>1 + x + x²/2 + o(x²)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'DL de sin(x) à l\'ordre 3',
+    generate() {
+      return {
+        question: `Le DL de <code>sin(x)</code> à l'ordre 3 en 0 est :`,
+        inputType: 'mcq',
+        options: [
+          'x − x³/6 + o(x³)',
+          'x + x³/6 + o(x³)',
+          '1 − x²/2 + o(x³)',
+          'x − x²/2 + o(x³)',
+        ],
+        answer: 0,
+        steps: [
+          `<code>sin(x) = x − x³/3! + x⁵/5! − ...</code>`,
+          `À l'ordre 3 : <code>x − x³/6 + o(x³)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Limite par DL',
+    generate() {
+      return {
+        question: `<code>lim<sub>x→0</sub> (e<sup>x</sup> − 1)/x</code> ?`,
+        inputType: 'number',
+        answer: 1,
+        steps: [
+          `DL : <code>e<sup>x</sup> − 1 = x + x²/2 + ...</code>`,
+          `<code>(e<sup>x</sup> − 1)/x = 1 + x/2 + ... → 1</code> en 0.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'DL de ln(1 + x)',
+    generate() {
+      return {
+        question: `<code>ln(1 + x)</code> à l'ordre 2 en 0 ?`,
+        inputType: 'mcq',
+        options: [
+          'x − x²/2 + o(x²)',
+          'x + x²/2 + o(x²)',
+          '1 + x + x²/2 + o(x²)',
+          'x − x² + o(x²)',
+        ],
+        answer: 0,
+        steps: [
+          `<code>ln(1 + x) = x − x²/2 + x³/3 − ...</code>`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'DL et tangente',
+    generate() {
+      return {
+        question: `Le DL à l'ordre 1 de <code>f</code> en <code>a</code> donne :`,
+        inputType: 'mcq',
+        options: [
+          'l\'équation de la tangente en a',
+          'l\'asymptote',
+          'le maximum',
+          'la dérivée seconde',
+        ],
+        answer: 0,
+        steps: [
+          `<code>f(a + h) = f(a) + h × f'(a) + o(h)</code> : tangente <code>y = f(a) + f'(a)(x − a)</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['analyse-7'] = [
+  {
+    title: 'Théorème de Rolle',
+    generate() {
+      return {
+        question: `Hypothèses du théorème de Rolle pour <code>f</code> sur <code>[a; b]</code> :`,
+        inputType: 'mcq',
+        options: [
+          'f continue sur [a;b], dérivable sur (a;b), f(a) = f(b)',
+          'f croissante sur [a;b]',
+          'f bornée seulement',
+          'f impaire',
+        ],
+        answer: 0,
+        steps: [
+          `Rolle : continuité + dérivabilité + <code>f(a) = f(b)</code> ⇒ ∃c ∈ (a;b) tel que <code>f'(c) = 0</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Théorème des accroissements finis',
+    generate() {
+      return {
+        question: `D'après le TAF, il existe <code>c ∈ (a; b)</code> tel que :`,
+        inputType: 'mcq',
+        options: [
+          'f(b) − f(a) = (b − a) × f\'(c)',
+          'f(b) = f(a)',
+          'f\'(c) = 0',
+          'f(c) = 0',
+        ],
+        answer: 0,
+        steps: [
+          `TAF : <code>f(b) − f(a) = (b − a) f'(c)</code> pour un certain <code>c ∈ (a; b)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Inégalité des accroissements finis',
+    generate() {
+      return {
+        question: `Si <code>|f'(x)| ≤ M</code> sur <code>[a; b]</code>, alors :`,
+        inputType: 'mcq',
+        options: [
+          '|f(b) − f(a)| ≤ M(b − a)',
+          'f(b) = f(a) + M',
+          '|f(b) − f(a)| = M',
+          'f est constante',
+        ],
+        answer: 0,
+        steps: [
+          `Inégalité des accroissements finis : <code>|f(b) − f(a)| ≤ M × (b − a)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'TAF généralisé (Cauchy)',
+    generate() {
+      return {
+        question: `Le théorème de Cauchy (généralisation du TAF) lie f et g par :`,
+        inputType: 'mcq',
+        options: [
+          '(f(b) − f(a))/(g(b) − g(a)) = f\'(c)/g\'(c)',
+          'f(c) = g(c)',
+          'f\'(c) g\'(c) = 1',
+          'f = g',
+        ],
+        answer: 0,
+        steps: [
+          `Théorème de Cauchy : <code>(f(b) − f(a))/(g(b) − g(a)) = f'(c)/g'(c)</code>.`,
+          `(Utilisé pour démontrer la règle de L'Hôpital.)`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Règle de L\'Hôpital',
+    generate() {
+      return {
+        question: `<code>lim<sub>x→0</sub> sin(x)/x</code> par L'Hôpital :`,
+        inputType: 'number',
+        answer: 1,
+        steps: [
+          `Forme indéterminée 0/0.`,
+          `<code>= lim cos(x)/1 = cos(0)/1 = 1</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['analyse-8'] = [
+  {
+    title: '∫ 1/x² de 1 à +∞',
+    generate() {
+      return {
+        question: `<code>∫_1^{+∞} dx/x²</code> ?`,
+        inputType: 'number',
+        answer: 1,
+        steps: [
+          `Primitive : <code>−1/x</code>.`,
+          `<code>[−1/x]_1^{+∞} = 0 − (−1) = 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Critère de Riemann (intégral)',
+    generate() {
+      const c = exPick([
+        { alpha: 2, conv: true }, { alpha: 1, conv: false },
+        { alpha: 0.5, conv: false }, { alpha: 3, conv: true },
+      ]);
+      return {
+        question: `<code>∫_1^{+∞} dx/x<sup>${c.alpha}</sup></code> converge-t-elle ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.conv ? 0 : 1,
+        steps: [
+          `Riemann en +∞ : converge ⇔ <code>α > 1</code>.`,
+          c.conv ? `<code>${c.alpha} > 1</code> → converge.` : `<code>${c.alpha} ≤ 1</code> → diverge.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Riemann en 0',
+    generate() {
+      const c = exPick([
+        { alpha: 0.5, conv: true }, { alpha: 2, conv: false },
+        { alpha: 1, conv: false }, { alpha: 0.3, conv: true },
+      ]);
+      return {
+        question: `<code>∫_0^1 dx/x<sup>${c.alpha}</sup></code> converge-t-elle ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.conv ? 0 : 1,
+        steps: [
+          `Riemann en 0 : converge ⇔ <code>α &lt; 1</code>.`,
+          c.conv ? `<code>${c.alpha} &lt; 1</code> → converge.` : `<code>${c.alpha} ≥ 1</code> → diverge.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Intégrale de e^(-x)',
+    generate() {
+      return {
+        question: `<code>∫_0^{+∞} e<sup>−x</sup> dx</code> ?`,
+        inputType: 'number',
+        answer: 1,
+        steps: [
+          `Primitive : <code>−e<sup>−x</sup></code>.`,
+          `<code>[−e<sup>−x</sup>]_0^{+∞} = 0 − (−1) = 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Comparaison',
+    generate() {
+      return {
+        question: `Si <code>0 ≤ f ≤ g</code> et <code>∫ g</code> converge, alors :`,
+        inputType: 'mcq',
+        options: ['∫ f converge', '∫ f diverge', 'on ne peut pas conclure', '∫ f = ∫ g'],
+        answer: 0,
+        steps: [
+          `Critère de comparaison : majoration par une fonction intégrable ⇒ convergence.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['analyse-9'] = [
+  {
+    title: 'EDL ordre 2 homogène',
+    generate() {
+      return {
+        question: `L'équation caractéristique de <code>y'' − 5y' + 6y = 0</code> est :`,
+        inputType: 'mcq',
+        options: [
+          'r² − 5r + 6 = 0',
+          'r² + 5r + 6 = 0',
+          'r − 5 + 6 = 0',
+          'y² = 6',
+        ],
+        answer: 0,
+        steps: [
+          `<code>y(t) = e<sup>rt</sup></code> ⇒ équation caractéristique <code>ar² + br + c = 0</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Racines réelles distinctes',
+    generate() {
+      return {
+        question: `Si l'équation caractéristique a 2 racines réelles <code>r_1, r_2</code>, la solution générale est :`,
+        inputType: 'mcq',
+        options: [
+          'C_1 e<sup>r_1 t</sup> + C_2 e<sup>r_2 t</sup>',
+          '(C_1 + C_2 t) e<sup>r_1 t</sup>',
+          'C_1 cos(r_1 t) + C_2 sin(r_2 t)',
+          'C_1 + C_2',
+        ],
+        answer: 0,
+        steps: [
+          `Δ > 0 : <code>y = C_1 e<sup>r_1 t</sup> + C_2 e<sup>r_2 t</sup></code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Racine double',
+    generate() {
+      return {
+        question: `Si l'équation caractéristique a une racine double <code>r</code>, la solution générale est :`,
+        inputType: 'mcq',
+        options: [
+          '(C_1 + C_2 t) e<sup>rt</sup>',
+          'C_1 e<sup>rt</sup>',
+          'C_1 cos(rt) + C_2 sin(rt)',
+          'rien',
+        ],
+        answer: 0,
+        steps: [
+          `Δ = 0 : <code>y = (C_1 + C_2 t) e<sup>rt</sup></code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Racines complexes',
+    generate() {
+      return {
+        question: `Si les racines sont <code>α ± iβ</code>, la solution générale réelle est :`,
+        inputType: 'mcq',
+        options: [
+          'e<sup>αt</sup>(C_1 cos(βt) + C_2 sin(βt))',
+          'C_1 + C_2 i',
+          'e<sup>αt</sup>',
+          'cos(αt)',
+        ],
+        answer: 0,
+        steps: [
+          `Δ &lt; 0, racines <code>α ± iβ</code> : <code>y = e<sup>αt</sup>(C_1 cos(βt) + C_2 sin(βt))</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Oscillateur harmonique',
+    generate() {
+      return {
+        question: `<code>y'' + 4y = 0</code>. Solution générale :`,
+        inputType: 'mcq',
+        options: [
+          'C_1 cos(2t) + C_2 sin(2t)',
+          'C_1 e<sup>2t</sup> + C_2 e<sup>−2t</sup>',
+          '(C_1 + C_2 t) e<sup>2t</sup>',
+          'C_1 + C_2',
+        ],
+        answer: 0,
+        steps: [
+          `<code>r² + 4 = 0</code> ⇒ <code>r = ±2i</code>.`,
+          `<code>y = C_1 cos(2t) + C_2 sin(2t)</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['analyse-10'] = [
+  {
+    title: 'Rayon de convergence : 1/n',
+    generate() {
+      return {
+        question: `Rayon de convergence de <code>Σ x<sup>n</sup>/n</code> ?`,
+        inputType: 'number',
+        answer: 1,
+        steps: [
+          `Test de d'Alembert : <code>|a_{n+1}/a_n| = n/(n+1) → 1</code>.`,
+          `Donc <code>R = 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Rayon de convergence : 1/n!',
+    generate() {
+      return {
+        question: `Rayon de convergence de <code>Σ x<sup>n</sup>/n!</code> ?`,
+        inputType: 'mcq',
+        options: ['+∞', '1', '0', 'e'],
+        answer: 0,
+        steps: [
+          `<code>|a_{n+1}/a_n| = 1/(n+1) → 0</code>.`,
+          `Rayon : <code>R = +∞</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Série de exp',
+    generate() {
+      return {
+        question: `<code>Σ x<sup>n</sup>/n!</code> converge vers :`,
+        inputType: 'mcq',
+        options: ['e<sup>x</sup>', 'ln(1+x)', '1/(1−x)', 'sin(x)'],
+        answer: 0,
+        steps: [
+          `Définition : <code>e<sup>x</sup> = Σ x<sup>n</sup>/n!</code>, partout sur ℝ.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Série géométrique',
+    generate() {
+      return {
+        question: `<code>Σ x<sup>n</sup></code> (pour |x| &lt; 1) converge vers :`,
+        inputType: 'mcq',
+        options: ['1/(1 − x)', '1/(1 + x)', 'e<sup>x</sup>', 'ln(1 + x)'],
+        answer: 0,
+        steps: [
+          `<code>Σ_{n=0}^{+∞} x<sup>n</sup> = 1/(1 − x)</code> pour |x| &lt; 1.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Dérivation terme à terme',
+    generate() {
+      return {
+        question: `Sur le disque ouvert de convergence, on peut dériver une série entière terme à terme :`,
+        inputType: 'mcq',
+        options: ['Vrai', 'Faux'],
+        answer: 0,
+        steps: [
+          `Théorème : sur <code>(−R; R)</code>, <code>(Σ a_n x<sup>n</sup>)' = Σ n a_n x<sup>n−1</sup></code>.`,
+          `Le rayon de convergence est conservé.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['algebre-0'] = [
+  {
+    title: 'Définition d\'un sous-espace',
+    generate() {
+      return {
+        question: `<code>F</code> est un sous-espace vectoriel de <code>E</code> si :`,
+        inputType: 'mcq',
+        options: [
+          '0 ∈ F, F stable par + et par ·',
+          'F est non vide',
+          'F = E',
+          'F est fini',
+        ],
+        answer: 0,
+        steps: [
+          `Conditions : <code>0_E ∈ F</code>, F stable par addition et par multiplication scalaire.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Famille libre',
+    generate() {
+      return {
+        question: `Une famille <code>(v_1, ..., v_n)</code> est libre si :`,
+        inputType: 'mcq',
+        options: [
+          'α_1 v_1 + ... + α_n v_n = 0 ⇒ tous les α_i = 0',
+          'tous les v_i sont non nuls',
+          'tous les v_i sont distincts',
+          'la famille est finie',
+        ],
+        answer: 0,
+        steps: [
+          `Définition : seule combinaison linéaire nulle est celle aux coefficients tous nuls.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Dimension de ℝ³',
+    generate() {
+      return {
+        question: `Quelle est la dimension de l'espace vectoriel <code>ℝ³</code> ?`,
+        inputType: 'number',
+        answer: 3,
+        steps: [
+          `Base canonique : <code>(1,0,0), (0,1,0), (0,0,1)</code> → 3 vecteurs.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Vecteurs colinéaires (libre ?)',
+    generate() {
+      return {
+        question: `<code>u→ = (1, 2)</code>, <code>v→ = (3, 6)</code>. La famille (u, v) est :`,
+        inputType: 'mcq',
+        options: ['libre', 'liée', 'vide', 'orthogonale'],
+        answer: 1,
+        steps: [
+          `<code>v = 3u</code> : un vecteur est combinaison linéaire de l'autre.`,
+          `Famille <strong>liée</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Base d\'un sous-espace',
+    generate() {
+      return {
+        question: `Une base d'un EV de dimension n est une famille :`,
+        inputType: 'mcq',
+        options: [
+          'libre et génératrice',
+          'libre uniquement',
+          'génératrice uniquement',
+          'orthogonale',
+        ],
+        answer: 0,
+        steps: [
+          `Base = libre + génératrice. (En dim. n : libre de cardinal n ⇒ base.)`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['algebre-1'] = [
+  {
+    title: 'Définition application linéaire',
+    generate() {
+      return {
+        question: `<code>f : E → F</code> est linéaire si :`,
+        inputType: 'mcq',
+        options: [
+          'f(αx + βy) = αf(x) + βf(y) pour tout α, β, x, y',
+          'f(0) = 0 seulement',
+          'f est continue',
+          'f est bijective',
+        ],
+        answer: 0,
+        steps: [
+          `Définition : <code>f(αx + βy) = αf(x) + βf(y)</code> (linéarité).`,
+          `Conséquence : <code>f(0_E) = 0_F</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Noyau et image',
+    generate() {
+      return {
+        question: `Le <strong>noyau</strong> de <code>f</code> est :`,
+        inputType: 'mcq',
+        options: [
+          '{x ∈ E | f(x) = 0}',
+          '{f(x) | x ∈ E}',
+          'E lui-même',
+          'F lui-même',
+        ],
+        answer: 0,
+        steps: [
+          `<code>Ker(f) = {x ∈ E | f(x) = 0_F}</code>.`,
+          `(L'image est <code>Im(f) = {f(x) | x ∈ E}</code>.)`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Théorème du rang',
+    generate() {
+      return {
+        question: `Théorème du rang : pour <code>f : E → F</code> avec dim E finie, on a :`,
+        inputType: 'mcq',
+        options: [
+          'dim Ker(f) + dim Im(f) = dim E',
+          'dim Ker(f) = dim Im(f)',
+          'dim Im(f) = dim F',
+          'dim E = dim F',
+        ],
+        answer: 0,
+        steps: [
+          `<code>dim Ker(f) + rg(f) = dim E</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Injectivité et noyau',
+    generate() {
+      return {
+        question: `Une application linéaire <code>f</code> est injective ssi :`,
+        inputType: 'mcq',
+        options: [
+          'Ker(f) = {0}',
+          'Ker(f) = E',
+          'Im(f) = F',
+          'rg(f) = dim E',
+        ],
+        answer: 0,
+        steps: [
+          `f linéaire injective ⇔ <code>Ker(f) = {0}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Endomorphisme = ?',
+    generate() {
+      return {
+        question: `Un <strong>endomorphisme</strong> est une application linéaire :`,
+        inputType: 'mcq',
+        options: ['de E dans E', 'de E dans F', 'bijective', 'continue'],
+        answer: 0,
+        steps: [
+          `Endomorphisme : <code>f : E → E</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['algebre-2'] = [
@@ -15996,7 +17147,6 @@ EXERCISES['algebre-2'] = [
     generate() {
       const a = exRand(1, 5), b = exRand(1, 5), c = exRand(1, 5), d = exRand(1, 5);
       const e = exRand(1, 5), f = exRand(1, 5), g = exRand(1, 5), h = exRand(1, 5);
-      // A·B[1,1] = a·e + b·g
       const r11 = a * e + b * g;
       return {
         question: `<code>A = ((${a}, ${b}); (${c}, ${d}))</code>, <code>B = ((${e}, ${f}); (${g}, ${h}))</code>. Quel est le coefficient (1,1) de <code>A·B</code> ?`,
@@ -16025,6 +17175,753 @@ EXERCISES['algebre-2'] = [
       };
     },
   },
+  {
+    title: 'Identité I_2',
+    generate() {
+      return {
+        question: `Que vaut <code>(1,2;3,4) × I_2</code> ?`,
+        inputType: 'mcq',
+        options: ['(1,2;3,4)', '(0,0;0,0)', '(1,1;1,1)', 'I_2'],
+        answer: 0,
+        steps: [
+          `<code>A × I = A</code> pour toute matrice carrée.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Transposée',
+    generate() {
+      return {
+        question: `<code>A = (1,2;3,4)</code>. Coefficient (1,2) de <code>tA</code> ?`,
+        inputType: 'number',
+        answer: 3,
+        steps: [
+          `Transposée : <code>tA<sub>ij</sub> = A<sub>ji</sub></code>.`,
+          `<code>tA<sub>12</sub> = A<sub>21</sub> = 3</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Matrice inversible',
+    generate() {
+      return {
+        question: `Une matrice carrée A est inversible ssi :`,
+        inputType: 'mcq',
+        options: [
+          'det(A) ≠ 0',
+          'A est diagonale',
+          'tous les coefficients sont non nuls',
+          'A est symétrique',
+        ],
+        answer: 0,
+        steps: [
+          `<code>A inversible ⇔ det(A) ≠ 0</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['algebre-3'] = [
+  {
+    title: 'Pivot de Gauss',
+    generate() {
+      return {
+        question: `La méthode du pivot de Gauss sert à :`,
+        inputType: 'mcq',
+        options: [
+          'résoudre un système linéaire en l\'échelonnant',
+          'calculer une dérivée',
+          'tester l\'orthogonalité',
+          'inverser une fonction',
+        ],
+        answer: 0,
+        steps: [
+          `Pivot de Gauss : on échelonne le système par opérations élémentaires sur les lignes pour le résoudre.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Système triangulaire',
+    generate() {
+      return {
+        question: `<code>x + y = 5; y = 2</code>. Que vaut x ?`,
+        inputType: 'number',
+        answer: 3,
+        steps: [
+          `Substitution : <code>x + 2 = 5 ⇒ x = 3</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Système 2×2',
+    generate() {
+      const x = exRand(2, 6);
+      const y = exRand(2, 6);
+      return {
+        question: `Résous : <code>x + y = ${x + y}; x − y = ${x - y}</code>. Donne x.`,
+        inputType: 'number',
+        answer: x,
+        steps: [
+          `Somme : <code>2x = ${2 * x}</code>, donc <code>x = ${x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Compatibilité',
+    generate() {
+      return {
+        question: `Un système linéaire à n équations et n inconnues a une solution unique ssi :`,
+        inputType: 'mcq',
+        options: [
+          'la matrice associée est inversible',
+          'le second membre est nul',
+          'tous les coefficients sont positifs',
+          'on a plus d\'équations que d\'inconnues',
+        ],
+        answer: 0,
+        steps: [
+          `<code>AX = B</code> a une solution unique ⇔ <code>A inversible</code> ⇔ <code>det(A) ≠ 0</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Système indépendant',
+    generate() {
+      return {
+        question: `Un système est dit <strong>compatible</strong> si :`,
+        inputType: 'mcq',
+        options: [
+          'il admet au moins une solution',
+          'il n\'admet aucune solution',
+          'il a une infinité de solutions',
+          'tous les coefficients sont entiers',
+        ],
+        answer: 0,
+        steps: [
+          `Compatible = au moins une solution (peut être unique ou infinie).`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['algebre-4'] = [
+  {
+    title: 'Déterminant 3×3 (diagonal)',
+    generate() {
+      const a = exRand(2, 6), b = exRand(2, 6), c = exRand(2, 6);
+      return {
+        question: `<code>det(diag(${a}, ${b}, ${c}))</code> ?`,
+        inputType: 'number',
+        answer: a * b * c,
+        steps: [
+          `Pour une matrice diagonale, <code>det = produit des coefficients diagonaux</code>.`,
+          `<code>= ${a} × ${b} × ${c} = ${a * b * c}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'det(AB) = det(A)det(B)',
+    generate() {
+      return {
+        question: `Si <code>det(A) = 3</code>, <code>det(B) = 4</code>, que vaut <code>det(AB)</code> ?`,
+        inputType: 'number',
+        answer: 12,
+        steps: [
+          `<code>det(AB) = det(A) × det(B) = 3 × 4 = 12</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'det(A^T)',
+    generate() {
+      const v = exRand(2, 8);
+      return {
+        question: `<code>det(A) = ${v}</code>. Que vaut <code>det(tA)</code> ?`,
+        inputType: 'number',
+        answer: v,
+        steps: [
+          `<code>det(tA) = det(A) = ${v}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'det(λA) en dim n',
+    generate() {
+      const v = exRand(2, 6);
+      return {
+        question: `<code>A</code> de taille 3×3, <code>det(A) = ${v}</code>. Que vaut <code>det(2A)</code> ?`,
+        inputType: 'number',
+        answer: 8 * v,
+        steps: [
+          `<code>det(λA) = λ<sup>n</sup> × det(A)</code>.`,
+          `<code>det(2A) = 2³ × ${v} = ${8 * v}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Det et inversibilité',
+    generate() {
+      return {
+        question: `<code>det(A) = 0</code> signifie que A est :`,
+        inputType: 'mcq',
+        options: ['non inversible', 'inversible', 'diagonale', 'symétrique'],
+        answer: 0,
+        steps: [
+          `<code>A inversible ⇔ det(A) ≠ 0</code>.`,
+          `Donc <code>det(A) = 0</code> ⇔ A non inversible.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['algebre-5'] = [
+  {
+    title: 'Valeur propre',
+    generate() {
+      return {
+        question: `<code>λ</code> est valeur propre de A ssi :`,
+        inputType: 'mcq',
+        options: [
+          'det(A − λI) = 0',
+          'A = λI',
+          'tr(A) = λ',
+          'A est inversible',
+        ],
+        answer: 0,
+        steps: [
+          `<code>λ</code> v.p. ⇔ <code>det(A − λI) = 0</code> (polynôme caractéristique).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Polynôme caractéristique',
+    generate() {
+      const a = exRand(2, 5);
+      return {
+        question: `<code>A = (${a}, 0; 0, ${a + 2})</code>. Combien de valeurs propres distinctes ?`,
+        inputType: 'number',
+        answer: 2,
+        steps: [
+          `Matrice diagonale : valeurs propres = coefficients diagonaux.`,
+          `<code>${a}</code> et <code>${a + 2}</code> : 2 v.p. distinctes.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Diagonalisable',
+    generate() {
+      return {
+        question: `Une matrice est diagonalisable ssi :`,
+        inputType: 'mcq',
+        options: [
+          'elle a une base de vecteurs propres',
+          'elle a une racine double',
+          'elle est triangulaire',
+          'son déterminant est 1',
+        ],
+        answer: 0,
+        steps: [
+          `Diagonalisable ⇔ il existe une base de vecteurs propres.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Trace = somme v.p.',
+    generate() {
+      return {
+        question: `Si A a pour valeurs propres <code>2, 3, 5</code>, que vaut <code>tr(A)</code> ?`,
+        inputType: 'number',
+        answer: 10,
+        steps: [
+          `<code>tr(A) = somme des valeurs propres = 2 + 3 + 5 = 10</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'det = produit v.p.',
+    generate() {
+      return {
+        question: `Si A a pour valeurs propres <code>2, 3, 5</code>, que vaut <code>det(A)</code> ?`,
+        inputType: 'number',
+        answer: 30,
+        steps: [
+          `<code>det(A) = produit des valeurs propres = 2 × 3 × 5 = 30</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['algebre-6'] = [
+  {
+    title: 'Produit scalaire en dim n',
+    generate() {
+      const u = [exRand(1, 5), exRand(1, 5), exRand(1, 5)];
+      const v = [exRand(1, 5), exRand(1, 5), exRand(1, 5)];
+      const ps = u[0]*v[0] + u[1]*v[1] + u[2]*v[2];
+      return {
+        question: `<code>u→(${u.join(';')}) · v→(${v.join(';')})</code> = ?`,
+        inputType: 'number',
+        answer: ps,
+        steps: [
+          `<code>u · v = ${u[0]} × ${v[0]} + ${u[1]} × ${v[1]} + ${u[2]} × ${v[2]} = ${ps}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Norme euclidienne',
+    generate() {
+      const c = exPick([
+        { v: [1, 2, 2], n: 3 }, { v: [2, 3, 6], n: 7 },
+        { v: [3, 4, 0], n: 5 },
+      ]);
+      return {
+        question: `Norme de <code>u→(${c.v.join(';')})</code> ?`,
+        inputType: 'number',
+        answer: c.n,
+        steps: [
+          `<code>||u|| = √(${c.v.map(x => x*x).join(' + ')}) = √${c.v.reduce((s, x) => s + x*x, 0)} = ${c.n}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Orthogonalité',
+    generate() {
+      return {
+        question: `Deux vecteurs sont orthogonaux ssi :`,
+        inputType: 'mcq',
+        options: [
+          'leur produit scalaire est nul',
+          'leur somme est nulle',
+          'l\'un est égal à l\'autre',
+          'leur norme est égale',
+        ],
+        answer: 0,
+        steps: [
+          `<code>u ⊥ v ⇔ u · v = 0</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Inégalité de Cauchy-Schwarz',
+    generate() {
+      return {
+        question: `Cauchy-Schwarz dit que :`,
+        inputType: 'mcq',
+        options: [
+          '|u · v| ≤ ||u|| × ||v||',
+          'u · v = ||u|| × ||v||',
+          'u · v ≥ ||u|| + ||v||',
+          'u · v &lt; 0',
+        ],
+        answer: 0,
+        steps: [
+          `Cauchy-Schwarz : <code>|u · v| ≤ ||u|| × ||v||</code>.`,
+          `Égalité ⇔ vecteurs colinéaires.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Base orthonormée',
+    generate() {
+      return {
+        question: `Une base orthonormée est une base où les vecteurs sont :`,
+        inputType: 'mcq',
+        options: [
+          'orthogonaux deux à deux et de norme 1',
+          'tous égaux',
+          'parallèles',
+          'tous nuls',
+        ],
+        answer: 0,
+        steps: [
+          `BON : <code>e_i · e_j = 0</code> si <code>i ≠ j</code>, et <code>||e_i|| = 1</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['algebre-7'] = [
+  {
+    title: 'Matrice de passage',
+    generate() {
+      return {
+        question: `La matrice de passage de la base <code>B</code> vers <code>B'</code> contient :`,
+        inputType: 'mcq',
+        options: [
+          'les coordonnées des vecteurs de B\' dans B',
+          'les coordonnées des vecteurs de B dans B\'',
+          'les vecteurs propres',
+          'les valeurs propres',
+        ],
+        answer: 0,
+        steps: [
+          `<code>P_{B → B'}</code> a pour colonnes les coordonnées des vecteurs de B' exprimés dans B.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Formule de changement de base',
+    generate() {
+      return {
+        question: `Si <code>X</code> sont les coordonnées dans B et <code>X'</code> dans B', alors :`,
+        inputType: 'mcq',
+        options: [
+          'X = P X\'',
+          'X\' = P X',
+          'X + X\' = P',
+          'P X = 0',
+        ],
+        answer: 0,
+        steps: [
+          `<code>X = P X'</code> où <code>P = P_{B → B'}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Matrice symétrique',
+    generate() {
+      return {
+        question: `Une matrice symétrique réelle est :`,
+        inputType: 'mcq',
+        options: [
+          'diagonalisable en base orthonormée',
+          'jamais diagonalisable',
+          'inversible',
+          'antisymétrique',
+        ],
+        answer: 0,
+        steps: [
+          `Théorème spectral : matrice symétrique réelle ⇒ diagonalisable en BON.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Inverse de la matrice de passage',
+    generate() {
+      return {
+        question: `Si <code>P</code> est la matrice de passage de B vers B', alors la matrice de passage de B' vers B est :`,
+        inputType: 'mcq',
+        options: ['P⁻¹', 'tP', 'P²', '−P'],
+        answer: 0,
+        steps: [
+          `<code>P_{B' → B} = (P_{B → B'})⁻¹</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Théorème spectral',
+    generate() {
+      return {
+        question: `Le théorème spectral concerne :`,
+        inputType: 'mcq',
+        options: [
+          'les matrices symétriques réelles',
+          'toutes les matrices',
+          'les matrices triangulaires',
+          'les matrices nilpotentes',
+        ],
+        answer: 0,
+        steps: [
+          `Théorème spectral : toute matrice symétrique réelle est diagonalisable dans une BON de vecteurs propres réels.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['probas-0'] = [
+  {
+    title: 'Tribu : axiomes',
+    generate() {
+      return {
+        question: `Une tribu <code>𝓐</code> sur <code>Ω</code> doit contenir :`,
+        inputType: 'mcq',
+        options: [
+          'Ω et être stable par complémentaire et union dénombrable',
+          'tous les singletons',
+          'l\'ensemble vide seulement',
+          'Ω uniquement',
+        ],
+        answer: 0,
+        steps: [
+          `Tribu : <code>Ω ∈ 𝓐</code>, stable par complémentaire et union dénombrable.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Probabilité : axiomes',
+    generate() {
+      return {
+        question: `Une mesure de probabilité <code>P</code> vérifie :`,
+        inputType: 'mcq',
+        options: [
+          'P(Ω) = 1 et P est σ-additive',
+          'P(Ω) = 0',
+          'P prend ses valeurs dans [0, ∞)',
+          'P est constante',
+        ],
+        answer: 0,
+        steps: [
+          `Axiomes : <code>P(Ω) = 1</code>, <code>P ≥ 0</code>, <code>P(⊔ A_n) = Σ P(A_n)</code> (σ-additivité).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'P(A ∪ B) générale',
+    generate() {
+      return {
+        question: `Pour deux événements <code>A</code> et <code>B</code> :`,
+        inputType: 'mcq',
+        options: [
+          'P(A ∪ B) = P(A) + P(B) − P(A ∩ B)',
+          'P(A ∪ B) = P(A) + P(B)',
+          'P(A ∪ B) = P(A) × P(B)',
+          'P(A ∪ B) = max(P(A), P(B))',
+        ],
+        answer: 0,
+        steps: [
+          `Formule générale : <code>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</code>.`,
+          `(Si A et B sont disjoints, le terme d'intersection est nul.)`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Système complet',
+    generate() {
+      return {
+        question: `<code>(A_1, ..., A_n)</code> est un système complet d'événements si :`,
+        inputType: 'mcq',
+        options: [
+          'A_i deux à deux disjoints et ⋃ A_i = Ω',
+          'tous les A_i sont égaux à Ω',
+          'P(A_i) = 1/n',
+          'A_1 ⊂ A_2 ⊂ ...',
+        ],
+        answer: 0,
+        steps: [
+          `Système complet : disjoints + recouvrant Ω.`,
+          `Permet d'utiliser la formule des probabilités totales.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Indépendance d\'événements',
+    generate() {
+      return {
+        question: `A et B sont indépendants ssi :`,
+        inputType: 'mcq',
+        options: [
+          'P(A ∩ B) = P(A) × P(B)',
+          'P(A) = P(B)',
+          'A ∩ B = ∅',
+          'P(A | B) = 1',
+        ],
+        answer: 0,
+        steps: [
+          `Indépendance : <code>P(A ∩ B) = P(A) × P(B)</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['probas-1'] = [
+  {
+    title: 'Loi de Bernoulli',
+    generate() {
+      const p = exPick([0.2, 0.3, 0.5, 0.7]);
+      return {
+        question: `<code>X ~ ℬ(${p})</code> (Bernoulli). Que vaut <code>E(X)</code> ?`,
+        inputType: 'number',
+        answer: p,
+        tolerance: 0.001,
+        steps: [
+          `Pour Bernoulli de paramètre p : <code>E(X) = p = ${p}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variance Bernoulli',
+    generate() {
+      const p = exPick([0.2, 0.3, 0.5]);
+      return {
+        question: `<code>X ~ ℬ(${p})</code>. Calcule <code>V(X)</code>.`,
+        inputType: 'number',
+        answer: p * (1 - p),
+        tolerance: 0.001,
+        steps: [
+          `<code>V(X) = p(1 − p) = ${p} × ${1 - p} = ${p * (1 - p)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Espérance loi binomiale',
+    generate() {
+      const n = exPick([10, 20, 50]);
+      const p = exPick([0.2, 0.3, 0.5]);
+      return {
+        question: `<code>X ~ ℬ(${n}; ${p})</code>. Calcule <code>E(X)</code>.`,
+        inputType: 'number',
+        answer: n * p,
+        tolerance: 0.001,
+        steps: [
+          `<code>E(X) = np = ${n} × ${p} = ${n * p}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Loi uniforme discrète',
+    generate() {
+      return {
+        question: `Sur <code>{1, 2, ..., n}</code> (uniforme), <code>E(X) = ?</code>`,
+        inputType: 'mcq',
+        options: ['(n + 1)/2', 'n/2', '1/n', 'n²'],
+        answer: 0,
+        steps: [
+          `<code>E(X) = (1 + 2 + ... + n)/n = n(n+1)/(2n) = (n+1)/2</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Probabilité d\'une VA discrète',
+    generate() {
+      return {
+        question: `Une VA discrète vérifie nécessairement :`,
+        inputType: 'mcq',
+        options: [
+          'Σ P(X = x_i) = 1',
+          'P(X = 0) = 1',
+          'X prend une infinité de valeurs',
+          'X est positive',
+        ],
+        answer: 0,
+        steps: [
+          `Loi de probabilité : la somme des probabilités vaut 1.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['probas-2'] = [
+  {
+    title: 'Densité d\'une VA continue',
+    generate() {
+      return {
+        question: `Pour <code>X</code> de densité <code>f</code>, <code>P(a ≤ X ≤ b) = ?</code>`,
+        inputType: 'mcq',
+        options: [
+          '∫_a^b f(x) dx',
+          'f(b) − f(a)',
+          'f(a) + f(b)',
+          'b − a',
+        ],
+        answer: 0,
+        steps: [
+          `<code>P(a ≤ X ≤ b) = ∫_a^b f(x) dx</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fonction de répartition',
+    generate() {
+      return {
+        question: `<code>F(x) = P(X ≤ x)</code>. F est :`,
+        inputType: 'mcq',
+        options: [
+          'croissante, à valeurs dans [0;1]',
+          'décroissante',
+          'constante',
+          'paire',
+        ],
+        answer: 0,
+        steps: [
+          `Fonction de répartition : <code>F</code> croissante, <code>lim<sub>−∞</sub> F = 0</code>, <code>lim<sub>+∞</sub> F = 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Espérance loi uniforme',
+    generate() {
+      const a = exRand(0, 5);
+      const b = exRand(a + 2, a + 8);
+      return {
+        question: `<code>X ~ U([${a}; ${b}])</code>. Calcule <code>E(X)</code>.`,
+        inputType: 'number',
+        answer: (a + b) / 2,
+        tolerance: 0.001,
+        steps: [
+          `<code>E(X) = (a + b)/2 = (${a} + ${b})/2 = ${(a + b) / 2}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variance loi uniforme',
+    generate() {
+      return {
+        question: `<code>X ~ U([0; 1])</code>. Calcule <code>V(X)</code> (au centième).`,
+        inputType: 'number',
+        answer: 1/12,
+        tolerance: 0.005,
+        steps: [
+          `<code>V(X) = (b − a)²/12 = 1/12 ≈ 0,083</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Loi exponentielle',
+    generate() {
+      const lambda = exPick([1, 2, 3]);
+      return {
+        question: `<code>X</code> suit une loi exponentielle de paramètre <code>λ = ${lambda}</code>. <code>V(X) = ?</code>`,
+        inputType: 'number',
+        answer: 1 / (lambda * lambda),
+        tolerance: 0.005,
+        steps: [
+          `<code>V(X) = 1/λ² = 1/${lambda * lambda} = ${1 / (lambda * lambda)}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['probas-3'] = [
@@ -16043,6 +17940,351 @@ EXERCISES['probas-3'] = [
         steps: [
           `<code>P(X = k) = e<sup>−λ</sup> × λ<sup>k</sup> / k!</code>.`,
           `<code>P(X = ${k}) = e<sup>−${lambda}</sup> × ${lambda}<sup>${k}</sup> / ${k}! ≈ ${p.toFixed(4)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Espérance loi de Poisson',
+    generate() {
+      const lambda = exRand(2, 8);
+      return {
+        question: `<code>X ~ 𝒫(${lambda})</code>. <code>E(X) = ?</code>`,
+        inputType: 'number',
+        answer: lambda,
+        steps: [
+          `Pour Poisson de paramètre λ : <code>E(X) = V(X) = λ = ${lambda}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Loi géométrique : E(X)',
+    generate() {
+      const p = exPick([0.2, 0.25, 0.5]);
+      return {
+        question: `<code>X</code> suit une loi géométrique de paramètre <code>p = ${p}</code>. <code>E(X) = ?</code>`,
+        inputType: 'number',
+        answer: 1 / p,
+        tolerance: 0.001,
+        steps: [
+          `Pour géométrique : <code>E(X) = 1/p = 1/${p} = ${1 / p}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Loi normale : E(X)',
+    generate() {
+      const mu = exRand(2, 10);
+      return {
+        question: `<code>X ~ N(${mu}; σ²)</code>. <code>E(X) = ?</code>`,
+        inputType: 'number',
+        answer: mu,
+        steps: [
+          `Loi normale de paramètres (μ, σ) : <code>E(X) = μ = ${mu}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Loi binomiale : V(X)',
+    generate() {
+      const n = exPick([10, 20, 25, 50]);
+      const p = exPick([0.2, 0.4, 0.5]);
+      return {
+        question: `<code>X ~ ℬ(${n}; ${p})</code>. <code>V(X) = ?</code>`,
+        inputType: 'number',
+        answer: n * p * (1 - p),
+        tolerance: 0.01,
+        steps: [
+          `<code>V(X) = np(1−p) = ${n} × ${p} × ${1 - p} = ${n * p * (1 - p)}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['probas-4'] = [
+  {
+    title: 'Loi des grands nombres',
+    generate() {
+      return {
+        question: `D'après la LGN (faible), <code>X̄_n →</code> ?`,
+        inputType: 'mcq',
+        options: ['μ (en probabilité)', '0', '+∞', 'σ²'],
+        answer: 0,
+        steps: [
+          `LGN faible : <code>X̄_n → μ</code> en probabilité.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Théorème central limite',
+    generate() {
+      return {
+        question: `Le TCL dit que pour <code>X_i</code> iid de moyenne μ et variance σ² :`,
+        inputType: 'mcq',
+        options: [
+          '√n (X̄_n − μ)/σ → N(0; 1) en loi',
+          'X̄_n → 0',
+          '√n X̄_n → +∞',
+          'Σ X_i / n → 0',
+        ],
+        answer: 0,
+        steps: [
+          `TCL : <code>√n (X̄_n − μ)/σ ⇒ N(0; 1)</code> (convergence en loi).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Conditions du TCL',
+    generate() {
+      return {
+        question: `Le TCL nécessite que les <code>X_i</code> soient :`,
+        inputType: 'mcq',
+        options: [
+          'iid avec variance finie',
+          'identiques',
+          'positives',
+          'discrètes',
+        ],
+        answer: 0,
+        steps: [
+          `Hypothèses : indépendantes, identiquement distribuées, espérance et variance finies.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Convergence en probabilité ⇒ en loi',
+    generate() {
+      return {
+        question: `Si <code>X_n → X</code> en probabilité, alors :`,
+        inputType: 'mcq',
+        options: [
+          'X_n → X en loi',
+          'X_n → ∞',
+          'rien',
+          'X_n → 0',
+        ],
+        answer: 0,
+        steps: [
+          `Convergence en probabilité ⇒ convergence en loi (mais pas la réciproque).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Convergence presque sûre',
+    generate() {
+      return {
+        question: `D'après la LGN <strong>forte</strong>, <code>X̄_n → μ</code> :`,
+        inputType: 'mcq',
+        options: [
+          'presque sûrement',
+          'en moyenne quadratique uniquement',
+          'jamais',
+          'en distribution uniquement',
+        ],
+        answer: 0,
+        steps: [
+          `LGN forte : <code>X̄_n → μ</code> presque sûrement (cv plus forte que la cv en probabilité).`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['probas-5'] = [
+  {
+    title: 'Hypothèse nulle',
+    generate() {
+      return {
+        question: `<code>H_0</code> est l'hypothèse :`,
+        inputType: 'mcq',
+        options: [
+          'qu\'on cherche à rejeter ou non',
+          'toujours fausse',
+          'choisie au hasard',
+          'égale à H_1',
+        ],
+        answer: 0,
+        steps: [
+          `H_0 (hypothèse nulle) : on la teste contre H_1 (alternative).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Erreur de 1ère espèce',
+    generate() {
+      return {
+        question: `L'erreur de 1ère espèce est :`,
+        inputType: 'mcq',
+        options: [
+          'rejeter H_0 alors qu\'elle est vraie',
+          'accepter H_0 alors qu\'elle est fausse',
+          'choisir un mauvais test',
+          'aucune des deux',
+        ],
+        answer: 0,
+        steps: [
+          `Erreur 1<sup>re</sup> espèce : faux positif = rejeter H_0 vrai (probabilité α).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Erreur de 2ème espèce',
+    generate() {
+      return {
+        question: `L'erreur de 2<sup>e</sup> espèce est :`,
+        inputType: 'mcq',
+        options: [
+          'accepter H_0 alors qu\'elle est fausse',
+          'rejeter H_0 alors qu\'elle est vraie',
+          'avoir un faux test',
+          'aucune des deux',
+        ],
+        answer: 0,
+        steps: [
+          `Erreur 2<sup>e</sup> espèce : accepter H_0 alors qu'elle est fausse (probabilité β).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'p-valeur',
+    generate() {
+      return {
+        question: `On rejette <code>H_0</code> au seuil α si :`,
+        inputType: 'mcq',
+        options: [
+          'p-valeur ≤ α',
+          'p-valeur > α',
+          'p-valeur = 0,5',
+          'jamais',
+        ],
+        answer: 0,
+        steps: [
+          `Règle : si <code>p-valeur ≤ α</code>, on rejette H_0.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Puissance d\'un test',
+    generate() {
+      return {
+        question: `La puissance d'un test est :`,
+        inputType: 'mcq',
+        options: [
+          '1 − β (probabilité de rejeter H_0 quand elle est fausse)',
+          'α',
+          '1 − α',
+          'β',
+        ],
+        answer: 0,
+        steps: [
+          `Puissance = <code>1 − β</code> = capacité à détecter une fausse H_0.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['probas-6'] = [
+  {
+    title: 'Estimateur sans biais',
+    generate() {
+      return {
+        question: `Un estimateur <code>θ̂</code> est sans biais si :`,
+        inputType: 'mcq',
+        options: [
+          'E(θ̂) = θ',
+          'V(θ̂) = 0',
+          'θ̂ = θ',
+          'θ̂ ne dépend pas de l\'échantillon',
+        ],
+        answer: 0,
+        steps: [
+          `Sans biais : <code>E(θ̂) = θ</code> (le paramètre vrai).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Maximum de vraisemblance',
+    generate() {
+      return {
+        question: `L'EMV est obtenu en :`,
+        inputType: 'mcq',
+        options: [
+          'maximisant la vraisemblance',
+          'minimisant la vraisemblance',
+          'minimisant le biais',
+          'résolvant E(X) = 0',
+        ],
+        answer: 0,
+        steps: [
+          `EMV : <code>θ̂ = argmax L(θ)</code>, où L est la vraisemblance.`,
+          `Souvent on maximise <code>log L</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Intervalle de confiance',
+    generate() {
+      return {
+        question: `Un intervalle de confiance à 95 % signifie qu'environ :`,
+        inputType: 'mcq',
+        options: [
+          '95 % des intervalles construits contiennent le vrai paramètre',
+          'le vrai paramètre est dans l\'intervalle avec proba 95 % (interprétation fréquentiste)',
+          'l\'intervalle a une longueur de 95',
+          'jamais le paramètre n\'est dans l\'intervalle',
+        ],
+        answer: 0,
+        steps: [
+          `Si l'on répétait l'expérience, environ 95 % des IC contiendraient la vraie valeur.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Estimateur convergent',
+    generate() {
+      return {
+        question: `Un estimateur <code>θ̂_n</code> est convergent si :`,
+        inputType: 'mcq',
+        options: [
+          'θ̂_n → θ en probabilité quand n → ∞',
+          'θ̂_n est constant',
+          'θ̂_n = E(X̄_n)',
+          'jamais',
+        ],
+        answer: 0,
+        steps: [
+          `Convergent : <code>θ̂_n → θ</code> en probabilité.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Variance d\'un estimateur',
+    generate() {
+      return {
+        question: `Pour un échantillon iid de taille n, <code>X̄_n</code> est un estimateur de <code>μ</code>. Quelle est sa variance ?`,
+        inputType: 'mcq',
+        options: ['σ²/n', 'σ²', 'n σ²', 'σ²·n²'],
+        answer: 0,
+        steps: [
+          `<code>V(X̄_n) = V(X)/n = σ²/n</code>.`,
+          `Plus n est grand, plus l'estimateur est précis.`,
         ],
       };
     },
