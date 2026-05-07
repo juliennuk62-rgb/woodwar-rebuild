@@ -2297,8 +2297,15 @@ function chaptersTle() {
         </ul>`)}
 
         <h2>2. Permutations et arrangements</h2>
-        ${lc.prop("Permutations", `<p>Le nombre de façons d'<strong>ordonner</strong> <code>n</code> objets distincts est <code>n!</code>.</p>`)}
-        ${lc.example("Ordonner 5 livres", `<p>Nombre d'arrangements possibles : <code>5! = 120</code>.</p>`)}
+        ${lc.prop("Permutations", `<p>Le nombre de façons d'<strong>ordonner</strong> <code>n</code> objets distincts (= permutation de <code>n</code>) est <code>n!</code>.</p>`)}
+        ${lc.example("Ordonner 5 livres", `<p>Nombre de permutations possibles : <code>5! = 120</code>.</p>`)}
+        ${lc.def("Arrangement A(n, k)", `<p>Le nombre de façons de <strong>choisir et ordonner</strong> <code>k</code> objets parmi <code>n</code> distincts est :</p>`)}
+        ${lc.formula("A(n, k) = n × (n−1) × … × (n−k+1) = n! / (n−k)!")}
+        ${lc.example("Podium d'une course à 8 coureurs", `<p>Combien de podiums distincts (1ᵉʳ, 2ᵉ, 3ᵉ) ?</p>
+          <p><code>A(8, 3) = 8 × 7 × 6 = 336</code>.</p>`)}
+        ${lc.tip("Arrangement vs combinaison", `<p><strong>Arrangement</strong> : l'ordre compte (un podium 1-2-3 est différent de 2-1-3).<br>
+          <strong>Combinaison</strong> <code>C(n,k)</code> : l'ordre ne compte pas (juste « qui est sur le podium »).<br>
+          Lien : <code>C(n,k) = A(n,k) / k!</code>.</p>`)}
 
         <h2>3. Coefficient binomial</h2>
         ${lc.def("Coefficient binomial C(n, k)", `<p>Le <strong>coefficient binomial</strong> <code>C(n, k)</code> compte le nombre de façons de <strong>choisir k objets parmi n</strong> (sans tenir compte de l'ordre).</p>`)}
@@ -2361,7 +2368,20 @@ function chaptersTle() {
           <li>Condition : <code>y(0) = C + 3 = 5</code>, donc <code>C = 2</code>.</li>
           <li>Solution : <code>y(x) = 2 × e^{2x} + 3</code>.</li></ol>`)}
 
-        <h2>5. Modélisations classiques</h2>
+        <h2>5. Cas y' = ay + f(x) (second membre fonction)</h2>
+        ${lc.prop("Méthode", `<p>Quand le second membre <code>b</code> n'est plus constant mais une fonction <code>f(x)</code>, on procède en deux temps :</p>
+          <ol><li>Résoudre l'équation <strong>homogène</strong> associée <code>y' = ay</code> → <code>y_h(x) = C × e^{ax}</code>.</li>
+          <li>Trouver une <strong>solution particulière</strong> <code>y_p(x)</code> de <code>y' = ay + f(x)</code>.</li>
+          <li>La solution générale est <code>y(x) = y_h(x) + y_p(x)</code>.</li></ol>`)}
+        ${lc.example("Résoudre y' = 2y + x", `<ol>
+          <li>Homogène : <code>y_h = C × e^{2x}</code>.</li>
+          <li>Cherchons une solution particulière de la forme <code>y_p = αx + β</code>. Alors <code>y'_p = α</code> et il faut <code>α = 2(αx + β) + x</code>, soit <code>α = 2αx + 2β + x</code>.</li>
+          <li>Identification : <code>0 = 2α + 1</code> donc <code>α = −1/2</code> ; <code>α = 2β</code> donc <code>β = −1/4</code>.</li>
+          <li>Solution particulière : <code>y_p = −x/2 − 1/4</code>.</li>
+          <li>Solution générale : <code>y(x) = C × e^{2x} − x/2 − 1/4</code>.</li>
+        </ol>`)}
+
+        <h2>6. Modélisations classiques</h2>
         ${lc.example("Refroidissement (loi de Newton)", `<p>Un objet de température <code>T(t)</code> dans un milieu à température <code>T_a</code> vérifie <code>T'(t) = −k(T − T_a)</code>, avec <code>k > 0</code>.</p>
           <p>Solution : <code>T(t) = (T_0 − T_a) × e^{−kt} + T_a</code>. La température tend vers <code>T_a</code> exponentiellement.</p>`)}
         ${lc.example("Décharge d'un condensateur", `<p><code>RC × U' + U = 0</code> donne <code>U(t) = U_0 × e^{−t/(RC)}</code>. Constante de temps <code>τ = RC</code>.</p>`)}
@@ -2752,7 +2772,7 @@ function chapters1ere() {
           <p><code>f'(x) = 6x × e^{3x²}</code>.</p>`)}
 
         <h2>7. Modélisation : croissance / décroissance exponentielle</h2>
-        ${lc.example("Population qui double", `<p>Si une population suit <code>P(t) = P₀ × e^{kt}</code> avec <code>k > 0</code>, elle croît exponentiellement. Le temps de doublement est <code>ln(2)/k</code>.</p>`)}
+        ${lc.example("Population qui croît", `<p>Si une population suit <code>P(t) = P₀ × e^{kt}</code> avec <code>k > 0</code>, elle croît exponentiellement. Le temps caractéristique de la croissance se calcule en Terminale avec la fonction logarithme (à venir).</p>`)}
       `,
     },
 
@@ -3260,10 +3280,14 @@ function chapters2nde() {
         </ul>`)}
 
         <h2>5. Variations</h2>
-        ${lc.def("Croissance / décroissance", `<p>Sur un intervalle <code>I</code>, <code>f</code> est :</p>
-          <ul><li><strong>croissante</strong> si quand <code>x</code> augmente, <code>f(x)</code> augmente aussi : <code>x₁ < x₂ ⇒ f(x₁) ≤ f(x₂)</code>.</li>
-          <li><strong>décroissante</strong> si quand <code>x</code> augmente, <code>f(x)</code> diminue : <code>x₁ < x₂ ⇒ f(x₁) ≥ f(x₂)</code>.</li>
-          <li><strong>constante</strong> si <code>f(x)</code> ne change pas.</li></ul>`)}
+        ${lc.def("Croissance / décroissance (au sens large)", `<p>Sur un intervalle <code>I</code>, <code>f</code> est :</p>
+          <ul><li><strong>croissante</strong> si <code>x₁ &lt; x₂ ⇒ f(x₁) ≤ f(x₂)</code> (l'image augmente ou reste constante).</li>
+          <li><strong>décroissante</strong> si <code>x₁ &lt; x₂ ⇒ f(x₁) ≥ f(x₂)</code>.</li>
+          <li><strong>constante</strong> si <code>f(x)</code> ne change pas sur <code>I</code>.</li></ul>`)}
+        ${lc.def("Croissance / décroissance stricte", `<p>On parle de <strong>strict</strong> quand l'image change vraiment :</p>
+          <ul><li><strong>strictement croissante</strong> : <code>x₁ &lt; x₂ ⇒ f(x₁) &lt; f(x₂)</code> (inégalité stricte).</li>
+          <li><strong>strictement décroissante</strong> : <code>x₁ &lt; x₂ ⇒ f(x₁) &gt; f(x₂)</code>.</li></ul>
+          <p>La distinction stricte / large est cruciale en 1ère et Terminale : par exemple, une fonction <em>strictement</em> monotone est injective, mais une fonction monotone large peut ne pas l'être.</p>`)}
 
         <h2>6. Tableau de variations</h2>
         ${lc.prop("Forme du tableau", `<p>Un tableau de variations résume les variations de <code>f</code> sur son ensemble de définition. Il indique les valeurs aux bornes et aux extrémums.</p>`)}
@@ -3441,7 +3465,7 @@ function chapters2nde() {
 
         <h2>2. Vecteurs égaux</h2>
         ${lc.def("Égalité de vecteurs", `<p>Deux vecteurs sont <strong>égaux</strong> s'ils ont même direction, même sens et même longueur.</p>
-          <p>Caractérisation : <code>AB→ = CD→</code> si et seulement si <code>ABDC</code> est un <strong>parallélogramme</strong> (sommets dans cet ordre).</p>`)}
+          <p>Caractérisation : <code>AB→ = CD→</code> si et seulement si <code>ABDC</code> est un <strong>parallélogramme</strong> (attention à l'ordre des sommets : <code>A → B → D → C</code>, et non <code>ABCD</code> ! Cette inversion vient du fait que pour avoir <code>AB→ = CD→</code>, les vecteurs doivent être de même sens, donc <code>D</code> est le 4ᵉ sommet « en face » de <code>B</code>).</p>`)}
 
         <h2>3. Vecteur nul</h2>
         ${lc.def("Vecteur nul", `<p>Le <strong>vecteur nul</strong>, noté <code>0→</code>, a une longueur nulle. C'est <code>AA→</code> pour n'importe quel point <code>A</code>.</p>`)}
@@ -3684,7 +3708,7 @@ function chapters3e() {
   return [
     {
       title: "Arithmétique : PGCD et fractions irréductibles",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Diviseurs communs</h2>
         ${lc.def("Diviseur commun", `<p>Un nombre est un <strong>diviseur commun</strong> à deux entiers <code>a</code> et <code>b</code> s'il divise à la fois <code>a</code> et <code>b</code>.</p>`)}
@@ -3726,7 +3750,7 @@ function chapters3e() {
 
     {
       title: "Racines carrées",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Définition</h2>
         ${lc.def("Racine carrée", `<p>Pour <code>a ≥ 0</code>, la <strong>racine carrée</strong> de <code>a</code>, notée <code>√a</code>, est l'unique nombre <strong>positif</strong> dont le carré vaut <code>a</code>.</p>`)}
@@ -3760,6 +3784,13 @@ function chapters3e() {
           <li>Si <code>a < 0</code> : <strong>aucune solution</strong>.</li>
         </ul>`)}
         ${lc.example("Résoudre x² = 25", `<p>Solutions : <code>x = 5</code> ou <code>x = −5</code>. (Toujours penser à la solution négative !)</p>`)}
+
+        <h2>7. Rationaliser un dénominateur</h2>
+        ${lc.def("Rationaliser", `<p><strong>Rationaliser</strong> le dénominateur d'une fraction, c'est l'écrire sans racine au dénominateur en multipliant le haut et le bas par une expression bien choisie.</p>`)}
+        ${lc.example("Cas simple : 1/√2", `<p>On multiplie haut et bas par <code>√2</code> :</p>
+          <p><code>1/√2 = (1 × √2)/(√2 × √2) = √2/2</code>.</p>`)}
+        ${lc.example("Cas un peu plus dur : 3/√5", `<p><code>3/√5 = (3 × √5)/(√5 × √5) = 3√5/5</code>.</p>`)}
+        ${lc.tip("Pourquoi rationaliser ?", `<p>L'écriture <code>√2/2</code> est plus simple à comparer, à additionner et à manipuler que <code>1/√2</code>. C'est la forme attendue dans une copie de fin de cycle / 2nde.</p>`)}
       `,
     },
 
@@ -3956,8 +3987,7 @@ function chapters3e() {
 
         <h2>2. Réciproque du théorème</h2>
         ${lc.prop("Énoncé de la réciproque", `<p>Si :</p>
-          <ul><li>les points <code>A</code>, <code>M</code>, <code>B</code> sont alignés <em>dans cet ordre ou dans l'ordre A, B, M</em>,</li>
-          <li>les points <code>A</code>, <code>N</code>, <code>C</code> sont alignés <em>dans le même ordre que A, M, B</em>,</li>
+          <ul><li>les points <code>A</code>, <code>M</code>, <code>B</code> sont alignés et les points <code>A</code>, <code>N</code>, <code>C</code> sont alignés <strong>dans le même ordre</strong> sur leurs droites respectives (par exemple <code>M</code> entre <code>A</code> et <code>B</code> ET <code>N</code> entre <code>A</code> et <code>C</code> ; ou bien <code>B</code> entre <code>A</code> et <code>M</code> ET <code>C</code> entre <code>A</code> et <code>N</code>),</li>
           <li>et <code>AM/AB = AN/AC</code>,</li></ul>
           <p>alors les droites <code>(BC)</code> et <code>(MN)</code> sont <strong>parallèles</strong>.</p>`)}
         ${lc.warn("Conditions précises", `<p>L'<strong>ordre des points</strong> compte. Si l'ordre n'est pas le même sur les deux droites, le résultat n'est pas valable. Toujours bien examiner la figure.</p>`)}
@@ -4288,7 +4318,7 @@ function chapters4e() {
   return [
     {
       title: "Nombres relatifs : multiplication et division",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Règle des signes</h2>
         ${lc.prop("Multiplication et division", `<p>Pour multiplier (ou diviser) deux nombres relatifs :</p>
@@ -4331,7 +4361,7 @@ function chapters4e() {
 
     {
       title: "Fractions : opérations avancées",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Rappels : addition et soustraction</h2>
         ${lc.prop("Avec le même dénominateur", `<p>On additionne (ou soustrait) les numérateurs en gardant le dénominateur.</p>`)}
@@ -4375,7 +4405,7 @@ function chapters4e() {
 
     {
       title: "Puissances et notation scientifique",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Définition d'une puissance</h2>
         ${lc.def("Puissance", `<p>Pour <code>a</code> nombre et <code>n</code> entier positif, <code>a^n</code> est le produit de <code>n</code> facteurs égaux à <code>a</code>.</p>`)}
@@ -4413,8 +4443,8 @@ function chapters4e() {
 
         <h2>4. Puissances de 10</h2>
         ${lc.prop("Règle simple", `<p>Pour <code>n</code> entier positif :</p>
-          <ul><li><code>10ⁿ</code> = <code>1</code> suivi de <code>n</code> zéros.</li>
-          <li><code>10⁻ⁿ</code> = <code>0,</code> avec <code>n−1</code> zéros puis un <code>1</code>.</li></ul>`)}
+          <ul><li><code>10ⁿ</code> = <code>1</code> suivi de <code>n</code> zéros (pour <code>n ≥ 1</code>).</li>
+          <li><code>10⁻ⁿ</code> = la virgule, suivie de <code>n−1</code> zéros, puis du chiffre <code>1</code> (pour <code>n ≥ 1</code>). Pour <code>n = 1</code> : aucun zéro, soit <code>0,1</code>.</li></ul>`)}
         ${lc.example("Quelques puissances de 10", `<ul>
           <li><code>10³ = 1 000</code></li>
           <li><code>10⁶ = 1 000 000</code></li>
@@ -4623,8 +4653,7 @@ function chapters4e() {
 
         <h2>6. Réciproque du théorème</h2>
         ${lc.prop("Réciproque de Thalès", `<p>Si :</p>
-          <ul><li>les points <code>A</code>, <code>M</code>, <code>B</code> sont alignés <strong>dans cet ordre</strong> (ou dans l'ordre A, B, M),</li>
-          <li>les points <code>A</code>, <code>N</code>, <code>C</code> sont alignés <strong>dans le même ordre</strong>,</li>
+          <ul><li>les points <code>A</code>, <code>M</code>, <code>B</code> sont alignés et les points <code>A</code>, <code>N</code>, <code>C</code> sont alignés <strong>dans le même ordre</strong> sur leurs droites respectives,</li>
           <li>et les rapports <code>AM/AB = AN/AC</code> sont égaux,</li></ul>
           <p>alors les droites <code>(BC)</code> et <code>(MN)</code> sont <strong>parallèles</strong>.</p>`)}
         ${lc.warn("L'ordre est crucial", `<p>Si les points ne sont pas alignés dans le même ordre sur les deux droites, la conclusion ne tient plus. Toujours examiner la figure.</p>`)}
@@ -4655,9 +4684,8 @@ function chapters4e() {
         <h2>2. Propriétés du cosinus</h2>
         ${lc.prop("Encadrement", `<p>Pour tout angle aigu α (avec <code>0° ≤ α ≤ 90°</code>) : <code>0 ≤ cos(α) ≤ 1</code>. Les bornes ne sont atteintes qu'aux extrémités :</p>
           <ul><li><code>cos(0°) = 1</code></li>
-          <li><code>cos(60°) = 0,5</code></li>
           <li><code>cos(90°) = 0</code></li></ul>
-          <p>Pour <code>0° < α < 90°</code> strictement, on a bien <code>0 < cos(α) < 1</code>.</p>`)}
+          <p>Pour <code>0° &lt; α &lt; 90°</code> strictement, on a bien <code>0 &lt; cos(α) &lt; 1</code>. Les valeurs intermédiaires <code>cos(30°)</code>, <code>cos(45°)</code>, <code>cos(60°)</code> seront étudiées en 3e.</p>`)}
 
         <h2>3. Calculer un cosinus à partir des longueurs</h2>
         ${lc.example("Triangle rectangle", `<p>Triangle <code>ABC</code> rectangle en <code>C</code>. Pour l'angle <code>α</code> en <code>A</code> : adjacent = <code>AC</code>, hypoténuse = <code>AB</code>. Si <code>AC = 4</code> et <code>AB = 5</code> :</p>
@@ -4890,7 +4918,7 @@ function chapters4e() {
 
         <h2>6. Loi des grands nombres (intuition)</h2>
         ${lc.tip("Plus on répète, plus on s'approche", `<p>Si on lance un dé 10 fois, on n'aura pas forcément un 6 sur 1/6 des lancers. Mais sur des milliers de lancers, la fréquence d'apparition du 6 va se rapprocher de <code>1/6 ≈ 16,67 %</code>. C'est la <strong>loi des grands nombres</strong>.</p>`)}
-        ${lc.warn("Pas de mémoire", `<p>Le dé n'a pas de « mémoire » : si tu obtiens 5 fois pile de suite, le 6e lancer a toujours <code>1/2</code> de chance de donner pile. Les lancers sont indépendants.</p>`)}
+        ${lc.warn("Pas de mémoire", `<p>La pièce n'a pas de « mémoire » : si tu obtiens 5 fois pile de suite, le 6e lancer a toujours <code>1/2</code> de chance de donner pile (idée fausse classique : « ça doit tomber sur face maintenant »). Les lancers sont indépendants.</p>`)}
       `,
     },
   ];
@@ -4901,7 +4929,7 @@ function chapters6e() {
   return [
     {
       title: "Nombres entiers : lecture et écriture",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Les chiffres et les nombres</h2>
         <p>Il y a <strong>10 chiffres</strong> : <code>0, 1, 2, 3, 4, 5, 6, 7, 8, 9</code>. Avec ces 10 chiffres, on peut écrire <strong>tous les nombres entiers</strong> : 7, 42, 1853, 1 000 000, etc.</p>
@@ -4947,7 +4975,7 @@ function chapters6e() {
 
     {
       title: "Nombres décimaux : lecture, comparaison",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Qu'est-ce qu'un nombre décimal ?</h2>
         <p>Un nombre <strong>décimal</strong> est un nombre qui peut s'écrire avec une <em>virgule</em>. Il a deux parties :</p>
@@ -4995,7 +5023,7 @@ function chapters6e() {
 
     {
       title: "Addition, soustraction, multiplication",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Vocabulaire</h2>
         ${lc.def("Termes utilisés", `<ul>
@@ -5036,7 +5064,7 @@ function chapters6e() {
 
     {
       title: "Division euclidienne",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Vocabulaire</h2>
         ${lc.def("Division euclidienne", `<p>Diviser un nombre <code>a</code> (le <strong>dividende</strong>) par un nombre <code>b</code> non nul (le <strong>diviseur</strong>), c'est trouver deux entiers : un <strong>quotient</strong> <code>q</code> et un <strong>reste</strong> <code>r</code>.</p>`)}
@@ -5086,7 +5114,7 @@ function chapters6e() {
 
     {
       title: "Fractions : sens et premières représentations",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Une fraction, ça représente quoi ?</h2>
         <p>Imagine une pizza partagée en <strong>4 parts égales</strong>. Si tu en manges <strong>3</strong>, tu as mangé les <code>3/4</code> de la pizza.</p>
@@ -5587,7 +5615,7 @@ function chapters5e() {
   return [
     {
       title: "Nombres décimaux",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Lecture et écriture</h2>
         <p>Un <strong>nombre décimal</strong> est un nombre qu'on peut écrire avec une partie entière et une partie décimale, séparées par une virgule.</p>
@@ -5636,7 +5664,7 @@ function chapters5e() {
     },
     {
       title: "Multiples, diviseurs, divisibilité",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Multiples et diviseurs</h2>
         ${lc.def("Multiple", `<p>Un nombre <code>a</code> est un <strong>multiple</strong> d'un nombre <code>b</code> s'il existe un entier <code>k</code> tel que <code>a = b × k</code>.</p>
@@ -5675,7 +5703,7 @@ function chapters5e() {
     },
     {
       title: "Fractions : sens et comparaison",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Qu'est-ce qu'une fraction ?</h2>
         ${lc.def("Fraction", `<p>Une <strong>fraction</strong> <code>a/b</code> représente le résultat de la division de <code>a</code> par <code>b</code> (avec <code>b ≠ 0</code>).</p>
@@ -5709,7 +5737,7 @@ function chapters5e() {
     },
     {
       title: "Fractions : addition et soustraction",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Avec le même dénominateur</h2>
         ${lc.prop("Règle simple", `<p>Pour additionner ou soustraire deux fractions de <strong>même dénominateur</strong>, on additionne (ou soustrait) les numérateurs en gardant le dénominateur.</p>`)}
@@ -5741,7 +5769,7 @@ function chapters5e() {
     },
     {
       title: "Fractions : multiplication",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Règle de multiplication</h2>
         ${lc.prop("Règle fondamentale", `<p>Pour multiplier deux fractions, on multiplie les <strong>numérateurs entre eux</strong>, et les <strong>dénominateurs entre eux</strong>.</p>`)}
@@ -5777,7 +5805,7 @@ function chapters5e() {
     },
     {
       title: "Nombres relatifs : sens et repérage",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Pourquoi les nombres négatifs ?</h2>
         <p>Les nombres relatifs servent à parler de <strong>quantités opposées</strong> à un point de référence (le zéro) :</p>
@@ -5813,7 +5841,7 @@ function chapters5e() {
     },
     {
       title: "Nombres relatifs : addition et soustraction",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. Addition</h2>
         ${lc.prop("Même signe", `<p>Pour additionner deux nombres de <strong>même signe</strong> : on additionne les distances à zéro et on garde le signe commun.</p>`)}
@@ -5849,7 +5877,7 @@ function chapters5e() {
     },
     {
       title: "Priorités opératoires",
-      category: "Nombres et calcul",
+      category: "Nombres et calculs",
       content: `
         <h2>1. La règle PEMDAS</h2>
         ${lc.prop("Ordre des opérations", `<p>Dans un calcul avec plusieurs opérations, on suit cet ordre :</p>
