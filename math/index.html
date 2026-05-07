@@ -7084,8 +7084,86 @@ EXERCISES['6e-1'] = [
         tolerance: 0.01,
         steps: [
           `On regarde le chiffre des centièmes : <code>${Math.floor(n * 100) % 10}</code>.`,
-          `${Math.floor(n * 100) % 10 >= 5 ? `Comme c'est ≥ 5, on arrondit au-dessus.` : `Comme c'est < 5, on arrondit en-dessous.`}`,
+          `${Math.floor(n * 100) % 10 >= 5 ? `Comme c'est ≥ 5, on arrondit au-dessus.` : `Comme c'est &lt; 5, on arrondit en-dessous.`}`,
           `Résultat : <code>${arr.toFixed(1)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Chiffre des centièmes',
+    generate() {
+      const e = exRand(1, 99);
+      const c = exRand(0, 9);
+      const m = exRand(0, 9);
+      const n = e + c / 10 + m / 100;
+      return {
+        question: `Quel est le chiffre des <strong>centièmes</strong> dans <code>${n.toFixed(2)}</code> ?`,
+        inputType: 'number',
+        answer: m,
+        steps: [
+          `Le chiffre juste après la virgule est celui des <em>dixièmes</em>, le suivant est celui des <em>centièmes</em>.`,
+          `Dans <code>${n.toFixed(2)}</code>, le chiffre des centièmes est <code>${m}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Encadrer un décimal entre deux entiers',
+    generate() {
+      const e = exRand(2, 50);
+      const d = exRand(1, 99);
+      const n = e + d / 100;
+      return {
+        question: `Entre quels deux entiers consécutifs se trouve <code>${n.toFixed(2)}</code> ?<br>Donne l'entier <strong>juste en-dessous</strong>.`,
+        inputType: 'number',
+        answer: e,
+        steps: [
+          `On regarde la partie entière : <code>${e}</code>.`,
+          `Comme la partie décimale n'est pas nulle, on a : <code>${e} &lt; ${n.toFixed(2)} &lt; ${e + 1}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Décomposer un décimal',
+    generate() {
+      const e = exRand(2, 9);
+      const d = exRand(1, 9);
+      const c = exRand(1, 9);
+      const n = e + d / 10 + c / 100;
+      return {
+        question: `Quelle décomposition correspond à <code>${n.toFixed(2)}</code> ?`,
+        inputType: 'mcq',
+        options: [
+          `${e} + 0,${d}${c}`,
+          `${e} + ${d}/10 + ${c}/100`,
+          `${e} + ${d}/100 + ${c}/10`,
+        ],
+        answer: 1,
+        steps: [
+          `Le chiffre <code>${d}</code> est dans les dixièmes : il vaut <code>${d}/10</code>.`,
+          `Le chiffre <code>${c}</code> est dans les centièmes : il vaut <code>${c}/100</code>.`,
+          `Donc <code>${n.toFixed(2)} = ${e} + ${d}/10 + ${c}/100</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Demi-droite graduée',
+    generate() {
+      const e = exRand(3, 8);
+      const k = exRand(1, 9);
+      const n = e + k / 10;
+      return {
+        question: `Sur une droite graduée, entre <code>${e}</code> et <code>${e + 1}</code> partagée en <strong>10</strong> parts égales, à quelle abscisse se trouve la <code>${k}</code><sup>e</sup> graduation après <code>${e}</code> ?`,
+        inputType: 'number',
+        answer: n,
+        tolerance: 0.001,
+        steps: [
+          `Une part vaut <code>1/10 = 0,1</code>.`,
+          `<code>${k}</code> parts valent <code>${k} × 0,1 = 0,${k}</code>.`,
+          `Abscisse cherchée : <code>${e} + 0,${k} = ${n.toFixed(1)}</code>.`,
         ],
       };
     },
@@ -7143,6 +7221,43 @@ EXERCISES['6e-2'] = [
       };
     },
   },
+  {
+    title: 'Soustraction de décimaux',
+    generate() {
+      const a = exRand(500, 999) / 10;
+      const b = exRand(50, 400) / 10;
+      return {
+        question: `Calcule : <code>${a.toFixed(1)} − ${b.toFixed(1)}</code>`,
+        inputType: 'number',
+        answer: Math.round((a - b) * 10) / 10,
+        tolerance: 0.001,
+        steps: [
+          `On aligne les virgules : <code>${a.toFixed(1)} − ${b.toFixed(1)}</code>.`,
+          `On soustrait colonne par colonne, en partant de la droite.`,
+          `Résultat : <code>${(a - b).toFixed(1)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Ordre de grandeur d\'un produit',
+    generate() {
+      const a = exPick([198, 312, 487, 521, 798, 612]);
+      const b = exPick([19, 31, 47, 52, 78, 21]);
+      const arrA = Math.round(a / 100) * 100;
+      const arrB = Math.round(b / 10) * 10;
+      const ordre = arrA * arrB;
+      return {
+        question: `Donne un <strong>ordre de grandeur</strong> de <code>${a} × ${b}</code> en arrondissant à la centaine et à la dizaine.`,
+        inputType: 'number',
+        answer: ordre,
+        steps: [
+          `<code>${a}</code> est proche de <code>${arrA}</code>, et <code>${b}</code> est proche de <code>${arrB}</code>.`,
+          `Ordre de grandeur : <code>${arrA} × ${arrB} = ${ordre}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['6e-3'] = [
@@ -7187,6 +7302,167 @@ EXERCISES['6e-3'] = [
       };
     },
   },
+  {
+    title: 'Reste d\'une division euclidienne',
+    generate() {
+      const b = exRand(4, 12);
+      const q = exRand(8, 40);
+      const r = exRand(1, b - 1);
+      const a = b * q + r;
+      return {
+        question: `Quel est le <strong>reste</strong> de la division euclidienne de <code>${a}</code> par <code>${b}</code> ?`,
+        inputType: 'number',
+        answer: r,
+        steps: [
+          `On cherche le plus grand multiple de ${b} ne dépassant pas ${a} : <code>${b} × ${q} = ${b * q}</code>.`,
+          `Reste : <code>${a} − ${b * q} = ${r}</code>.`,
+          `Vérification : <code>0 ≤ ${r} &lt; ${b}</code> ✓.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Multiple suivant',
+    generate() {
+      const b = exRand(3, 11);
+      const k = exRand(4, 12);
+      return {
+        question: `Quel est le <strong>multiple</strong> de <code>${b}</code> qui vient juste après <code>${b * k}</code> ?`,
+        inputType: 'number',
+        answer: b * (k + 1),
+        steps: [
+          `Les multiples de ${b} sont <code>${b}, ${2*b}, ${3*b}, ...</code>`,
+          `Après <code>${b} × ${k} = ${b * k}</code> vient <code>${b} × ${k + 1} = ${b * (k + 1)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Plus petit diviseur (autre que 1)',
+    generate() {
+      const candidats = [
+        { n: 15, div: 3 }, { n: 21, div: 3 }, { n: 25, div: 5 },
+        { n: 35, div: 5 }, { n: 49, div: 7 }, { n: 33, div: 3 },
+        { n: 55, div: 5 }, { n: 77, div: 7 }, { n: 39, div: 3 },
+      ];
+      const c = exPick(candidats);
+      return {
+        question: `Quel est le <strong>plus petit diviseur</strong> (autre que 1) de <code>${c.n}</code> ?`,
+        inputType: 'number',
+        answer: c.div,
+        steps: [
+          `On teste 2, 3, 5, 7… dans l'ordre.`,
+          `<code>${c.n} ÷ ${c.div} = ${c.n / c.div}</code> donne un quotient entier, donc <code>${c.div}</code> divise <code>${c.n}</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-4'] = [
+  {
+    title: 'Lire une fraction',
+    generate() {
+      const choices = [
+        { num: 1, den: 2, mot: 'un demi' },
+        { num: 1, den: 3, mot: 'un tiers' },
+        { num: 1, den: 4, mot: 'un quart' },
+        { num: 3, den: 4, mot: 'trois quarts' },
+        { num: 1, den: 5, mot: 'un cinquième' },
+        { num: 2, den: 5, mot: 'deux cinquièmes' },
+      ];
+      const c = exPick(choices);
+      const wrongs = choices.filter(x => x.mot !== c.mot).slice(0, 3).map(x => x.mot);
+      const opts = [c.mot, ...wrongs].sort(() => Math.random() - 0.5);
+      return {
+        question: `Comment se lit la fraction <code>${c.num}/${c.den}</code> ?`,
+        inputType: 'mcq',
+        options: opts,
+        answer: opts.indexOf(c.mot),
+        steps: [
+          `Le numérateur ${c.num} se lit normalement, le dénominateur ${c.den} se lit avec un suffixe.`,
+          `<code>${c.num}/${c.den}</code> se lit « ${c.mot} ».`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fraction d\'une quantité',
+    generate() {
+      const den = exPick([2, 3, 4, 5]);
+      const num = exRand(1, den - 1);
+      const k = exRand(2, 12);
+      const total = den * k;
+      const part = num * k;
+      return {
+        question: `Combien font les <code>${num}/${den}</code> de <code>${total}</code> ?`,
+        inputType: 'number',
+        answer: part,
+        steps: [
+          `On divise par le dénominateur : <code>${total} ÷ ${den} = ${k}</code>.`,
+          `On multiplie par le numérateur : <code>${k} × ${num} = ${part}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Comparer une fraction à 1',
+    generate() {
+      const den = exRand(3, 9);
+      const num = exRand(1, den * 2 - 1);
+      const compare = num < den ? 0 : (num === den ? 1 : 2);
+      return {
+        question: `La fraction <code>${num}/${den}</code> est :`,
+        inputType: 'mcq',
+        options: ['plus petite que 1', 'égale à 1', 'plus grande que 1'],
+        answer: compare,
+        steps: [
+          `On compare le numérateur (<code>${num}</code>) et le dénominateur (<code>${den}</code>).`,
+          num < den ? `<code>${num} &lt; ${den}</code> donc <code>${num}/${den} &lt; 1</code>.`
+          : num === den ? `<code>${num} = ${den}</code> donc <code>${num}/${den} = 1</code>.`
+          : `<code>${num} > ${den}</code> donc <code>${num}/${den} > 1</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fraction = quotient',
+    generate() {
+      const choices = [
+        { f: '1/2', q: 0.5 }, { f: '1/4', q: 0.25 }, { f: '3/4', q: 0.75 },
+        { f: '1/5', q: 0.2 }, { f: '1/10', q: 0.1 }, { f: '3/10', q: 0.3 },
+        { f: '7/10', q: 0.7 }, { f: '1/100', q: 0.01 }, { f: '3/100', q: 0.03 },
+      ];
+      const c = exPick(choices);
+      return {
+        question: `Donne l'écriture décimale de <code>${c.f}</code>.`,
+        inputType: 'number',
+        answer: c.q,
+        tolerance: 0.001,
+        steps: [
+          `Une fraction est aussi un quotient : <code>${c.f} = ${c.f.replace('/', ' ÷ ')}</code>.`,
+          `Résultat : <code>${c.q}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Numérateur ou dénominateur ?',
+    generate() {
+      const den = exRand(3, 9);
+      const num = exRand(1, den - 1);
+      const ask = exPick(['numérateur', 'dénominateur']);
+      return {
+        question: `Dans la fraction <code>${num}/${den}</code>, quel est le <strong>${ask}</strong> ?`,
+        inputType: 'number',
+        answer: ask === 'numérateur' ? num : den,
+        steps: [
+          `Le <strong>numérateur</strong> est le nombre du haut (parts prises) ; le <strong>dénominateur</strong> est le nombre du bas (parts totales).`,
+          `Ici, ${ask} = <code>${ask === 'numérateur' ? num : den}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['6e-5'] = [
@@ -7197,7 +7473,6 @@ EXERCISES['6e-5'] = [
       const a = exRand(2, 12);
       const b = exRand(2, 12);
       const aK = a * k;
-      // a → aK, b → ?
       return {
         question: `Pour <code>${a}</code> personnes, il faut <code>${aK}</code> g de farine. Combien faut-il pour <code>${b}</code> personnes (en g) ?`,
         inputType: 'number',
@@ -7206,6 +7481,82 @@ EXERCISES['6e-5'] = [
         steps: [
           `On utilise le coefficient de proportionnalité : <code>${aK} / ${a} = ${k}</code> g par personne.`,
           `Pour ${b} personnes : <code>${b} × ${k} = ${b * k}</code> g.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Coefficient de proportionnalité',
+    generate() {
+      const k = exRand(2, 8);
+      const a = exRand(3, 12);
+      const aK = a * k;
+      return {
+        question: `<code>${a}</code> stylos coûtent <code>${aK} €</code>. Quel est le <strong>prix unitaire</strong> (€/stylo) ?`,
+        inputType: 'number',
+        answer: k,
+        tolerance: 0.001,
+        steps: [
+          `Prix unitaire = prix total ÷ nombre d'objets.`,
+          `<code>${aK} ÷ ${a} = ${k} €</code> par stylo.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Tableau de proportionnalité',
+    generate() {
+      const k = exRand(2, 6);
+      const a = exRand(4, 12);
+      return {
+        question: `Si <code>3</code> kg coûtent <code>${3 * k} €</code>, combien coûtent <code>${a}</code> kg ?`,
+        inputType: 'number',
+        answer: a * k,
+        tolerance: 0.01,
+        steps: [
+          `Coefficient : <code>${3 * k} ÷ 3 = ${k}</code> €/kg.`,
+          `Prix pour ${a} kg : <code>${a} × ${k} = ${a * k} €</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Vitesse moyenne',
+    generate() {
+      const v = exPick([40, 50, 60, 80, 100]);
+      const t = exRand(2, 6);
+      return {
+        question: `Une voiture roule à <code>${v} km/h</code> pendant <code>${t} h</code>. Quelle distance parcourt-elle (en km) ?`,
+        inputType: 'number',
+        answer: v * t,
+        steps: [
+          `Distance = vitesse × temps.`,
+          `<code>${v} × ${t} = ${v * t} km</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Reconnaître la proportionnalité',
+    generate() {
+      const k = exRand(2, 5);
+      const data = exPick([
+        { vals: [[1, k], [2, 2*k], [3, 3*k]], prop: true },
+        { vals: [[1, k], [2, 2*k], [3, 3*k + 1]], prop: false },
+        { vals: [[2, 2*k], [4, 4*k], [6, 6*k]], prop: true },
+        { vals: [[1, 5], [2, 9], [3, 14]], prop: false },
+      ]);
+      const tableau = data.vals.map(([x, y]) => `${x} → ${y}`).join(' &nbsp;|&nbsp; ');
+      return {
+        question: `Le tableau <code>${tableau}</code> est-il un tableau de proportionnalité ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: data.prop ? 0 : 1,
+        steps: [
+          `On calcule les rapports y/x pour chaque colonne.`,
+          data.prop
+            ? `Tous les rapports sont égaux (${data.vals.map(([x, y]) => `${y}/${x}=${y/x}`).join(', ')}) → c'est proportionnel.`
+            : `Les rapports ne sont pas tous égaux → ce n'est pas proportionnel.`,
         ],
       };
     },
@@ -7259,8 +7610,40 @@ EXERCISES['6e-9'] = [
         options: types,
         answer: types.indexOf(choice.type),
         steps: [
-          `Aigu : 0 < α < 90°. Droit : 90°. Obtus : 90 < α < 180°. Plat : 180°.`,
+          `Aigu : 0 &lt; α &lt; 90°. Droit : 90°. Obtus : 90 &lt; α &lt; 180°. Plat : 180°.`,
           `<code>${choice.val}°</code> est un angle <strong>${choice.type}</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Angles autour d\'un point',
+    generate() {
+      const a = exRand(40, 120);
+      const b = exRand(40, 360 - a - 30);
+      const c = 360 - a - b;
+      return {
+        question: `Trois angles autour d'un point mesurent <code>${a}°</code>, <code>${b}°</code> et <code>?°</code>. Quelle est la mesure manquante ?`,
+        inputType: 'number',
+        answer: c,
+        steps: [
+          `La somme des angles autour d'un point vaut <code>360°</code>.`,
+          `<code>360 − ${a} − ${b} = ${c}°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Demi-tour : angle plat',
+    generate() {
+      const a = exRand(20, 160);
+      return {
+        question: `Deux angles forment un angle plat. L'un mesure <code>${a}°</code>. Quelle est la mesure de l'autre ?`,
+        inputType: 'number',
+        answer: 180 - a,
+        steps: [
+          `Un angle plat mesure <code>180°</code>.`,
+          `Angle cherché : <code>180 − ${a} = ${180 - a}°</code>.`,
         ],
       };
     },
@@ -7305,7 +7688,6 @@ EXERCISES['6e-14'] = [
     generate() {
       const b = exRand(4, 20);
       const h = exRand(3, 15);
-      // pour faire que le résultat soit un nombre simple, on garantit que b*h soit pair
       const bb = b % 2 === 0 ? b : b + 1;
       return {
         question: `Aire d'un triangle de base <code>${bb} cm</code> et hauteur <code>${h} cm</code> ?`,
@@ -7315,6 +7697,38 @@ EXERCISES['6e-14'] = [
         steps: [
           `Formule : <code>A = (b × h) / 2</code>.`,
           `<code>A = (${bb} × ${h}) / 2 = ${bb * h} / 2 = ${(bb * h) / 2} cm²</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Périmètre d\'un carré',
+    generate() {
+      const c = exRand(3, 25);
+      return {
+        question: `Périmètre d'un carré de côté <code>${c} cm</code> ?`,
+        inputType: 'number',
+        answer: 4 * c,
+        steps: [
+          `Formule : <code>P = 4 × c</code>.`,
+          `<code>P = 4 × ${c} = ${4 * c} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Largeur d\'un rectangle (aire connue)',
+    generate() {
+      const L = exRand(5, 15);
+      const l = exRand(2, L - 1);
+      return {
+        question: `Un rectangle a une aire de <code>${L * l} cm²</code> et une longueur de <code>${L} cm</code>. Quelle est sa <strong>largeur</strong> (en cm) ?`,
+        inputType: 'number',
+        answer: l,
+        tolerance: 0.001,
+        steps: [
+          `Formule : <code>A = L × l</code>, donc <code>l = A / L</code>.`,
+          `<code>l = ${L * l} / ${L} = ${l} cm</code>.`,
         ],
       };
     },
@@ -7357,7 +7771,7 @@ EXERCISES['6e-6'] = [
   {
     title: 'Conversion volume → litres',
     generate() {
-      const v = exRand(2, 50) * 1000; // en cm³
+      const v = exRand(2, 50) * 1000;
       return {
         question: `Une cuve a un volume de <code>${v} cm³</code>. Combien cela fait-il en <strong>litres</strong> ?`,
         inputType: 'number',
@@ -7366,6 +7780,614 @@ EXERCISES['6e-6'] = [
         steps: [
           `Rappel : <code>1 dm³ = 1 L = 1 000 cm³</code>.`,
           `<code>${v} cm³ = ${v / 1000} L</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Hauteur d\'un pavé droit',
+    generate() {
+      const L = exRand(3, 12);
+      const l = exRand(2, 9);
+      const h = exRand(2, 10);
+      return {
+        question: `Un pavé droit a un volume de <code>${L * l * h} cm³</code>, une longueur de <code>${L} cm</code> et une largeur de <code>${l} cm</code>. Quelle est sa <strong>hauteur</strong> (en cm) ?`,
+        inputType: 'number',
+        answer: h,
+        tolerance: 0.001,
+        steps: [
+          `Formule : <code>V = L × l × h</code>, donc <code>h = V / (L × l)</code>.`,
+          `<code>h = ${L * l * h} / (${L} × ${l}) = ${L * l * h} / ${L * l} = ${h} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Conversion m³ → dm³',
+    generate() {
+      const m3 = exRand(2, 9);
+      return {
+        question: `Convertis <code>${m3} m³</code> en <strong>dm³</strong>.`,
+        inputType: 'number',
+        answer: m3 * 1000,
+        steps: [
+          `Rappel : <code>1 m³ = 1 000 dm³</code>.`,
+          `<code>${m3} m³ = ${m3} × 1 000 = ${m3 * 1000} dm³</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-7'] = [
+  {
+    title: 'Lecture dans un tableau',
+    generate() {
+      const lun = exRand(8, 18);
+      const mar = exRand(8, 18);
+      const mer = exRand(8, 18);
+      const jeu = exRand(8, 18);
+      const ven = exRand(8, 18);
+      const data = [['Lun', lun], ['Mar', mar], ['Mer', mer], ['Jeu', jeu], ['Ven', ven]];
+      const idx = exRand(0, 4);
+      const tableau = data.map(([j, v]) => `${j}: ${v}°C`).join(' &nbsp;|&nbsp; ');
+      return {
+        question: `Tableau des températures : <code>${tableau}</code>.<br>Quelle est la température du <strong>${data[idx][0]}</strong> (en °C) ?`,
+        inputType: 'number',
+        answer: data[idx][1],
+        steps: [
+          `On lit la valeur dans la colonne ${data[idx][0]}.`,
+          `Réponse : <code>${data[idx][1]}°C</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Effectif total',
+    generate() {
+      const a = exRand(5, 15);
+      const b = exRand(5, 15);
+      const c = exRand(5, 15);
+      const d = exRand(5, 15);
+      return {
+        question: `Dans une classe, on compte les couleurs préférées : Bleu : ${a}, Rouge : ${b}, Vert : ${c}, Jaune : ${d}.<br>Quel est l'<strong>effectif total</strong> ?`,
+        inputType: 'number',
+        answer: a + b + c + d,
+        steps: [
+          `L'effectif total est la somme des effectifs.`,
+          `<code>${a} + ${b} + ${c} + ${d} = ${a + b + c + d}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Plus grand effectif',
+    generate() {
+      const choix = ['Sport', 'Musique', 'Lecture', 'Cinéma'];
+      const eff = [exRand(10, 40), exRand(10, 40), exRand(10, 40), exRand(10, 40)];
+      const max = Math.max(...eff);
+      let idxMax = eff.indexOf(max);
+      while (eff.filter(e => e === max).length > 1) {
+        eff[exRand(0, 3)] += exRand(1, 5);
+        idxMax = eff.indexOf(Math.max(...eff));
+      }
+      const tableau = choix.map((c, i) => `${c}: ${eff[i]}`).join(' &nbsp;|&nbsp; ');
+      return {
+        question: `Loisirs préférés : <code>${tableau}</code>.<br>Quel est le loisir <strong>le plus choisi</strong> ?`,
+        inputType: 'mcq',
+        options: choix,
+        answer: idxMax,
+        steps: [
+          `On cherche l'effectif le plus grand.`,
+          `Le plus grand effectif est <code>${eff[idxMax]}</code>, pour <strong>${choix[idxMax]}</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fraction d\'un disque',
+    generate() {
+      const den = exPick([2, 4, 8]);
+      const angle = 360 / den;
+      return {
+        question: `Sur un diagramme circulaire, une part représente <code>1/${den}</code> du disque. Quelle est la mesure de l'angle au centre (en °) ?`,
+        inputType: 'number',
+        answer: angle,
+        tolerance: 0.001,
+        steps: [
+          `Le disque entier représente <code>360°</code>.`,
+          `<code>1/${den}</code> du disque : <code>360 ÷ ${den} = ${angle}°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Différence entre deux valeurs',
+    generate() {
+      const t1 = exRand(5, 25);
+      const t2 = exRand(5, 25);
+      const j1 = exPick(['lundi', 'mardi', 'mercredi']);
+      const j2 = exPick(['jeudi', 'vendredi']);
+      return {
+        question: `Le ${j1}, il fait <code>${t1}°C</code> ; le ${j2}, <code>${t2}°C</code>. De combien de degrés varie la température ?`,
+        inputType: 'number',
+        answer: Math.abs(t1 - t2),
+        steps: [
+          `On calcule la différence des deux valeurs (en valeur absolue).`,
+          `<code>|${t1} − ${t2}| = ${Math.abs(t1 - t2)}°C</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-8'] = [
+  {
+    title: 'Reconnaître une notation',
+    generate() {
+      const sym = exPick(['⊥', '∥']);
+      const mot = sym === '⊥' ? 'perpendiculaires' : 'parallèles';
+      return {
+        question: `Que signifie la notation <code>(d) ${sym} (d')</code> ?`,
+        inputType: 'mcq',
+        options: ['Les droites se croisent', 'Les droites sont perpendiculaires', 'Les droites sont parallèles'],
+        answer: sym === '⊥' ? 1 : 2,
+        steps: [
+          `<code>⊥</code> signifie « perpendiculaire à » (angle droit).`,
+          `<code>∥</code> signifie « parallèle à » (jamais de croisement).`,
+          `Donc <code>(d) ${sym} (d')</code> = les droites sont ${mot}.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Outil pour tracer une perpendiculaire',
+    generate() {
+      return {
+        question: `Quel outil utilise-t-on pour tracer ou vérifier qu'une droite est <strong>perpendiculaire</strong> à une autre ?`,
+        inputType: 'mcq',
+        options: ['Le compas seul', 'L\'équerre', 'Le rapporteur', 'Une simple règle'],
+        answer: 1,
+        steps: [
+          `L'<strong>équerre</strong> a un coin à 90° : on l'utilise pour tracer des angles droits.`,
+          `Le rapporteur sert à mesurer des angles, le compas à tracer des cercles ou reporter des longueurs.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Propriété perp ⇒ parallèle',
+    generate() {
+      return {
+        question: `Si deux droites <code>(d₁)</code> et <code>(d₂)</code> sont toutes les deux <strong>perpendiculaires</strong> à une même droite <code>(d)</code>, alors :`,
+        inputType: 'mcq',
+        options: [
+          '(d₁) et (d₂) sont parallèles',
+          '(d₁) et (d₂) sont perpendiculaires',
+          'On ne peut rien dire',
+        ],
+        answer: 0,
+        steps: [
+          `Propriété : <code>(d₁) ⊥ (d) et (d₂) ⊥ (d) ⇒ (d₁) ∥ (d₂)</code>.`,
+          `Deux droites perpendiculaires à une même droite sont <strong>parallèles</strong> entre elles.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Propriété parallèles + perp',
+    generate() {
+      return {
+        question: `Si <code>(d₁) ∥ (d₂)</code> et <code>(d) ⊥ (d₁)</code>, que peut-on dire de <code>(d)</code> et <code>(d₂)</code> ?`,
+        inputType: 'mcq',
+        options: ['Parallèles', 'Perpendiculaires', 'Identiques', 'On ne sait pas'],
+        answer: 1,
+        steps: [
+          `Propriété : si une droite est perpendiculaire à l'une de deux droites parallèles, elle est perpendiculaire à l'autre.`,
+          `Donc <code>(d) ⊥ (d₂)</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Vrai ou faux : parallèles',
+    generate() {
+      const c = exPick([
+        { q: 'Deux droites qui ne se touchent pas sur la feuille sont forcément parallèles.', ans: false, why: 'Elles peuvent se rejoindre si on les prolonge.' },
+        { q: 'Deux droites parallèles ne se coupent jamais.', ans: true, why: 'C\'est la définition.' },
+        { q: 'Une droite peut être à la fois parallèle et perpendiculaire à une même droite.', ans: false, why: 'Si elle est parallèle, elle ne croise pas, donc pas d\'angle droit possible.' },
+        { q: 'Si deux droites ont le même point d\'intersection, elles ne peuvent pas être parallèles.', ans: true, why: 'Deux droites qui se croisent ne sont pas parallèles.' },
+      ]);
+      return {
+        question: `Vrai ou faux : « ${c.q} »`,
+        inputType: 'mcq',
+        options: ['Vrai', 'Faux'],
+        answer: c.ans ? 0 : 1,
+        steps: [
+          c.why,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-10'] = [
+  {
+    title: 'Diamètre d\'un cercle',
+    generate() {
+      const r = exRand(3, 25);
+      return {
+        question: `Un cercle a pour rayon <code>${r} cm</code>. Quel est son <strong>diamètre</strong> (en cm) ?`,
+        inputType: 'number',
+        answer: 2 * r,
+        steps: [
+          `Formule : <code>D = 2 × R</code>.`,
+          `<code>D = 2 × ${r} = ${2 * r} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Rayon d\'un cercle',
+    generate() {
+      const d = exRand(4, 30) * 2;
+      return {
+        question: `Un cercle a pour diamètre <code>${d} cm</code>. Quel est son <strong>rayon</strong> (en cm) ?`,
+        inputType: 'number',
+        answer: d / 2,
+        tolerance: 0.001,
+        steps: [
+          `Formule : <code>R = D / 2</code>.`,
+          `<code>R = ${d} / 2 = ${d / 2} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Médiatrice : propriété',
+    generate() {
+      return {
+        question: `Un point <code>M</code> appartient à la médiatrice de <code>[AB]</code>. Que peut-on dire des distances <code>MA</code> et <code>MB</code> ?`,
+        inputType: 'mcq',
+        options: ['MA = MB', 'MA > MB', 'MA &lt; MB', 'On ne peut pas conclure'],
+        answer: 0,
+        steps: [
+          `Propriété : <code>M ∈ médiatrice de [AB] ⇔ MA = MB</code>.`,
+          `Tout point de la médiatrice est à <strong>égale distance</strong> de A et de B.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Vocabulaire du cercle',
+    generate() {
+      const c = exPick([
+        { def: 'Segment qui relie le centre à un point du cercle', mot: 'Rayon' },
+        { def: 'Segment qui relie deux points du cercle en passant par le centre', mot: 'Diamètre' },
+        { def: 'Segment qui relie deux points du cercle (sans forcément passer par le centre)', mot: 'Corde' },
+        { def: 'Portion du cercle entre deux points', mot: 'Arc' },
+      ]);
+      return {
+        question: `Comment s'appelle un <strong>${c.def.toLowerCase()}</strong> ?`,
+        inputType: 'mcq',
+        options: ['Rayon', 'Diamètre', 'Corde', 'Arc'],
+        answer: ['Rayon', 'Diamètre', 'Corde', 'Arc'].indexOf(c.mot),
+        steps: [
+          `${c.def} → <strong>${c.mot}</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Médiatrice : caractéristiques',
+    generate() {
+      return {
+        question: `La médiatrice du segment <code>[AB]</code> est :`,
+        inputType: 'mcq',
+        options: [
+          'La droite parallèle à (AB) passant par son milieu',
+          'La droite perpendiculaire à (AB) passant par son milieu',
+          'La droite passant par A et B',
+          'Le segment de A à B',
+        ],
+        answer: 1,
+        steps: [
+          `La médiatrice de <code>[AB]</code> est la droite <strong>perpendiculaire</strong> à <code>(AB)</code> qui passe par le <strong>milieu</strong> de <code>[AB]</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-11'] = [
+  {
+    title: 'Triangle particulier',
+    generate() {
+      const c = exPick([
+        { desc: '3 côtés de même longueur', type: 'équilatéral' },
+        { desc: '2 côtés de même longueur', type: 'isocèle' },
+        { desc: 'un angle droit', type: 'rectangle' },
+      ]);
+      return {
+        question: `Un triangle qui a <strong>${c.desc}</strong> est appelé :`,
+        inputType: 'mcq',
+        options: ['équilatéral', 'isocèle', 'rectangle', 'quelconque'],
+        answer: ['équilatéral', 'isocèle', 'rectangle', 'quelconque'].indexOf(c.type),
+        steps: [
+          `${c.desc} → triangle <strong>${c.type}</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Angle d\'un triangle équilatéral',
+    generate() {
+      return {
+        question: `Combien mesure chaque angle d'un triangle <strong>équilatéral</strong> (en °) ?`,
+        inputType: 'number',
+        answer: 60,
+        steps: [
+          `La somme des angles d'un triangle vaut <code>180°</code>.`,
+          `Dans un triangle équilatéral les 3 angles sont égaux : <code>180 ÷ 3 = 60°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Reconnaître un quadrilatère',
+    generate() {
+      const c = exPick([
+        { desc: '4 côtés égaux et 4 angles droits', type: 'carré' },
+        { desc: '4 angles droits (sans préciser les côtés)', type: 'rectangle' },
+        { desc: '4 côtés égaux (sans préciser les angles)', type: 'losange' },
+        { desc: 'côtés opposés parallèles deux à deux', type: 'parallélogramme' },
+      ]);
+      return {
+        question: `Un quadrilatère qui a <strong>${c.desc}</strong> est :`,
+        inputType: 'mcq',
+        options: ['carré', 'rectangle', 'losange', 'parallélogramme'],
+        answer: ['carré', 'rectangle', 'losange', 'parallélogramme'].indexOf(c.type),
+        steps: [
+          `${c.desc} → <strong>${c.type}</strong>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Hiérarchie : carré ⊂ ?',
+    generate() {
+      return {
+        question: `Le <strong>carré</strong> est aussi :`,
+        inputType: 'mcq',
+        options: [
+          'un rectangle ET un losange',
+          'un rectangle seulement',
+          'un losange seulement',
+          'ni l\'un ni l\'autre',
+        ],
+        answer: 0,
+        steps: [
+          `Le carré a 4 angles droits → c'est un rectangle.`,
+          `Il a aussi 4 côtés égaux → c'est un losange.`,
+          `Donc le carré est <strong>à la fois</strong> rectangle ET losange.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Somme des angles d\'un triangle',
+    generate() {
+      const a = exRand(30, 90);
+      const b = exRand(30, 180 - a - 20);
+      const c = 180 - a - b;
+      return {
+        question: `Dans un triangle, deux angles mesurent <code>${a}°</code> et <code>${b}°</code>. Quelle est la mesure du <strong>troisième</strong> (en °) ?`,
+        inputType: 'number',
+        answer: c,
+        steps: [
+          `La somme des angles d'un triangle vaut <code>180°</code>.`,
+          `<code>180 − ${a} − ${b} = ${c}°</code>.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-12'] = [
+  {
+    title: 'Symétrie axiale : conservation des longueurs',
+    generate() {
+      const L = exRand(3, 12);
+      return {
+        question: `Le segment <code>[AB]</code> mesure <code>${L} cm</code>. Quelle est la longueur de son <strong>symétrique</strong> par rapport à un axe (en cm) ?`,
+        inputType: 'number',
+        answer: L,
+        steps: [
+          `La symétrie axiale <strong>conserve</strong> les longueurs.`,
+          `Le symétrique mesure donc aussi <code>${L} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Symétrique d\'un angle',
+    generate() {
+      const a = exRand(20, 160);
+      return {
+        question: `Un angle mesure <code>${a}°</code>. Quelle est la mesure de son <strong>symétrique</strong> par rapport à un axe (en °) ?`,
+        inputType: 'number',
+        answer: a,
+        steps: [
+          `La symétrie axiale conserve les angles.`,
+          `Le symétrique mesure donc <code>${a}°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Nombre d\'axes : figures usuelles',
+    generate() {
+      const c = exPick([
+        { fig: 'carré', n: 4 },
+        { fig: 'rectangle (non carré)', n: 2 },
+        { fig: 'losange (non carré)', n: 2 },
+        { fig: 'triangle équilatéral', n: 3 },
+        { fig: 'triangle isocèle (non équilatéral)', n: 1 },
+      ]);
+      return {
+        question: `Combien d'<strong>axes de symétrie</strong> a un ${c.fig} ?`,
+        inputType: 'number',
+        answer: c.n,
+        steps: [
+          c.fig === 'carré' ? `Carré : 2 médianes + 2 diagonales = 4 axes.`
+          : c.fig.startsWith('rectangle') ? `Rectangle : seulement les 2 médianes (pas les diagonales).`
+          : c.fig.startsWith('losange') ? `Losange : les 2 diagonales sont axes de symétrie.`
+          : c.fig === 'triangle équilatéral' ? `Triangle équilatéral : 3 axes (médiatrices des côtés).`
+          : `Triangle isocèle : 1 axe (médiatrice de la base).`,
+          `Donc <code>${c.n}</code> axe${c.n > 1 ? 's' : ''}.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Cercle et axes de symétrie',
+    generate() {
+      return {
+        question: `Combien de droites peuvent être <strong>axe de symétrie</strong> d'un cercle ?`,
+        inputType: 'mcq',
+        options: ['1', '2', '4', 'Une infinité'],
+        answer: 3,
+        steps: [
+          `Toute droite passant par le centre du cercle est un axe de symétrie.`,
+          `Il y a donc <strong>une infinité</strong> d'axes de symétrie.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Lettre avec axe vertical',
+    generate() {
+      const c = exPick([
+        { lettre: 'A', axe: true },
+        { lettre: 'M', axe: true },
+        { lettre: 'T', axe: true },
+        { lettre: 'V', axe: true },
+        { lettre: 'F', axe: false },
+        { lettre: 'G', axe: false },
+        { lettre: 'R', axe: false },
+        { lettre: 'P', axe: false },
+      ]);
+      return {
+        question: `La lettre <strong>${c.lettre}</strong> a-t-elle un axe de symétrie <strong>vertical</strong> ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.axe ? 0 : 1,
+        steps: [
+          c.axe
+            ? `On peut plier la lettre ${c.lettre} verticalement et les deux moitiés se superposent : oui, elle a un axe vertical.`
+            : `Si on plie la lettre ${c.lettre} verticalement, les deux moitiés ne se superposent pas : pas d'axe vertical.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['6e-13'] = [
+  {
+    title: 'Symétrie centrale : type d\'objet',
+    generate() {
+      return {
+        question: `La symétrie centrale se fait par rapport à :`,
+        inputType: 'mcq',
+        options: ['une droite', 'un point', 'un segment', 'un cercle'],
+        answer: 1,
+        steps: [
+          `La symétrie <strong>axiale</strong> est par rapport à une droite (axe).`,
+          `La symétrie <strong>centrale</strong> est par rapport à un <strong>point</strong> (centre).`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Demi-tour : angle de rotation',
+    generate() {
+      return {
+        question: `Une symétrie centrale équivaut à une rotation de quel angle (en °) ?`,
+        inputType: 'number',
+        answer: 180,
+        steps: [
+          `Une symétrie centrale est un <strong>demi-tour</strong> autour du centre.`,
+          `Un demi-tour, c'est <code>180°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Centre de symétrie : figures usuelles',
+    generate() {
+      const c = exPick([
+        { fig: 'rectangle', a: true, why: 'Le centre de symétrie est l\'intersection des diagonales.' },
+        { fig: 'carré', a: true, why: 'Le centre de symétrie est l\'intersection des diagonales.' },
+        { fig: 'cercle', a: true, why: 'Le centre du cercle est centre de symétrie.' },
+        { fig: 'triangle équilatéral', a: false, why: 'Aucun point ne convient pour un demi-tour.' },
+        { fig: 'parallélogramme', a: true, why: 'Le centre de symétrie est l\'intersection des diagonales.' },
+      ]);
+      return {
+        question: `Un <strong>${c.fig}</strong> a-t-il un centre de symétrie ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.a ? 0 : 1,
+        steps: [
+          c.why,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Axiale ou centrale ?',
+    generate() {
+      const c = exPick([
+        { lettre: 'S', axe: false, centre: true },
+        { lettre: 'A', axe: true, centre: false },
+        { lettre: 'H', axe: true, centre: true },
+        { lettre: 'N', axe: false, centre: true },
+        { lettre: 'O', axe: true, centre: true },
+      ]);
+      const opts = [
+        'Axe seulement',
+        'Centre seulement',
+        'Les deux',
+        'Aucun',
+      ];
+      const ans = c.axe && c.centre ? 2 : c.axe ? 0 : c.centre ? 1 : 3;
+      return {
+        question: `La lettre <strong>${c.lettre}</strong> possède :`,
+        inputType: 'mcq',
+        options: opts,
+        answer: ans,
+        steps: [
+          `On vérifie : peut-on la plier (axe) ? la faire tourner de 180° (centre) ?`,
+          `Réponse : ${opts[ans]}.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Différence axiale / centrale',
+    generate() {
+      return {
+        question: `Quelle affirmation est <strong>vraie</strong> ?`,
+        inputType: 'mcq',
+        options: [
+          'La symétrie centrale est une réflexion miroir.',
+          'La symétrie axiale est un demi-tour.',
+          'La symétrie centrale est un demi-tour autour d\'un point.',
+          'Les deux sont identiques.',
+        ],
+        answer: 2,
+        steps: [
+          `La symétrie axiale = effet miroir par rapport à une droite.`,
+          `La symétrie centrale = demi-tour (180°) autour d'un <strong>point</strong>.`,
         ],
       };
     },
