@@ -3325,6 +3325,35 @@ function chapters2nde() {
             <tr><td>(x − 1)(x + 2)</td><td>+</td><td>−</td><td>+</td></tr>
           </table>
           <p>Donc <code>(x − 1)(x + 2) ≥ 0</code> sur <code>]−∞ ; −2] ∪ [1 ; +∞[</code> (en ajoutant les bornes où le produit s'annule).</p>`)}
+
+        <h2>6. Composition d'inégalités</h2>
+        ${lc.prop("Règles", `<p>À partir d'un encadrement <code>a ≤ x ≤ b</code> :</p>
+          <ul><li>Ajouter un nombre c : <code>a + c ≤ x + c ≤ b + c</code>.</li>
+          <li>Multiplier par <strong>c &gt; 0</strong> : <code>ac ≤ cx ≤ bc</code> (sens conservé).</li>
+          <li>Multiplier par <strong>c &lt; 0</strong> : <code>bc ≤ cx ≤ ac</code> (sens inversé !).</li>
+          <li>On peut <strong>additionner deux encadrements</strong> dans le même sens : si <code>a ≤ x ≤ b</code> et <code>c ≤ y ≤ d</code>, alors <code>a + c ≤ x + y ≤ b + d</code>.</li>
+        </ul>`)}
+        ${lc.example("Encadrer 2x − 3 connaissant 1 ≤ x ≤ 5", `<ol>
+          <li>Multiplier par 2 (positif) : <code>2 ≤ 2x ≤ 10</code>.</li>
+          <li>Soustraire 3 : <code>−1 ≤ 2x − 3 ≤ 7</code>.</li>
+        </ol>`)}
+        ${lc.warn("Soustraction d'encadrements", `<p>Pour soustraire deux encadrements, on additionne avec l'<em>opposé</em> du second. Si <code>a ≤ x ≤ b</code> et <code>c ≤ y ≤ d</code>, alors <code>a − d ≤ x − y ≤ b − c</code>. Ne <strong>pas</strong> faire « <code>a − c ≤ x − y ≤ b − d</code> » qui est faux.</p>`)}
+
+        <h2>7. Valeur absolue</h2>
+        ${lc.def("Valeur absolue", `<p>La <strong>valeur absolue</strong> d'un réel <code>x</code>, notée <code>|x|</code>, est :</p>
+          <ul><li><code>|x| = x</code> si <code>x ≥ 0</code> ;</li>
+          <li><code>|x| = −x</code> si <code>x &lt; 0</code>.</li></ul>
+          <p>C'est toujours un nombre <strong>positif</strong> ou nul.</p>`)}
+        ${lc.example("Calculs", `<ul><li><code>|7| = 7</code></li>
+          <li><code>|−4| = 4</code></li>
+          <li><code>|0| = 0</code></li></ul>`)}
+        ${lc.prop("Distance", `<p>La <strong>distance entre deux réels</strong> <code>a</code> et <code>b</code> est <code>|a − b|</code>.</p>`)}
+        ${lc.prop("Inéquation |x − a| ≤ r", `<p>Avec <code>r ≥ 0</code> :</p>`)}
+        ${lc.formula("|x − a| ≤ r &nbsp;⇔&nbsp; a − r ≤ x ≤ a + r &nbsp;⇔&nbsp; x ∈ [a − r ; a + r]")}
+        ${lc.example("Résoudre |x − 3| < 2", `<ol>
+          <li>Équivaut à <code>3 − 2 &lt; x &lt; 3 + 2</code>, soit <code>1 &lt; x &lt; 5</code>.</li>
+          <li>Solutions : <code>x ∈ ]1 ; 5[</code>.</li>
+        </ol>`)}
       `,
     },
 
@@ -3713,6 +3742,22 @@ function chapters2nde() {
         ${lc.example("Deux dés à six faces", `<p>Univers : 36 couples possibles. Probabilité d'obtenir une somme égale à 7 ?</p>
           <p>Couples : <code>(1,6), (2,5), (3,4), (4,3), (5,2), (6,1)</code>. 6 couples favorables.</p>
           <p><code>P = 6/36 = 1/6</code>.</p>`)}
+
+        <h2>7. Échantillonnage et fluctuation</h2>
+        ${lc.def("Échantillon", `<p>Un <strong>échantillon de taille n</strong> est obtenu en répétant <code>n</code> fois la même expérience aléatoire dans des conditions identiques.</p>`)}
+        ${lc.def("Fréquence observée", `<p>Pour un événement <code>A</code> de probabilité <code>p</code>, la <strong>fréquence observée</strong> <code>f</code> dans un échantillon est le rapport « nombre de fois où A se produit / n ».</p>`)}
+        ${lc.prop("Loi des grands nombres (admise)", `<p>Quand <code>n</code> est grand, <code>f</code> se rapproche de <code>p</code>. Mais pour un échantillon donné, <code>f</code> peut <strong>fluctuer</strong> autour de <code>p</code>.</p>`)}
+
+        <h3>Intervalle de fluctuation au niveau 95 %</h3>
+        ${lc.prop("Approximation simple (programme 2nde)", `<p>Pour un échantillon de taille <code>n ≥ 25</code> issu d'une population de proportion <code>p</code> avec <code>0,2 ≤ p ≤ 0,8</code>, la fréquence observée se trouve dans l'intervalle suivant avec une probabilité d'au moins 95 % :</p>`)}
+        ${lc.formula("[p − 1/√n ; p + 1/√n]")}
+        ${lc.example("Pile ou face 100 fois", `<p>On lance une pièce équilibrée 100 fois. <code>p = 0,5</code>, <code>n = 100</code>.</p>
+          <ol><li><code>1/√100 = 0,1</code>.</li>
+          <li>Intervalle de fluctuation : <code>[0,4 ; 0,6]</code>.</li>
+          <li>Avec une fréquence observée de 0,55 (55 piles sur 100) : on est dans l'intervalle, le résultat est cohérent avec une pièce équilibrée.</li>
+          <li>Avec 0,72 : on sort de l'intervalle, on peut soupçonner que la pièce est <strong>truquée</strong>.</li>
+        </ol>`)}
+        ${lc.tip("Simulation Python", `<p>On peut simuler un grand nombre d'échantillons avec <code>random.random()</code> et observer la distribution des fréquences. C'est une excellente application de l'algorithmique 2nde.</p>`)}
       `,
     },
 
