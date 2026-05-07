@@ -983,6 +983,48 @@ function chapters6e() {
     },
 
     {
+      title: "Lecture de tableaux et de graphiques",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Tableau à double entrée</h2>
+        ${lc.def("Tableau à double entrée", `<p>Un tableau à double entrée a des <strong>lignes</strong> et des <strong>colonnes</strong>. Pour lire une valeur, on croise une ligne et une colonne.</p>`)}
+        ${lc.example("Météo", `<p>Tableau des températures (°C) :</p>
+          <p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Lun &nbsp; Mar &nbsp; Mer<br>Matin &nbsp;&nbsp; 12 &nbsp;&nbsp; 14 &nbsp;&nbsp; 11<br>Après-midi 18 &nbsp;&nbsp; 21 &nbsp;&nbsp; 17</code></p>
+          <p>Pour lire « la température du mardi après-midi », on croise la ligne « après-midi » et la colonne « Mar » : <strong>21 °C</strong>.</p>`)}
+
+        <h2>2. Diagramme en bâtons</h2>
+        ${lc.def("Diagramme en bâtons", `<p>Un <strong>diagramme en bâtons</strong> représente des données par des barres dont la <strong>hauteur</strong> est proportionnelle à la valeur.</p>`)}
+        ${lc.tip("Pour quoi c'est utile ?", `<p>Pour comparer rapidement plusieurs valeurs : on voit immédiatement la plus grande et la plus petite.</p>`)}
+
+        <h2>3. Diagramme circulaire (camembert)</h2>
+        ${lc.def("Diagramme circulaire", `<p>Un <strong>diagramme circulaire</strong> représente des données comme des parts d'un disque. Chaque part correspond à une <strong>fraction du tout</strong>.</p>`)}
+        ${lc.example("Sondage", `<p>Sur 200 personnes, 100 préfèrent le sport, 50 la musique, 50 le cinéma.</p>
+          <ul><li>Sport : 100/200 = 1/2 → <strong>moitié</strong> du disque (180°).</li>
+          <li>Musique : 50/200 = 1/4 → <strong>quart</strong> du disque (90°).</li>
+          <li>Cinéma : 50/200 = 1/4 → autre quart (90°).</li></ul>`)}
+
+        <h2>4. Graphique cartésien (lignes/courbes)</h2>
+        ${lc.def("Repère cartésien", `<p>On utilise deux <strong>axes perpendiculaires</strong> : l'axe horizontal (souvent le temps) et l'axe vertical (la valeur). Chaque point du graphique correspond à un couple <code>(x, y)</code>.</p>`)}
+        ${lc.tip("Pour quoi c'est utile ?", `<p>Pour montrer comment une grandeur évolue au cours du temps. On voit les hausses, les baisses, les pics.</p>`)}
+
+        <h2>5. Effectifs</h2>
+        ${lc.def("Effectif", `<p>L'<strong>effectif</strong> d'une catégorie, c'est le <strong>nombre</strong> d'éléments qu'elle contient.</p>`)}
+        ${lc.example("Couleurs préférées", `<p>Sur 30 élèves : 10 bleu, 8 rouge, 7 vert, 5 jaune.</p>
+          <ul><li>Effectif « bleu » : 10.</li>
+          <li>Effectif total : 30.</li></ul>`)}
+
+        <h2>6. Bien lire un graphique : checklist</h2>
+        ${lc.prop("Avant de lire", `<ol>
+          <li>Lire le <strong>titre</strong> : de quoi parle le graphique ?</li>
+          <li>Lire les <strong>légendes des axes</strong> : qu'est-ce qui est représenté en x et en y ? Quelle unité ?</li>
+          <li>Lire l'<strong>échelle</strong> : à quoi correspond une graduation ?</li>
+          <li>Faire la lecture en croisant les bonnes valeurs.</li>
+        </ol>`)}
+        ${lc.warn("Échelle trompeuse", `<p>Attention : un graphique peut être visuellement spectaculaire mais avec une échelle trompeuse (par exemple en zoomant entre 95 et 100 au lieu de 0 et 100). Toujours regarder l'<strong>échelle</strong>.</p>`)}
+      `,
+    },
+
+    {
       title: "Droites perpendiculaires et parallèles",
       category: "Géométrie",
       content: `
@@ -1210,47 +1252,6 @@ function chapters6e() {
       `,
     },
 
-    {
-      title: "Lecture de tableaux et de graphiques",
-      category: "Organisation des données",
-      content: `
-        <h2>1. Tableau à double entrée</h2>
-        ${lc.def("Tableau à double entrée", `<p>Un tableau à double entrée a des <strong>lignes</strong> et des <strong>colonnes</strong>. Pour lire une valeur, on croise une ligne et une colonne.</p>`)}
-        ${lc.example("Météo", `<p>Tableau des températures (°C) :</p>
-          <p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Lun &nbsp; Mar &nbsp; Mer<br>Matin &nbsp;&nbsp; 12 &nbsp;&nbsp; 14 &nbsp;&nbsp; 11<br>Après-midi 18 &nbsp;&nbsp; 21 &nbsp;&nbsp; 17</code></p>
-          <p>Pour lire « la température du mardi après-midi », on croise la ligne « après-midi » et la colonne « Mar » : <strong>21 °C</strong>.</p>`)}
-
-        <h2>2. Diagramme en bâtons</h2>
-        ${lc.def("Diagramme en bâtons", `<p>Un <strong>diagramme en bâtons</strong> représente des données par des barres dont la <strong>hauteur</strong> est proportionnelle à la valeur.</p>`)}
-        ${lc.tip("Pour quoi c'est utile ?", `<p>Pour comparer rapidement plusieurs valeurs : on voit immédiatement la plus grande et la plus petite.</p>`)}
-
-        <h2>3. Diagramme circulaire (camembert)</h2>
-        ${lc.def("Diagramme circulaire", `<p>Un <strong>diagramme circulaire</strong> représente des données comme des parts d'un disque. Chaque part correspond à une <strong>fraction du tout</strong>.</p>`)}
-        ${lc.example("Sondage", `<p>Sur 200 personnes, 100 préfèrent le sport, 50 la musique, 50 le cinéma.</p>
-          <ul><li>Sport : 100/200 = 1/2 → <strong>moitié</strong> du disque (180°).</li>
-          <li>Musique : 50/200 = 1/4 → <strong>quart</strong> du disque (90°).</li>
-          <li>Cinéma : 50/200 = 1/4 → autre quart (90°).</li></ul>`)}
-
-        <h2>4. Graphique cartésien (lignes/courbes)</h2>
-        ${lc.def("Repère cartésien", `<p>On utilise deux <strong>axes perpendiculaires</strong> : l'axe horizontal (souvent le temps) et l'axe vertical (la valeur). Chaque point du graphique correspond à un couple <code>(x, y)</code>.</p>`)}
-        ${lc.tip("Pour quoi c'est utile ?", `<p>Pour montrer comment une grandeur évolue au cours du temps. On voit les hausses, les baisses, les pics.</p>`)}
-
-        <h2>5. Effectifs</h2>
-        ${lc.def("Effectif", `<p>L'<strong>effectif</strong> d'une catégorie, c'est le <strong>nombre</strong> d'éléments qu'elle contient.</p>`)}
-        ${lc.example("Couleurs préférées", `<p>Sur 30 élèves : 10 bleu, 8 rouge, 7 vert, 5 jaune.</p>
-          <ul><li>Effectif « bleu » : 10.</li>
-          <li>Effectif total : 30.</li></ul>`)}
-
-        <h2>6. Bien lire un graphique : checklist</h2>
-        ${lc.prop("Avant de lire", `<ol>
-          <li>Lire le <strong>titre</strong> : de quoi parle le graphique ?</li>
-          <li>Lire les <strong>légendes des axes</strong> : qu'est-ce qui est représenté en x et en y ? Quelle unité ?</li>
-          <li>Lire l'<strong>échelle</strong> : à quoi correspond une graduation ?</li>
-          <li>Faire la lecture en croisant les bonnes valeurs.</li>
-        </ol>`)}
-        ${lc.warn("Échelle trompeuse", `<p>Attention : un graphique peut être visuellement spectaculaire mais avec une échelle trompeuse (par exemple en zoomant entre 95 et 100 au lieu de 0 et 100). Toujours regarder l'<strong>échelle</strong>.</p>`)}
-      `,
-    },
   ];
 }
 
