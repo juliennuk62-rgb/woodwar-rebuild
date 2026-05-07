@@ -1468,12 +1468,21 @@ function renderChapter(main, level, chapter, idx) {
   meta.appendChild(el('span', { class: 'pill' }, chapter.category));
   main.appendChild(meta);
   if (!chapter.content) {
-    main.appendChild(el('div', { class: 'empty-state', html: `
-      <div class="big">📝</div>
-      <p>Ce chapitre n'est <strong>pas encore rédigé</strong>.</p>
-      <p>Il sera ajouté lors d'une prochaine session — niveau par niveau, en commençant par les fondamentaux.</p>
-      <p style="margin-top:20px"><button onclick="state.chapterId=null;saveState();render();" class="nav-btn">Retour au sommaire</button></p>
-    `}));
+    const empty = el('div', { class: 'empty-state' });
+    empty.appendChild(el('div', { class: 'big' }, '📝'));
+    empty.appendChild(el('p', { html: `Ce chapitre n'est <strong>pas encore rédigé</strong>.` }));
+    empty.appendChild(el('p', {}, "Il sera ajouté lors d'une prochaine session — niveau par niveau, en commençant par les fondamentaux."));
+    const backWrap = el('p', { style: 'margin-top:20px' });
+    // Bouton « Retour » via addEventListener, pas via onclick="" inline.
+    // En ES6, les let/const top-level du script tag ne sont PAS exposés
+    // sur window, donc un handler inline plantait avec « state is not
+    // defined ».
+    backWrap.appendChild(el('button', {
+      class: 'nav-btn',
+      onclick: () => { state.chapterId = null; saveState(); render(); }
+    }, 'Retour au sommaire'));
+    empty.appendChild(backWrap);
+    main.appendChild(empty);
     return;
   }
   const body = el('div');
