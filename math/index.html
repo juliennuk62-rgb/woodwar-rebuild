@@ -2184,6 +2184,45 @@ function chapters1ere() {
     },
 
     {
+      title: "Raisonnement par récurrence",
+      category: "Suites",
+      content: `
+        <h2>1. Principe de récurrence</h2>
+        ${lc.def("Récurrence", `<p>Pour démontrer qu'une propriété <code>P(n)</code> est vraie pour tout entier <code>n ≥ n₀</code>, on procède en deux temps :</p>
+          <ol><li><strong>Initialisation</strong> : on vérifie que <code>P(n₀)</code> est vraie (le cas de base).</li>
+          <li><strong>Hérédité</strong> : on suppose <code>P(n)</code> vraie pour un certain <code>n ≥ n₀</code> (« hypothèse de récurrence »), et on démontre <code>P(n + 1)</code>.</li></ol>
+          <p>Conclusion : par principe de récurrence, <code>P(n)</code> est vraie pour tout <code>n ≥ n₀</code>.</p>`)}
+        ${lc.tip("Image des dominos", `<p>Imagine une chaîne de dominos. Si le premier tombe (initialisation) et que chaque domino fait tomber le suivant (hérédité), alors tous les dominos tombent.</p>`)}
+
+        <h2>2. Premier exemple : somme des n premiers entiers</h2>
+        ${lc.example("Démontrer 1 + 2 + … + n = n(n+1)/2", `<p>Soit <code>P(n) :</code> « <code>1 + 2 + … + n = n(n+1)/2</code> ».</p>
+          <p><strong>Initialisation</strong> (n = 1) : à gauche, 1. À droite, <code>1×2/2 = 1</code>. <code>P(1)</code> ✓.</p>
+          <p><strong>Hérédité</strong> : supposons <code>P(n)</code> vraie. Démontrons <code>P(n+1)</code> :</p>
+          <p><code>1 + 2 + … + n + (n+1) = n(n+1)/2 + (n+1)</code> (par hypothèse de récurrence)</p>
+          <p><code>= (n+1) × (n/2 + 1) = (n+1)(n+2)/2</code>. ✓</p>
+          <p><strong>Conclusion</strong> : <code>P(n)</code> vraie pour tout <code>n ≥ 1</code>.</p>`)}
+
+        <h2>3. Exemple avec une suite</h2>
+        ${lc.example("Démontrer 2ⁿ ≥ n + 1 pour n ≥ 0", `<p><strong>Init</strong> : <code>2⁰ = 1 ≥ 0 + 1 = 1</code> ✓.</p>
+          <p><strong>Hérédité</strong> : supposons <code>2ⁿ ≥ n + 1</code>. Alors :</p>
+          <p><code>2^{n+1} = 2 × 2ⁿ ≥ 2(n+1) = 2n + 2 ≥ n + 2</code> (car <code>n ≥ 0</code>).</p>
+          <p>Donc <code>P(n+1)</code> est vraie.</p>`)}
+
+        <h2>4. Démontrer une propriété d'une suite récurrente</h2>
+        ${lc.example("Suite encadrée", `<p>Soit <code>u₀ = 0</code> et <code>u_{n+1} = √(uₙ + 6)</code>. Démontrer que <code>0 ≤ uₙ ≤ 3</code> pour tout <code>n</code>.</p>
+          <p><strong>Init</strong> : <code>u₀ = 0</code>, donc <code>0 ≤ u₀ ≤ 3</code> ✓.</p>
+          <p><strong>Hérédité</strong> : supposons <code>0 ≤ uₙ ≤ 3</code>. Alors <code>6 ≤ uₙ + 6 ≤ 9</code>, donc <code>√6 ≤ u_{n+1} ≤ 3</code>. En particulier <code>0 ≤ u_{n+1} ≤ 3</code>. ✓</p>`)}
+
+        <h2>5. Pièges</h2>
+        ${lc.warn("Ne pas oublier l'initialisation", `<p>Une démonstration sans initialisation peut « marcher » mais conclure quelque chose de faux. Toujours commencer par initialiser.</p>`)}
+        ${lc.warn("Bien utiliser l'hypothèse", `<p>L'hérédité doit utiliser <code>P(n)</code> pour démontrer <code>P(n+1)</code>. Si on n'utilise pas <code>P(n)</code>, c'est qu'on a une démonstration directe (pas une récurrence).</p>`)}
+
+        <h2>6. Variantes</h2>
+        ${lc.tip("Récurrence forte", `<p>Parfois, pour démontrer <code>P(n+1)</code> on a besoin de supposer <code>P(k)</code> vraie pour <em>tous</em> les <code>k ≤ n</code> (pas seulement <code>P(n)</code>). C'est la <strong>récurrence forte</strong>, qui se justifie par le même principe.</p>`)}
+      `,
+    },
+
+    {
       title: "Dérivation : nombre dérivé, fonction dérivée",
       category: "Analyse",
       content: `
@@ -2472,6 +2511,26 @@ function chapters1ere() {
           <ol><li><code>u→ · v→ = 0 + 1 = 1</code>.</li>
           <li><code>||u→|| = √2</code>, <code>||v→|| = 1</code>.</li>
           <li><code>cos θ = 1/√2 = √2/2</code>, donc <code>θ = π/4 = 45°</code>.</li></ol>`)}
+
+        <h2>8. Théorème d'Al-Kashi (Pythagore généralisé)</h2>
+        ${lc.prop("Énoncé", `<p>Dans un triangle <code>ABC</code>, en notant <code>a = BC</code>, <code>b = AC</code>, <code>c = AB</code> :</p>`)}
+        ${lc.formula("a² = b² + c² − 2 × b × c × cos(Â)")}
+        <p>(et formules analogues pour les autres côtés). C'est la <strong>généralisation de Pythagore</strong> à un triangle quelconque : si <code>Â = 90°</code>, <code>cos(Â) = 0</code> et on retrouve <code>a² = b² + c²</code>.</p>
+        ${lc.example("Calculer un côté", `<p>Triangle <code>ABC</code> avec <code>AB = 5</code>, <code>AC = 7</code> et angle en A = 60°. Calculer BC.</p>
+          <ol><li><code>BC² = 5² + 7² − 2 × 5 × 7 × cos(60°) = 25 + 49 − 70 × 0,5 = 74 − 35 = 39</code>.</li>
+          <li><code>BC = √39 ≈ 6,24</code>.</li></ol>`)}
+
+        <h2>9. Formule de la médiane</h2>
+        ${lc.prop("Énoncé", `<p>Soit <code>I</code> le milieu de <code>[BC]</code>. Alors :</p>`)}
+        ${lc.formula("AB² + AC² = 2 × AI² + (BC²)/2")}
+        <p>Utile en géométrie analytique pour démontrer l'égalité de distances ou trouver les coordonnées du milieu autrement.</p>
+
+        <h2>10. Équations cos(x) = a et sin(x) = a</h2>
+        ${lc.prop("cos(x) = a, avec −1 ≤ a ≤ 1", `<p>Les solutions sont :</p>
+          <p><code>x = ±arccos(a) + 2kπ</code> &nbsp;(k ∈ ℤ)</p>`)}
+        ${lc.prop("sin(x) = a, avec −1 ≤ a ≤ 1", `<p>Les solutions sont :</p>
+          <p><code>x = arcsin(a) + 2kπ</code> &nbsp;ou&nbsp; <code>x = π − arcsin(a) + 2kπ</code></p>`)}
+        ${lc.example("Résoudre cos(x) = 1/2 sur [0 ; 2π]", `<p>Solutions : <code>x = π/3</code> et <code>x = −π/3 + 2π = 5π/3</code>.</p>`)}
       `,
     },
 
