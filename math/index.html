@@ -76,7 +76,14 @@
       font-size: 17px;
       color: var(--text);
       letter-spacing: -0.01em;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--r-sm);
+      font-family: inherit;
     }
+    .app-title:hover { background: var(--bg-soft); }
     .app-title .logo {
       width: 32px; height: 32px;
       border-radius: 8px;
@@ -648,10 +655,10 @@
 <body>
   <header class="app-header">
     <button class="menu-btn" id="menu-btn" aria-label="Ouvrir le menu de navigation" aria-expanded="false" aria-controls="sidebar">☰ Menu</button>
-    <div class="app-title">
+    <button class="app-title" id="home-btn" type="button" aria-label="Retour à l'accueil">
       <span class="logo">∑</span>
       <span>Cours de maths</span>
-    </div>
+    </button>
     <div class="breadcrumb-bar" id="breadcrumb"></div>
   </header>
 
@@ -682,14 +689,24 @@ const el = (tag, attrs = {}, children = []) => {
   return e;
 };
 
+// Échappe les caractères HTML dangereux dans une chaîne. Utilisé pour les
+// labels des helpers lc.*, qui ne sont *normalement* que du texte simple,
+// mais on protège préventivement contre une coquille future qui ferait
+// passer un < ou un & non échappé dans un label.
+const escAttr = (s) => String(s).replace(/[&<>"']/g, c => (
+  { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]
+));
+
 // Helpers de blocs pédagogiques pour le contenu HTML des chapitres.
+// Le `label` (titre du bloc) est échappé ; le `html` reste injecté tel quel
+// car il contient du formatage volontaire (<code>, <strong>, etc.).
 const lc = {
-  def:  (label, html) => `<div class="lc-def"><span class="label">${label}</span>${html}</div>`,
-  prop: (label, html) => `<div class="lc-prop"><span class="label">${label}</span>${html}</div>`,
+  def:  (label, html) => `<div class="lc-def"><span class="label">${escAttr(label)}</span>${html}</div>`,
+  prop: (label, html) => `<div class="lc-prop"><span class="label">${escAttr(label)}</span>${html}</div>`,
   formula: (html) => `<div class="lc-formula">${html}</div>`,
-  example: (label, html) => `<div class="lc-example"><span class="label">${label}</span>${html}</div>`,
-  warn: (label, html) => `<div class="lc-warn"><span class="label">${label}</span>${html}</div>`,
-  tip:  (label, html) => `<div class="lc-tip"><span class="label">${label}</span>${html}</div>`,
+  example: (label, html) => `<div class="lc-example"><span class="label">${escAttr(label)}</span>${html}</div>`,
+  warn: (label, html) => `<div class="lc-warn"><span class="label">${escAttr(label)}</span>${html}</div>`,
+  tip:  (label, html) => `<div class="lc-tip"><span class="label">${escAttr(label)}</span>${html}</div>`,
 };
 
 // Crée un chapitre placeholder (pas encore rédigé).
@@ -6619,11 +6636,21 @@ let state = { levelId: '5e', chapterId: null };
 let searchState = { query: '' };
 
 function loadState() {
+  // Priorité 1 : URL hash (#5e ou #5e/3) pour permettre les liens partageables.
+  if (location.hash) {
+    const m = location.hash.slice(1).match(/^([^/]+)(?:\/(\d+))?$/);
+    if (m && findLevel(m[1])) {
+      state.levelId = m[1];
+      state.chapterId = m[2] !== undefined ? `${m[1]}-${m[2]}` : null;
+      return;
+    }
+  }
+  // Priorité 2 : localStorage (dernier chapitre visité).
   try {
     const raw = localStorage.getItem(STATE_KEY);
     if (!raw) return;
     const parsed = JSON.parse(raw);
-    if (parsed.levelId) state.levelId = parsed.levelId;
+    if (parsed.levelId && findLevel(parsed.levelId)) state.levelId = parsed.levelId;
     if (parsed.chapterId) state.chapterId = parsed.chapterId;
   } catch (e) { /* ignore */ }
 }
@@ -6631,6 +6658,23 @@ function loadState() {
 function saveState() {
   try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
   catch (e) { /* ignore quota */ }
+  // Synchronise l'URL avec l'état pour permettre back/forward et partage.
+  syncHash();
+}
+
+let suppressHashChange = false;
+function syncHash() {
+  if (!state.levelId) { suppressHashChange = true; location.hash = ''; return; }
+  let target = state.levelId;
+  if (state.chapterId) {
+    const m = state.chapterId.match(/-(\d+)$/);
+    if (m) target += '/' + m[1];
+  }
+  const desired = '#' + target;
+  if (location.hash !== desired) {
+    suppressHashChange = true;
+    location.hash = desired;
+  }
 }
 
 function findLevel(id) {
@@ -7002,6 +7046,19 @@ function boot() {
   render();
   $('#menu-btn').addEventListener('click', openSidebarMobile);
   $('#backdrop').addEventListener('click', closeSidebarMobile);
+  $('#home-btn').addEventListener('click', () => {
+    state.levelId = null;
+    state.chapterId = null;
+    saveState();
+    render();
+  });
+
+  // Synchronisation back/forward du navigateur via le hash.
+  window.addEventListener('hashchange', () => {
+    if (suppressHashChange) { suppressHashChange = false; return; }
+    loadState();
+    render();
+  });
 
   // Raccourci global Cmd+K / Ctrl+K → focus la recherche.
   document.addEventListener('keydown', (e) => {
