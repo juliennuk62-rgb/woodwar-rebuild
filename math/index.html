@@ -600,21 +600,7 @@ const CURRICULUM = [
       { id: '6e',  name: '6e',  chapters: chapters6e() },
       { id: '5e',  name: '5e',  chapters: chapters5e() },
       { id: '4e',  name: '4e',  chapters: chapters4e() },
-      { id: '3e',  name: '3e',  chapters: [
-        todo("Arithmétique : PGCD, fractions irréductibles", "Nombres et calcul"),
-        todo("Racines carrées", "Nombres et calcul"),
-        todo("Calcul littéral : factorisation, identités remarquables", "Calcul littéral"),
-        todo("Équations produits", "Calcul littéral"),
-        todo("Inéquations du 1er degré", "Calcul littéral"),
-        todo("Systèmes d'équations", "Calcul littéral"),
-        todo("Théorème de Thalès et réciproque", "Géométrie"),
-        todo("Trigonométrie : sin, cos, tan", "Géométrie"),
-        todo("Géométrie dans l'espace (volumes)", "Géométrie"),
-        todo("Homothéties", "Géométrie"),
-        todo("Fonctions linéaires et affines", "Fonctions"),
-        todo("Statistiques : médiane, étendue", "Organisation des données"),
-        todo("Probabilités : événements", "Organisation des données"),
-      ]},
+      { id: '3e',  name: '3e',  chapters: chapters3e() },
     ],
   },
   {
@@ -696,6 +682,584 @@ const CURRICULUM = [
     ],
   },
 ];
+
+// ─── Contenu pédagogique : 3e à fond ─────────────────────────────
+function chapters3e() {
+  return [
+    {
+      title: "Arithmétique : PGCD et fractions irréductibles",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Diviseurs communs</h2>
+        ${lc.def("Diviseur commun", `<p>Un nombre est un <strong>diviseur commun</strong> à deux entiers <code>a</code> et <code>b</code> s'il divise à la fois <code>a</code> et <code>b</code>.</p>`)}
+        ${lc.example("Diviseurs communs de 12 et 18", `<p>Diviseurs de 12 : 1, 2, 3, 4, 6, 12. Diviseurs de 18 : 1, 2, 3, 6, 9, 18.</p>
+          <p>Diviseurs communs : <strong>1, 2, 3, 6</strong>. Le plus grand est <code>6</code>.</p>`)}
+
+        <h2>2. PGCD : définition</h2>
+        ${lc.def("PGCD", `<p>Le <strong>PGCD</strong> (Plus Grand Diviseur Commun) de deux entiers <code>a</code> et <code>b</code> est le plus grand des diviseurs communs à <code>a</code> et <code>b</code>. On le note <code>PGCD(a, b)</code>.</p>`)}
+        ${lc.example("PGCD(12, 18)", `<p>D'après les listes ci-dessus, <code>PGCD(12, 18) = 6</code>.</p>`)}
+
+        <h2>3. Algorithme d'Euclide</h2>
+        ${lc.prop("Méthode rapide pour calculer un PGCD", `<p>Le PGCD se calcule par <strong>divisions successives</strong>.</p>
+          <ol><li>On effectue la division euclidienne du plus grand par le plus petit.</li>
+          <li>Tant que le reste est non nul, on recommence avec le diviseur et le reste.</li>
+          <li>Quand le reste vaut 0, le PGCD est le <strong>dernier diviseur</strong>.</li></ol>`)}
+        ${lc.example("PGCD(252, 198) par Euclide", `<ol>
+          <li><code>252 = 198 × 1 + 54</code></li>
+          <li><code>198 = 54 × 3 + 36</code></li>
+          <li><code>54 = 36 × 1 + 18</code></li>
+          <li><code>36 = 18 × 2 + 0</code> → reste 0, on s'arrête.</li>
+          <li>Donc <code>PGCD(252, 198) = 18</code>.</li>
+        </ol>`)}
+
+        <h2>4. Nombres premiers entre eux</h2>
+        ${lc.def("Premiers entre eux", `<p>Deux nombres sont <strong>premiers entre eux</strong> si leur PGCD vaut <code>1</code>.</p>
+          <p>Exemple : <code>15</code> et <code>28</code>. Diviseurs de 15 : 1, 3, 5, 15. Diviseurs de 28 : 1, 2, 4, 7, 14, 28. Le seul commun est 1, donc PGCD = 1 : ils sont premiers entre eux.</p>`)}
+        ${lc.warn("Premiers vs premiers entre eux", `<p>« Nombre premier » et « nombres premiers entre eux » sont deux notions différentes. <code>15</code> et <code>28</code> sont premiers entre eux, mais <strong>aucun</strong> n'est un nombre premier.</p>`)}
+
+        <h2>5. Fraction irréductible</h2>
+        ${lc.def("Fraction irréductible", `<p>Une fraction est <strong>irréductible</strong> quand on ne peut plus la simplifier, c'est-à-dire quand son numérateur et son dénominateur sont <strong>premiers entre eux</strong>.</p>`)}
+        ${lc.prop("Méthode pour rendre irréductible", `<p>Pour rendre <code>a/b</code> irréductible :</p>
+          <ol><li>Calculer <code>PGCD(a, b)</code>.</li>
+          <li>Diviser <code>a</code> et <code>b</code> par ce PGCD.</li></ol>`)}
+        ${lc.example("Rendre 252/198 irréductible", `<p>D'après le calcul précédent, <code>PGCD(252, 198) = 18</code>.</p>
+          <p><code>252/198 = (252 ÷ 18)/(198 ÷ 18) = 14/11</code>.</p>
+          <p>14 et 11 sont premiers entre eux (11 est premier et ne divise pas 14), donc <strong>14/11</strong> est irréductible.</p>`)}
+      `,
+    },
+
+    {
+      title: "Racines carrées",
+      category: "Nombres et calcul",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Racine carrée", `<p>Pour <code>a ≥ 0</code>, la <strong>racine carrée</strong> de <code>a</code>, notée <code>√a</code>, est l'unique nombre <strong>positif</strong> dont le carré vaut <code>a</code>.</p>`)}
+        ${lc.formula("(√a)² = a &nbsp;&nbsp; et &nbsp;&nbsp; √(a²) = |a|")}
+        ${lc.warn("Pas de racine pour les négatifs", `<p>On ne peut pas calculer la racine carrée d'un nombre négatif (au collège). <code>√(−4)</code> n'existe pas.</p>`)}
+
+        <h2>2. Carrés parfaits</h2>
+        ${lc.prop("À mémoriser", `<p>Les <strong>carrés parfaits</strong> sont les carrés des entiers : 0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225...</p>
+          <p>Leur racine est entière : <code>√144 = 12</code>, <code>√169 = 13</code>, etc.</p>`)}
+
+        <h2>3. Propriétés</h2>
+        ${lc.prop("Avec un produit ou un quotient", `<p>Pour tous nombres <code>a, b ≥ 0</code> (et <code>b > 0</code> pour le quotient) :</p>`)}
+        ${lc.formula("√(a × b) &nbsp;=&nbsp; √a × √b<br>√(a / b) &nbsp;=&nbsp; √a / √b")}
+        ${lc.example("Avec produit", `<p><code>√(4 × 9) = √4 × √9 = 2 × 3 = 6</code>. Vérification : <code>√36 = 6</code> ✓.</p>`)}
+        ${lc.warn("Pas avec une somme !", `<p><strong>Attention</strong> : <code>√(a + b) ≠ √a + √b</code> en général. Exemple : <code>√(9 + 16) = √25 = 5</code>, mais <code>√9 + √16 = 3 + 4 = 7</code>. Différent !</p>`)}
+
+        <h2>4. Simplifier une racine</h2>
+        ${lc.prop("Méthode", `<p>Pour simplifier <code>√n</code>, on cherche à isoler un <strong>facteur carré</strong> dans <code>n</code>.</p>`)}
+        ${lc.example("Simplifier √50", `<ol><li>On cherche le plus grand carré qui divise 50 : <code>50 = 25 × 2</code>.</li>
+          <li><code>√50 = √(25 × 2) = √25 × √2 = 5√2</code>.</li></ol>`)}
+        ${lc.example("Simplifier √72", `<p><code>72 = 36 × 2</code>. Donc <code>√72 = 6√2</code>.</p>`)}
+
+        <h2>5. Opérations avec racines</h2>
+        ${lc.example("Addition de racines simplifiées", `<p><code>2√3 + 5√3 = (2 + 5)√3 = 7√3</code>. (On additionne les coefficients quand la racine est la même.)</p>`)}
+        ${lc.example("Avec simplification préalable", `<p><code>√8 + √18 = 2√2 + 3√2 = 5√2</code>. (On simplifie d'abord, puis on additionne.)</p>`)}
+
+        <h2>6. Équation x² = a</h2>
+        ${lc.prop("Solutions", `<ul>
+          <li>Si <code>a > 0</code> : <strong>deux solutions</strong>, <code>x = √a</code> ou <code>x = −√a</code>.</li>
+          <li>Si <code>a = 0</code> : une solution, <code>x = 0</code>.</li>
+          <li>Si <code>a < 0</code> : <strong>aucune solution</strong>.</li>
+        </ul>`)}
+        ${lc.example("Résoudre x² = 25", `<p>Solutions : <code>x = 5</code> ou <code>x = −5</code>. (Toujours penser à la solution négative !)</p>`)}
+      `,
+    },
+
+    {
+      title: "Calcul littéral : factorisation et identités remarquables",
+      category: "Calcul littéral",
+      content: `
+        <h2>1. Factoriser, c'est quoi ?</h2>
+        ${lc.def("Factorisation", `<p><strong>Factoriser</strong> une expression, c'est l'écrire sous forme d'un <strong>produit</strong> de facteurs. C'est l'opération inverse du développement.</p>`)}
+        <p>Exemple : <code>3x + 12 = 3(x + 4)</code> est factorisé.</p>
+
+        <h2>2. Facteur commun</h2>
+        ${lc.prop("Méthode du facteur commun", `<p>On repère un facteur présent dans tous les termes et on le met « en facteur ».</p>`)}
+        ${lc.formula("k × a + k × b &nbsp;=&nbsp; k × (a + b)")}
+        ${lc.example("Factoriser 5x + 15", `<p>Le facteur commun est 5. <code>5x + 15 = 5(x + 3)</code>.</p>`)}
+        ${lc.example("Factoriser 4x² − 6x", `<p>Facteur commun : <code>2x</code>. <code>4x² − 6x = 2x(2x − 3)</code>.</p>`)}
+
+        <h2>3. Les trois identités remarquables</h2>
+        ${lc.prop("À connaître par cœur", `<p>Ces formules sont essentielles, elles servent à la fois à <strong>développer</strong> et à <strong>factoriser</strong>.</p>`)}
+        ${lc.formula("(a + b)² &nbsp;=&nbsp; a² + 2ab + b²")}
+        ${lc.formula("(a − b)² &nbsp;=&nbsp; a² − 2ab + b²")}
+        ${lc.formula("(a + b)(a − b) &nbsp;=&nbsp; a² − b²")}
+
+        <h2>4. Développer avec les identités</h2>
+        ${lc.example("Développer (x + 3)²", `<p>Avec <code>a = x</code>, <code>b = 3</code> : <code>(x + 3)² = x² + 2 × x × 3 + 3² = x² + 6x + 9</code>.</p>`)}
+        ${lc.example("Développer (2x − 5)²", `<p><code>a = 2x</code>, <code>b = 5</code> : <code>(2x − 5)² = (2x)² − 2 × 2x × 5 + 5² = 4x² − 20x + 25</code>.</p>`)}
+        ${lc.example("Développer (x + 4)(x − 4)", `<p>C'est la 3e identité : <code>(x + 4)(x − 4) = x² − 16</code>.</p>`)}
+
+        <h2>5. Factoriser avec les identités</h2>
+        ${lc.example("Factoriser x² + 10x + 25", `<p>On reconnaît la forme <code>a² + 2ab + b²</code> avec <code>a = x</code>, <code>b = 5</code> (car <code>25 = 5²</code> et <code>10x = 2 × x × 5</code>).</p>
+          <p>Donc <code>x² + 10x + 25 = (x + 5)²</code>.</p>`)}
+        ${lc.example("Factoriser x² − 49", `<p>On reconnaît <code>a² − b²</code> avec <code>a = x</code> et <code>b = 7</code>.</p>
+          <p>Donc <code>x² − 49 = (x + 7)(x − 7)</code>.</p>`)}
+
+        <h2>6. Erreurs classiques</h2>
+        ${lc.warn("(a + b)² ≠ a² + b²", `<p>Très grosse erreur fréquente. <code>(3 + 4)² = 49</code>, mais <code>3² + 4² = 25</code>. Il manque le terme <code>2ab</code> !</p>`)}
+        ${lc.warn("Pas de racine d'une somme", `<p>De même, <code>√(a² + b²) ≠ a + b</code>. Exemple : <code>√(9 + 16) = 5</code>, pas 7.</p>`)}
+      `,
+    },
+
+    {
+      title: "Équations produits",
+      category: "Calcul littéral",
+      content: `
+        <h2>1. La règle clé</h2>
+        ${lc.prop("Produit nul", `<p>Un <strong>produit</strong> de facteurs est nul si et seulement si <strong>au moins un</strong> de ses facteurs est nul.</p>`)}
+        ${lc.formula("A × B = 0 &nbsp;⇔&nbsp; A = 0 &nbsp;ou&nbsp; B = 0")}
+        ${lc.tip("Logique", `<p>Si on multiplie deux nombres, le résultat est zéro <strong>uniquement</strong> si l'un d'eux est zéro. Autrement, deux nombres non nuls donnent toujours un produit non nul.</p>`)}
+
+        <h2>2. Résoudre une équation produit</h2>
+        ${lc.prop("Méthode", `<p>Quand l'équation est sous la forme <code>(...) × (...) = 0</code>, on dit que chaque facteur peut être nul, et on résout chaque équation séparément.</p>`)}
+        ${lc.example("Résoudre (x − 3)(x + 5) = 0", `<ol>
+          <li>Le produit est nul si <code>x − 3 = 0</code> ou <code>x + 5 = 0</code>.</li>
+          <li>Première équation : <code>x = 3</code>.</li>
+          <li>Deuxième équation : <code>x = −5</code>.</li>
+          <li>L'équation a <strong>deux solutions</strong> : <code>3</code> et <code>−5</code>.</li>
+        </ol>`)}
+
+        <h2>3. Mettre sous forme produit (factoriser)</h2>
+        ${lc.example("Résoudre x² − 9 = 0", `<ol>
+          <li>Factoriser (identité remarquable) : <code>x² − 9 = (x − 3)(x + 3)</code>.</li>
+          <li>Donc l'équation devient : <code>(x − 3)(x + 3) = 0</code>.</li>
+          <li>Solutions : <code>x = 3</code> ou <code>x = −3</code>.</li>
+        </ol>`)}
+        ${lc.example("Résoudre x² + 4x + 4 = 0", `<ol>
+          <li>Identité remarquable : <code>x² + 4x + 4 = (x + 2)²</code>.</li>
+          <li>L'équation devient <code>(x + 2)² = 0</code>, c'est-à-dire <code>(x + 2)(x + 2) = 0</code>.</li>
+          <li>Une seule solution (double) : <code>x = −2</code>.</li>
+        </ol>`)}
+
+        <h2>4. Avec un facteur commun</h2>
+        ${lc.example("Résoudre 3x² − 6x = 0", `<ol>
+          <li>Factoriser : <code>3x² − 6x = 3x(x − 2)</code>.</li>
+          <li>L'équation devient <code>3x(x − 2) = 0</code>.</li>
+          <li>Donc <code>3x = 0</code> ou <code>x − 2 = 0</code>.</li>
+          <li>Solutions : <code>x = 0</code> ou <code>x = 2</code>.</li>
+        </ol>`)}
+
+        <h2>5. Erreurs classiques</h2>
+        ${lc.warn("Ne pas développer", `<p>Si on a <code>(x − 3)(x + 5) = 0</code>, surtout <strong>ne pas développer</strong>. La factorisation est notre amie ! Le développement donnerait <code>x² + 2x − 15 = 0</code>, qu'on ne sait pas résoudre directement en 3e (il faudrait revenir au produit).</p>`)}
+        ${lc.warn("Comparaison à zéro indispensable", `<p>La règle ne s'applique que si l'équation vaut <strong>0</strong>. Si on a <code>(x − 1)(x + 2) = 6</code>, on <strong>ne peut pas</strong> dire « <code>x − 1 = 6</code> ou <code>x + 2 = 6</code> ». Il faut d'abord ramener à 0.</p>`)}
+      `,
+    },
+
+    {
+      title: "Inéquations du 1er degré",
+      category: "Calcul littéral",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Inéquation", `<p>Une <strong>inéquation</strong> est une inégalité contenant une inconnue. <strong>Résoudre</strong>, c'est trouver toutes les valeurs de l'inconnue qui rendent l'inégalité vraie.</p>`)}
+        ${lc.prop("Symboles", `<ul>
+          <li><code><</code> : strictement inférieur à</li>
+          <li><code>></code> : strictement supérieur à</li>
+          <li><code>≤</code> : inférieur ou égal à</li>
+          <li><code>≥</code> : supérieur ou égal à</li>
+        </ul>`)}
+
+        <h2>2. Règles fondamentales</h2>
+        ${lc.prop("Ce qu'on peut faire", `<p>Sans changer les solutions, on peut :</p>
+          <ol><li><strong>Ajouter ou soustraire</strong> un même nombre aux deux membres.</li>
+          <li><strong>Multiplier ou diviser</strong> par un nombre <strong>strictement positif</strong>.</li></ol>`)}
+        ${lc.warn("Règle cruciale", `<p>Quand on multiplie ou divise par un nombre <strong>strictement négatif</strong>, on doit <strong>INVERSER le sens</strong> de l'inégalité.</p>
+          <p>Exemple : <code>−2x < 6</code>. On divise par <code>−2</code> : <code>x > −3</code> (l'inégalité s'est retournée !).</p>`)}
+
+        <h2>3. Résoudre une inéquation</h2>
+        ${lc.example("Résoudre 3x + 5 < 17", `<ol>
+          <li>Soustraire 5 : <code>3x < 12</code>.</li>
+          <li>Diviser par 3 (positif, on garde le sens) : <code>x < 4</code>.</li>
+          <li>Solutions : tous les nombres strictement plus petits que 4.</li>
+        </ol>`)}
+        ${lc.example("Résoudre −2x + 7 ≥ 1", `<ol>
+          <li>Soustraire 7 : <code>−2x ≥ −6</code>.</li>
+          <li>Diviser par <code>−2</code> (négatif → on inverse !) : <code>x ≤ 3</code>.</li>
+          <li>Solutions : tous les nombres ≤ 3.</li>
+        </ol>`)}
+
+        <h2>4. Représenter sur une droite graduée</h2>
+        ${lc.prop("Crochets", `<p>Sur la droite numérique, on hachure la zone des solutions.</p>
+          <ul><li>Crochet <strong>fermé</strong> ([ ou ]) si la valeur est <em>incluse</em> (<code>≤</code> ou <code>≥</code>).</li>
+          <li>Crochet <strong>ouvert</strong> (] ou [) si la valeur est <em>exclue</em> (<code><</code> ou <code>></code>).</li></ul>`)}
+        ${lc.example("Représenter x ≤ 3", `<p>On hachure tout ce qui est à gauche de 3, en incluant 3 (crochet fermé : <code>]</code> en 3).</p>
+          <p>L'ensemble des solutions s'écrit <code>]−∞ ; 3]</code>.</p>`)}
+        ${lc.example("Représenter x > −1", `<p>On hachure à droite de <code>−1</code>, sans inclure <code>−1</code> (crochet ouvert : <code>]</code> en <code>−1</code>).</p>
+          <p>Solutions : <code>]−1 ; +∞[</code>.</p>`)}
+
+        <h2>5. Application concrète</h2>
+        ${lc.example("Acheter le maximum de cahiers", `<p>Avec 25 €, combien de cahiers à 3,50 € peut-on acheter au maximum ?</p>
+          <ol><li>Si <code>n</code> est le nombre de cahiers : <code>3,5n ≤ 25</code>.</li>
+          <li>Diviser par 3,5 : <code>n ≤ 25/3,5 ≈ 7,14</code>.</li>
+          <li><code>n</code> entier → maximum <strong>7 cahiers</strong>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Systèmes d'équations",
+      category: "Calcul littéral",
+      content: `
+        <h2>1. Qu'est-ce qu'un système ?</h2>
+        ${lc.def("Système de deux équations à deux inconnues", `<p>C'est l'ensemble de deux équations qui doivent être satisfaites <strong>en même temps</strong>. Les inconnues sont généralement notées <code>x</code> et <code>y</code>.</p>`)}
+        ${lc.example("Un système typique", `<p><code>{ 2x + y = 7<br>&nbsp;&nbsp;3x − y = 8 }</code></p>
+          <p>On cherche le couple <code>(x, y)</code> qui rend les <strong>deux</strong> équations vraies.</p>`)}
+
+        <h2>2. Méthode par substitution</h2>
+        ${lc.prop("Principe", `<ol>
+          <li>Exprimer une inconnue en fonction de l'autre dans une équation.</li>
+          <li>Remplacer dans l'autre équation : on obtient une équation à une seule inconnue.</li>
+          <li>Résoudre, puis remonter pour trouver la deuxième inconnue.</li>
+        </ol>`)}
+        ${lc.example("Résoudre par substitution", `<p>Système : <code>{ x + y = 5 ; 2x + 3y = 13 }</code>.</p>
+          <ol>
+          <li>De la 1re : <code>y = 5 − x</code>.</li>
+          <li>On remplace dans la 2e : <code>2x + 3(5 − x) = 13</code>.</li>
+          <li>Développer : <code>2x + 15 − 3x = 13</code>, soit <code>−x = −2</code>, donc <code>x = 2</code>.</li>
+          <li>Donc <code>y = 5 − 2 = 3</code>.</li>
+          <li>Solution : <code>(x, y) = (2, 3)</code>.</li></ol>
+          <p>Vérification : <code>2 + 3 = 5</code> ✓, <code>2×2 + 3×3 = 13</code> ✓.</p>`)}
+
+        <h2>3. Méthode par combinaison (élimination)</h2>
+        ${lc.prop("Principe", `<ol>
+          <li>Multiplier les équations par des coefficients pour faire apparaître la même quantité (au signe près) sur une inconnue.</li>
+          <li>Additionner (ou soustraire) les deux équations pour <strong>éliminer</strong> cette inconnue.</li>
+          <li>Résoudre l'équation à une inconnue obtenue.</li>
+        </ol>`)}
+        ${lc.example("Résoudre par combinaison", `<p>Système : <code>{ 2x + y = 7 ; 3x − y = 8 }</code>.</p>
+          <ol>
+          <li>Les <code>y</code> ont déjà des signes opposés. On additionne les deux équations : <code>(2x + y) + (3x − y) = 7 + 8</code> → <code>5x = 15</code>, donc <code>x = 3</code>.</li>
+          <li>On remplace dans la 1re : <code>2 × 3 + y = 7</code>, donc <code>y = 1</code>.</li>
+          <li>Solution : <code>(3, 1)</code>.</li></ol>`)}
+
+        <h2>4. Cas particuliers</h2>
+        ${lc.prop("Pas de solution", `<p>Si en résolvant on aboutit à une <strong>égalité fausse</strong> (par exemple <code>0 = 5</code>), le système n'a <strong>aucune</strong> solution. Géométriquement : les droites représentant les équations sont parallèles non confondues.</p>`)}
+        ${lc.prop("Une infinité de solutions", `<p>Si on aboutit à une <strong>égalité toujours vraie</strong> (par exemple <code>0 = 0</code>), le système a une <strong>infinité</strong> de solutions. Les deux équations représentent en fait la même droite.</p>`)}
+
+        <h2>5. Application : problèmes</h2>
+        ${lc.example("Mise en équations", `<p>« 5 stylos et 3 cahiers coûtent 14,50 €. 3 stylos et 4 cahiers coûtent 14 €. Quel est le prix d'un stylo et celui d'un cahier ? »</p>
+          <ol><li>Soit <code>x</code> le prix d'un stylo, <code>y</code> celui d'un cahier.</li>
+          <li>Système : <code>{ 5x + 3y = 14,5 ; 3x + 4y = 14 }</code>.</li>
+          <li>Par combinaison ou substitution, on trouve <code>x = 1</code> et <code>y = 2,75</code>.</li>
+          <li>Conclusion : un stylo coûte <strong>1 €</strong>, un cahier coûte <strong>2,75 €</strong>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Théorème de Thalès et réciproque",
+      category: "Géométrie",
+      content: `
+        <h2>1. Rappel du théorème direct</h2>
+        ${lc.prop("Configuration", `<p>Soit deux droites sécantes en <code>A</code>. Sur l'une, deux points <code>B</code> et <code>M</code> ; sur l'autre, deux points <code>C</code> et <code>N</code>. Si <code>(BC) ∥ (MN)</code>, alors :</p>`)}
+        ${lc.formula("AM/AB &nbsp;=&nbsp; AN/AC &nbsp;=&nbsp; MN/BC")}
+        ${lc.tip("Configuration en triangle ou en papillon", `<p>Le théorème s'applique aux deux configurations classiques : les triangles emboîtés (M entre A et B) ou en papillon (B entre M et A, etc.). L'essentiel est que <code>(BC) ∥ (MN)</code>.</p>`)}
+
+        <h2>2. Réciproque du théorème</h2>
+        ${lc.prop("Énoncé de la réciproque", `<p>Si :</p>
+          <ul><li>les points <code>A</code>, <code>M</code>, <code>B</code> sont alignés <em>dans cet ordre ou dans l'ordre A, B, M</em>,</li>
+          <li>les points <code>A</code>, <code>N</code>, <code>C</code> sont alignés <em>dans le même ordre que A, M, B</em>,</li>
+          <li>et <code>AM/AB = AN/AC</code>,</li></ul>
+          <p>alors les droites <code>(BC)</code> et <code>(MN)</code> sont <strong>parallèles</strong>.</p>`)}
+        ${lc.warn("Conditions précises", `<p>L'<strong>ordre des points</strong> compte. Si l'ordre n'est pas le même sur les deux droites, le résultat n'est pas valable. Toujours bien examiner la figure.</p>`)}
+
+        <h2>3. Comment utiliser la réciproque</h2>
+        ${lc.example("Démontrer un parallélisme", `<p>Sur une figure : <code>A, M, B</code> alignés dans cet ordre, idem pour <code>A, N, C</code>. <code>AM = 2</code>, <code>AB = 5</code>, <code>AN = 3</code>, <code>AC = 7,5</code>. Les droites <code>(BC)</code> et <code>(MN)</code> sont-elles parallèles ?</p>
+          <ol><li>Calculer les rapports : <code>AM/AB = 2/5 = 0,4</code> et <code>AN/AC = 3/7,5 = 0,4</code>.</li>
+          <li>Les rapports sont égaux et l'ordre est respecté.</li>
+          <li>D'après la réciproque de Thalès, <code>(BC) ∥ (MN)</code>.</li></ol>`)}
+
+        <h2>4. Contraposée : montrer un non-parallélisme</h2>
+        ${lc.prop("Contraposée", `<p>Si <code>AM/AB ≠ AN/AC</code> (rapports différents), alors les droites ne sont <strong>pas parallèles</strong>.</p>`)}
+        ${lc.example("Cas non parallèle", `<p><code>AM/AB = 2/5 = 0,4</code> mais <code>AN/AC = 3/7 ≈ 0,43</code>. Différents ! Donc <code>(BC)</code> et <code>(MN)</code> <strong>ne sont pas parallèles</strong>.</p>`)}
+
+        <h2>5. Quand utiliser quoi ?</h2>
+        ${lc.tip("Choix de l'outil", `<ul>
+          <li>Pour <strong>calculer une longueur</strong>, on utilise le théorème direct (les côtés parallèles sont donnés).</li>
+          <li>Pour <strong>démontrer un parallélisme</strong>, on utilise la <strong>réciproque</strong>.</li>
+          <li>Pour <strong>montrer qu'on n'a pas parallélisme</strong>, on utilise la contraposée (rapports différents).</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Trigonométrie : sin, cos, tan",
+      category: "Géométrie",
+      content: `
+        <h2>1. Définitions</h2>
+        ${lc.def("Cosinus, sinus, tangente d'un angle aigu", `<p>Dans un triangle rectangle, pour un angle aigu <code>α</code> :</p>`)}
+        ${lc.formula("cos(α) &nbsp;=&nbsp; (côté adjacent) / (hypoténuse)<br>sin(α) &nbsp;=&nbsp; (côté opposé) / (hypoténuse)<br>tan(α) &nbsp;=&nbsp; (côté opposé) / (côté adjacent)")}
+
+        <h2>2. Le mnémotechnique SOH-CAH-TOA</h2>
+        ${lc.tip("Pour ne plus oublier", `<p>Trois lettres pour chacun :</p>
+          <ul><li><strong>SOH</strong> : Sinus = Opposé sur Hypoténuse</li>
+          <li><strong>CAH</strong> : Cosinus = Adjacent sur Hypoténuse</li>
+          <li><strong>TOA</strong> : Tangente = Opposé sur Adjacent</li></ul>`)}
+
+        <h2>3. Identifier les côtés</h2>
+        ${lc.prop("À chaque angle ses côtés", `<p>Toujours partir de l'angle qu'on étudie :</p>
+          <ul><li>L'<strong>hypoténuse</strong> est le grand côté, opposé à l'angle droit. Elle ne change pas.</li>
+          <li>Le côté <strong>opposé</strong> à <code>α</code> est celui qui ne touche pas <code>α</code>.</li>
+          <li>Le côté <strong>adjacent</strong> à <code>α</code> est celui qui touche <code>α</code> (sans être l'hypoténuse).</li></ul>`)}
+
+        <h2>4. Calculer une longueur</h2>
+        ${lc.example("Avec sinus", `<p>Triangle rectangle, angle α = 35°, hypoténuse = 12 cm. Calculer le côté opposé à α.</p>
+          <ol><li><code>sin(35°) = opposé / 12</code>.</li>
+          <li><code>opposé = 12 × sin(35°) ≈ 12 × 0,574 ≈ 6,88 cm</code>.</li></ol>`)}
+
+        <h2>5. Calculer un angle</h2>
+        ${lc.prop("Avec les fonctions inverses", `<p>Quand on connaît un rapport, on retrouve l'angle avec les touches inverses : <code>sin⁻¹</code>, <code>cos⁻¹</code>, <code>tan⁻¹</code>.</p>`)}
+        ${lc.example("Application", `<p>Triangle rectangle, opposé = 3 cm, hypoténuse = 5 cm. Trouver l'angle α.</p>
+          <ol><li><code>sin(α) = 3/5 = 0,6</code>.</li>
+          <li><code>α = sin⁻¹(0,6) ≈ 36,87°</code>.</li></ol>`)}
+
+        <h2>6. Relations importantes</h2>
+        ${lc.formula("cos²(α) + sin²(α) &nbsp;=&nbsp; 1")}
+        ${lc.formula("tan(α) &nbsp;=&nbsp; sin(α) / cos(α)")}
+        ${lc.tip("Conséquence", `<p>Si on connaît <code>cos(α)</code>, on peut retrouver <code>sin(α)</code> sans calculatrice :</p>
+          <p>Si <code>cos(α) = 3/5</code>, alors <code>sin²(α) = 1 − 9/25 = 16/25</code>, donc <code>sin(α) = 4/5</code>.</p>`)}
+
+        <h2>7. Valeurs particulières</h2>
+        ${lc.prop("À mémoriser", `<table style="margin:8px 0;font-family:monospace;font-size:13px"><tr><td>α</td><td style="padding:0 12px">cos</td><td style="padding:0 12px">sin</td><td>tan</td></tr><tr><td>30°</td><td style="padding:0 12px">√3/2</td><td style="padding:0 12px">1/2</td><td>√3/3</td></tr><tr><td>45°</td><td style="padding:0 12px">√2/2</td><td style="padding:0 12px">√2/2</td><td>1</td></tr><tr><td>60°</td><td style="padding:0 12px">1/2</td><td style="padding:0 12px">√3/2</td><td>√3</td></tr></table>`)}
+      `,
+    },
+
+    {
+      title: "Géométrie dans l'espace : volumes",
+      category: "Géométrie",
+      content: `
+        <h2>1. Vocabulaire 3D</h2>
+        ${lc.def("Solides", `<ul>
+          <li><strong>Cube</strong> : 6 faces carrées identiques.</li>
+          <li><strong>Pavé droit (parallélépipède rectangle)</strong> : 6 faces rectangulaires.</li>
+          <li><strong>Cylindre</strong> : deux disques parallèles reliés par une surface courbe (boîte de conserve).</li>
+          <li><strong>Prisme droit</strong> : deux polygones identiques parallèles reliés par des rectangles.</li>
+          <li><strong>Pyramide</strong> : une base polygonale et un sommet ; les faces latérales sont des triangles.</li>
+          <li><strong>Cône</strong> : base circulaire et un sommet (cornet de glace).</li>
+          <li><strong>Sphère / boule</strong> : la sphère est la surface ; la boule est ce qu'il y a à l'intérieur.</li>
+        </ul>`)}
+
+        <h2>2. Formules de volumes</h2>
+        ${lc.formula("Cube (côté c) &nbsp;:&nbsp; V = c³")}
+        ${lc.formula("Pavé droit (L, l, h) &nbsp;:&nbsp; V = L × l × h")}
+        ${lc.formula("Cylindre (rayon r, hauteur h) &nbsp;:&nbsp; V = π × r² × h")}
+        ${lc.formula("Prisme droit (aire base B, hauteur h) &nbsp;:&nbsp; V = B × h")}
+        ${lc.formula("Pyramide (aire base B, hauteur h) &nbsp;:&nbsp; V = (1/3) × B × h")}
+        ${lc.formula("Cône (rayon r, hauteur h) &nbsp;:&nbsp; V = (1/3) × π × r² × h")}
+        ${lc.formula("Boule (rayon r) &nbsp;:&nbsp; V = (4/3) × π × r³")}
+        ${lc.tip("À retenir", `<p>Les pyramides et cônes ont toujours un facteur <code>1/3</code> par rapport au prisme/cylindre de même base et hauteur.</p>`)}
+
+        <h2>3. Exemples de calcul</h2>
+        ${lc.example("Cylindre", `<p>Cylindre de rayon 4 cm, hauteur 10 cm. Volume ?</p>
+          <p><code>V = π × 4² × 10 = 160π ≈ 502,65 cm³</code>.</p>`)}
+        ${lc.example("Pyramide", `<p>Pyramide à base carrée de côté 6 cm, hauteur 9 cm. Volume ?</p>
+          <ol><li>Aire de la base : <code>B = 6 × 6 = 36 cm²</code>.</li>
+          <li><code>V = (1/3) × 36 × 9 = 108 cm³</code>.</li></ol>`)}
+        ${lc.example("Boule", `<p>Boule de rayon 5 cm. Volume ?</p>
+          <p><code>V = (4/3) × π × 5³ = (4/3) × π × 125 ≈ 523,6 cm³</code>.</p>`)}
+
+        <h2>4. Unités de volume</h2>
+        ${lc.prop("Conversions", `<p>Pour passer d'une unité de volume à une autre, on multiplie ou divise par <strong>1000</strong> à chaque palier (et non par 10).</p>
+          <ul><li><code>1 m³ = 1 000 dm³ = 1 000 000 cm³</code></li>
+          <li><code>1 dm³ = 1 L</code> (lien avec les capacités)</li>
+          <li><code>1 m³ = 1 000 L</code></li></ul>`)}
+        ${lc.tip("Pourquoi 1000 ?", `<p>Parce que <code>1 m = 10 dm</code>, donc <code>1 m³ = 10 dm × 10 dm × 10 dm = 1000 dm³</code>.</p>`)}
+
+        <h2>5. Effet d'agrandissement / réduction</h2>
+        ${lc.prop("Coefficient k", `<p>Si on multiplie toutes les dimensions d'un solide par un coefficient <code>k</code> :</p>
+          <ul><li>les longueurs sont multipliées par <code>k</code> ;</li>
+          <li>les aires sont multipliées par <code>k²</code> ;</li>
+          <li>les volumes sont multipliés par <code>k³</code>.</li></ul>`)}
+        ${lc.example("Doubler les dimensions", `<p>Si on double (k = 2) toutes les dimensions d'un cube, son volume est multiplié par <code>2³ = 8</code>. Un cube 8 fois plus volumineux !</p>`)}
+      `,
+    },
+
+    {
+      title: "Homothéties",
+      category: "Géométrie",
+      content: `
+        <h2>1. Qu'est-ce qu'une homothétie ?</h2>
+        ${lc.def("Homothétie", `<p>Une <strong>homothétie</strong> est une transformation qui agrandit ou réduit une figure à partir d'un point fixe (le <strong>centre</strong>), avec un facteur multiplicatif (le <strong>rapport</strong>).</p>`)}
+        ${lc.tip("Exemples concrets", `<p>Faire un zoom photo, projeter une image, agrandir un plan... ce sont des homothéties.</p>`)}
+
+        <h2>2. Image d'un point</h2>
+        ${lc.def("Image", `<p>Soit <code>O</code> un point (le centre) et <code>k</code> un nombre non nul (le rapport). L'image d'un point <code>A</code> par l'homothétie de centre <code>O</code> et de rapport <code>k</code> est l'unique point <code>A'</code> tel que :</p>
+          <ul><li><code>O</code>, <code>A</code> et <code>A'</code> sont alignés ;</li>
+          <li><code>OA' = |k| × OA</code> ;</li>
+          <li>si <code>k > 0</code>, <code>A'</code> est <em>du même côté</em> que <code>A</code> par rapport à <code>O</code> ;</li>
+          <li>si <code>k < 0</code>, <code>A'</code> est <em>de l'autre côté</em>.</li></ul>`)}
+
+        <h2>3. Cas particuliers</h2>
+        ${lc.prop("Selon la valeur de k", `<ul>
+          <li><code>k = 1</code> : <strong>identité</strong> (chaque point est son propre image).</li>
+          <li><code>k = −1</code> : <strong>symétrie centrale</strong> de centre <code>O</code>.</li>
+          <li><code>|k| > 1</code> : agrandissement.</li>
+          <li><code>0 < |k| < 1</code> : réduction.</li>
+        </ul>`)}
+
+        <h2>4. Propriétés</h2>
+        ${lc.prop("Conservations", `<p>Une homothétie conserve :</p>
+          <ul><li>l'<strong>alignement</strong> des points ;</li>
+          <li>les <strong>angles</strong> (la figure n'est pas déformée) ;</li>
+          <li>le <strong>parallélisme</strong>.</li></ul>
+          <p>Mais elle <strong>multiplie</strong> :</p>
+          <ul><li>les <strong>longueurs</strong> par <code>|k|</code> ;</li>
+          <li>les <strong>aires</strong> par <code>k²</code> ;</li>
+          <li>les <strong>volumes</strong> par <code>|k|³</code>.</li></ul>`)}
+
+        <h2>5. Exemples concrets</h2>
+        ${lc.example("Agrandissement d'un triangle", `<p>Un triangle a des côtés de 3, 4 et 5 cm. On lui applique une homothétie de rapport 2.</p>
+          <ul><li>Côtés du triangle image : 6, 8 et 10 cm.</li>
+          <li>Aire multipliée par <code>2² = 4</code>.</li></ul>`)}
+        ${lc.example("Réduction d'un photo", `<p>Une photo est réduite avec un rapport <code>k = 1/3</code>. Si elle mesurait 18 cm × 24 cm, la nouvelle photo mesure :</p>
+          <p><code>18/3 = 6 cm</code> et <code>24/3 = 8 cm</code>. Aire divisée par <code>3² = 9</code>.</p>`)}
+
+        <h2>6. Construire l'image</h2>
+        ${lc.prop("Méthode (rapport positif)", `<ol>
+          <li>Tracer la droite <code>(OA)</code>.</li>
+          <li>Mesurer <code>OA</code>.</li>
+          <li>Reporter <code>k × OA</code> à partir de <code>O</code>, sur la droite (du même côté que <code>A</code> si <code>k > 0</code>).</li>
+          <li>Le point obtenu est <code>A'</code>.</li>
+        </ol>`)}
+      `,
+    },
+
+    {
+      title: "Fonctions linéaires et affines",
+      category: "Fonctions",
+      content: `
+        <h2>1. Fonction linéaire</h2>
+        ${lc.def("Fonction linéaire", `<p>Une <strong>fonction linéaire</strong> est une fonction <code>f</code> de la forme :</p>`)}
+        ${lc.formula("f(x) &nbsp;=&nbsp; a × x &nbsp;&nbsp; (a est un nombre fixé, le coefficient)")}
+        <p>Une fonction linéaire correspond à une <strong>situation de proportionnalité</strong> : <code>a</code> est le coefficient.</p>
+        ${lc.example("f(x) = 3x", `<p><code>f(2) = 6</code>, <code>f(5) = 15</code>, <code>f(−4) = −12</code>.</p>`)}
+
+        <h2>2. Représentation graphique d'une fonction linéaire</h2>
+        ${lc.prop("Une droite par l'origine", `<p>La représentation graphique de <code>f(x) = ax</code> est une <strong>droite passant par l'origine</strong> du repère. Le coefficient <code>a</code> est appelé la <strong>pente</strong> de la droite.</p>`)}
+        ${lc.tip("Sens de la pente", `<ul>
+          <li>Si <code>a > 0</code> : la droite « monte ».</li>
+          <li>Si <code>a < 0</code> : la droite « descend ».</li>
+          <li>Si <code>a = 0</code> : la droite est horizontale (sur l'axe des abscisses).</li>
+        </ul>`)}
+
+        <h2>3. Fonction affine</h2>
+        ${lc.def("Fonction affine", `<p>Une <strong>fonction affine</strong> est une fonction de la forme :</p>`)}
+        ${lc.formula("f(x) &nbsp;=&nbsp; a × x + b &nbsp;&nbsp; (a et b fixés)")}
+        <ul>
+          <li><code>a</code> est le <strong>coefficient directeur</strong> (ou pente).</li>
+          <li><code>b</code> est l'<strong>ordonnée à l'origine</strong> (la valeur de <code>f(0) = b</code>).</li>
+        </ul>
+        ${lc.example("f(x) = 2x + 3", `<p><code>f(0) = 3</code>, <code>f(1) = 5</code>, <code>f(−2) = −1</code>.</p>`)}
+
+        <h2>4. Représentation graphique d'une fonction affine</h2>
+        ${lc.prop("Une droite", `<p>La représentation de <code>f(x) = ax + b</code> est une <strong>droite</strong> :</p>
+          <ul><li>qui coupe l'axe des ordonnées au point <code>(0, b)</code> ;</li>
+          <li>de pente <code>a</code> (montée verticale par unité horizontale).</li></ul>
+          <p>Si <code>b = 0</code>, on retrouve une fonction linéaire (droite par l'origine). Une fonction linéaire est donc un cas particulier de fonction affine.</p>`)}
+
+        <h2>5. Calcul d'images et d'antécédents</h2>
+        ${lc.def("Image et antécédent", `<ul>
+          <li>L'<strong>image</strong> de <code>x</code> par <code>f</code> est <code>f(x)</code>.</li>
+          <li>Un <strong>antécédent</strong> de <code>y</code> est un nombre <code>x</code> tel que <code>f(x) = y</code>.</li>
+        </ul>`)}
+        ${lc.example("Avec f(x) = 2x + 3", `<ul>
+          <li>Image de 4 : <code>f(4) = 2 × 4 + 3 = 11</code>.</li>
+          <li>Antécédent de 9 : on résout <code>2x + 3 = 9</code> → <code>x = 3</code>.</li>
+        </ul>`)}
+
+        <h2>6. Déterminer une fonction affine</h2>
+        ${lc.prop("À partir de deux points", `<p>Si une droite passe par les points <code>(x₁, y₁)</code> et <code>(x₂, y₂)</code>, la pente est :</p>`)}
+        ${lc.formula("a &nbsp;=&nbsp; (y₂ − y₁) / (x₂ − x₁)")}
+        ${lc.example("Trouver f connaissant deux points", `<p>Droite passant par <code>(1, 5)</code> et <code>(3, 9)</code>.</p>
+          <ol><li>Pente : <code>a = (9 − 5)/(3 − 1) = 4/2 = 2</code>.</li>
+          <li>Avec un point : <code>5 = 2 × 1 + b</code> → <code>b = 3</code>.</li>
+          <li>Donc <code>f(x) = 2x + 3</code>.</li></ol>`)}
+      `,
+    },
+
+    {
+      title: "Statistiques : médiane, étendue",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Rappels</h2>
+        ${lc.def("Moyenne", `<p>La <strong>moyenne</strong> = (somme des valeurs) / (nombre de valeurs).</p>`)}
+        ${lc.def("Étendue", `<p>L'<strong>étendue</strong> = (valeur maximale) − (valeur minimale). C'est une mesure de la <em>dispersion</em>.</p>`)}
+
+        <h2>2. La médiane</h2>
+        ${lc.def("Médiane", `<p>La <strong>médiane</strong> d'une série de valeurs (rangées dans l'ordre croissant) est la valeur qui <strong>partage la série en deux moitiés de même effectif</strong> : 50 % des valeurs sont en dessous et 50 % au-dessus.</p>`)}
+
+        <h2>3. Calculer la médiane</h2>
+        ${lc.prop("Effectif impair", `<p>Si l'effectif total <code>n</code> est <strong>impair</strong>, la médiane est la valeur à la position <code>(n + 1) / 2</code> (la valeur centrale).</p>`)}
+        ${lc.example("Série de 7 notes", `<p>Notes triées : <code>8 ; 10 ; 12 ; 13 ; 14 ; 15 ; 18</code>. Effectif 7 (impair). Position centrale : <code>(7 + 1)/2 = 4</code>.</p>
+          <p>La médiane est la 4e valeur : <strong>13</strong>.</p>`)}
+        ${lc.prop("Effectif pair", `<p>Si l'effectif <code>n</code> est <strong>pair</strong>, la médiane est la moyenne des deux valeurs centrales (positions <code>n/2</code> et <code>n/2 + 1</code>).</p>`)}
+        ${lc.example("Série de 8 notes", `<p>Notes triées : <code>6 ; 9 ; 10 ; 11 ; 13 ; 14 ; 16 ; 18</code>. Effectif 8.</p>
+          <p>Valeurs centrales (4e et 5e) : <code>11</code> et <code>13</code>. Médiane : <code>(11 + 13)/2 = 12</code>.</p>`)}
+
+        <h2>4. Médiane vs moyenne</h2>
+        ${lc.tip("Différence importante", `<p>La <strong>moyenne</strong> est sensible aux valeurs extrêmes ; la <strong>médiane</strong>, non. Avec une valeur très grande ou très petite, la médiane bouge peu, la moyenne beaucoup.</p>`)}
+        ${lc.example("Salaires d'une entreprise", `<p>Quatre salariés gagnent 1 800 €, un patron gagne 30 000 €.</p>
+          <ul><li>Moyenne : <code>(4 × 1800 + 30000)/5 = 7440 €</code> (peu représentative).</li>
+          <li>Médiane : <strong>1 800 €</strong> (représentative du salarié type).</li></ul>`)}
+
+        <h2>5. Étendue : la dispersion</h2>
+        ${lc.example("Comparer deux séries", `<p>Série A : <code>10, 11, 12, 13, 14</code>. Étendue = <code>14 − 10 = 4</code>.</p>
+          <p>Série B : <code>5, 8, 12, 16, 19</code>. Étendue = <code>19 − 5 = 14</code>.</p>
+          <p>Les deux séries ont la même <strong>moyenne</strong> (12) et même <strong>médiane</strong> (12), mais B est beaucoup plus dispersée.</p>`)}
+
+        <h2>6. Quartiles (notion)</h2>
+        ${lc.def("Premier et troisième quartile", `<ul>
+          <li>Le <strong>premier quartile</strong> <code>Q1</code> : 25 % des valeurs sont en dessous.</li>
+          <li>Le <strong>troisième quartile</strong> <code>Q3</code> : 75 % des valeurs sont en dessous.</li>
+        </ul>
+          <p>L'<strong>écart interquartile</strong> <code>Q3 − Q1</code> donne la dispersion de la « moitié centrale » de la série (sans tenir compte des extrêmes).</p>`)}
+      `,
+    },
+
+    {
+      title: "Probabilités : événements",
+      category: "Organisation des données",
+      content: `
+        <h2>1. Rappel</h2>
+        ${lc.formula("P(A) &nbsp;=&nbsp; (nb d'issues favorables à A) / (nb total d'issues)")}
+        <p>Cette formule s'applique uniquement en <strong>situation équiprobable</strong> (chaque issue a la même chance).</p>
+
+        <h2>2. Réunion et intersection</h2>
+        ${lc.def("Réunion (A ou B)", `<p>L'événement « <code>A</code> ou <code>B</code> » se réalise si <code>A</code> se réalise, ou <code>B</code> se réalise, ou les deux.</p>`)}
+        ${lc.def("Intersection (A et B)", `<p>L'événement « <code>A</code> et <code>B</code> » se réalise si <code>A</code> et <code>B</code> se réalisent en même temps.</p>`)}
+
+        <h2>3. Événements incompatibles</h2>
+        ${lc.def("Événements incompatibles", `<p>Deux événements sont <strong>incompatibles</strong> s'ils ne peuvent pas se réaliser en même temps.</p>`)}
+        ${lc.example("Lancer d'un dé", `<p>« Obtenir 3 » et « Obtenir un nombre pair » sont incompatibles (3 n'est pas pair).</p>
+          <p>Mais « Obtenir un multiple de 3 » et « Obtenir un nombre pair » sont compatibles : ils sont vrais en même temps si on obtient 6.</p>`)}
+
+        <h2>4. Formule de la réunion</h2>
+        ${lc.prop("Cas général", `<p>Pour deux événements quelconques :</p>`)}
+        ${lc.formula("P(A ou B) &nbsp;=&nbsp; P(A) + P(B) − P(A et B)")}
+        ${lc.prop("Cas incompatibles", `<p>Si <code>A</code> et <code>B</code> sont incompatibles (<code>P(A et B) = 0</code>) :</p>`)}
+        ${lc.formula("P(A ou B) &nbsp;=&nbsp; P(A) + P(B)")}
+        ${lc.example("Avec un dé", `<p><code>A</code> = « obtenir 2 », <code>B</code> = « obtenir 5 ». Incompatibles. <code>P(A) = 1/6</code>, <code>P(B) = 1/6</code>.</p>
+          <p><code>P(« 2 ou 5 ») = 1/6 + 1/6 = 2/6 = 1/3</code>.</p>`)}
+
+        <h2>5. Événement contraire</h2>
+        ${lc.def("Contraire", `<p>L'événement contraire de <code>A</code>, noté <code>Ā</code>, se réalise quand <code>A</code> ne se réalise pas.</p>`)}
+        ${lc.formula("P(Ā) &nbsp;=&nbsp; 1 − P(A)")}
+        ${lc.example("Avec une carte", `<p>Probabilité de tirer un roi : <code>P = 4/32 = 1/8</code>. Probabilité de <em>ne pas</em> tirer un roi : <code>1 − 1/8 = 7/8</code>.</p>`)}
+
+        <h2>6. Arbres de probabilité</h2>
+        ${lc.def("Arbre", `<p>Pour une expérience à <strong>plusieurs étapes</strong>, on peut représenter les issues par un <strong>arbre</strong>. Chaque branche porte une probabilité.</p>`)}
+        ${lc.prop("Règles de l'arbre", `<ul>
+          <li>La somme des probabilités des branches issues d'un même nœud vaut <strong>1</strong>.</li>
+          <li>La probabilité d'un <strong>chemin</strong> est le produit des probabilités sur les branches.</li>
+          <li>La probabilité d'un événement est la somme des probabilités des chemins qui y mènent.</li>
+        </ul>`)}
+        ${lc.example("Deux lancers de pièce", `<p>On lance une pièce 2 fois. Probabilité d'obtenir au moins une fois pile ?</p>
+          <ol><li>Plus simple : passer par le contraire « jamais pile » = « FF ». <code>P(FF) = (1/2) × (1/2) = 1/4</code>.</li>
+          <li>Donc <code>P(au moins un pile) = 1 − 1/4 = 3/4</code>.</li></ol>`)}
+      `,
+    },
+  ];
+}
 
 // ─── Contenu pédagogique : 4e à fond ─────────────────────────────
 function chapters4e() {
