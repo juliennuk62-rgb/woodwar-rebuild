@@ -10012,6 +10012,59 @@ EXERCISES['4e-0'] = [
       };
     },
   },
+  {
+    title: 'Division de relatifs',
+    generate() {
+      const b = exPick([-6, -5, -4, -3, -2, 2, 3, 4, 5, 6]);
+      const q = exPick([-8, -7, -5, -4, -3, 3, 4, 5, 7, 8]);
+      const a = b * q;
+      return {
+        question: `Calcule : <code>(${a}) ÷ (${b})</code>`,
+        inputType: 'number',
+        answer: q,
+        steps: [
+          (a > 0) === (b > 0) ? `Mêmes signes → résultat positif.` : `Signes différents → résultat négatif.`,
+          `<code>(${a}) ÷ (${b}) = ${q}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Quotient de relatifs (signe)',
+    generate() {
+      const a = exRand(-12, 12) || 7;
+      const b = exRand(-12, 12) || -3;
+      const q = a / b;
+      return {
+        question: `Le quotient <code>(${a}) ÷ (${b})</code> est :`,
+        inputType: 'mcq',
+        options: ['positif', 'négatif', 'nul'],
+        answer: q > 0 ? 0 : q < 0 ? 1 : 2,
+        steps: [
+          a === 0 ? `Le numérateur est nul, donc le quotient vaut 0.`
+          : (a > 0) === (b > 0) ? `Mêmes signes → quotient positif.`
+          : `Signes différents → quotient négatif.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Calcul mixte',
+    generate() {
+      const a = exRand(-8, 8) || 4;
+      const b = exRand(-8, 8) || -3;
+      const c = exRand(-8, 8) || 5;
+      return {
+        question: `Calcule : <code>(${a}) × (${b}) + (${c})</code>`,
+        inputType: 'number',
+        answer: a * b + c,
+        steps: [
+          `Multiplication d'abord : <code>(${a}) × (${b}) = ${a * b}</code>.`,
+          `Puis addition : <code>${a * b} + (${c}) = ${a * b + c}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['4e-1'] = [
@@ -10028,6 +10081,83 @@ EXERCISES['4e-1'] = [
         steps: [
           `Diviser par une fraction = multiplier par son inverse.`,
           `<code>${a}/${b} ÷ ${c}/${d} = ${a}/${b} × ${d}/${c} = ${a * d}/${b * c}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Fraction négative × positive',
+    generate() {
+      const a = exRand(2, 6);
+      const b = exRand(3, 9);
+      const c = exRand(2, 6);
+      const d = exRand(3, 9);
+      const num = -a * c;
+      const den = b * d;
+      return {
+        question: `Calcule : <code>(−${a}/${b}) × (${c}/${d})</code>. Donne sous forme <code>num/den</code> (avec signe au numérateur).`,
+        inputType: 'fraction',
+        answer: num / den,
+        formatAnswer: () => `${num}/${den}`,
+        steps: [
+          `Signes différents → résultat négatif.`,
+          `<code>(−${a}/${b}) × (${c}/${d}) = ${num}/${den}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Inverse d\'une fraction',
+    generate() {
+      const a = exRand(2, 9);
+      const b = exRand(2, 9);
+      return {
+        question: `Quel est l'inverse de <code>${a}/${b}</code> ? (forme <code>num/den</code>)`,
+        inputType: 'fraction',
+        answer: b / a,
+        formatAnswer: () => `${b}/${a}`,
+        steps: [
+          `L'inverse de <code>a/b</code> est <code>b/a</code>.`,
+          `Inverse : <code>${b}/${a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Soustraction de fractions',
+    generate() {
+      const d1 = exPick([3, 4, 6]);
+      const d2 = exPick([2, 5, 6, 8]);
+      const a = exRand(1, d1 - 1);
+      const b = exRand(1, d2 - 1);
+      const D = d1 * d2;
+      const A = a * d2, B = b * d1;
+      return {
+        question: `Calcule : <code>${a}/${d1} − ${b}/${d2}</code>. Forme <code>num/den</code> avec dénominateur ${D}.`,
+        inputType: 'fraction',
+        answer: (A - B) / D,
+        formatAnswer: () => `${A - B}/${D}`,
+        steps: [
+          `Dénominateur commun : <code>${D}</code>.`,
+          `<code>${a}/${d1} = ${A}/${D}</code> et <code>${b}/${d2} = ${B}/${D}</code>.`,
+          `<code>${A}/${D} − ${B}/${D} = ${A - B}/${D}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Calcul de fraction d\'une fraction',
+    generate() {
+      const a = exRand(2, 5), b = exRand(2, 7);
+      const c = exRand(2, 5), d = exRand(2, 7);
+      return {
+        question: `Calcule les <code>${a}/${b}</code> de <code>${c}/${d}</code>. Forme <code>num/den</code>.`,
+        inputType: 'fraction',
+        answer: (a * c) / (b * d),
+        formatAnswer: () => `${a * c}/${b * d}`,
+        steps: [
+          `« Les a/b de c/d » = <code>a/b × c/d</code>.`,
+          `<code>${a}/${b} × ${c}/${d} = ${a * c}/${b * d}</code>.`,
         ],
       };
     },
@@ -10083,6 +10213,39 @@ EXERCISES['4e-2'] = [
       };
     },
   },
+  {
+    title: 'Quotient de puissances',
+    generate() {
+      const a = exRand(2, 5);
+      const m = exRand(4, 8);
+      const n = exRand(1, m - 1);
+      return {
+        question: `Simplifie sous forme <code>${a}<sup>k</sup></code> : <code>${a}<sup>${m}</sup> ÷ ${a}<sup>${n}</sup></code>. Donne k.`,
+        inputType: 'number',
+        answer: m - n,
+        steps: [
+          `Règle : <code>a<sup>m</sup> ÷ a<sup>n</sup> = a<sup>m−n</sup></code>.`,
+          `<code>${a}<sup>${m}</sup> ÷ ${a}<sup>${n}</sup> = ${a}<sup>${m - n}</sup></code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Puissance de 10 négative',
+    generate() {
+      const n = exRand(2, 5);
+      return {
+        question: `Que vaut <code>10<sup>−${n}</sup></code> en décimal ?`,
+        inputType: 'number',
+        answer: 10 ** (-n),
+        tolerance: 1e-10,
+        steps: [
+          `Puissance négative : <code>10<sup>−n</sup> = 1 / 10<sup>n</sup></code>.`,
+          `<code>10<sup>−${n}</sup> = 1 / ${10 ** n} = ${(10 ** -n).toString()}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['4e-3'] = [
@@ -10108,7 +10271,6 @@ EXERCISES['4e-3'] = [
     generate() {
       const a = exRand(1, 5), b = exRand(1, 8);
       const c = exRand(1, 5), d = exRand(1, 8);
-      // (ax + b)(cx + d) → coeff de x = ad + bc
       return {
         question: `On développe <code>(${a}x + ${b})(${c}x + ${d})</code>. Quel est le coefficient de <code>x</code> ?`,
         inputType: 'number',
@@ -10116,6 +10278,57 @@ EXERCISES['4e-3'] = [
         steps: [
           `<code>(${a}x + ${b})(${c}x + ${d}) = ${a*c}x² + ${a*d}x + ${b*c}x + ${b*d}</code>.`,
           `Coefficient de x : <code>${a*d} + ${b*c} = ${a*d + b*c}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Réduire une expression',
+    generate() {
+      const a = exRand(2, 8), b = exRand(2, 8);
+      const c = exRand(2, 8), d = exRand(2, 8);
+      return {
+        question: `Réduis : <code>${a}x + ${b} + ${c}x − ${d}</code>. Donne le coefficient de <code>x</code>.`,
+        inputType: 'number',
+        answer: a + c,
+        steps: [
+          `Regrouper les termes en x : <code>${a}x + ${c}x = ${a + c}x</code>.`,
+          `Regrouper les constantes : <code>${b} − ${d} = ${b - d}</code>.`,
+          `Résultat : <code>${a + c}x ${b - d >= 0 ? '+ ' : '− '}${Math.abs(b - d)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Développer −k(...)',
+    generate() {
+      const k = exRand(2, 8);
+      const a = exRand(1, 9);
+      const b = exRand(1, 9);
+      return {
+        question: `Développe : <code>−${k}(${a}x + ${b})</code>. Donne le coefficient de <code>x</code>.`,
+        inputType: 'number',
+        answer: -k * a,
+        steps: [
+          `Distribuer le signe : <code>−${k}(${a}x + ${b}) = −${k * a}x − ${k * b}</code>.`,
+          `Coefficient de x : <code>−${k * a}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Calcul de valeur après développement',
+    generate() {
+      const k = exRand(2, 6);
+      const a = exRand(1, 6);
+      const b = exRand(1, 9);
+      const x = exRand(2, 6);
+      return {
+        question: `Calcule la valeur de <code>${k}(${a}x + ${b})</code> pour <code>x = ${x}</code>.`,
+        inputType: 'number',
+        answer: k * (a * x + b),
+        steps: [
+          `<code>${k}(${a} × ${x} + ${b}) = ${k}(${a * x + b}) = ${k * (a * x + b)}</code>.`,
         ],
       };
     },
@@ -10138,6 +10351,82 @@ EXERCISES['4e-4'] = [
         steps: [
           `Isoler le terme en x : <code>${a}x = ${c} ${b >= 0 ? '−' : '+'} ${Math.abs(b)} = ${c - b}</code>.`,
           `Diviser par ${a} : <code>x = ${c - b} / ${a} = ${x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Équation : x des deux côtés',
+    generate() {
+      const a = exRand(3, 8);
+      const b = exRand(2, a - 1);
+      const x = exRand(2, 10);
+      const c = exRand(1, 12);
+      const d = (a - b) * x + c;
+      return {
+        question: `Résous : <code>${a}x + ${c} = ${b}x + ${d}</code>. Donne x.`,
+        inputType: 'number',
+        answer: x,
+        steps: [
+          `Regrouper les x à gauche : <code>${a - b}x = ${d - c}</code>.`,
+          `<code>x = ${d - c} / ${a - b} = ${x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Équation avec parenthèses',
+    generate() {
+      const k = exRand(2, 5);
+      const a = exRand(2, 6);
+      const x = exRand(2, 9);
+      const total = k * (a * x);
+      return {
+        question: `Résous : <code>${k}(${a}x) = ${total}</code>. Donne x.`,
+        inputType: 'number',
+        answer: x,
+        steps: [
+          `Développer ou simplifier : <code>${k * a}x = ${total}</code>.`,
+          `<code>x = ${total} / ${k * a} = ${x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Mise en équation',
+    generate() {
+      const x = exRand(5, 20);
+      const k = exRand(2, 5);
+      const total = k * x + 12;
+      return {
+        question: `Le quintuple d'un nombre, augmenté de 12, vaut <code>${total}</code>. Si le nombre est <code>${x}</code>, le multiplicateur réel est <code>k = ${k}</code>. Résous l'équation <code>${k}x + 12 = ${total}</code>.`,
+        inputType: 'number',
+        answer: x,
+        steps: [
+          `<code>${k}x = ${total} − 12 = ${total - 12}</code>.`,
+          `<code>x = ${total - 12} / ${k} = ${x}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Tester une solution',
+    generate() {
+      const a = exRand(2, 7);
+      const b = exRand(1, 12);
+      const x = exRand(2, 10);
+      const c = a * x - b;
+      const test = exRand(0, 1) === 1 ? x : x + exRand(1, 4);
+      return {
+        question: `<code>${test}</code> est-il solution de <code>${a}x − ${b} = ${c}</code> ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: test === x ? 0 : 1,
+        steps: [
+          `Calculer <code>${a} × ${test} − ${b} = ${a * test - b}</code>.`,
+          a * test - b === c
+            ? `<code>${a * test - b} = ${c}</code> ✓ : oui, c'est solution.`
+            : `<code>${a * test - b} ≠ ${c}</code> : non, ce n'est pas solution.`,
         ],
       };
     },
@@ -10177,6 +10466,63 @@ EXERCISES['4e-5'] = [
       };
     },
   },
+  {
+    title: 'Réciproque : triangle rectangle ?',
+    generate() {
+      const c = exPick([
+        { sides: [3, 4, 5], rect: true },
+        { sides: [5, 12, 13], rect: true },
+        { sides: [6, 8, 10], rect: true },
+        { sides: [4, 5, 6], rect: false },
+        { sides: [5, 6, 8], rect: false },
+        { sides: [7, 8, 10], rect: false },
+      ]);
+      const [a, b, cc] = c.sides;
+      return {
+        question: `Un triangle a pour côtés <code>${a}</code>, <code>${b}</code>, <code>${cc}</code> cm. Est-il rectangle ?`,
+        inputType: 'mcq',
+        options: ['Oui', 'Non'],
+        answer: c.rect ? 0 : 1,
+        steps: [
+          `Le plus grand côté est <code>${cc}</code> ; on teste <code>${cc}² = ${a}² + ${b}²</code> ?`,
+          `<code>${cc * cc} ${cc * cc === a * a + b * b ? '=' : '≠'} ${a * a + b * b}</code>`,
+          c.rect ? `Égalité vraie → triangle rectangle.` : `Égalité fausse → pas rectangle.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Diagonale d\'un rectangle',
+    generate() {
+      const triplets = [[3, 4, 5], [5, 12, 13], [6, 8, 10], [8, 15, 17], [9, 12, 15]];
+      const [a, b, c] = exPick(triplets);
+      return {
+        question: `Un rectangle mesure <code>${a} cm</code> sur <code>${b} cm</code>. Quelle est la longueur de sa <strong>diagonale</strong> (en cm) ?`,
+        inputType: 'number',
+        answer: c,
+        steps: [
+          `La diagonale forme un triangle rectangle avec les deux côtés.`,
+          `<code>d² = ${a}² + ${b}² = ${a*a + b*b}</code>, donc <code>d = ${c} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Pythagore : carré de l\'hypoténuse',
+    generate() {
+      const a = exRand(3, 12);
+      const b = exRand(3, 12);
+      return {
+        question: `Triangle rectangle. Cathètes : <code>${a}</code> et <code>${b}</code>. Que vaut <code>BC²</code> (carré de l'hypoténuse) ?`,
+        inputType: 'number',
+        answer: a * a + b * b,
+        steps: [
+          `Pythagore : <code>BC² = ${a}² + ${b}²</code>.`,
+          `<code>= ${a * a} + ${b * b} = ${a * a + b * b}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['4e-6'] = [
@@ -10188,7 +10534,6 @@ EXERCISES['4e-6'] = [
       const AN = exRand(2, 8);
       const AB = AM * k;
       const AC = AN * k;
-      // Calculer MN si BC est donné, ou inversement
       const BC = exRand(5, 15);
       const MN = BC / k;
       return {
@@ -10199,6 +10544,84 @@ EXERCISES['4e-6'] = [
         steps: [
           `Thalès : <code>MN/BC = AM/AB</code>.`,
           `<code>MN = BC × AM/AB = ${BC} × ${AM}/${AB} = ${MN}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Thalès : calculer AC',
+    generate() {
+      const k = exRand(2, 5);
+      const AM = exRand(2, 6);
+      const AN = exRand(2, 6);
+      const AB = AM * k;
+      const AC = AN * k;
+      return {
+        question: `Configuration de Thalès : <code>AM = ${AM}</code>, <code>AB = ${AB}</code>, <code>AN = ${AN}</code>, <code>(MN) ∥ (BC)</code>. Calcule <code>AC</code>.`,
+        inputType: 'number',
+        answer: AC,
+        tolerance: 0.01,
+        steps: [
+          `Thalès : <code>AM/AB = AN/AC</code>.`,
+          `<code>AC = AN × AB / AM = ${AN} × ${AB} / ${AM} = ${AC}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Coefficient de réduction',
+    generate() {
+      const k = exRand(2, 6);
+      const AM = exRand(2, 8);
+      const AB = AM * k;
+      return {
+        question: `Configuration de Thalès : <code>AM = ${AM}</code>, <code>AB = ${AB}</code>. Quel est le rapport <code>AM/AB</code> ? (forme <code>num/den</code> simplifiée)`,
+        inputType: 'fraction',
+        answer: AM / AB,
+        formatAnswer: () => `1/${k}`,
+        steps: [
+          `<code>AM/AB = ${AM}/${AB}</code>.`,
+          `On simplifie par <code>${AM}</code> : <code>= 1/${k}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Configuration de Thalès',
+    generate() {
+      return {
+        question: `Pour appliquer le théorème de Thalès dans la configuration <code>(MN) ∥ (BC)</code>, on doit avoir :`,
+        inputType: 'mcq',
+        options: [
+          'A, M, B alignés et A, N, C alignés',
+          'M et N quelconques',
+          '(MN) perpendiculaire à (BC)',
+          '(MN) confondue avec (BC)',
+        ],
+        answer: 0,
+        steps: [
+          `Thalès s'applique pour deux droites sécantes en A coupées par deux parallèles.`,
+          `Donc on doit avoir : <code>A, M, B</code> alignés et <code>A, N, C</code> alignés.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Vérifier l\'égalité des rapports',
+    generate() {
+      const k = exRand(2, 5);
+      const AM = exRand(2, 8);
+      const AB = AM * k;
+      const AN = exRand(2, 8);
+      const AC = AN * k;
+      return {
+        question: `<code>AM = ${AM}</code>, <code>AB = ${AB}</code>, <code>AN = ${AN}</code>, <code>AC = ${AC}</code>. Calcule le rapport <code>AM/AB</code>.`,
+        inputType: 'fraction',
+        answer: AM / AB,
+        formatAnswer: () => `1/${k}`,
+        steps: [
+          `<code>AM/AB = ${AM}/${AB} = 1/${k}</code>.`,
+          `(On observe que <code>AN/AC = ${AN}/${AC} = 1/${k}</code> aussi : les rapports sont égaux.)`,
         ],
       };
     },
@@ -10223,6 +10646,167 @@ EXERCISES['4e-7'] = [
       };
     },
   },
+  {
+    title: 'Cosinus : calculer le côté adjacent',
+    generate() {
+      const cases = [
+        { angle: 60, cos: 0.5, hyp: 10, adj: 5 },
+        { angle: 60, cos: 0.5, hyp: 14, adj: 7 },
+        { angle: 60, cos: 0.5, hyp: 20, adj: 10 },
+      ];
+      const c = exPick(cases);
+      return {
+        question: `Triangle rectangle. Hypoténuse = <code>${c.hyp}</code>, angle α = <code>${c.angle}°</code>. Calcule le côté adjacent à α (avec cos(60°) = 0,5).`,
+        inputType: 'number',
+        answer: c.adj,
+        tolerance: 0.1,
+        steps: [
+          `<code>cos(α) = adj/hyp</code>, donc <code>adj = hyp × cos(α)</code>.`,
+          `<code>adj = ${c.hyp} × ${c.cos} = ${c.adj}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Cosinus : repérer le côté adjacent',
+    generate() {
+      return {
+        question: `Dans un triangle rectangle, l'<strong>adjacent</strong> à un angle aigu α est :`,
+        inputType: 'mcq',
+        options: [
+          'Le côté qui forme l\'angle droit',
+          'Le côté entre l\'angle droit et α',
+          'L\'hypoténuse',
+          'Le côté opposé à α',
+        ],
+        answer: 1,
+        steps: [
+          `L'adjacent à α est le côté <strong>entre l'angle droit et α</strong>.`,
+          `(L'autre côté de l'angle droit est l'opposé ; le 3e côté est l'hypoténuse.)`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Cosinus : valeurs remarquables',
+    generate() {
+      const c = exPick([
+        { a: 0, v: '1' }, { a: 30, v: '√3/2' },
+        { a: 45, v: '√2/2' }, { a: 60, v: '1/2' }, { a: 90, v: '0' },
+      ]);
+      return {
+        question: `Que vaut <code>cos(${c.a}°)</code> ?`,
+        inputType: 'mcq',
+        options: ['0', '1/2', '√2/2', '√3/2', '1'],
+        answer: ['0', '1/2', '√2/2', '√3/2', '1'].indexOf(c.v),
+        steps: [
+          `Valeurs remarquables : cos(0)=1, cos(30°)=√3/2, cos(45°)=√2/2, cos(60°)=1/2, cos(90°)=0.`,
+          `<code>cos(${c.a}°) = ${c.v}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Cosinus : encadrement',
+    generate() {
+      const a = exRand(10, 80);
+      return {
+        question: `L'angle α est aigu (entre 0° et 90°). Que peut-on dire de <code>cos(α)</code> ?`,
+        inputType: 'mcq',
+        options: ['cos(α) &lt; 0', 'cos(α) > 1', '0 &lt; cos(α) &lt; 1', 'cos(α) = 1'],
+        answer: 2,
+        steps: [
+          `Pour un angle aigu strict, le cosinus est strictement compris entre 0 et 1.`,
+          `cos(0°) = 1 et cos(90°) = 0 : les valeurs intermédiaires sont strictement entre.`,
+        ],
+      };
+    },
+  },
+];
+
+EXERCISES['4e-8'] = [
+  {
+    title: 'Translation : conservation des longueurs',
+    generate() {
+      const L = exRand(3, 15);
+      return {
+        question: `Le segment <code>[AB]</code> mesure <code>${L} cm</code>. Quelle est la longueur de son image par une translation (en cm) ?`,
+        inputType: 'number',
+        answer: L,
+        steps: [
+          `Une translation conserve les longueurs.`,
+          `Image : <code>${L} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Translation : conservation des angles',
+    generate() {
+      const a = exRand(20, 160);
+      return {
+        question: `Un angle mesure <code>${a}°</code>. Quelle est la mesure de son image par une translation (en °) ?`,
+        inputType: 'number',
+        answer: a,
+        steps: [
+          `Une translation conserve les angles.`,
+          `Image : <code>${a}°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Image d\'un point par translation',
+    generate() {
+      const ax = exRand(-5, 5), ay = exRand(-5, 5);
+      const vx = exRand(-5, 5) || 2, vy = exRand(-5, 5) || -3;
+      return {
+        question: `Le point A a pour coordonnées <code>(${ax}; ${ay})</code>. On applique la translation de vecteur <code>(${vx}; ${vy})</code>. Quelle est l'<strong>abscisse</strong> de l'image A' ?`,
+        inputType: 'number',
+        answer: ax + vx,
+        steps: [
+          `Translation de vecteur <code>(v<sub>x</sub>; v<sub>y</sub>)</code> : <code>A'(x + v<sub>x</sub>; y + v<sub>y</sub>)</code>.`,
+          `Abscisse : <code>${ax} + ${vx} = ${ax + vx}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Translation et parallélisme',
+    generate() {
+      return {
+        question: `Une translation transforme une droite (d) en :`,
+        inputType: 'mcq',
+        options: [
+          'une droite perpendiculaire à (d)',
+          'une droite parallèle à (d) (ou (d) elle-même)',
+          'un cercle',
+          'un point',
+        ],
+        answer: 1,
+        steps: [
+          `Une translation préserve les directions, donc l'image d'une droite est une droite parallèle.`,
+          `(Si le vecteur de translation est parallèle à (d), l'image est (d) elle-même.)`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Vecteur de translation',
+    generate() {
+      const ax = exRand(-3, 3), ay = exRand(-3, 3);
+      const bx = exRand(-3, 3), by = exRand(-3, 3);
+      return {
+        question: `La translation qui transforme <code>A(${ax}; ${ay})</code> en <code>B(${bx}; ${by})</code> a pour vecteur <code>(?; ?)</code>. Donne la première composante.`,
+        inputType: 'number',
+        answer: bx - ax,
+        steps: [
+          `Le vecteur de translation est <code>(x<sub>B</sub> − x<sub>A</sub>; y<sub>B</sub> − y<sub>A</sub>)</code>.`,
+          `Première composante : <code>${bx} − ${ax} = ${bx - ax}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['4e-9'] = [
@@ -10243,6 +10827,70 @@ EXERCISES['4e-9'] = [
       };
     },
   },
+  {
+    title: 'Distance à partir de vitesse et temps',
+    generate() {
+      const v = exPick([40, 60, 80, 100]);
+      const t = exPick([2, 3, 4, 5]);
+      return {
+        question: `À <code>${v} km/h</code>, quelle distance (en km) parcourt-on en <code>${t} h</code> ?`,
+        inputType: 'number',
+        answer: v * t,
+        steps: [
+          `<code>d = v × t = ${v} × ${t} = ${v * t} km</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Temps à partir de distance et vitesse',
+    generate() {
+      const v = exPick([60, 80, 100, 120]);
+      const t = exPick([2, 3, 4]);
+      const d = v * t;
+      return {
+        question: `Distance <code>${d} km</code>, vitesse <code>${v} km/h</code>. Combien de temps (en h) ?`,
+        inputType: 'number',
+        answer: t,
+        tolerance: 0.001,
+        steps: [
+          `<code>t = d / v = ${d} / ${v} = ${t} h</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Augmentation de pourcentage',
+    generate() {
+      const p = exPick([10, 20, 25, 50]);
+      const n = exPick([60, 80, 100, 200]);
+      return {
+        question: `Un produit à <code>${n} €</code> augmente de <code>${p}%</code>. Nouveau prix (en €) ?`,
+        inputType: 'number',
+        answer: n + (p * n) / 100,
+        tolerance: 0.01,
+        steps: [
+          `Nouveau prix = ancien × (1 + p/100) = <code>${n} × ${1 + p/100} = ${n + (p * n) / 100} €</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Coefficient multiplicateur',
+    generate() {
+      const p = exPick([10, 20, 25, 50, 5]);
+      return {
+        question: `Une augmentation de <code>${p}%</code> correspond à un coefficient multiplicateur de :`,
+        inputType: 'number',
+        answer: 1 + p / 100,
+        tolerance: 0.001,
+        steps: [
+          `Augmenter de p% = multiplier par <code>(1 + p/100)</code>.`,
+          `Coefficient : <code>1 + ${p}/100 = ${1 + p/100}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['4e-10'] = [
@@ -10259,6 +10907,77 @@ EXERCISES['4e-10'] = [
         steps: [
           `Effectif impair (${n}). Position centrale : <code>(${n} + 1)/2 = ${(n + 1) / 2}</code>.`,
           `Médiane = ${(n + 1) / 2}<sup>e</sup> valeur = <code>${med}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Moyenne d\'une série',
+    generate() {
+      const n = exPick([4, 5, 6]);
+      const vals = Array.from({length: n}, () => exRand(8, 18));
+      const sum = vals.reduce((a, b) => a + b, 0);
+      const m = sum / n;
+      return {
+        question: `Moyenne de la série : <code>${vals.join(', ')}</code> (arrondi au dixième) ?`,
+        inputType: 'number',
+        answer: Math.round(m * 10) / 10,
+        tolerance: 0.05,
+        steps: [
+          `Somme : <code>${sum}</code>. Effectif : <code>${n}</code>.`,
+          `Moyenne : <code>${sum} / ${n} ≈ ${m.toFixed(2)}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Médiane d\'une série paire',
+    generate() {
+      const vals = Array.from({length: 6}, () => exRand(10, 20)).sort((a, b) => a - b);
+      const med = (vals[2] + vals[3]) / 2;
+      return {
+        question: `Médiane de la série de 6 valeurs : <code>${vals.join(', ')}</code> ?`,
+        inputType: 'number',
+        answer: med,
+        tolerance: 0.05,
+        steps: [
+          `Effectif pair : la médiane est la moyenne des 3<sup>e</sup> et 4<sup>e</sup> valeurs.`,
+          `<code>(${vals[2]} + ${vals[3]}) / 2 = ${med}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Étendue',
+    generate() {
+      const vals = Array.from({length: 7}, () => exRand(5, 25));
+      const e = Math.max(...vals) - Math.min(...vals);
+      return {
+        question: `Étendue de la série : <code>${vals.join(', ')}</code> ?`,
+        inputType: 'number',
+        answer: e,
+        steps: [
+          `Étendue = max − min.`,
+          `<code>${Math.max(...vals)} − ${Math.min(...vals)} = ${e}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Moyenne pondérée',
+    generate() {
+      const v1 = exRand(10, 16), n1 = exRand(2, 5);
+      const v2 = exRand(10, 16), n2 = exRand(2, 5);
+      const sum = v1 * n1 + v2 * n2;
+      const total = n1 + n2;
+      const m = sum / total;
+      return {
+        question: `${n1} contrôles à <code>${v1}</code> et ${n2} contrôles à <code>${v2}</code>. Moyenne pondérée (au dixième) ?`,
+        inputType: 'number',
+        answer: Math.round(m * 10) / 10,
+        tolerance: 0.05,
+        steps: [
+          `<code>(${v1} × ${n1} + ${v2} × ${n2}) / (${n1} + ${n2}) = ${sum}/${total} ≈ ${m.toFixed(2)}</code>.`,
         ],
       };
     },
@@ -10284,6 +11003,81 @@ EXERCISES['4e-11'] = [
       };
     },
   },
+  {
+    title: 'Volume d\'un cône',
+    generate() {
+      const r = exRand(2, 8);
+      const h = exRand(3, 12);
+      const V = (Math.PI * r * r * h) / 3;
+      return {
+        question: `Volume d'un cône de rayon <code>${r} cm</code> et hauteur <code>${h} cm</code> ? (arrondi au dixième de cm³)`,
+        inputType: 'number',
+        answer: Math.round(V * 10) / 10,
+        tolerance: 0.5,
+        steps: [
+          `Formule : <code>V = (1/3) × π × r² × h</code>.`,
+          `<code>V = (1/3) × π × ${r}² × ${h} ≈ ${V.toFixed(2)} cm³</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Pyramide à base rectangulaire',
+    generate() {
+      const L = exRand(3, 9);
+      const l = exRand(2, 8);
+      const h = exRand(3, 12);
+      const V = (L * l * h) / 3;
+      return {
+        question: `Volume d'une pyramide à base rectangulaire <code>${L} × ${l}</code> cm et hauteur <code>${h} cm</code> ? (en cm³, arrondi au dixième)`,
+        inputType: 'number',
+        answer: Math.round(V * 10) / 10,
+        tolerance: 0.5,
+        steps: [
+          `Aire de base : <code>${L} × ${l} = ${L * l} cm²</code>.`,
+          `Volume : <code>(1/3) × ${L * l} × ${h} = ${V.toFixed(2)} cm³</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Hauteur d\'une pyramide',
+    generate() {
+      const c = exRand(3, 9);
+      const h = exRand(3, 10);
+      const V = (c * c * h) / 3;
+      return {
+        question: `Une pyramide à base carrée a un volume de <code>${V.toFixed(1)} cm³</code> et une base de côté <code>${c} cm</code>. Quelle est sa <strong>hauteur</strong> (en cm) ?`,
+        inputType: 'number',
+        answer: h,
+        tolerance: 0.1,
+        steps: [
+          `<code>V = (1/3) × c² × h</code>, donc <code>h = 3V / c²</code>.`,
+          `<code>h = 3 × ${V.toFixed(1)} / ${c * c} = ${h} cm</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Volume du cône (formule)',
+    generate() {
+      return {
+        question: `La formule du volume d'un cône de rayon r et hauteur h est :`,
+        inputType: 'mcq',
+        options: [
+          'V = π × r² × h',
+          'V = (1/3) × π × r² × h',
+          'V = (1/2) × π × r × h',
+          'V = π × r × h',
+        ],
+        answer: 1,
+        steps: [
+          `Le cône est 3 fois moins gros que le cylindre de mêmes base et hauteur.`,
+          `<code>V = (1/3) × π × r² × h</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['4e-12'] = [
@@ -10302,6 +11096,80 @@ EXERCISES['4e-12'] = [
         steps: [
           `Issues favorables : ${fav} (boules 1, 2, …, ${fav}).`,
           `<code>P = ${fav}/${total} = ${fav / k}/${total / k}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Probabilité avec un dé',
+    generate() {
+      const c = exPick([
+        { txt: 'un nombre pair', n: 3 },
+        { txt: 'un multiple de 3', n: 2 },
+        { txt: 'un nombre supérieur ou égal à 5', n: 2 },
+        { txt: 'le nombre 1', n: 1 },
+      ]);
+      const g = (a, b) => b ? g(b, a%b) : a;
+      const k = g(c.n, 6);
+      return {
+        question: `On lance un dé équilibré. Probabilité d'obtenir <em>${c.txt}</em> ? (forme <code>num/den</code> simplifiée)`,
+        inputType: 'fraction',
+        answer: c.n / 6,
+        formatAnswer: () => `${c.n / k}/${6 / k}`,
+        steps: [
+          `Issues favorables : ${c.n}, total : 6.`,
+          `<code>P = ${c.n}/6 = ${c.n / k}/${6 / k}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Événement contraire',
+    generate() {
+      const c = exPick([
+        { p: '1/3', q: '2/3' }, { p: '1/4', q: '3/4' },
+        { p: '2/5', q: '3/5' }, { p: '1/6', q: '5/6' },
+      ]);
+      return {
+        question: `Probabilité de A : <code>${c.p}</code>. Probabilité de l'événement contraire ?`,
+        inputType: 'fraction',
+        answer: eval(c.q),
+        formatAnswer: () => c.q,
+        steps: [
+          `<code>P(non A) = 1 − P(A) = 1 − ${c.p} = ${c.q}</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Probabilité égale à 0',
+    generate() {
+      return {
+        question: `Quelle est la probabilité d'un événement <strong>impossible</strong> ?`,
+        inputType: 'number',
+        answer: 0,
+        tolerance: 0.001,
+        steps: [
+          `Un événement impossible n'a aucune issue favorable.`,
+          `<code>P(impossible) = 0</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Total à partir d\'une probabilité',
+    generate() {
+      const fav = exRand(2, 8);
+      const total = fav * exRand(3, 8);
+      const g = (a, b) => b ? g(b, a%b) : a;
+      const k = g(fav, total);
+      return {
+        question: `Une urne contient <code>${fav}</code> boules rouges et d'autres bleues. La probabilité de tirer une rouge est <code>${fav/k}/${total/k}</code>. Combien y a-t-il de boules au total ?`,
+        inputType: 'number',
+        answer: total,
+        steps: [
+          `<code>P(rouge) = nb rouges / total = ${fav}/total = ${fav/k}/${total/k}</code>.`,
+          `On en déduit : <code>total = ${total}</code>.`,
         ],
       };
     },
