@@ -7538,6 +7538,70 @@ EXERCISES['6e-4'] = [
       };
     },
   },
+  {
+    title: 'Place une fraction sur la droite graduée [figure]',
+    generate() {
+      const den = exPick([2, 3, 4, 5, 6, 8]);
+      const num = exRand(1, den - 1);
+      const x0 = 1, x1 = 9, axisY = 3;
+      const targetX = x0 + (x1 - x0) * num / den;
+      const startX = x0 + (x1 - x0) * (exRand(1, 9) / 10);
+      // Construit les graduations comme des points hidden + segments verticaux
+      const tickPoints = [];
+      const tickShapes = [];
+      for (let k = 0; k <= den; k++) {
+        const tx = x0 + (x1 - x0) * k / den;
+        tickPoints.push({ name: `t${k}a`, x: tx, y: axisY - 0.2, hidden: true });
+        tickPoints.push({ name: `t${k}b`, x: tx, y: axisY + 0.2, hidden: true });
+        tickShapes.push({ type: 'segment', from: `t${k}a`, to: `t${k}b`, style: { color: 'fixed' } });
+      }
+      return {
+        inputType: 'figure',
+        question: `Place le point <code>P</code> sur la droite graduée à la position <strong>${num}/${den}</strong>.`,
+        figure: {
+          width: 480, height: 160,
+          viewBox: { xMin: 0, xMax: 10, yMin: 1.5, yMax: 4.5 },
+          grid: false, snap: 0, flipY: true,
+          points: [
+            { name: 'O', x: x0, y: axisY, label: '0', color: 'fixed' },
+            { name: 'I', x: x1, y: axisY, label: '1', color: 'fixed' },
+            ...tickPoints,
+            {
+              name: 'P', x: startX, y: axisY, label: 'P',
+              color: 'user', draggable: true,
+              constrain: (x) => ({ x: Math.max(x0, Math.min(x1, x)), y: axisY }),
+            },
+          ],
+          shapes: [
+            { type: 'segment', from: 'O', to: 'I', style: { color: 'fixed' } },
+            ...tickShapes,
+          ],
+          info: (state) => {
+            const P = state.points.P;
+            const k = (P.x - x0) / (x1 - x0) * den;
+            return `Position de P : ${k.toFixed(2)} / ${den}   (cible : ${num}/${den})`;
+          },
+        },
+        target: { P: { x: targetX, y: axisY } },
+        validate: (state) => {
+          const P = state.points.P;
+          const tol = (x1 - x0) / (4 * den);
+          if (Math.abs(P.x - targetX) < tol) return { ok: true };
+          const k = (P.x - x0) / (x1 - x0) * den;
+          if (P.x < targetX) {
+            return { ok: false, hint: `P est vers ${k.toFixed(1)}/${den}, il faut le déplacer vers la droite jusqu'à ${num}/${den}.` };
+          }
+          return { ok: false, hint: `P est vers ${k.toFixed(1)}/${den}, il faut le déplacer vers la gauche jusqu'à ${num}/${den}.` };
+        },
+        formatAnswer: () => `P à l'abscisse ${num}/${den}`,
+        steps: [
+          `Sur une droite graduée de 0 à 1 partagée en ${den} parts égales, chaque part vaut <code>1/${den}</code>.`,
+          `La fraction <code>${num}/${den}</code> correspond à la <code>${num}<sup>e</sup></code> graduation après 0.`,
+          `Place P à l'abscisse <code>${num}/${den}</code>.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['6e-5'] = [
@@ -7719,6 +7783,68 @@ EXERCISES['6e-9'] = [
         steps: [
           `Un angle plat mesure <code>180°</code>.`,
           `Angle cherché : <code>180 − ${a} = ${180 - a}°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Construis un angle [figure]',
+    generate() {
+      const cx = 5, cy = 4, r = 3;
+      const targetDeg = exPick([30, 45, 60, 90, 120, 135]);
+      const startDeg = exPick([10, 20, 70, 100, 150, 165]);
+      const startRad = startDeg * Math.PI / 180;
+      const mStart = { x: cx + r * Math.cos(startRad), y: cy + r * Math.sin(startRad) };
+      return {
+        inputType: 'figure',
+        question: `Place le point <code>M</code> sur le cercle pour que l'angle <code>AOM</code> mesure <strong>${targetDeg}°</strong>.`,
+        figure: {
+          width: 360, height: 280,
+          viewBox: { xMin: 0, xMax: 10, yMin: 0, yMax: 8 },
+          grid: false, snap: 0, flipY: true,
+          points: [
+            { name: 'O', x: cx, y: cy, label: 'O', color: 'fixed' },
+            { name: 'A', x: cx + r, y: cy, label: 'A', color: 'fixed' },
+            {
+              name: 'M', x: mStart.x, y: mStart.y, label: 'M',
+              color: 'user', draggable: true,
+              constrain: (x, y) => {
+                const dx = x - cx, dy = y - cy;
+                const d = Math.hypot(dx, dy);
+                if (d < 1e-9) return { x: cx + r, y: cy };
+                return { x: cx + r * dx / d, y: cy + r * dy / d };
+              },
+            },
+          ],
+          shapes: [
+            { type: 'circle', center: 'O', radius: r, style: { color: 'guide' } },
+            { type: 'segment', from: 'O', to: 'A', style: { color: 'fixed' } },
+            { type: 'segment', from: 'O', to: 'M', style: { color: 'user' } },
+          ],
+          info: (state) => {
+            const m = geom.angleDeg(state.points.A, state.points.O, state.points.M);
+            return `Angle AOM = ${isNaN(m) ? '?' : m.toFixed(1) + '°'}   (cible : ${targetDeg}°)`;
+          },
+        },
+        validate: (state) => {
+          const A = state.points.A, O = state.points.O, M = state.points.M;
+          const m = geom.angleDeg(A, O, M);
+          if (isNaN(m)) return { ok: false, hint: 'Place M sur le cercle.' };
+          if (Math.abs(m - targetDeg) < 3) return { ok: true };
+          if (m < targetDeg) {
+            return { ok: false, hint: `L'angle actuel mesure ${m.toFixed(1)}°, il faut l'ouvrir davantage (${(targetDeg - m).toFixed(1)}° de plus).` };
+          }
+          return { ok: false, hint: `L'angle actuel mesure ${m.toFixed(1)}°, il faut le réduire de ${(m - targetDeg).toFixed(1)}°.` };
+        },
+        formatAnswer: () => `Angle AOM = ${targetDeg}°`,
+        steps: [
+          `Un angle se mesure entre deux demi-droites issues du même sommet (ici O).`,
+          targetDeg === 90
+            ? `90° est un angle <strong>droit</strong> : [OM) est perpendiculaire à [OA).`
+            : (targetDeg < 90
+              ? `${targetDeg}° est un angle <strong>aigu</strong> (moins ouvert qu'un angle droit).`
+              : `${targetDeg}° est un angle <strong>obtus</strong> (plus ouvert qu'un angle droit).`),
+          `Au rapporteur, on aligne le 0 sur [OA) et on lit ${targetDeg}° pour placer M.`,
         ],
       };
     },
@@ -8172,6 +8298,58 @@ EXERCISES['6e-10'] = [
       };
     },
   },
+  {
+    title: 'Place M équidistant de A et B [figure]',
+    generate() {
+      const ax = exRand(1, 3);
+      const bx = exRand(7, 9);
+      const ay = exRand(2, 6);
+      const by = exRand(2, 6);
+      const startX = exRand(2, 8);
+      const startY = exRand(2, 7);
+      return {
+        inputType: 'figure',
+        question: `Place le point <code>M</code> pour qu'il soit à <strong>égale distance</strong> de A et B (c'est-à-dire <code>MA = MB</code>).`,
+        figure: {
+          width: 360, height: 280,
+          viewBox: { xMin: 0, xMax: 10, yMin: 0, yMax: 9 },
+          grid: true, gridStep: 1, snap: 0.5, flipY: true,
+          points: [
+            { name: 'A', x: ax, y: ay, label: 'A', color: 'fixed' },
+            { name: 'B', x: bx, y: by, label: 'B', color: 'fixed' },
+            { name: 'M', x: startX, y: startY, label: 'M', color: 'user', draggable: true },
+          ],
+          shapes: [
+            { type: 'segment', from: 'A', to: 'B', style: { color: 'fixed' } },
+            { type: 'segment', from: 'M', to: 'A', style: { color: 'guide' } },
+            { type: 'segment', from: 'M', to: 'B', style: { color: 'guide' } },
+          ],
+          info: (state) => {
+            const M = state.points.M, A = state.points.A, B = state.points.B;
+            const MA = Math.hypot(M.x - A.x, M.y - A.y);
+            const MB = Math.hypot(M.x - B.x, M.y - B.y);
+            return `MA = ${MA.toFixed(2)}   |   MB = ${MB.toFixed(2)}`;
+          },
+        },
+        validate: (state) => {
+          const M = state.points.M, A = state.points.A, B = state.points.B;
+          if (geom.equidistants(M, A, B, 0.4)) return { ok: true };
+          const MA = Math.hypot(M.x - A.x, M.y - A.y);
+          const MB = Math.hypot(M.x - B.x, M.y - B.y);
+          if (MA > MB) {
+            return { ok: false, hint: `MA = ${MA.toFixed(2)} > MB = ${MB.toFixed(2)}. Rapproche M de A.` };
+          }
+          return { ok: false, hint: `MB = ${MB.toFixed(2)} > MA = ${MA.toFixed(2)}. Rapproche M de B.` };
+        },
+        formatAnswer: () => 'Tout point de la médiatrice de [AB]',
+        steps: [
+          `On cherche M tel que <code>MA = MB</code>.`,
+          `L'ensemble des points équidistants de A et B est la <strong>médiatrice</strong> de [AB] : la droite perpendiculaire à (AB) qui passe par son milieu.`,
+          `Tu peux placer M n'importe où sur cette médiatrice : il y a une infinité de solutions.`,
+        ],
+      };
+    },
+  },
 ];
 
 EXERCISES['6e-11'] = [
@@ -8262,6 +8440,78 @@ EXERCISES['6e-11'] = [
         steps: [
           `La somme des angles d'un triangle vaut <code>180°</code>.`,
           `<code>180 − ${a} − ${b} = ${c}°</code>.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Construis un rectangle ABCD [figure]',
+    generate() {
+      const w = exPick([4, 5, 6]);
+      const h = exPick([2, 3]);
+      const ax = 1, ay = 1;
+      const bx = ax + w, by = ay;
+      const cTarget = { x: bx, y: ay + h };
+      const dTarget = { x: ax, y: ay + h };
+      // Positions initiales volontairement fausses
+      const cStart = { x: bx + 1, y: ay + 2 };
+      const dStart = { x: ax - 0.5, y: ay + 3 };
+      return {
+        inputType: 'figure',
+        question: `Place les points <code>C</code> et <code>D</code> pour que <code>ABCD</code> soit un <strong>rectangle</strong> de longueur <code>${w}</code> et largeur <code>${h}</code>.`,
+        figure: {
+          width: 360, height: 280,
+          viewBox: { xMin: 0, xMax: 10, yMin: 0, yMax: 8 },
+          grid: true, gridStep: 1, snap: 0.5, flipY: true,
+          points: [
+            { name: 'A', x: ax, y: ay, label: 'A', color: 'fixed' },
+            { name: 'B', x: bx, y: by, label: 'B', color: 'fixed' },
+            { name: 'C', x: cStart.x, y: cStart.y, label: 'C', color: 'user', draggable: true },
+            { name: 'D', x: dStart.x, y: dStart.y, label: 'D', color: 'user', draggable: true },
+          ],
+          shapes: [
+            { type: 'polygon', points: ['A', 'B', 'C', 'D'], style: { color: 'user' } },
+          ],
+          info: (state) => {
+            const { A, B, C, D } = state.points;
+            const AB = Math.hypot(B.x - A.x, B.y - A.y);
+            const BC = Math.hypot(C.x - B.x, C.y - B.y);
+            const CD = Math.hypot(D.x - C.x, D.y - C.y);
+            const DA = Math.hypot(A.x - D.x, A.y - D.y);
+            return `AB=${AB.toFixed(1)}  BC=${BC.toFixed(1)}  CD=${CD.toFixed(1)}  DA=${DA.toFixed(1)}`;
+          },
+        },
+        target: { C: cTarget, D: dTarget },
+        validate: (state) => {
+          const { A, B, C, D } = state.points;
+          const okPerpB = geom.perpendiculaires(A, B, B, C, 4);
+          const okPerpC = geom.perpendiculaires(B, C, C, D, 4);
+          const okBC = geom.longueurEgale(B, C, h, 0.4);
+          const okDA = geom.longueurEgale(D, A, h, 0.4);
+          const okCD = geom.longueurEgale(C, D, w, 0.4);
+          if (okPerpB && okPerpC && okBC && okDA && okCD) return { ok: true };
+          if (!okBC) {
+            const bc = Math.hypot(C.x - B.x, C.y - B.y);
+            return { ok: false, hint: `BC = ${bc.toFixed(2)}, il faut ${h}.` };
+          }
+          if (!okPerpB) {
+            return { ok: false, hint: 'L\'angle en B n\'est pas droit (90°).' };
+          }
+          if (!okCD) {
+            const cd = Math.hypot(D.x - C.x, D.y - C.y);
+            return { ok: false, hint: `CD = ${cd.toFixed(2)}, il faut ${w}.` };
+          }
+          if (!okDA) {
+            const da = Math.hypot(A.x - D.x, A.y - D.y);
+            return { ok: false, hint: `DA = ${da.toFixed(2)}, il faut ${h}.` };
+          }
+          return { ok: false, hint: 'Vérifie que tous les angles sont droits.' };
+        },
+        steps: [
+          `Un rectangle a <strong>4 angles droits</strong> et ses côtés opposés sont égaux.`,
+          `<code>AB</code> mesure ${w}, donc <code>CD</code> aussi.`,
+          `<code>BC</code> et <code>DA</code> mesurent la largeur ${h}.`,
+          `Donc <code>C(${cTarget.x} ; ${cTarget.y})</code> et <code>D(${dTarget.x} ; ${dTarget.y})</code>.`,
         ],
       };
     },
@@ -8361,6 +8611,56 @@ EXERCISES['6e-12'] = [
           c.axe
             ? `On peut plier la lettre ${c.lettre} verticalement et les deux moitiés se superposent : oui, elle a un axe vertical.`
             : `Si on plie la lettre ${c.lettre} verticalement, les deux moitiés ne se superposent pas : pas d'axe vertical.`,
+        ],
+      };
+    },
+  },
+  {
+    title: 'Place le symétrique d\'un point [figure]',
+    generate() {
+      const axisX = 5;
+      const xa = exRand(1, 4);
+      const ya = exRand(2, 7);
+      const target = { x: 2 * axisX - xa, y: ya };
+      const mStart = { x: xa + exRand(1, 3), y: ya + exRand(-1, 1) };
+      return {
+        inputType: 'figure',
+        question: `Place le point <code>M</code> pour qu'il soit le <strong>symétrique</strong> de <code>A</code> par rapport à la droite (d).`,
+        figure: {
+          width: 360, height: 280,
+          viewBox: { xMin: 0, xMax: 10, yMin: 0, yMax: 9 },
+          grid: true, gridStep: 1, snap: 0.5, flipY: true,
+          points: [
+            { name: 'A', x: xa, y: ya, label: 'A', color: 'fixed' },
+            { name: 'P1', x: axisX, y: 0.5, hidden: true },
+            { name: 'P2', x: axisX, y: 8.5, hidden: true },
+            { name: 'M', x: mStart.x, y: mStart.y, label: 'M', color: 'user', draggable: true },
+          ],
+          shapes: [
+            { type: 'line', from: 'P1', to: 'P2', style: { color: 'fixed' } },
+          ],
+          info: (state) => {
+            const M = state.points.M;
+            return `M(${(+M.x.toFixed(1))} ; ${(+M.y.toFixed(1))})`;
+          },
+        },
+        target: { M: target },
+        validate: (state) => {
+          const M = state.points.M;
+          const ok = geom.symetriqueAxial(M, { x: xa, y: ya }, { x: axisX, y: 0 }, { x: axisX, y: 1 }, 0.4);
+          if (ok) return { ok: true };
+          if (Math.abs(M.x - xa) < 0.4 && Math.abs(M.y - ya) < 0.4) {
+            return { ok: false, hint: 'M doit être de l\'autre côté de la droite (d), pas confondu avec A.' };
+          }
+          if (Math.abs(M.y - ya) > 0.4) {
+            return { ok: false, hint: 'M doit être à la même hauteur que A (l\'axe est vertical).' };
+          }
+          return { ok: false, hint: 'M doit être à la même distance de (d) que A.' };
+        },
+        steps: [
+          `Le symétrique de A par rapport à (d) est le point M tel que (d) est la médiatrice de [AM].`,
+          `M est à la <strong>même distance</strong> de (d) que A, mais <strong>de l'autre côté</strong>.`,
+          `A est en (${xa} ; ${ya}), donc M est en (${target.x} ; ${target.y}).`,
         ],
       };
     },
