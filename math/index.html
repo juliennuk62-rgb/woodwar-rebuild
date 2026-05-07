@@ -1547,7 +1547,6 @@ function renderCity() {
     const sc = state.concepts[c.id];
     const unlocked = isUnlocked(c.id);
     const tierData = TIERS[sc.tier];
-    const next = TIERS[sc.tier + 1];
 
     const card = el('div', { class: 'building' + (unlocked ? '' : ' locked'), 'data-id': c.id });
     card.appendChild(el('div', { class: 'building-icon' }, c.icon));
