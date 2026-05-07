@@ -939,6 +939,128 @@ function chaptersAnalyse() {
         ${lc.warn("Garder le bon ordre", `<p>Quand on multiplie deux DL d'ordre <code>n</code>, on conserve uniquement les termes jusqu'à <code>xⁿ</code>. Tout terme d'ordre supérieur est inclus dans le <code>o(xⁿ)</code>.</p>`)}
       `,
     },
+
+    {
+      title: "Théorèmes du calcul différentiel",
+      category: "Analyse",
+      content: `
+        <h2>1. Théorème de Rolle</h2>
+        ${lc.prop("Énoncé", `<p>Soit <code>f : [a, b] → ℝ</code> continue sur <code>[a, b]</code>, dérivable sur <code>]a, b[</code>, avec <code>f(a) = f(b)</code>. Alors il existe <code>c ∈ ]a, b[</code> tel que :</p>`)}
+        ${lc.formula("f'(c) = 0")}
+        ${lc.tip("Image", `<p>Si une fonction continue revient à son point de départ, sa dérivée s'annule au moins une fois entre les deux : il y a un « plateau » avec tangente horizontale.</p>`)}
+
+        <h2>2. Théorème des accroissements finis (TAF)</h2>
+        ${lc.prop("Énoncé", `<p>Soit <code>f</code> continue sur <code>[a, b]</code>, dérivable sur <code>]a, b[</code>. Il existe <code>c ∈ ]a, b[</code> tel que :</p>`)}
+        ${lc.formula("f(b) − f(a) = f'(c) × (b − a)")}
+        ${lc.tip("Lien avec Rolle", `<p>Le TAF est une généralisation de Rolle. Géométriquement : la pente moyenne entre <code>(a, f(a))</code> et <code>(b, f(b))</code> est atteinte par la tangente en au moins un point intermédiaire.</p>`)}
+        ${lc.example("Conséquences pratiques", `<p>Si <code>|f'(x)| ≤ M</code> sur <code>[a, b]</code>, alors <code>|f(b) − f(a)| ≤ M × (b − a)</code>. C'est l'<strong>inégalité des accroissements finis</strong>, très utile pour majorer.</p>`)}
+
+        <h2>3. Formule de Taylor-Lagrange</h2>
+        ${lc.prop("Énoncé", `<p>Soit <code>f</code> de classe <code>C^{n+1}</code> sur <code>[a, x]</code>. Il existe <code>c ∈ ]a, x[</code> tel que :</p>`)}
+        ${lc.formula("f(x) = f(a) + f'(a)(x−a) + … + f⁽ⁿ⁾(a)·(x−a)ⁿ/n! + f⁽ⁿ⁺¹⁾(c)·(x−a)ⁿ⁺¹/(n+1)!")}
+        <p>Le dernier terme est le <strong>reste</strong> sous forme de Lagrange. Il permet de <em>borner</em> l'erreur d'approximation.</p>
+        ${lc.example("Application : approximation de e", `<p>Avec <code>f(x) = e^x</code>, <code>a = 0</code>, à l'ordre <code>n</code> : <code>e^x ≈ 1 + x + x²/2! + … + xⁿ/n!</code>. Le reste <code>e^c × x^{n+1}/(n+1)!</code> peut être borné.</p>
+          <p>Pour <code>x = 1</code> et <code>n = 4</code> : <code>e ≈ 1 + 1 + 1/2 + 1/6 + 1/24 = 65/24 ≈ 2,708</code>. L'erreur est bornée par <code>e/120 ≈ 0,023</code> ✓.</p>`)}
+
+        <h2>4. Comparaison Taylor-Young vs Taylor-Lagrange</h2>
+        ${lc.prop("Différence essentielle", `<ul>
+          <li><strong>Taylor-Young</strong> : reste en <code>o(xⁿ)</code> (qualitatif, dit que c'est petit).</li>
+          <li><strong>Taylor-Lagrange</strong> : reste explicite avec <code>f⁽ⁿ⁺¹⁾(c)</code> (quantitatif, donne une borne).</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Intégrales généralisées",
+      category: "Analyse",
+      content: `
+        <h2>1. Définition</h2>
+        ${lc.def("Intégrale impropre", `<p>Une intégrale est <strong>impropre</strong> (ou généralisée) si :</p>
+          <ul><li>une borne est <strong>infinie</strong> (par exemple <code>∫_a^{+∞}</code>),</li>
+          <li>la fonction n'est <strong>pas définie</strong> en l'une des bornes (par exemple <code>∫_0^1 1/√x dx</code>).</li></ul>
+          <p>On la définit comme une <strong>limite</strong> :</p>`)}
+        ${lc.formula("∫_a^{+∞} f(x) dx = lim_{X → +∞} ∫_a^X f(x) dx")}
+
+        <h2>2. Convergence / divergence</h2>
+        ${lc.def("Convergence", `<p>L'intégrale impropre <strong>converge</strong> si la limite existe et est finie. Sinon elle <strong>diverge</strong>.</p>`)}
+        ${lc.example("Calculer ∫₁^{+∞} 1/x² dx", `<ol>
+          <li>Pour <code>X > 1</code> : <code>∫_1^X 1/x² dx = [−1/x]_1^X = 1 − 1/X</code>.</li>
+          <li>Limite : <code>lim_{X → +∞} (1 − 1/X) = 1</code>.</li>
+          <li>L'intégrale converge et vaut <strong>1</strong>.</li>
+        </ol>`)}
+        ${lc.example("Diverge : ∫₁^{+∞} 1/x dx", `<ol>
+          <li><code>∫_1^X 1/x dx = ln(X) − ln(1) = ln(X)</code>.</li>
+          <li><code>lim ln(X) = +∞</code>.</li>
+          <li>L'intégrale <strong>diverge</strong>.</li>
+        </ol>`)}
+
+        <h2>3. Critère de Riemann</h2>
+        ${lc.formula("∫_1^{+∞} 1/x^α dx converge ⇔ α > 1")}
+        ${lc.formula("∫_0^1 1/x^α dx converge ⇔ α < 1")}
+        ${lc.tip("Symétrie", `<p>Les deux types d'intégrales impropres ont des <strong>conditions opposées</strong> : à l'infini on veut une décroissance assez rapide (α > 1), au voisinage de 0 on veut une singularité pas trop forte (α < 1).</p>`)}
+
+        <h2>4. Comparaison</h2>
+        ${lc.prop("Comparaison (cas positif)", `<p>Si <code>0 ≤ f ≤ g</code> au voisinage de la singularité :</p>
+          <ul><li>Si <code>∫ g</code> converge, alors <code>∫ f</code> converge.</li>
+          <li>Si <code>∫ f</code> diverge, alors <code>∫ g</code> diverge.</li></ul>`)}
+        ${lc.prop("Équivalence", `<p>Si <code>f ~ g</code> au voisinage de la singularité (positives), <code>∫ f</code> et <code>∫ g</code> sont de même nature.</p>`)}
+
+        <h2>5. Convergence absolue</h2>
+        ${lc.def("Convergence absolue", `<p>L'intégrale <code>∫ f</code> est <strong>absolument convergente</strong> si <code>∫ |f|</code> converge. La convergence absolue implique la convergence.</p>`)}
+
+        <h2>6. Lien avec les séries</h2>
+        ${lc.prop("Critère de l'intégrale", `<p>Si <code>f</code> est positive et décroissante sur <code>[1, +∞[</code>, la série <code>Σ f(n)</code> et l'intégrale <code>∫_1^{+∞} f(x) dx</code> sont de <strong>même nature</strong>.</p>`)}
+        ${lc.example("Justifier la série de Riemann", `<p><code>Σ 1/n^α</code> converge ⇔ <code>∫_1^{+∞} 1/x^α dx</code> converge ⇔ <code>α > 1</code>. Cohérent avec le résultat ci-dessus.</p>`)}
+      `,
+    },
+
+    {
+      title: "Équations différentielles linéaires d'ordre 2",
+      category: "Analyse",
+      content: `
+        <h2>1. Forme générale</h2>
+        ${lc.def("EDL2 à coefficients constants", `<p>Une <strong>équation différentielle linéaire d'ordre 2 à coefficients constants</strong> s'écrit :</p>`)}
+        ${lc.formula("a y'' + b y' + c y = f(x) &nbsp;&nbsp; (a ≠ 0)")}
+        <p>Si <code>f(x) = 0</code>, on parle d'équation <strong>homogène</strong>.</p>
+
+        <h2>2. Équation caractéristique</h2>
+        ${lc.def("Équation caractéristique", `<p>À l'EDL homogène <code>ay'' + by' + cy = 0</code>, on associe :</p>`)}
+        ${lc.formula("a r² + b r + c = 0")}
+        <p>C'est une équation polynomiale du 2nd degré. Son discriminant <code>Δ = b² − 4ac</code> détermine la forme des solutions.</p>
+
+        <h2>3. Solutions de l'équation homogène selon Δ</h2>
+        ${lc.prop("Cas Δ > 0", `<p>Deux racines réelles distinctes <code>r₁</code> et <code>r₂</code>. Solutions :</p>`)}
+        ${lc.formula("y(x) = A × e^{r₁ x} + B × e^{r₂ x}")}
+        ${lc.prop("Cas Δ = 0", `<p>Une racine double <code>r₀</code>. Solutions :</p>`)}
+        ${lc.formula("y(x) = (A + B × x) × e^{r₀ x}")}
+        ${lc.prop("Cas Δ < 0", `<p>Deux racines complexes conjuguées <code>r = α ± iβ</code>. Solutions réelles :</p>`)}
+        ${lc.formula("y(x) = e^{αx} × (A × cos(βx) + B × sin(βx))")}
+
+        <h2>4. Exemples</h2>
+        ${lc.example("Résoudre y'' − 5y' + 6y = 0", `<ol>
+          <li>Caractéristique : <code>r² − 5r + 6 = 0</code>. Δ = 25 − 24 = 1.</li>
+          <li>Racines : <code>r = (5 ± 1)/2 = 2 ou 3</code>.</li>
+          <li>Solutions : <code>y(x) = A × e^{2x} + B × e^{3x}</code>.</li>
+        </ol>`)}
+        ${lc.example("Résoudre y'' + 4y = 0", `<ol>
+          <li>Caractéristique : <code>r² + 4 = 0</code>. Racines : <code>r = ±2i</code>.</li>
+          <li>Solutions : <code>y(x) = A cos(2x) + B sin(2x)</code> (oscillations).</li>
+        </ol>`)}
+
+        <h2>5. Conditions initiales</h2>
+        ${lc.prop("Détermination unique", `<p>Pour déterminer les constantes <code>A</code> et <code>B</code>, il faut <strong>deux conditions</strong> (souvent <code>y(0)</code> et <code>y'(0)</code>).</p>`)}
+
+        <h2>6. Solution particulière (équation avec second membre)</h2>
+        ${lc.prop("Méthode", `<p>Pour <code>ay'' + by' + cy = f(x)</code> avec <code>f ≠ 0</code> :</p>
+          <ol><li>Résoudre l'homogène associée → solution générale <code>y_h</code>.</li>
+          <li>Trouver une solution particulière <code>y_p</code> (souvent par essai d'une forme similaire à <code>f</code>).</li>
+          <li>Solution générale = <code>y_h + y_p</code>.</li></ol>`)}
+
+        <h2>7. Modélisations classiques</h2>
+        ${lc.example("Oscillateur harmonique", `<p><code>m × y'' + k × y = 0</code> donne des oscillations sinusoïdales de pulsation <code>ω = √(k/m)</code>.</p>`)}
+        ${lc.example("Oscillateur amorti", `<p><code>m y'' + γ y' + k y = 0</code>. Selon <code>Δ</code> on a un mouvement apériodique (Δ > 0), critique (Δ = 0) ou oscillant amorti (Δ < 0).</p>`)}
+      `,
+    },
   ];
 }
 
@@ -1244,6 +1366,47 @@ function chaptersAlgebre() {
         ${lc.tip("Application", `<p>Le projeté orthogonal est l'élément de <code>F</code> le plus proche de <code>u</code> au sens de la distance : <code>||u − p|| ≤ ||u − w||</code> pour tout <code>w ∈ F</code>. C'est la base de la <strong>méthode des moindres carrés</strong>.</p>`)}
       `,
     },
+
+    {
+      title: "Changement de base et théorème spectral",
+      category: "Algèbre linéaire",
+      content: `
+        <h2>1. Matrice de passage</h2>
+        ${lc.def("Matrice de passage", `<p>Soit <code>B = (e₁, …, eₙ)</code> et <code>B' = (e'₁, …, e'ₙ)</code> deux bases d'un même espace vectoriel <code>E</code>. La <strong>matrice de passage</strong> de <code>B</code> à <code>B'</code>, notée <code>P_{B → B'}</code>, est la matrice dont les colonnes sont les coordonnées des vecteurs de <code>B'</code> exprimés dans <code>B</code>.</p>`)}
+        ${lc.prop("Propriété", `<p><code>P_{B → B'}</code> est inversible, et <code>(P_{B → B'})⁻¹ = P_{B' → B}</code>.</p>`)}
+
+        <h2>2. Formule de changement de coordonnées</h2>
+        ${lc.formula("Si X est le vecteur colonne des coordonnées dans B, et X' celui dans B' :<br>X = P × X' &nbsp;&nbsp; (avec P = P_{B → B'})")}
+
+        <h2>3. Changement de base pour une matrice</h2>
+        ${lc.prop("Formule fondamentale", `<p>Si <code>f</code> est un endomorphisme de matrice <code>A</code> dans <code>B</code> et <code>A'</code> dans <code>B'</code> :</p>`)}
+        ${lc.formula("A' = P⁻¹ × A × P &nbsp;&nbsp; (P = matrice de passage B → B')")}
+        <p>Les matrices <code>A</code> et <code>A'</code> sont dites <strong>semblables</strong>.</p>
+
+        <h2>4. Multiplicité algébrique vs géométrique</h2>
+        ${lc.def("Multiplicités", `<ul>
+          <li><strong>Multiplicité algébrique</strong> de <code>λ</code> : ordre de <code>λ</code> comme racine du polynôme caractéristique <code>P_A</code>.</li>
+          <li><strong>Multiplicité géométrique</strong> de <code>λ</code> : dimension du sous-espace propre <code>E_λ = ker(A − λI)</code>.</li>
+        </ul>`)}
+        ${lc.prop("Inégalité fondamentale", `<p>Pour toute valeur propre <code>λ</code> :</p>`)}
+        ${lc.formula("1 ≤ mult_géo(λ) ≤ mult_alg(λ)")}
+        ${lc.prop("Critère de diagonalisation", `<p>Une matrice est diagonalisable si et seulement si pour chaque valeur propre, <strong>mult_géo = mult_alg</strong>.</p>`)}
+
+        <h2>5. Théorème de Cayley-Hamilton</h2>
+        ${lc.prop("Énoncé", `<p>Toute matrice carrée <code>A</code> annule son polynôme caractéristique :</p>`)}
+        ${lc.formula("P_A(A) = 0")}
+        ${lc.tip("Conséquence", `<p>Permet d'exprimer <code>A^n</code> en fonction de puissances inférieures, ou de calculer <code>A⁻¹</code> sans inverser de matrice.</p>`)}
+
+        <h2>6. Théorème spectral</h2>
+        ${lc.prop("Énoncé (cas réel)", `<p>Toute matrice <strong>symétrique réelle</strong> est <strong>diagonalisable dans une base orthonormée</strong>. Plus précisément, il existe une matrice orthogonale <code>P</code> (avec <code>P^T = P⁻¹</code>) telle que :</p>`)}
+        ${lc.formula("P^T × A × P = D &nbsp;&nbsp; (D diagonale)")}
+        ${lc.tip("Conséquence", `<p>Les valeurs propres d'une matrice symétrique réelle sont toujours <strong>réelles</strong>, et il existe une base orthonormée de vecteurs propres.</p>`)}
+        ${lc.example("Application en physique", `<p>Le tenseur d'inertie d'un solide est symétrique. Le théorème spectral dit qu'il existe trois axes principaux d'inertie deux à deux orthogonaux.</p>`)}
+
+        <h2>7. Formes quadratiques (notion)</h2>
+        ${lc.def("Forme quadratique", `<p>Une <strong>forme quadratique</strong> sur ℝⁿ est une application <code>q(x) = x^T × A × x</code> où <code>A</code> est une matrice symétrique. Sa <strong>signature</strong> (nombre de valeurs propres positives, négatives, nulles) caractérise sa nature géométrique.</p>`)}
+      `,
+    },
   ];
 }
 
@@ -1492,6 +1655,55 @@ function chaptersProbasPostBac() {
 
         <h2>8. Précautions d'interprétation</h2>
         ${lc.warn("Significatif ≠ important", `<p>Un test significatif (<code>p &lt; α</code>) <strong>ne dit pas</strong> que l'effet est grand, juste qu'il est non nul. Toujours regarder l'<strong>amplitude</strong> de l'effet, pas seulement la p-valeur.</p>`)}
+      `,
+    },
+
+    {
+      title: "Estimation et maximum de vraisemblance",
+      category: "Statistiques",
+      content: `
+        <h2>1. Notion d'estimateur</h2>
+        ${lc.def("Estimateur", `<p>Un <strong>estimateur</strong> d'un paramètre <code>θ</code> est une fonction des observations <code>(X₁, …, Xₙ)</code> dont la valeur sert à approcher <code>θ</code>. On le note souvent <code>θ̂_n</code>.</p>
+          <p>Exemple : la moyenne empirique <code>X̄_n = (X₁ + … + Xₙ)/n</code> est un estimateur de l'espérance <code>μ</code>.</p>`)}
+
+        <h2>2. Biais</h2>
+        ${lc.def("Biais", `<p>Le <strong>biais</strong> d'un estimateur <code>θ̂</code> est :</p>`)}
+        ${lc.formula("biais(θ̂) = E(θ̂) − θ")}
+        <p>Un estimateur est dit <strong>sans biais</strong> si son espérance est exactement <code>θ</code>.</p>
+        ${lc.example("Moyenne empirique", `<p><code>E(X̄_n) = μ</code>, donc <code>X̄_n</code> est <strong>sans biais</strong>.</p>`)}
+
+        <h2>3. Convergence</h2>
+        ${lc.def("Estimateur convergent", `<p>Un estimateur est <strong>convergent</strong> si <code>θ̂_n → θ</code> en probabilité quand <code>n → +∞</code>.</p>`)}
+        ${lc.tip("Conséquence de la LGN", `<p>La moyenne empirique <code>X̄_n</code> converge vers <code>μ</code> par la loi des grands nombres : c'est un estimateur convergent.</p>`)}
+
+        <h2>4. Erreur quadratique moyenne (MSE)</h2>
+        ${lc.def("MSE", `<p>L'<strong>erreur quadratique moyenne</strong> de <code>θ̂</code> est :</p>`)}
+        ${lc.formula("MSE(θ̂) = E((θ̂ − θ)²) = V(θ̂) + biais(θ̂)²")}
+        <p>Plus la MSE est petite, plus l'estimateur est précis. La décomposition montre qu'il faut équilibrer biais et variance.</p>
+
+        <h2>5. Variance empirique</h2>
+        ${lc.formula("S²_n = (1/n) × Σ (Xᵢ − X̄_n)²")}
+        ${lc.warn("Biais", `<p>Cet estimateur est <strong>biaisé</strong> : <code>E(S²_n) = ((n−1)/n) × σ²</code>. On préfère souvent l'estimateur corrigé :</p>`)}
+        ${lc.formula("S'²_n = (1/(n−1)) × Σ (Xᵢ − X̄_n)²")}
+        <p><code>S'²_n</code> est sans biais (correction de Bessel).</p>
+
+        <h2>6. Maximum de vraisemblance</h2>
+        ${lc.def("Vraisemblance", `<p>Soit un modèle paramétrique avec densité <code>f(x ; θ)</code>. La <strong>vraisemblance</strong> de l'échantillon <code>(x₁, …, xₙ)</code> est :</p>`)}
+        ${lc.formula("L(θ) = f(x₁ ; θ) × f(x₂ ; θ) × … × f(xₙ ; θ)")}
+        ${lc.def("Estimateur du maximum de vraisemblance", `<p>L'<strong>EMV</strong> est la valeur de <code>θ</code> qui maximise <code>L(θ)</code> (ou de manière équivalente <code>ln L(θ)</code>, plus pratique car la somme remplace le produit).</p>`)}
+
+        <h2>7. Exemple : EMV pour la loi normale</h2>
+        ${lc.example("Estimer μ et σ² d'une loi N(μ, σ²)", `<p>La log-vraisemblance s'écrit :</p>
+          <p><code>ln L(μ, σ²) = −n/2 × ln(2π) − n/2 × ln(σ²) − (1/(2σ²)) × Σ (xᵢ − μ)²</code></p>
+          <p>En annulant les dérivées partielles, on obtient :</p>
+          <ul><li><code>μ̂_{MV} = X̄_n</code> (moyenne empirique).</li>
+          <li><code>σ̂²_{MV} = (1/n) × Σ (xᵢ − X̄_n)² = S²_n</code> (variance empirique non corrigée).</li></ul>`)}
+
+        <h2>8. Intervalle de confiance rigoureux</h2>
+        ${lc.def("IC", `<p>Un <strong>intervalle de confiance</strong> au niveau <code>1 − α</code> pour <code>θ</code> est un intervalle aléatoire <code>[L_n, U_n]</code> tel que <code>P(L_n ≤ θ ≤ U_n) = 1 − α</code>.</p>`)}
+        ${lc.example("IC pour μ (σ² connu, échantillon gaussien)", `<p>Avec <code>X̄_n ~ N(μ, σ²/n)</code>, on a :</p>
+          <p><code>IC_{1−α}(μ) = [X̄_n − z_{α/2} × σ/√n ; X̄_n + z_{α/2} × σ/√n]</code></p>
+          <p>où <code>z_{α/2}</code> est le quantile de la loi normale centrée réduite (1,96 pour α = 5 %).</p>`)}
       `,
     },
   ];
