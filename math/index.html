@@ -1548,6 +1548,7 @@ function chaptersAlgebre() {
         ${lc.def("Matrice diagonalisable", `<p>Une matrice <code>A</code> est <strong>diagonalisable</strong> s'il existe une base de vecteurs propres. Dans ce cas :</p>`)}
         ${lc.formula("A = P × D × P⁻¹")}
         <p>où <code>D</code> est diagonale (valeurs propres) et <code>P</code> a pour colonnes les vecteurs propres.</p>
+        ${lc.warn("Sens de la formule : P·D·P⁻¹, pas P⁻¹·D·P", `<p>L'erreur classique est d'écrire <code>A = P⁻¹DP</code>. Souvenez-vous : si <code>P</code> a pour colonnes les vecteurs propres, alors <code>P</code> est la matrice qui envoie la <em>base canonique</em> sur la <em>base de vecteurs propres</em>. Donc <code>A·P = P·D</code>, soit <code>A = P·D·P⁻¹</code>.</p>`)}
         ${lc.prop("Critère", `<p>Une matrice <code>n × n</code> est diagonalisable si la somme des dimensions des sous-espaces propres égale <code>n</code>. Cas suffisant : si elle a <code>n</code> valeurs propres distinctes.</p>`)}
 
         <h2>5. Application : puissances de matrice</h2>
@@ -2219,6 +2220,7 @@ function chaptersTle() {
         <h2>2. Existence et unicité</h2>
         ${lc.prop("Théorème", `<p>Toute fonction continue sur un intervalle admet une infinité de primitives. Si <code>F</code> et <code>G</code> sont deux primitives de <code>f</code>, alors <code>F − G</code> est constante.</p>`)}
         ${lc.tip("Bref", `<p>Les primitives d'une fonction diffèrent d'une <strong>constante</strong>. On parle souvent de « la » primitive en sous-entendant « à constante près ».</p>`)}
+        ${lc.warn("L'hypothèse intervalle est cruciale", `<p>La constante d'intégration n'est unique que sur un <strong>intervalle</strong>. Sur un domaine en plusieurs morceaux (par exemple <code>ℝ*</code> = <code>]−∞, 0[ ∪ ]0, +∞[</code>), on peut avoir une constante différente sur chaque morceau. Pour <code>1/x</code> par exemple, la primitive sur <code>]0, +∞[</code> est <code>ln(x) + C₁</code>, et sur <code>]−∞, 0[</code> c'est <code>ln(−x) + C₂</code> avec <code>C₁</code> et <code>C₂</code> indépendantes.</p>`)}
 
         <h2>3. Primitives usuelles</h2>
         ${lc.formula("Primitives de a (constante) : F(x) = ax + C")}
@@ -2264,8 +2266,9 @@ function chaptersTle() {
         ${lc.tip("Lecture", `<p>« <code>∫</code> » est un « S » allongé pour « somme ». L'intégrale est intuitivement une somme d'aires de rectangles très fins.</p>`)}
 
         <h2>2. Lien fondamental avec les primitives</h2>
-        ${lc.prop("Théorème fondamental de l'analyse", `<p>Si <code>F</code> est une primitive de <code>f</code> sur <code>[a ; b]</code> :</p>`)}
+        ${lc.prop("Théorème fondamental de l'analyse", `<p>Si <code>f</code> est <strong>continue</strong> sur <code>[a ; b]</code> et <code>F</code> est une primitive de <code>f</code> :</p>`)}
         ${lc.formula("∫_a^b f(x) dx = F(b) − F(a) = [F(x)]_a^b")}
+        <p class="hint" style="font-size:13px;color:var(--text-2);font-style:italic">L'hypothèse de continuité de <code>f</code> est nécessaire pour garantir l'existence de l'intégrale au sens de Riemann.</p>
         ${lc.example("Calcul d'aire", `<p>Calculer <code>∫_0^2 x² dx</code>.</p>
           <ol><li>Primitive de <code>x²</code> : <code>F(x) = x³/3</code>.</li>
           <li><code>F(2) − F(0) = 8/3 − 0 = 8/3</code>.</li>
@@ -3113,6 +3116,7 @@ function chapters1ere() {
         ${lc.def("Discriminant Δ", `<p>Le <strong>discriminant</strong> de <code>ax² + bx + c</code> est :</p>`)}
         ${lc.formula("Δ = b² − 4ac")}
         <p>Il détermine le nombre de racines de l'équation <code>ax² + bx + c = 0</code>.</p>
+        ${lc.warn("Erreur fréquente avec b négatif", `<p>Quand <code>b</code> est négatif, ne pas oublier que <code>b²</code> est toujours <strong>positif</strong>. Pour <code>x² − 5x + 6 = 0</code> : <code>b = −5</code>, <code>b² = (−5)² = 25</code> (et non <code>−25</code> !), donc <code>Δ = 25 − 24 = 1</code>.</p>`)}
 
         <h2>3. Racines selon le discriminant</h2>
         ${lc.prop("Trois cas", `<ul>
@@ -3299,6 +3303,8 @@ function chapters1ere() {
           <li><code>P_M(+) = 0,95</code>, <code>P_{M̄}(+) = 0,02</code>.</li>
           <li><code>P(+) = 0,01 × 0,95 + 0,99 × 0,02 = 0,0095 + 0,0198 = 0,0293</code>.</li>
           <li>Soit environ <strong>2,93 %</strong>.</li></ol>`)}
+        ${lc.warn("Confusion fréquente : P(A | B) vs P(B | A)", `<p>Suite à l'exemple ci-dessus, <strong>question piège</strong> : si je suis testé positif, ai-je 95 % de chance d'être malade ? <strong>Non !</strong> 95 % est <code>P(+ | M)</code>, pas <code>P(M | +)</code>.</p>
+          <p>Calcul correct (formule de Bayes) : <code>P(M | +) = P(+ | M) × P(M) / P(+) = (0,95 × 0,01) / 0,0293 ≈ 0,32</code>. Soit seulement <strong>32 %</strong> de chance d'être réellement malade en cas de test positif. C'est contre-intuitif mais c'est dû à la rareté de la maladie. Toujours bien distinguer le sens du conditionnement.</p>`)}
 
         <h2>5. Indépendance</h2>
         ${lc.def("Événements indépendants", `<p>Deux événements <code>A</code> et <code>B</code> sont <strong>indépendants</strong> si la réalisation de l'un n'influence pas la probabilité de l'autre :</p>`)}
@@ -3399,11 +3405,18 @@ function chapters1ere() {
           <li><code>= 10 × (1/36) × (125/216)</code></li>
           <li><code>= 1250 / 7776 ≈ 0,161</code> (environ 16,1 %).</li></ol>`)}
 
-        <h2>8. Symétrie des coefficients binomiaux</h2>
+        <h2>8. Représentation graphique</h2>
+        ${lc.tip("Diagramme en bâtons", `<p>On représente la loi binomiale par un <strong>diagramme en bâtons</strong> : en abscisse les valeurs <code>k = 0, 1, …, n</code> ; en ordonnée la hauteur <code>P(X = k)</code>.</p>
+          <ul><li>Pour <code>p = 0,5</code> : la loi est <strong>symétrique</strong> autour de <code>n/2</code>.</li>
+          <li>Pour <code>p &lt; 0,5</code> : la loi est dissymétrique vers la gauche (mode petit).</li>
+          <li>Pour <code>p &gt; 0,5</code> : dissymétrique vers la droite.</li></ul>
+          <p>Quand <code>n</code> est grand, la forme du diagramme s'approche d'une <strong>courbe en cloche</strong> centrée sur <code>np</code> (ce qui annonce le théorème de Moivre-Laplace, vu en Tle).</p>`)}
+
+        <h2>9. Symétrie des coefficients binomiaux</h2>
         ${lc.formula("C(n, k) = C(n, n − k)")}
         <p>Conséquence : <code>P(X = k) = P(X = n − k)</code> uniquement lorsque <code>p = 1/2</code> (loi symétrique). Pour <code>p ≠ 1/2</code>, la loi est dissymétrique.</p>
 
-        <h2>9. Échantillonnage binomial : intervalle de fluctuation</h2>
+        <h2>10. Échantillonnage binomial : intervalle de fluctuation</h2>
         ${lc.def("Idée", `<p>Lorsqu'on répète <code>n</code> fois une expérience de Bernoulli de paramètre <code>p</code> et qu'on observe la fréquence empirique <code>F = X/n</code> (proportion de succès), on s'attend à ce que <code>F</code> soit proche de <code>p</code> avec une certaine variabilité.</p>`)}
         ${lc.prop("Intervalle de fluctuation au seuil 95 % (programme 1ère)", `<p>Pour <code>n ≥ 25</code> et <code>0,2 ≤ p ≤ 0,8</code>, la fréquence <code>F</code> appartient à l'intervalle suivant avec une probabilité ≥ 95 % :</p>`)}
         ${lc.formula("[ p − 1,96 × √(p(1−p)/n) ; p + 1,96 × √(p(1−p)/n) ]")}
@@ -4555,7 +4568,7 @@ function chapters3e() {
         ${lc.example("Agrandissement d'un triangle", `<p>Un triangle a des côtés de 3, 4 et 5 cm. On lui applique une homothétie de rapport 2.</p>
           <ul><li>Côtés du triangle image : 6, 8 et 10 cm.</li>
           <li>Aire multipliée par <code>2² = 4</code>.</li></ul>`)}
-        ${lc.example("Réduction d'un photo", `<p>Une photo est réduite avec un rapport <code>k = 1/3</code>. Si elle mesurait 18 cm × 24 cm, la nouvelle photo mesure :</p>
+        ${lc.example("Réduction d'une photo", `<p>Une photo est réduite avec un rapport <code>k = 1/3</code>. Si elle mesurait 18 cm × 24 cm, la nouvelle photo mesure :</p>
           <p><code>18/3 = 6 cm</code> et <code>24/3 = 8 cm</code>. Aire divisée par <code>3² = 9</code>.</p>`)}
 
         <h2>6. Construire l'image</h2>
