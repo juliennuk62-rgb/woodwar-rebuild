@@ -2067,6 +2067,179 @@ function chaptersTle() {
         ${lc.example("Sondage à ±3 %", `<p>Pour une marge de 3 % (<code>m = 0,03</code>), il faut <code>n ≥ 1/0,0009 ≈ 1112</code> personnes.</p>`)}
       `,
     },
+
+    {
+      title: "Combinatoire et coefficients binomiaux",
+      category: "Probabilités",
+      content: `
+        <h2>1. Factorielle</h2>
+        ${lc.def("Factorielle de n", `<p>La <strong>factorielle</strong> de <code>n</code> (entier naturel), notée <code>n!</code>, est le produit de tous les entiers de 1 à n :</p>`)}
+        ${lc.formula("n! = n × (n−1) × (n−2) × … × 2 × 1")}
+        ${lc.example("Quelques factorielles", `<ul>
+          <li><code>0! = 1</code> (par convention)</li>
+          <li><code>1! = 1</code></li>
+          <li><code>2! = 2</code></li>
+          <li><code>3! = 6</code></li>
+          <li><code>5! = 120</code></li>
+          <li><code>10! = 3 628 800</code></li>
+        </ul>`)}
+
+        <h2>2. Permutations et arrangements</h2>
+        ${lc.prop("Permutations", `<p>Le nombre de façons d'<strong>ordonner</strong> <code>n</code> objets distincts est <code>n!</code>.</p>`)}
+        ${lc.example("Ordonner 5 livres", `<p>Nombre d'arrangements possibles : <code>5! = 120</code>.</p>`)}
+
+        <h2>3. Coefficient binomial</h2>
+        ${lc.def("Coefficient binomial C(n, k)", `<p>Le <strong>coefficient binomial</strong> <code>C(n, k)</code> compte le nombre de façons de <strong>choisir k objets parmi n</strong> (sans tenir compte de l'ordre).</p>`)}
+        ${lc.formula("C(n, k) = n! / (k! × (n−k)!)")}
+        ${lc.example("Calculs", `<ul>
+          <li><code>C(5, 2) = 5! / (2! × 3!) = 120 / 12 = 10</code></li>
+          <li><code>C(10, 3) = 10! / (3! × 7!) = 720/6 = 120</code></li>
+          <li><code>C(n, 0) = 1</code> ; <code>C(n, n) = 1</code></li>
+          <li><code>C(n, 1) = n</code></li>
+        </ul>`)}
+
+        <h2>4. Symétrie et triangle de Pascal</h2>
+        ${lc.formula("C(n, k) = C(n, n − k)")}
+        ${lc.formula("C(n, k) + C(n, k+1) = C(n+1, k+1)  (formule de Pascal)")}
+        ${lc.tip("Triangle de Pascal", `<pre>1
+1 1
+1 2 1
+1 3 3 1
+1 4 6 4 1
+1 5 10 10 5 1
+1 6 15 20 15 6 1</pre>
+          <p>Chaque coefficient est la somme des deux du dessus.</p>`)}
+
+        <h2>5. Formule du binôme de Newton</h2>
+        ${lc.prop("Énoncé", `<p>Pour tous réels <code>a, b</code> et entier <code>n ≥ 0</code> :</p>`)}
+        ${lc.formula("(a + b)ⁿ = Σ_{k=0}^{n} C(n, k) × a^{n−k} × b^k")}
+        ${lc.example("Développer (a + b)³", `<p>Avec <code>n = 3</code> : coefficients C(3,0), C(3,1), C(3,2), C(3,3) = 1, 3, 3, 1.</p>
+          <p><code>(a + b)³ = a³ + 3a²b + 3ab² + b³</code>.</p>`)}
+        ${lc.example("Développer (1 + x)⁵", `<p>Coefficients : 1, 5, 10, 10, 5, 1.</p>
+          <p><code>(1 + x)⁵ = 1 + 5x + 10x² + 10x³ + 5x⁴ + x⁵</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Équations différentielles linéaires",
+      category: "Analyse",
+      content: `
+        <h2>1. Vocabulaire</h2>
+        ${lc.def("Équation différentielle", `<p>Une <strong>équation différentielle</strong> est une équation reliant une fonction inconnue <code>y</code> et ses dérivées. <strong>Linéaire d'ordre 1</strong> : <code>y' = ay + b</code> ou <code>y' + a(x)y = b(x)</code>.</p>`)}
+
+        <h2>2. Cas y' = ay (a constante)</h2>
+        ${lc.prop("Solutions", `<p>Les solutions de <code>y' = ay</code> sont :</p>`)}
+        ${lc.formula("y(x) = C × e^{ax} &nbsp;&nbsp; (C ∈ ℝ)")}
+        ${lc.example("Application : croissance exponentielle", `<p>Une population vérifie <code>P'(t) = 0,05 × P(t)</code>. Solutions : <code>P(t) = C × e^{0,05 t}</code>. Avec <code>P(0) = 1000</code>, <code>C = 1000</code>, donc <code>P(t) = 1000 × e^{0,05 t}</code>.</p>`)}
+
+        <h2>3. Cas y' = ay + b (a, b constantes, a ≠ 0)</h2>
+        ${lc.prop("Solution générale", `<p>Solution générale = solution homogène + solution particulière constante :</p>`)}
+        ${lc.formula("y(x) = C × e^{ax} − b/a &nbsp;&nbsp; (C ∈ ℝ)")}
+        <p>La solution particulière constante <code>−b/a</code> s'obtient en posant <code>y' = 0</code>.</p>
+        ${lc.example("Résoudre y' = 2y − 6", `<ol>
+          <li>Solution particulière constante : <code>0 = 2y − 6</code> → <code>y = 3</code>.</li>
+          <li>Solution homogène : <code>y' = 2y</code> → <code>y = C × e^{2x}</code>.</li>
+          <li>Solution générale : <code>y(x) = C × e^{2x} + 3</code>.</li>
+        </ol>`)}
+
+        <h2>4. Problème de Cauchy</h2>
+        ${lc.def("Condition initiale", `<p>Une équation différentielle accompagnée d'une <strong>condition initiale</strong> <code>y(x₀) = y₀</code> a une <strong>unique</strong> solution.</p>`)}
+        ${lc.example("Avec condition initiale", `<p>Résoudre <code>y' = 2y − 6</code> avec <code>y(0) = 5</code>.</p>
+          <ol><li>Forme générale : <code>y(x) = C × e^{2x} + 3</code>.</li>
+          <li>Condition : <code>y(0) = C + 3 = 5</code>, donc <code>C = 2</code>.</li>
+          <li>Solution : <code>y(x) = 2 × e^{2x} + 3</code>.</li></ol>`)}
+
+        <h2>5. Modélisations classiques</h2>
+        ${lc.example("Refroidissement (loi de Newton)", `<p>Un objet de température <code>T(t)</code> dans un milieu à température <code>T_a</code> vérifie <code>T'(t) = −k(T − T_a)</code>, avec <code>k > 0</code>.</p>
+          <p>Solution : <code>T(t) = (T_0 − T_a) × e^{−kt} + T_a</code>. La température tend vers <code>T_a</code> exponentiellement.</p>`)}
+        ${lc.example("Décharge d'un condensateur", `<p><code>RC × U' + U = 0</code> donne <code>U(t) = U_0 × e^{−t/(RC)}</code>. Constante de temps <code>τ = RC</code>.</p>`)}
+      `,
+    },
+
+    {
+      title: "Convexité et dérivée seconde",
+      category: "Analyse",
+      content: `
+        <h2>1. Convexité, concavité</h2>
+        ${lc.def("Fonction convexe", `<p>Une fonction <code>f</code> est <strong>convexe</strong> sur un intervalle <code>I</code> si, pour tous <code>a, b ∈ I</code>, le segment qui relie les points <code>(a, f(a))</code> et <code>(b, f(b))</code> est <strong>au-dessus</strong> de la courbe entre ces deux points.</p>
+          <p>Image : la courbe « tient l'eau » comme un bol ouvert vers le haut.</p>`)}
+        ${lc.def("Fonction concave", `<p><code>f</code> est <strong>concave</strong> si le segment est en-dessous de la courbe. Image : un bol retourné, ouvert vers le bas.</p>`)}
+        ${lc.example("Exemples", `<ul>
+          <li><code>x²</code> est convexe sur ℝ.</li>
+          <li><code>√x</code> est concave sur <code>[0, +∞[</code>.</li>
+          <li><code>e^x</code> est convexe sur ℝ.</li>
+          <li><code>ln(x)</code> est concave sur <code>]0, +∞[</code>.</li>
+        </ul>`)}
+
+        <h2>2. Dérivée seconde</h2>
+        ${lc.def("Dérivée seconde", `<p>La <strong>dérivée seconde</strong> de <code>f</code>, notée <code>f''</code>, est la dérivée de <code>f'</code> :</p>`)}
+        ${lc.formula("f''(x) = (f')'(x)")}
+        ${lc.example("Calcul", `<p>Pour <code>f(x) = x³</code> : <code>f'(x) = 3x²</code> et <code>f''(x) = 6x</code>.</p>`)}
+
+        <h2>3. Lien convexité / dérivée seconde</h2>
+        ${lc.prop("Théorème", `<p>Soit <code>f</code> deux fois dérivable sur <code>I</code>.</p>
+          <ul><li><code>f'' ≥ 0</code> sur <code>I</code> ⇔ <code>f</code> est <strong>convexe</strong> sur <code>I</code>.</li>
+          <li><code>f'' ≤ 0</code> sur <code>I</code> ⇔ <code>f</code> est <strong>concave</strong> sur <code>I</code>.</li></ul>`)}
+        ${lc.example("Étudier la convexité de f(x) = x³ − 3x", `<ol>
+          <li><code>f'(x) = 3x² − 3</code>, <code>f''(x) = 6x</code>.</li>
+          <li><code>f'' < 0</code> sur <code>]−∞ ; 0[</code> : f concave.</li>
+          <li><code>f'' > 0</code> sur <code>]0 ; +∞[</code> : f convexe.</li>
+        </ol>`)}
+
+        <h2>4. Point d'inflexion</h2>
+        ${lc.def("Point d'inflexion", `<p>Un <strong>point d'inflexion</strong> est un point où la courbe <em>change de convexité</em> (passe de convexe à concave ou inversement). C'est aussi un point où la tangente <strong>traverse</strong> la courbe.</p>`)}
+        ${lc.prop("Caractérisation", `<p>Si <code>f''</code> s'annule en <code>a</code> en changeant de signe, alors <code>(a, f(a))</code> est un point d'inflexion.</p>`)}
+        ${lc.example("Avec f(x) = x³ − 3x", `<p><code>f''</code> s'annule en 0 en changeant de signe (négatif puis positif). Donc <code>(0, 0)</code> est un point d'inflexion.</p>`)}
+
+        <h2>5. Application à la position de la tangente</h2>
+        ${lc.prop("Conséquence", `<ul>
+          <li>Sur un intervalle où <code>f</code> est convexe, sa courbe est <strong>au-dessus</strong> de chacune de ses tangentes.</li>
+          <li>Sur un intervalle où <code>f</code> est concave, la courbe est <strong>en-dessous</strong> de ses tangentes.</li>
+        </ul>`)}
+      `,
+    },
+
+    {
+      title: "Sommes de variables aléatoires et concentration",
+      category: "Probabilités",
+      content: `
+        <h2>1. Espérance d'une somme</h2>
+        ${lc.prop("Linéarité", `<p>Pour deux variables aléatoires <code>X</code> et <code>Y</code> définies sur le même univers :</p>`)}
+        ${lc.formula("E(X + Y) = E(X) + E(Y)")}
+        ${lc.formula("E(aX + b) = a × E(X) + b")}
+        <p>La linéarité de l'espérance est <strong>toujours vraie</strong>, même sans indépendance.</p>
+
+        <h2>2. Variance d'une somme (cas indépendant)</h2>
+        ${lc.prop("Si X et Y indépendantes", `<p>La variance d'une somme de variables aléatoires <strong>indépendantes</strong> est la somme des variances :</p>`)}
+        ${lc.formula("V(X + Y) = V(X) + V(Y) &nbsp;(si X et Y indépendantes)")}
+        ${lc.formula("V(aX + b) = a² × V(X)")}
+        ${lc.warn("Attention", `<p>Sans indépendance, la formule générale est <code>V(X+Y) = V(X) + V(Y) + 2×Cov(X,Y)</code>. Sans le terme de covariance, l'égalité est fausse.</p>`)}
+
+        <h2>3. Schéma de Bernoulli répété</h2>
+        ${lc.prop("Binomiale = somme de Bernoulli", `<p>Si <code>X₁, …, Xₙ</code> sont des variables de Bernoulli <strong>indépendantes</strong> et <strong>de même loi</strong> de paramètre <code>p</code>, alors leur somme suit la loi binomiale :</p>`)}
+        ${lc.formula("S = X₁ + X₂ + … + Xₙ &nbsp;~&nbsp; ℬ(n, p)")}
+        ${lc.formula("E(S) = np &nbsp;&nbsp; V(S) = np(1 − p)")}
+        ${lc.tip("Démonstration intuitive", `<p>Chaque <code>Xᵢ</code> a espérance <code>p</code> et variance <code>p(1−p)</code>. Par linéarité : <code>E(S) = n × p</code>. Par indépendance : <code>V(S) = n × p(1−p)</code>.</p>`)}
+
+        <h2>4. Inégalité de Bienaymé-Tchebychev</h2>
+        ${lc.prop("Énoncé", `<p>Pour toute variable aléatoire <code>X</code> d'espérance <code>μ</code> et variance <code>σ²</code> finies, et tout <code>ε > 0</code> :</p>`)}
+        ${lc.formula("P(|X − μ| ≥ ε) ≤ σ² / ε²")}
+        <p>Cette inégalité <em>universelle</em> (vraie quelle que soit la loi de X) borne la probabilité d'écart par rapport à la moyenne.</p>
+        ${lc.example("Application", `<p><code>X</code> a espérance 50, variance 9 (donc σ = 3). Probabilité que <code>X</code> s'écarte de plus de 6 de sa moyenne ?</p>
+          <p><code>P(|X − 50| ≥ 6) ≤ 9 / 36 = 1/4 = 0,25</code>.</p>`)}
+
+        <h2>5. Loi des grands nombres pour la moyenne empirique</h2>
+        ${lc.prop("LGN faible", `<p>Soit <code>(Xₙ)</code> une suite de variables i.i.d. d'espérance <code>μ</code>. La moyenne empirique <code>M_n = (X₁ + … + Xₙ)/n</code> vérifie :</p>`)}
+        ${lc.formula("∀ ε > 0, &nbsp; P(|M_n − μ| ≥ ε) → 0 &nbsp; (n → +∞)")}
+        ${lc.tip("Conséquence pratique", `<p>Sur un grand nombre d'expériences, la moyenne observée se rapproche de l'espérance théorique. C'est le fondement de l'estimation par échantillon.</p>`)}
+
+        <h2>6. Concentration de la binomiale (corollaire)</h2>
+        ${lc.example("Application directe", `<p><code>X ~ ℬ(100, 0,5)</code>. Probabilité que <code>X/100</code> s'écarte de 0,5 de plus de 0,1 ?</p>
+          <ol><li><code>E(X/100) = 0,5</code>, <code>V(X/100) = (0,5 × 0,5)/100 = 0,0025</code>.</li>
+          <li>Tchebychev : <code>P(|X/100 − 0,5| ≥ 0,1) ≤ 0,0025 / 0,01 = 0,25</code>.</li>
+          <li>(Borne grossière mais sans calculer la binomiale exactement.)</li></ol>`)}
+      `,
+    },
   ];
 }
 
