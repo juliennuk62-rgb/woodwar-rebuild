@@ -9057,6 +9057,9 @@ function generateExercise(levelId, idx) {
 }
 
 function openExercise(levelId, idx) {
+  // Empêche un état incohérent si un DS était ouvert.
+  dsState.current = null;
+  dsState.status = 'idle';
   exState.current = generateExercise(levelId, idx);
   exState.selectedMcq = null;
   $('#ex-backdrop').classList.add('show');
@@ -9258,6 +9261,9 @@ function hasDS(levelId, idx) {
 function openDS(levelId, idx) {
   const list = EXERCISES[exKey(levelId, idx)];
   if (!list || list.length < DS_MIN_TEMPLATES) return;
+  // Empêche un état incohérent si un exercice libre était ouvert.
+  exState.current = null;
+  exState.selectedMcq = null;
   // Pioche DS_QUESTION_COUNT templates distincts (mélange + slice)
   const shuffled = [...list].sort(() => Math.random() - 0.5).slice(0, DS_QUESTION_COUNT);
   const questions = shuffled.map(tmpl => ({
@@ -9274,9 +9280,13 @@ function openDS(levelId, idx) {
 }
 
 function closeDS() {
+  // Si on ferme après une note enregistrée, on re-render le chapitre pour
+  // que le bloc « Meilleure note » sous le bouton DS se rafraîchisse.
+  const wasFinished = dsState.status === 'finished';
   dsState.current = null;
   dsState.status = 'idle';
   $('#ex-backdrop').classList.remove('show');
+  if (wasFinished) render();
 }
 
 function dsNextQuestion() {
